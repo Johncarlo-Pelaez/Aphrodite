@@ -1,0 +1,36 @@
+version: "3"
+services:
+  amicassa-nginx:
+    container_name: amicassa-main-nginx
+    build:
+      context: ./main-nginx
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 7070:80
+    depends_on:
+      - main-app
+      - pdfjs
+      - main-api
+  main-app:
+    container_name: amicassa-main-app
+    build:
+      context: ./main-app
+      dockerfile: Dockerfile
+    stdin_open: true
+    volumes:
+      - /usr/src/app/node_modules
+      - ./main-app:/usr/src/app
+  pdfjs:
+    container_name: amicassa-pdfjs
+    build:
+      context: ./pdfjs
+      dockerfile: Dockerfile
+  main-api:
+    container_name: amicassa-main-api
+    build:
+      context: ./main-api
+      dockerfile: Dockerfile
+    volumes:
+      - /usr/src/app/node_modules
+      - ./main-api:/usr/src/app

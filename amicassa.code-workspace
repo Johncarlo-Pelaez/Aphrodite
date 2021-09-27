@@ -1,0 +1,21 @@
+{
+  "folders": [
+    {
+      "path": "./main-api"
+    },
+    {
+      "path": "./main-app"
+    },
+    {
+      "path": "./main-nginx"
+    },
+    {
+      "path": "./pdfjs"
+    }
+  ],
+  "settings": {
+    "editor.rulers": [80],
+    "editor.tabSize": 2,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+}
