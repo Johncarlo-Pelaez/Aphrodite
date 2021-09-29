@@ -1,0 +1,11 @@
+.loginContainer {
+  height: 100vh;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loginForm {
+  min-width: 320px;
+}
