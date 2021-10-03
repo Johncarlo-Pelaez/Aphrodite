@@ -1,3 +1,9 @@
+### My ignores ###
+
+.env
+
+### End of My ignores ###
+
 # compiled output
 /dist
 /node_modules
