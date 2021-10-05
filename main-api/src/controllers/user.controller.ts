@@ -12,9 +12,9 @@ import {
   ApiOkResponse,
 } from '@nestjs/swagger';
 import { CreatedResponse, GetUserId } from 'src/core';
-import { CreateAdminUserDto } from 'src/dtos';
 import { Role, User } from 'src/entities';
 import { UserRepository } from 'src/repositories';
+import { CreateAdminUserDto } from './user.dto';
 
 @Controller('/users')
 export class UserController {

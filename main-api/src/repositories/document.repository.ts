@@ -1,14 +1,17 @@
 import { Document, DocumentHistory } from 'src/entities';
 import { EntityManager, EntityRepository } from 'typeorm';
-import { CreateDocumentParam } from './document.params';
+import { CreateDocumentParam, GetDocumentsParam } from './document.params';
 
 @EntityRepository()
 export class DocumentRepository {
   constructor(private readonly manager: EntityManager) {}
 
-  async getDocuments(): Promise<Document[]> {
+  async getDocuments(param: GetDocumentsParam): Promise<Document[]> {
     return this.manager.find(Document, {
       relations: ['user'],
+      order: { modifiedDate: 'DESC' },
+      skip: param.skip,
+      take: param.take,
     });
   }
 
@@ -17,6 +20,10 @@ export class DocumentRepository {
       relations: ['user'],
       where: { id },
     });
+  }
+
+  async count(): Promise<number> {
+    return this.manager.count(Document);
   }
 
   async getHistory(documentId: number): Promise<DocumentHistory[]> {

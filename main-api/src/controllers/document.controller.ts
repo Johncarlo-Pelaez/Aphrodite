@@ -3,26 +3,41 @@ import {
   Controller,
   Get,
   Param,
+  ParseIntPipe,
   Post,
+  Query,
   ValidationPipe,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
-import { CreatedResponse, GetUserId } from 'src/core';
+import {
+  ApiPaginatedResponse,
+  CreatedResponse,
+  GetUserId,
+  PaginatedResponse,
+} from 'src/core';
 import { Document, DocumentHistory } from 'src/entities';
 import { DocumentRepository } from 'src/repositories';
-import { CreateDocumentDto } from '../dtos/document.dto';
+import { GetDocumentsDto, CreateDocumentDto } from './document.dto';
+import { GetDocumentsIntPipe } from './document.pipe';
 
 @Controller('/documents')
 export class DocumentController {
   constructor(private readonly documentRepository: DocumentRepository) {}
 
-  @ApiOkResponse({
-    type: Document,
-    isArray: true,
-  })
+  @ApiPaginatedResponse(Document)
   @Get('/')
-  async getDocuments(): Promise<Document[]> {
-    return this.documentRepository.getDocuments();
+  async getDocuments(
+    @Query(GetDocumentsIntPipe) dto: GetDocumentsDto,
+  ): Promise<PaginatedResponse<Document>> {
+    const response = new PaginatedResponse<Document>();
+
+    response.count = await this.documentRepository.count();
+    response.data = await this.documentRepository.getDocuments({
+      skip: dto.skip,
+      take: dto.take,
+    });
+
+    return response;
   }
 
   @ApiOkResponse({
@@ -31,7 +46,7 @@ export class DocumentController {
   })
   @Get('/:id/history')
   async getDocumentHistory(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
   ): Promise<DocumentHistory[]> {
     return this.documentRepository.getHistory(id);
   }
