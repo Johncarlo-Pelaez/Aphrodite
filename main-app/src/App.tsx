@@ -1,16 +1,26 @@
-import React from 'react';
+import { QueryClientProvider, QueryClient } from 'react-query';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { HomePage, LoginPage, NotFoundPage } from './pages';
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+  },
+});
+
 function App() {
   return (
-    <Router>
-      <Switch>
-        <Route exact path="/" component={HomePage} />
-        <Route path="/login" component={LoginPage} />
-        <Route component={NotFoundPage} />
-      </Switch>
-    </Router>
+    <QueryClientProvider client={queryClient}>
+      <Router>
+        <Switch>
+          <Route exact path="/" component={HomePage} />
+          <Route path="/login" component={LoginPage} />
+          <Route component={NotFoundPage} />
+        </Switch>
+      </Router>
+    </QueryClientProvider>
   );
 }
 

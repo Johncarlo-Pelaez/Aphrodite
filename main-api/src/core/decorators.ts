@@ -2,7 +2,7 @@ import { applyDecorators, createParamDecorator, Type } from '@nestjs/common';
 import { ApiOkResponse, getSchemaPath } from '@nestjs/swagger';
 
 export const GetUserId = createParamDecorator((): number => {
-  return 1;
+  return 3;
 });
 
 export const ApiPaginatedResponse = <TModel extends Type<any>>(
