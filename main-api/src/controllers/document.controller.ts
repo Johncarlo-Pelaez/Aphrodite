@@ -31,11 +31,8 @@ export class DocumentController {
   ): Promise<PaginatedResponse<Document>> {
     const response = new PaginatedResponse<Document>();
 
-    response.count = await this.documentRepository.count();
-    response.data = await this.documentRepository.getDocuments({
-      skip: dto.skip,
-      take: dto.take,
-    });
+    response.count = await this.documentRepository.count(dto.search);
+    response.data = await this.documentRepository.getDocuments(dto);
 
     return response;
   }

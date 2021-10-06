@@ -1,4 +1,5 @@
 export interface GetDocumentsParam {
+  search?: string;
   skip?: number;
   take?: number;
 }

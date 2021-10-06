@@ -10,6 +10,11 @@ import {
 export class GetDocumentsDto {
   @ApiProperty({ required: false })
   @IsOptional()
+  @IsString()
+  search?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
   @IsNumberString()
   skip?: number;
 

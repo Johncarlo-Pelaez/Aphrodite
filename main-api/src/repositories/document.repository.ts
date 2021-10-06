@@ -1,5 +1,5 @@
 import { Document, DocumentHistory } from 'src/entities';
-import { EntityManager, EntityRepository } from 'typeorm';
+import { EntityManager, EntityRepository, ILike } from 'typeorm';
 import { CreateDocumentParam, GetDocumentsParam } from './document.params';
 
 @EntityRepository()
@@ -7,8 +7,25 @@ export class DocumentRepository {
   constructor(private readonly manager: EntityManager) {}
 
   async getDocuments(param: GetDocumentsParam): Promise<Document[]> {
+    const search = param.search || '';
+
     return this.manager.find(Document, {
       relations: ['user'],
+      where: [
+        {
+          documentName: ILike(`%${search}%`),
+        },
+        {
+          user: {
+            firstName: ILike(`%${search}%`),
+          },
+        },
+        {
+          user: {
+            lastName: ILike(`%${search}%`),
+          },
+        },
+      ],
       order: { modifiedDate: 'DESC' },
       skip: param.skip,
       take: param.take,
@@ -22,8 +39,25 @@ export class DocumentRepository {
     });
   }
 
-  async count(): Promise<number> {
-    return this.manager.count(Document);
+  async count(search?: string): Promise<number> {
+    return this.manager.count(Document, {
+      relations: ['user'],
+      where: [
+        {
+          documentName: ILike(`%${search}%`),
+        },
+        {
+          user: {
+            firstName: ILike(`%${search}%`),
+          },
+        },
+        {
+          user: {
+            lastName: ILike(`%${search}%`),
+          },
+        },
+      ],
+    });
   }
 
   async getHistory(documentId: number): Promise<DocumentHistory[]> {
