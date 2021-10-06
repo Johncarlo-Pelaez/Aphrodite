@@ -1,7 +1,7 @@
 version: "3"
 services:
-  amicassa-nginx:
-    container_name: amicassa-main-nginx
+  main_nginx:
+    container_name: epds-aphrodite_main-nginx
     build:
       context: ./main-nginx
       dockerfile: Dockerfile
@@ -13,7 +13,7 @@ services:
       - pdfjs
       - main-api
   main-app:
-    container_name: amicassa-main-app
+    container_name: epds-aphrodite_main-app
     build:
       context: ./main-app
       dockerfile: Dockerfile
@@ -22,12 +22,12 @@ services:
       - /usr/src/app/node_modules
       - ./main-app:/usr/src/app
   pdfjs:
-    container_name: amicassa-pdfjs
+    container_name: epds-aphrodite_pdfjs
     build:
       context: ./pdfjs
       dockerfile: Dockerfile
   main-api:
-    container_name: amicassa-main-api
+    container_name: epds-aphrodite_main-api
     build:
       context: ./main-api
       dockerfile: Dockerfile
