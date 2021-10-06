@@ -16,13 +16,17 @@ import {
   PaginatedResponse,
 } from 'src/core';
 import { Document, DocumentHistory } from 'src/entities';
+import { QueueService } from 'src/queue';
 import { DocumentRepository } from 'src/repositories';
 import { GetDocumentsDto, CreateDocumentDto } from './document.dto';
 import { GetDocumentsIntPipe } from './document.pipe';
 
 @Controller('/documents')
 export class DocumentController {
-  constructor(private readonly documentRepository: DocumentRepository) {}
+  constructor(
+    private readonly documentRepository: DocumentRepository,
+    private readonly queueService: QueueService,
+  ) {}
 
   @ApiPaginatedResponse(Document)
   @Get('/')
@@ -64,6 +68,8 @@ export class DocumentController {
       createdDate: rightNow,
       userId,
     });
+
+    await this.queueService.migrate(response.id);
 
     return response;
   }

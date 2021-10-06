@@ -1,4 +1,4 @@
-# Amicassa's RIS Main API
+# Amicassa's RIS Queue API
 
 ## Installation
 
