@@ -35,13 +35,14 @@ export const Pagination = (props: PaginationProps): ReactElement => {
   } = props;
   const pageRemain = total % pageSize > 0 ? 1 : 0;
   const totalPage = Math.trunc(total / pageSize) + pageRemain;
-  const showingFrom = currentPage * pageSize + 1 - pageSize;
-  const showingTo = showingFrom + rowCount - 1;
+  const showingFrom =
+    currentPage > 0 ? currentPage * pageSize + 1 - pageSize : 0;
+  const showingTo = currentPage > 0 ? showingFrom + rowCount - 1 : 0;
 
   const controlsEnabilityStyle = (): CSSProperties => {
     return {
-      pointerEvents: isLoading ? 'none' : 'auto',
-      opacity: isLoading ? '0.5' : 1,
+      pointerEvents: isLoading || currentPage === 0 ? 'none' : 'auto',
+      opacity: isLoading || currentPage === 0 ? '0.5' : 1,
     };
   };
 
@@ -67,6 +68,7 @@ export const Pagination = (props: PaginationProps): ReactElement => {
 
   useEffect(() => {
     setPaginations(getPaginationNumbers());
+    if (totalPage > 0 && currentPage === 0) onPageChanged(1);
     if (currentPage > totalPage) onPageChanged(totalPage);
     // eslint-disable-next-line
   }, [currentPage, paginationNumber, totalPage]);

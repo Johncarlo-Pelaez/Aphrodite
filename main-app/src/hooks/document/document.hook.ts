@@ -12,16 +12,16 @@ const useDocuments = (
   const { searchKey, currentPage, pageSize, isEnabled = true } = params;
 
   const paginationQuery = createTablePaginationQuery({
-      currentPage,
-      pageSize,
+    currentPage: currentPage > 0 ? currentPage : 1,
+    pageSize,
   });
   
   const filterQuery = createQueryString(
-      {
-          search: searchKey,
-      },
-      { arrayFormat: 'index' }
-  );
+    {
+      search: searchKey,
+    },
+    { arrayFormat: 'index' }
+  )
 
   return useQuery<GetDocsResult>(
     [QueryCacheKey.DOCUMENTS],
