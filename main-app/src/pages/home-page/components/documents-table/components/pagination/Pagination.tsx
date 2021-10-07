@@ -29,10 +29,9 @@ export const Pagination = (props: PaginationProps): ReactElement => {
   } = props;
   const pageRemain = total % pageSize > 0 ? 1 : 0;
   const totalPage = Math.trunc(total / pageSize) + pageRemain;
-  const showingFrom =
-    currentPage > 0 ? currentPage * pageSize + 1 - pageSize : 0;
-  const showingTo = currentPage > 0 ? showingFrom + rowCount - 1 : 0;
-  const disabled = isLoading || currentPage === 0;
+  const showingFrom = currentPage * pageSize + 1 - pageSize;
+  const showingTo = showingFrom + rowCount - 1;
+  const disabled = isLoading || totalPage <= 0;
 
   const getPaginationNumbers = (): number[] => {
     let pageNumbers: number[] = [currentPage];
@@ -56,8 +55,6 @@ export const Pagination = (props: PaginationProps): ReactElement => {
 
   useEffect(() => {
     setPaginations(getPaginationNumbers());
-    if (totalPage > 0 && currentPage === 0) onPageChanged(1);
-    if (currentPage > totalPage) onPageChanged(totalPage);
     // eslint-disable-next-line
   }, [currentPage, paginationNumber, totalPage]);
 
@@ -98,8 +95,10 @@ export const Pagination = (props: PaginationProps): ReactElement => {
           <Form.Group as={Row} className="align-items-center">
             <Col xs="auto">
               <Form.Label>
-                {`Showing ${showingFrom} to ${showingTo} of ${total} entries `}|
-                Go to page:{' '}
+                {`Showing ${totalPage > 0 ? showingFrom : 0} to ${
+                  totalPage > 0 ? showingTo : 0
+                } of ${total} entries `}
+                | Go to page:{' '}
               </Form.Label>
             </Col>
             <Col xs="auto">

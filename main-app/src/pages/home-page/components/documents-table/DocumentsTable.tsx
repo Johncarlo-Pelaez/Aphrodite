@@ -40,6 +40,8 @@ export const DocumentsTable = (props: DocumentsTableProps): ReactElement => {
     onSearchDocument,
   } = props;
 
+  const rowCount = documents.length;
+
   const showRowHighlight = (document: Document): string => {
     return document.id === selectedDocument?.id ? styles.highlightRow : '';
   };
@@ -56,6 +58,14 @@ export const DocumentsTable = (props: DocumentsTableProps): ReactElement => {
         <div className="w-100 p-4 d-flex justify-content-center align-items-center">
           <Spinner animation="border" />
         </div>
+      );
+    }
+
+    if (rowCount <= 0) {
+      return (
+        <Alert className="text-center" variant="light">
+          No Data.
+        </Alert>
       );
     }
 
@@ -97,7 +107,7 @@ export const DocumentsTable = (props: DocumentsTableProps): ReactElement => {
       <Pagination
         isLoading={isLoading}
         total={total}
-        rowCount={documents.length}
+        rowCount={rowCount}
         pageSize={pageSize}
         currentPage={currentPage}
         paginationNumber={paginationNumber}

@@ -15,19 +15,21 @@ export const SearchField = (props: SearchFieldProps): ReactElement => {
   const { searchKey, onSearchDocument } = props;
 
   return (
-    <InputGroup className={styles.searchField}>
-      <FormControl
-        placeholder="Search"
-        aria-label="Search"
-        aria-describedby="Search documents"
-        type="text"
-        value={searchKey}
-        onChange={(e) => onSearchDocument(e.target.value ?? '')}
-      />
-      <Button variant="outline-secondary" id="button-addon2">
-        <FontAwesomeIcon icon={faSearch} />
-      </Button>
-    </InputGroup>
+    <div className="d-flex justify-content-end">
+      <InputGroup className={styles.searchField}>
+        <FormControl
+          placeholder="Search"
+          aria-label="Search"
+          aria-describedby="Search documents"
+          type="text"
+          value={searchKey}
+          onChange={(e) => onSearchDocument(e.target.value ?? '')}
+        />
+        <Button variant="outline-secondary" id="button-addon2">
+          <FontAwesomeIcon icon={faSearch} />
+        </Button>
+      </InputGroup>
+    </div>
   );
 };
 
