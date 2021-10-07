@@ -1,8 +1,12 @@
 import { ReactElement } from 'react';
 import fileSize from 'filesize';
+import moment from 'moment';
+import { DEFAULT_DATE_FORMAT } from 'core/constants';
 import Table from 'react-bootstrap/Table';
 import Alert from 'react-bootstrap/Alert';
 import Spinner from 'react-bootstrap/Spinner';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSort } from '@fortawesome/free-solid-svg-icons';
 import styles from './DocumentsTable.module.css';
 import { Document } from 'models';
 import { Pagination, SearchField } from './components';
@@ -17,7 +21,7 @@ interface DocumentsTableProps {
   paginationNumber: number;
   searchKey: string;
   selectedDocument?: Document;
-  onSelectRow: (document: Document) => void;
+  onSelectRow: (document?: Document) => void;
   onPageChanged: (page: number) => void;
   onSizeChange: (pageSize: number) => void;
   onSearchDocument: (seachKey: string) => void;
@@ -47,7 +51,13 @@ export const DocumentsTable = (props: DocumentsTableProps): ReactElement => {
   };
 
   const renderSearchField = (): ReactElement => {
-    return <SearchField onSearchDocument={onSearchDocument} />;
+    return (
+      <SearchField searchKey={searchKey} onSearchDocument={onSearchDocument} />
+    );
+  };
+
+  const setSelectedRow = (document: Document): void => {
+    onSelectRow(selectedDocument?.id === document.id ? undefined : document);
   };
 
   const renderTable = (): ReactElement => {
@@ -75,10 +85,14 @@ export const DocumentsTable = (props: DocumentsTableProps): ReactElement => {
         <Table striped bordered hover>
           <thead>
             <tr>
-              <th>Name</th>
+              <th>
+                Name <FontAwesomeIcon icon={faSort} />
+              </th>
               <th>Size</th>
               <th>User</th>
-              <th>Date Modified</th>
+              <th>
+                Date Modified <FontAwesomeIcon icon={faSort} />
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -86,12 +100,14 @@ export const DocumentsTable = (props: DocumentsTableProps): ReactElement => {
               <tr
                 key={document.id}
                 className={showRowHighlight(document)}
-                onClick={() => onSelectRow(document)}
+                onClick={() => setSelectedRow(document)}
               >
                 <td>{document.documentName}</td>
                 <td>{fileSize(document.documentSize)}</td>
                 <td>{`${document.user.firstName} ${document.user.lastName}`}</td>
-                <td>{document.modifiedDate}</td>
+                <td>
+                  {moment(document.modifiedDate).format(DEFAULT_DATE_FORMAT)}
+                </td>
               </tr>
             ))}
           </tbody>
