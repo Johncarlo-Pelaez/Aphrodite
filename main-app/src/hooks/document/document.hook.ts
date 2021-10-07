@@ -24,7 +24,7 @@ const useDocuments = (
   )
 
   return useQuery<GetDocsResult>(
-    [QueryCacheKey.DOCUMENTS],
+    [QueryCacheKey.DOCUMENTS, searchKey, currentPage, pageSize],
     () => getDocuments(`${paginationQuery}&${filterQuery}`),
     {
       enabled: isEnabled,

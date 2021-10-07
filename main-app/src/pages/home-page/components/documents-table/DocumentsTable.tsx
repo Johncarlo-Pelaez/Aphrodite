@@ -46,11 +46,7 @@ export const DocumentsTable = (props: DocumentsTableProps): ReactElement => {
 
   const renderSearchField = (): ReactElement => {
     return (
-      <SearchField
-        isLoading={isLoading}
-        searchKey={searchKey}
-        onSearchDocument={onSearchDocument}
-      />
+      <SearchField searchKey={searchKey} onSearchDocument={onSearchDocument} />
     );
   };
 

@@ -1,10 +1,4 @@
-import {
-  ChangeEvent,
-  ReactElement,
-  useState,
-  useEffect,
-  CSSProperties,
-} from 'react';
+import { ChangeEvent, ReactElement, useState, useEffect } from 'react';
 import BPagination from 'react-bootstrap/Pagination';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
@@ -38,13 +32,7 @@ export const Pagination = (props: PaginationProps): ReactElement => {
   const showingFrom =
     currentPage > 0 ? currentPage * pageSize + 1 - pageSize : 0;
   const showingTo = currentPage > 0 ? showingFrom + rowCount - 1 : 0;
-
-  const controlsEnabilityStyle = (): CSSProperties => {
-    return {
-      pointerEvents: isLoading || currentPage === 0 ? 'none' : 'auto',
-      opacity: isLoading || currentPage === 0 ? '0.5' : 1,
-    };
-  };
+  const disabled = isLoading || currentPage === 0;
 
   const getPaginationNumbers = (): number[] => {
     let pageNumbers: number[] = [currentPage];
@@ -74,36 +62,34 @@ export const Pagination = (props: PaginationProps): ReactElement => {
   }, [currentPage, paginationNumber, totalPage]);
 
   return (
-    <Row
-      className="d-flex justify-content-end"
-      style={controlsEnabilityStyle()}
-    >
+    <Row className="d-flex justify-content-end">
       <Col xs="auto">
         <BPagination>
           <BPagination.First
             onClick={() => onPageChanged(1)}
-            disabled={!!paginations.find((p) => p === 1)}
+            disabled={!!paginations.find((p) => p === 1) || disabled}
           />
           <BPagination.Prev
             onClick={() => onPageChanged(currentPage - 1)}
-            disabled={currentPage === 1}
+            disabled={currentPage === 1 || disabled}
           />
           {paginations.map((pageNumber: number, index: number) => (
             <BPagination.Item
               key={index}
               active={pageNumber === currentPage}
               onClick={() => onPageChanged(pageNumber)}
+              disabled={disabled}
             >
               {pageNumber}
             </BPagination.Item>
           ))}
           <BPagination.Next
             onClick={() => onPageChanged(currentPage + 1)}
-            disabled={currentPage === totalPage}
+            disabled={currentPage === totalPage || disabled}
           />
           <BPagination.Last
             onClick={() => onPageChanged(totalPage)}
-            disabled={!!paginations.find((p) => p === totalPage)}
+            disabled={!!paginations.find((p) => p === totalPage) || disabled}
           />
         </BPagination>
       </Col>
@@ -118,6 +104,7 @@ export const Pagination = (props: PaginationProps): ReactElement => {
             </Col>
             <Col xs="auto">
               <Form.Control
+                disabled={disabled}
                 placeholder="page"
                 type="number"
                 min={1}
@@ -133,6 +120,7 @@ export const Pagination = (props: PaginationProps): ReactElement => {
             </Col>
             <Col xs="auto">
               <Form.Select
+                disabled={disabled}
                 value={pageSize}
                 onChange={(event: ChangeEvent<HTMLSelectElement>) => {
                   onSizeChange(Number(event.target.value));

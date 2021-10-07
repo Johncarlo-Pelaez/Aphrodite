@@ -1,6 +1,4 @@
-import { useState, useEffect } from 'react';
-import { useQueryClient } from 'react-query';
-import { QueryCacheKey } from 'core/enums';
+import { useState } from 'react';
 import { S3Upload } from './S3Upload';
 import { useDocuments } from 'hooks/document';
 import { DocumentsTable } from './components';
@@ -13,7 +11,6 @@ export const HomePage = () => {
   const [searchKey, setSearchKey] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
-  const queryClient = useQueryClient();
 
   const {
     isLoading: isDocsLoading,
@@ -27,10 +24,6 @@ export const HomePage = () => {
 
   const documents = result?.data || [];
   const count = result?.count || 0;
-
-  useEffect(() => {
-    queryClient.invalidateQueries(QueryCacheKey.DOCUMENTS);
-  }, [searchKey, currentPage, pageSize]);
 
   return (
     <>

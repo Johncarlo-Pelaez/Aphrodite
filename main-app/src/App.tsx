@@ -1,4 +1,5 @@
 import { QueryClientProvider, QueryClient } from 'react-query';
+import { ReactQueryDevtools } from 'react-query/devtools';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { HomePage, LoginPage, NotFoundPage } from './pages';
 
@@ -20,6 +21,7 @@ function App() {
           <Route component={NotFoundPage} />
         </Switch>
       </Router>
+      <ReactQueryDevtools />
     </QueryClientProvider>
   );
 }
