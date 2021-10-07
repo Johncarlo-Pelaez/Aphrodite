@@ -32,6 +32,7 @@ export const Pagination = (props: PaginationProps): ReactElement => {
   const showingFrom = currentPage * pageSize + 1 - pageSize;
   const showingTo = showingFrom + rowCount - 1;
   const disabled = isLoading || totalPage <= 0;
+
   const getPaginationNumbers = (): number[] => {
     let pageNumbers: number[] = [currentPage];
     let paginationRadius = Math.trunc(paginationNumber / 2);
@@ -54,6 +55,7 @@ export const Pagination = (props: PaginationProps): ReactElement => {
 
   useEffect(() => {
     setPaginations(getPaginationNumbers());
+    if (currentPage > totalPage && totalPage > 0) onPageChanged(totalPage);
     // eslint-disable-next-line
   }, [currentPage, paginationNumber, totalPage]);
 

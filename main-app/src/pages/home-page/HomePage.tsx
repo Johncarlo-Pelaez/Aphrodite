@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { S3Upload } from './S3Upload';
 import { useDocuments } from 'hooks/document';
+import { useDebounce } from 'hooks/debounce';
 import { DocumentsTable } from './components';
 import { Document } from 'models';
 
@@ -11,13 +12,14 @@ export const HomePage = () => {
   const [searchKey, setSearchKey] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
+  const debouncedSearch = useDebounce(searchKey);
 
   const {
     isLoading: isDocsLoading,
     isError: hasDocsError,
     data: result,
   } = useDocuments({
-    searchKey,
+    searchKey: debouncedSearch,
     currentPage,
     pageSize,
   });

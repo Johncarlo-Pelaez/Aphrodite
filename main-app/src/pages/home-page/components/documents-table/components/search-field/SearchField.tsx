@@ -7,13 +7,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
 interface SearchFieldProps {
-  searchKey?: string;
+  searchKey: string;
   onSearchDocument: (seachKey: string) => void;
 }
 
 export const SearchField = (props: SearchFieldProps): ReactElement => {
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const { onSearchDocument } = props;
+  const { searchKey, onSearchDocument } = props;
 
   const searchDocs = (): void => {
     onSearchDocument(searchInputRef?.current?.value ?? '');
@@ -28,11 +28,13 @@ export const SearchField = (props: SearchFieldProps): ReactElement => {
           aria-label="Search"
           aria-describedby="Search documents"
           type="text"
+          value={searchKey}
           onKeyUp={(e) => {
             if (e.key === 'Enter' || e.keyCode === 13) {
               searchDocs();
             }
           }}
+          onChange={(e) => onSearchDocument(e.target.value ?? '')}
         />
         <Button
           variant="outline-secondary"
