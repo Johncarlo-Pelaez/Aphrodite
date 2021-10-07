@@ -1,10 +1,10 @@
+import { BullModule } from '@nestjs/bull';
 import { Logger, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { createConnection } from 'typeorm';
 import { AppConfigModule, AppConfigService, Environment } from './app-config';
-import { DocumentController, UserController } from './controllers';
-import { QueueModule } from './queue';
-import { DocumentRepository, UserRepository } from './repositories';
+import { DocumentConsumer } from './consumers';
+import { DocumentRepository } from './repositories';
 
 const logger = new Logger('AppModule');
 
@@ -34,9 +34,20 @@ const logger = new Logger('AppModule');
         return connection;
       },
     }),
-    QueueModule,
+    BullModule.forRootAsync({
+      imports: [AppConfigModule],
+      useFactory: async (appConfigService: AppConfigService) => ({
+        redis: {
+          host: appConfigService.redisHost,
+          port: appConfigService.redisPort,
+        },
+      }),
+      inject: [AppConfigService],
+    }),
+    BullModule.registerQueue({
+      name: 'document',
+    }),
   ],
-  controllers: [DocumentController, UserController],
-  providers: [DocumentRepository, UserRepository],
+  providers: [DocumentRepository, DocumentConsumer, Logger],
 })
 export class AppModule {}
