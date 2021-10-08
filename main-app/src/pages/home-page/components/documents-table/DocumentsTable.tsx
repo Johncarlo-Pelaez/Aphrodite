@@ -34,7 +34,7 @@ export const DocumentsTable = (): ReactElement => {
   >(undefined);
   const [searchKey, setSearchKey] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [pageSize, setPageSize] = useState<number>(10);
+  const [pageSize, setPageSize] = useState<number>(15);
   const debouncedSearch = useDebounce(searchKey);
 
   const {

@@ -12,7 +12,7 @@ const useDocuments = (
   const { searchKey, currentPage, pageSize, isEnabled = true } = params;
 
   const paginationQuery = createTablePaginationQuery({
-    currentPage: currentPage > 0 ? currentPage : 1,
+    currentPage,
     pageSize,
   });
   

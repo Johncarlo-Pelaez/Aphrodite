@@ -32,6 +32,10 @@ export const Pagination = (props: PaginationProps): ReactElement => {
   const showingFrom = currentPage * pageSize + 1 - pageSize;
   const showingTo = showingFrom + rowCount - 1;
   const disabled = isLoading || totalPage <= 0;
+  const isGotoFirstPageHidden = !!paginations.find((p) => p === 1);
+  const isPrevPageHidden = currentPage === 1;
+  const isNextPageHidden = currentPage === totalPage;
+  const isGotoLastPageHidden = !!paginations.find((p) => p === totalPage);
 
   const getPaginationNumbers = (): number[] => {
     let pageNumbers: number[] = [currentPage];
@@ -56,6 +60,7 @@ export const Pagination = (props: PaginationProps): ReactElement => {
   useEffect(() => {
     setPaginations(getPaginationNumbers());
     if (currentPage > totalPage && totalPage > 0) onPageChanged(totalPage);
+    if (currentPage === 0 && totalPage > 0) onPageChanged(1);
     // eslint-disable-next-line
   }, [currentPage, paginationNumber, totalPage]);
 
@@ -65,11 +70,13 @@ export const Pagination = (props: PaginationProps): ReactElement => {
         <BPagination>
           <BPagination.First
             onClick={() => onPageChanged(1)}
-            disabled={!!paginations.find((p) => p === 1) || disabled}
+            hidden={isGotoFirstPageHidden}
+            disabled={isGotoFirstPageHidden || disabled}
           />
           <BPagination.Prev
             onClick={() => onPageChanged(currentPage - 1)}
-            disabled={currentPage === 1 || disabled}
+            hidden={isPrevPageHidden}
+            disabled={isPrevPageHidden || disabled}
           />
           {paginations.map((pageNumber: number, index: number) => (
             <BPagination.Item
@@ -83,11 +90,13 @@ export const Pagination = (props: PaginationProps): ReactElement => {
           ))}
           <BPagination.Next
             onClick={() => onPageChanged(currentPage + 1)}
-            disabled={currentPage === totalPage || disabled}
+            hidden={isNextPageHidden}
+            disabled={isNextPageHidden || disabled}
           />
           <BPagination.Last
             onClick={() => onPageChanged(totalPage)}
-            disabled={!!paginations.find((p) => p === totalPage) || disabled}
+            hidden={isGotoLastPageHidden}
+            disabled={isGotoLastPageHidden || disabled}
           />
         </BPagination>
       </Col>
@@ -126,7 +135,7 @@ export const Pagination = (props: PaginationProps): ReactElement => {
                   onSizeChange(Number(event.target.value));
                 }}
               >
-                {[10, 15, 20, 30, 40, 50].map((pageSize) => (
+                {[5, 10, 15, 20, 30].map((pageSize) => (
                   <option key={pageSize} value={pageSize}>
                     Show {pageSize}
                   </option>
