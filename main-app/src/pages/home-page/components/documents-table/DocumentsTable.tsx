@@ -25,6 +25,7 @@ const columns: TableColumnProps<Document>[] = [
     dataIndex: 'modifiedDate',
     render: (document: Document) =>
       moment(document.modifiedDate).format(DEFAULT_DATE_FORMAT),
+    sorter: true,
   },
 ];
 
@@ -57,16 +58,18 @@ export const DocumentsTable = (): ReactElement => {
       isError={hasDocsError}
       columns={columns}
       data={documents}
-      total={total}
-      pageSize={pageSize}
-      currentPage={currentPage}
-      paginationNumber={5}
+      pagination={{
+        total: total,
+        pageSize: pageSize,
+        current: currentPage,
+        pageNumber: 5,
+        onChange: setCurrentPage,
+        onSizeChange: setPageSize,
+      }}
       searchKey={searchKey}
       selectedRow={selectedDocument}
       onSelectRow={setSelectedDocument}
-      onPageChanged={setCurrentPage}
-      onSizeChange={setPageSize}
-      onSearchDocument={setSearchKey}
+      onSearch={setSearchKey}
     />
   );
 };

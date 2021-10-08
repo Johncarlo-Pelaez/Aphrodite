@@ -1,34 +1,34 @@
-import { ReactElement } from 'react';
+import { ReactElement, useState } from 'react';
 import BTable from 'react-bootstrap/Table';
 import Alert from 'react-bootstrap/Alert';
 import Spinner from 'react-bootstrap/Spinner';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSort } from '@fortawesome/free-solid-svg-icons';
-import styles from './Table.module.css';
-import { TableProps } from './Table.types';
+import {
+  faSort,
+  faSortAlphaDown,
+  faSortAlphaUp,
+} from '@fortawesome/free-solid-svg-icons';
+import styles from './Table.module.scss';
+import { TableProps, Sorter } from './Table.types';
 import { Pagination, SearchField } from './components';
 
 export const Table = <T extends Record<string, any> = {}>(
   props: TableProps<T>,
 ): ReactElement => {
+  const [sorter, setSorter] = useState<Sorter | undefined>(undefined);
   const {
     rowKey,
     loading,
     isError,
     columns,
     data,
-    total,
-    pageSize,
-    currentPage,
-    paginationNumber,
-    searchKey,
+    pagination,
+    searchKey = null,
     selectedRow,
     onSelectRow,
-    onPageChanged,
-    onSizeChange,
-    onSearchDocument,
+    onChange,
+    onSearch = null,
   } = props;
-
   const rowCount = data.length;
 
   const showRowHighlight = (rowData: T): string => {
@@ -41,14 +41,57 @@ export const Table = <T extends Record<string, any> = {}>(
     return '';
   };
 
-  const renderSearchField = (): ReactElement => {
-    return (
-      <SearchField searchKey={searchKey} onSearchDocument={onSearchDocument} />
-    );
+  const setSelectedRow = (rowData: T): void => {
+    if (onSelectRow && typeof onSelectRow === 'function')
+      onSelectRow(selectedRow?.id === rowData.id ? undefined : rowData);
   };
 
-  const setSelectedRow = (rowData: T): void => {
-    onSelectRow(selectedRow?.id === rowData.id ? undefined : rowData);
+  const triggerOnChange = (sorter?: Sorter): void => {
+    if (onChange && typeof onChange === 'function') onChange(sorter);
+    setSorter(sorter);
+  };
+
+  const renderSearchField = (): ReactElement | undefined => {
+    if (searchKey != null && onSearch != null && typeof onSearch === 'function')
+      return <SearchField searchKey={searchKey} onSearchDocument={onSearch} />;
+  };
+
+  const renderTableColumns = (): ReactElement[] => {
+    return columns.map(({ title, dataIndex, sorter: sorterConfig }, index) => {
+      let newSorter: Sorter = { field: dataIndex, order: 'ASC', orderIndex: 0 };
+      const isSorterSelf = sorter?.field === newSorter.field;
+      const isSortOrderAsc = sorter?.order === 'ASC';
+      return (
+        <th
+          key={index}
+          className={styles.tableHeaderCol}
+          onClick={() => {
+            if (!sorterConfig) return;
+            if (isSorterSelf) {
+              var currentSorter = { ...sorter };
+              currentSorter.order = isSortOrderAsc ? 'DESC' : 'ASC';
+              currentSorter.orderIndex = ++currentSorter.orderIndex % 3;
+              triggerOnChange(
+                currentSorter.orderIndex < 2 ? currentSorter : undefined,
+              );
+            } else triggerOnChange(newSorter);
+          }}
+        >
+          {title}{' '}
+          {sorterConfig && (
+            <FontAwesomeIcon
+              icon={
+                isSorterSelf
+                  ? isSortOrderAsc
+                    ? faSortAlphaUp
+                    : faSortAlphaDown
+                  : faSort
+              }
+            />
+          )}
+        </th>
+      );
+    });
   };
 
   const renderTable = (): ReactElement => {
@@ -68,54 +111,55 @@ export const Table = <T extends Record<string, any> = {}>(
       );
     }
 
-    return (
-      <>
-        <Alert variant="danger" show={isError}>
+    if (isError) {
+      return (
+        <Alert className="text-center" variant="danger">
           Could not load data, Please try again.
         </Alert>
-        <BTable striped bordered hover>
-          <thead>
-            <tr>
-              {columns.map((col, index) => (
-                <th key={index}>
-                  {col.title} <FontAwesomeIcon icon={faSort} />
-                </th>
+      );
+    }
+
+    return (
+      <BTable striped bordered hover>
+        <thead>
+          <tr>{renderTableColumns()}</tr>
+        </thead>
+        <tbody>
+          {data.map((data, index) => (
+            <tr
+              key={index}
+              className={showRowHighlight(data)}
+              onClick={() => setSelectedRow(data)}
+            >
+              {columns.map(({ dataIndex, render }, index) => (
+                <td key={index}>
+                  {(render && render(data)) || data[dataIndex]}
+                </td>
               ))}
             </tr>
-          </thead>
-          <tbody>
-            {data.map((data, index) => (
-              <tr
-                key={index}
-                className={showRowHighlight(data)}
-                onClick={() => setSelectedRow(data)}
-              >
-                {columns.map(({ dataIndex, render }, index) => (
-                  <td key={index}>
-                    {(render && render(data)) || data[dataIndex]}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </BTable>
-      </>
+          ))}
+        </tbody>
+      </BTable>
     );
   };
 
-  const renderPagination = (): ReactElement => {
-    return (
-      <Pagination
-        isLoading={loading}
-        total={total}
-        rowCount={rowCount}
-        pageSize={pageSize}
-        currentPage={currentPage}
-        paginationNumber={paginationNumber}
-        onPageChanged={onPageChanged}
-        onSizeChange={onSizeChange}
-      />
-    );
+  const renderPagination = (): ReactElement | undefined => {
+    if (pagination && typeof pagination === 'object') {
+      const { total, pageSize, current, pageNumber, onChange, onSizeChange } =
+        pagination;
+      return (
+        <Pagination
+          isLoading={loading}
+          total={total}
+          rowCount={rowCount}
+          pageSize={pageSize}
+          currentPage={current}
+          paginationNumber={pageNumber}
+          onPageChanged={onChange}
+          onSizeChange={onSizeChange}
+        />
+      );
+    }
   };
 
   return (

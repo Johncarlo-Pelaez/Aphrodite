@@ -3,17 +3,7 @@ import BPagination from 'react-bootstrap/Pagination';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-
-interface PaginationProps {
-  isLoading: boolean;
-  total: number;
-  rowCount: number;
-  pageSize: number;
-  currentPage: number;
-  paginationNumber: number;
-  onPageChanged: (page: number) => void;
-  onSizeChange: (pageSize: number) => void;
-}
+import { PaginationProps } from './Pagination.types';
 
 export const Pagination = (props: PaginationProps): ReactElement => {
   const [paginations, setPaginations] = useState<number[]>([]);
