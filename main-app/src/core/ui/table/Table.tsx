@@ -71,7 +71,7 @@ export const Table = <T extends Record<string, any> = {}>(
     return (
       <>
         <Alert variant="danger" show={isError}>
-          Could not load documents, Please try again.
+          Could not load data, Please try again.
         </Alert>
         <BTable striped bordered hover>
           <thead>
