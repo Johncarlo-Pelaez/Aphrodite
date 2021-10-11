@@ -16,7 +16,7 @@ import {
   PaginatedResponse,
 } from 'src/core';
 import { Document, DocumentHistory } from 'src/entities';
-import { QueueService } from 'src/queue';
+import { DocumentProducer } from 'src/producers';
 import { DocumentRepository } from 'src/repositories';
 import { GetDocumentsDto, CreateDocumentDto } from './document.dto';
 import { GetDocumentsIntPipe } from './document.pipe';
@@ -25,7 +25,7 @@ import { GetDocumentsIntPipe } from './document.pipe';
 export class DocumentController {
   constructor(
     private readonly documentRepository: DocumentRepository,
-    private readonly queueService: QueueService,
+    private readonly documentProducer: DocumentProducer,
   ) {}
 
   @ApiPaginatedResponse(Document)
@@ -69,7 +69,7 @@ export class DocumentController {
       userId,
     });
 
-    await this.queueService.migrate(response.id);
+    await this.documentProducer.migrate(response.id);
 
     return response;
   }
