@@ -59,17 +59,17 @@ export const Table = <T extends Record<string, any> = {}>(
   const renderTableColumns = (): ReactElement[] => {
     return columns.map(({ title, dataIndex, sorter: sorterConfig }, index) => {
       let newSorter: Sorter = { field: dataIndex, order: 'ASC', orderIndex: 0 };
-      const isSorterSelf = sorter?.field === newSorter.field;
-      const isSortOrderAsc = sorter?.order === 'ASC';
+      const isSelf = sorter?.field === newSorter.field;
+      const isAsc = sorter?.order === 'ASC';
       return (
         <th
           key={index}
           className={styles.tableHeaderCol}
           onClick={() => {
             if (!sorterConfig) return;
-            if (isSorterSelf) {
+            if (isSelf) {
               var currentSorter = { ...sorter };
-              currentSorter.order = isSortOrderAsc ? 'DESC' : 'ASC';
+              currentSorter.order = isAsc ? 'DESC' : 'ASC';
               currentSorter.orderIndex = ++currentSorter.orderIndex % 3;
               triggerOnChange(
                 currentSorter.orderIndex < 2 ? currentSorter : undefined,
@@ -80,13 +80,7 @@ export const Table = <T extends Record<string, any> = {}>(
           {title}{' '}
           {sorterConfig && (
             <FontAwesomeIcon
-              icon={
-                isSorterSelf
-                  ? isSortOrderAsc
-                    ? faSortAlphaUp
-                    : faSortAlphaDown
-                  : faSort
-              }
+              icon={isSelf ? (isAsc ? faSortAlphaUp : faSortAlphaDown) : faSort}
             />
           )}
         </th>
