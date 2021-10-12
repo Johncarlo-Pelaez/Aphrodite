@@ -41,4 +41,8 @@ export class AppConfigService {
   get redisPort(): number {
     return this.configService.get('REDIS_PORT') || 6379;
   }
+ 
+  get filePath(): string {
+    return this.configService.get('FILE_PATH');
+  }
 }

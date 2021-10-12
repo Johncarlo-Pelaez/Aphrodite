@@ -23,11 +23,11 @@ export const Table = <T extends Record<string, any> = {}>(
     columns,
     data,
     pagination,
-    searchKey = null,
+    searchKey,
     selectedRow,
     onSelectRow,
     onChange,
-    onSearch = null,
+    onSearch,
   } = props;
   const rowCount = data.length;
 
@@ -52,7 +52,7 @@ export const Table = <T extends Record<string, any> = {}>(
   };
 
   const renderSearchField = (): ReactElement | undefined => {
-    if (searchKey != null && onSearch != null && typeof onSearch === 'function')
+    if (searchKey != undefined && onSearch && typeof onSearch === 'function')
       return <SearchField searchKey={searchKey} onSearchDocument={onSearch} />;
   };
 

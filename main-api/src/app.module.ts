@@ -4,8 +4,9 @@ import { createConnection } from 'typeorm';
 import { AppConfigModule, AppConfigService, Environment } from './app-config';
 import { DocumentController, UserController } from './controllers';
 import { QueueModule } from './queue';
+import { UtilsModule } from './utils/utils.module';
 import { DocumentRepository, UserRepository } from './repositories';
-
+import { DocumentsService } from './services'
 const logger = new Logger('AppModule');
 
 @Module({
@@ -34,9 +35,9 @@ const logger = new Logger('AppModule');
         return connection;
       },
     }),
-    QueueModule,
+    QueueModule, UtilsModule,
   ],
   controllers: [DocumentController, UserController],
-  providers: [DocumentRepository, UserRepository],
+  providers: [DocumentRepository, DocumentsService,  UserRepository],
 })
 export class AppModule {}
