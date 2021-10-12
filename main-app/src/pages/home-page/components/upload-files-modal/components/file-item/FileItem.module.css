@@ -1,5 +1,5 @@
 .navbar_list_upload_file {
-  height: 2.5rem;
+  height: 3rem;
   margin: 0;
   padding: 0;
   display: flex;
@@ -12,8 +12,6 @@
   display: flex;
   padding: 0;
   margin: 0;
-  margin-top: 1em;
-  margin-bottom: 0;
   margin-left: 5px;
   margin-right: 5px;
 }
@@ -30,49 +28,5 @@
 .navbar_list_upload_progress {
   display: flex !important;
   position: relative;
-  margin-right: 65px;
   height: 13px;
-  margin-top: 5px;
-}
-
-.navbar_list_upload_btn_action {
-  display: inline-flex;
-  position: relative;
-  margin-left: auto;
-  bottom: 1.6rem;
-  align-content: center;
-  height: 20px;
-  margin-top: 0px;
-  margin-bottom: 0px;
-  padding-top: 0;
-  padding-bottom: 0;
-}
-
-.button_files_action_retry,
-.button_files_action_delete {
-  display: flex;
-  margin-left: 3px;
-  margin-right: 3px;
-  height: 25px;
-  width: 10px;
-}
-
-.button_files_action_retry {
-  background-color: #ef4d00;
-  border-color: gainsboro;
-  opacity: 60%;
-}
-
-.button_files_action_delete {
-  background-color: #b20e0b;
-  border-color: gainsboro;
-  opacity: 60%;
-}
-
-.button_files_action_retry:hover {
-  background-color: #f28322;
-}
-
-.button_files_action_delete:hover {
-  background-color: #ea1111;
 }

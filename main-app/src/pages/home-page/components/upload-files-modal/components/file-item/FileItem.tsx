@@ -1,5 +1,5 @@
 import { ReactElement } from 'react';
-import { ProgressBar, Container, Navbar, Stack, Button } from 'react-bootstrap';
+import { ProgressBar, Container, Navbar, Stack } from 'react-bootstrap';
 import styles from './FileItem.module.css';
 
 interface FileItemProps {
@@ -23,10 +23,6 @@ export const FileItem = ({
             now={progress}
             label={`${progress}%`}
           />
-          <div className={styles.navbar_list_upload_btn_action}>
-            <Button className={styles.button_files_action_retry}></Button>
-            <Button className={styles.button_files_action_delete}></Button>
-          </div>
         </Stack>
       </Container>
     </Navbar>
