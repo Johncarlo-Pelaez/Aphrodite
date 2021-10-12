@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { Job, Queue } from 'bull';
 
 @Injectable()
-export class QueueService {
+export class DocumentProducer {
   constructor(
     @InjectQueue('document') private readonly documentQueue: Queue<number>,
   ) {}

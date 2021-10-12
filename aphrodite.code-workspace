@@ -11,9 +11,6 @@
     },
     {
       "path": "./pdfjs"
-    },
-    {
-      "path": "./queue-api"
     }
   ],
   "settings": {
