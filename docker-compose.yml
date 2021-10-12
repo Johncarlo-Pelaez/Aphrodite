@@ -34,18 +34,10 @@ services:
     volumes:
       - /usr/src/app/node_modules
       - ./main-api:/usr/src/app
+      - ./files:/usr/src/files
     environment:
       - REDIS_HOST=queue-redis
-  queue-api:
-    container_name: epds-aphrodite_queue-api
-    build:
-      context: ./queue-api
-      dockerfile: Dockerfile
-    volumes:
-      - /usr/src/app/node_modules
-      - ./queue-api:/usr/src/app
-    environment:
-      - REDIS_HOST=queue-redis
+      - FILE_PATH=/usr/src/files
   queue-redis:
     container_name: epds-aphrodite_queue-redis
     image: redis:6-alpine

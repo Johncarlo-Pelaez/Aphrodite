@@ -1,12 +1,11 @@
 import {
-  Body,
   Controller,
   Get,
   Param,
   ParseIntPipe,
   Post,
   Query,
-  ValidationPipe,
+  UploadedFile,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
 import {
@@ -14,18 +13,20 @@ import {
   CreatedResponse,
   GetUserId,
   PaginatedResponse,
+  ApiFile,
+  fileMimetypeFilter,
 } from 'src/core';
 import { Document, DocumentHistory } from 'src/entities';
-import { QueueService } from 'src/queue';
 import { DocumentRepository } from 'src/repositories';
-import { GetDocumentsDto, CreateDocumentDto } from './document.dto';
+import { DocumentsService } from 'src/services';
+import { GetDocumentsDto } from './document.dto';
 import { GetDocumentsIntPipe } from './document.pipe';
 
 @Controller('/documents')
 export class DocumentController {
   constructor(
+    private readonly documentsService: DocumentsService,
     private readonly documentRepository: DocumentRepository,
-    private readonly queueService: QueueService,
   ) {}
 
   @ApiPaginatedResponse(Document)
@@ -56,21 +57,14 @@ export class DocumentController {
     type: CreatedResponse,
   })
   @Post('/')
-  async createDocument(
-    @Body(ValidationPipe) dto: CreateDocumentDto,
+  @ApiFile('file', true, { fileFilter: fileMimetypeFilter('pdf') })
+  uploadDocument(
+    @UploadedFile() file: Express.Multer.File,
     @GetUserId() userId: number,
   ): Promise<CreatedResponse> {
-    const response = new CreatedResponse();
-    const rightNow = new Date();
-
-    response.id = await this.documentRepository.createDocument({
-      ...dto,
-      createdDate: rightNow,
-      userId,
+    return this.documentsService.uploadDocument({
+      file,
+      uploadedBy: userId,
     });
-
-    await this.queueService.migrate(response.id);
-
-    return response;
   }
 }

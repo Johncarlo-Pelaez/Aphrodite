@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Container, Button } from 'react-bootstrap';
-import { UploadFilesModal } from './components';
+import { UploadFilesModal, DocumentsTable } from './components';
 
 export const HomePage = () => {
   const [modalShow, setModalShow] = useState(false);
@@ -17,6 +17,9 @@ export const HomePage = () => {
           onClose={() => setModalShow(false)}
         />
       </div>
+      <DocumentsTable />
     </Container>
   );
 };
+
+export default HomePage;
