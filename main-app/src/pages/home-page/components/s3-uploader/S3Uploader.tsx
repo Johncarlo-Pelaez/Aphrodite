@@ -27,11 +27,7 @@ export const S3Uploader = ({ setItems }: S3UploaderProps): ReactElement => {
 
   const onDrop = useCallback(
     (accessFiles: File[]) => {
-      const getFiles = accessFiles.map((file) => ({
-        file,
-      }));
-
-      const constructFileInfo = getFiles.map(({ file }) => {
+      const constructFileInfo = accessFiles.map((file) => {
         const item = {
           file,
           percent: 0,
@@ -39,7 +35,8 @@ export const S3Uploader = ({ setItems }: S3UploaderProps): ReactElement => {
         return item;
       });
 
-      setItems((current) => [...current, ...constructFileInfo]);
+      setItems([]);
+      setItems(constructFileInfo);
     },
     [setItems],
   );

@@ -45,7 +45,7 @@ export const UploadFilesModal = ({
   onClose,
 }: UploadModalProps): ReactElement => {
   const [files, setFiles] = useState<FileInfoProps[]>([]);
-  const [started, setStarted] = useState<boolean>(false);
+  const [, setStarted] = useState<boolean>(false);
   const [itemNumber, setItemNumber] = useState<number>(STARTING_ITEM);
   const [filesProgress, setFilesProgress] = useState<number>(0);
   const numberOfFiles = files?.length;
@@ -135,7 +135,7 @@ export const UploadFilesModal = ({
 
     return (
       <Container>
-        <Stack gap={0} className={styles.stack_list_file_items}>
+        <Stack gap={1} className={styles.stack_list_file_items}>
           {files.map(({ file, percent }, idx) => {
             return (
               <Card className={styles.card_file_item_list} key={idx}>
@@ -189,14 +189,6 @@ export const UploadFilesModal = ({
         {renderUploadComponent()}
       </Modal.Body>
       <Modal.Footer className={styles.modal_footer_s3_upload}>
-        <Button
-          variant="primary"
-          size="sm"
-          onClick={uploadFiles}
-          disabled={started || !files}
-        >
-          Upload
-        </Button>
         <Button variant="primary" size="sm" onClick={clearFiles}>
           Reset
         </Button>
