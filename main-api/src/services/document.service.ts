@@ -5,7 +5,7 @@ import * as path from 'path';
 import { DatesUtil } from 'src/utils';
 import { AppConfigService } from 'src/app-config';
 import { DocumentRepository } from 'src/repositories';
-import { QueueService } from 'src/queue';
+import { DocumentProducer } from 'src/producers';
 import { CreatedResponse } from 'src/core';
 import { UploadDocuments } from './documents.inputs';
 
@@ -15,7 +15,7 @@ export class DocumentsService {
     private readonly documentRepository: DocumentRepository,
     private readonly datesUtil: DatesUtil,
     private readonly appConfigService: AppConfigService,
-    private readonly queueService: QueueService,
+    private readonly documentProducer: DocumentProducer,
   ) {}
 
   async uploadDocument(data: UploadDocuments): Promise<CreatedResponse> {    
@@ -35,7 +35,7 @@ export class DocumentsService {
       userId: data.uploadedBy,
     });
 
-    await this.queueService.migrate(response.id);
+    await this.documentProducer.migrate(response.id);
     return response;
   }
 }

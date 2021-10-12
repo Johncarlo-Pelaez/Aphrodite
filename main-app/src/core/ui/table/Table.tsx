@@ -52,7 +52,7 @@ export const Table = <T extends Record<string, any> = {}>(
   };
 
   const renderSearchField = (): ReactElement | undefined => {
-    if (searchKey != undefined && onSearch && typeof onSearch === 'function')
+    if (searchKey !== undefined && onSearch && typeof onSearch === 'function')
       return <SearchField searchKey={searchKey} onSearchDocument={onSearch} />;
   };
 
