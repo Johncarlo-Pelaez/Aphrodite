@@ -1,10 +1,11 @@
-import { getDocuments, GetDocsResult } from 'apis/document';
-import { useQuery, UseQueryResult } from 'react-query';
+import { getDocuments, uploadDocument, GetDocsResult, UploadDocResult, UploadDocParams } from 'apis/document';
+import { useQuery, useMutation, UseQueryResult, UseMutationResult, useQueryClient } from 'react-query';
 import { UseDocumentsParams } from './document.type';
 import { QueryCacheKey } from 'core/enums';
+import { ApiError } from 'core/types';
 import { createTablePaginationQuery, createQueryString } from 'utils/query-string';
 
-export { useDocuments };
+export { useDocuments, useUploadDoc };
 
 const useDocuments = (
   params: UseDocumentsParams
@@ -30,4 +31,13 @@ const useDocuments = (
       enabled: isEnabled,
     }
   );
+};
+
+const useUploadDoc = (): UseMutationResult<UploadDocResult, ApiError, UploadDocParams> => {
+  const queryClient = useQueryClient();
+  return useMutation<UploadDocResult, ApiError, UploadDocParams>(uploadDocument, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(QueryCacheKey.DOCUMENTS);
+    },
+  });
 };

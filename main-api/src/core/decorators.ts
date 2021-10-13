@@ -5,7 +5,7 @@ import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 
 export const GetUserId = createParamDecorator((): number => {
-  return 3;
+  return 1;
 });
 
 export const ApiPaginatedResponse = <TModel extends Type<any>>(

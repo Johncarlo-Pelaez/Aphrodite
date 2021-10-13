@@ -1,8 +1,20 @@
 import axios from 'axios';
 import { API_BASE_URL } from 'core/constants';
+import { CancelTokenSource } from './request.types';
 
-export { request };
+export { request, createCancelTokenSource, cancelRequest };
 
 const request = axios.create({
   baseURL: API_BASE_URL,
 });
+
+const createCancelTokenSource = (): CancelTokenSource => {
+  return axios.CancelToken.source();
+};
+
+const cancelRequest = (cancelTokenSource: CancelTokenSource): void => {
+  if (cancelTokenSource) {
+    cancelTokenSource.cancel();
+    cancelTokenSource = null;
+  }
+};

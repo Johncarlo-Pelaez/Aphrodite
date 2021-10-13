@@ -1,176 +1,132 @@
 import { ReactElement, useEffect, useState } from 'react';
+import { Modal, Button, Stack, ProgressBar } from 'react-bootstrap';
+import { useUploadDoc } from 'hooks/document';
+import { FileItem, DropZone } from './components';
 import {
-  Modal,
-  Button,
-  Stack,
-  Container,
-  Row,
-  ProgressBar,
-  Card,
-  Navbar,
-} from 'react-bootstrap';
-import { S3Uploader } from '../s3-uploader';
-import { FileItem } from './components';
-import {
-  STARTING_ITEM,
-  accessKeyId,
-  secretAccessKey,
-  S3_BUCKET,
-  REGION,
-} from 'core/constants';
-import styles from './UploadFilesModal.module.css';
-
-import AWS from 'aws-sdk';
-import S3 from 'aws-sdk/clients/s3';
-
-AWS.config.update({ accessKeyId, secretAccessKey });
-
-const myBucket = new S3({
-  params: { Bucket: S3_BUCKET },
-  region: REGION,
-});
-
-export interface UploadModalProps {
-  isVisible: boolean;
-  onClose: () => void;
-}
-
-export interface FileInfoProps {
-  file: File;
-  percent: number;
-}
+  UploadModalProps,
+  FileInfo,
+  UploadStatus,
+} from './UploadFilesModal.types';
 
 export const UploadFilesModal = ({
   isVisible,
   onClose,
 }: UploadModalProps): ReactElement => {
-  const [files, setFiles] = useState<FileInfoProps[]>([]);
-  const [, setStarted] = useState<boolean>(false);
-  const [itemNumber, setItemNumber] = useState<number>(STARTING_ITEM);
+  const [files, setFiles] = useState<FileInfo[]>([]);
+  const [currentItemIndex, setCurrentItemIndex] = useState<number>(0);
   const [filesProgress, setFilesProgress] = useState<number>(0);
   const numberOfFiles = files?.length;
+  const hasFiles = !!files.length;
+  const { reset: resetUseUploadDoc, mutateAsync: uploadDocument } =
+    useUploadDoc();
 
-  const uploadFiles = () => {
-    setStarted(true);
-    uploadAgain(itemNumber);
-  };
-
-  const uploadAgain = (itemNumber: number) => {
-    if (files) {
-      const fileIndex = itemNumber - 1;
-      const file = files[fileIndex];
-      let nextItem = itemNumber + 1;
-
-      uploadFile(
-        file,
-        () => {
-          if (nextItem <= files.length) {
-            uploadAgain(nextItem);
-          } else {
-            nextItem = STARTING_ITEM;
-          }
-
-          if (nextItem === STARTING_ITEM) {
-            setStarted(false);
-          }
-
-          setItemNumber(nextItem);
-        },
-        itemNumber,
-      );
+  const uploadAgain = (itemIndex: number) => {
+    if (
+      hasFiles &&
+      itemIndex >= 0 &&
+      files.find((file) => file.status === UploadStatus.PENDING)
+    ) {
+      const { file, status } = files[itemIndex];
+      const nextItemIndex = (itemIndex + 1) % numberOfFiles;
+      if (status === UploadStatus.SUCCESS || status === UploadStatus.REMOVED)
+        setCurrentItemIndex(nextItemIndex);
+      else
+        uploadFile(
+          file,
+          () => {
+            if (nextItemIndex < numberOfFiles)
+              setCurrentItemIndex(nextItemIndex);
+          },
+          itemIndex,
+        );
     }
   };
 
   const clearFiles = () => {
     setFiles([]);
-    setStarted(false);
-    setItemNumber(STARTING_ITEM);
+    setCurrentItemIndex(1);
     setFilesProgress(0);
+    resetUseUploadDoc();
   };
 
-  const uploadFile = (
-    file: FileInfoProps,
+  const uploadFile = async (
+    file: File,
     onComplete: () => void,
     index: number,
   ) => {
-    let fileInfo = [...files];
-    let idx = index - 1;
-
-    const params = {
-      ACL: 'public-read',
-      Body: file.file,
-      Bucket: S3_BUCKET,
-      Key: 'docs/' + file.file.name,
-    };
-
-    myBucket
-      .putObject(params)
-      .on('httpUploadProgress', (evt) => {
-        fileInfo[idx].percent = Math.round((evt.loaded / evt.total) * 100);
-        setFiles(fileInfo);
-
-        const currentProgress = fileInfo
-          .map((item) => item.percent)
-          .reduce((prev, next) => prev + next);
-
-        if (numberOfFiles) {
-          const onProgress = Math.round(currentProgress / numberOfFiles);
-          setFilesProgress(onProgress);
-        }
-      })
-      .on('complete', () => {
-        onComplete();
-      })
-      .send((err) => {
-        if (err) console.log(err);
+    const formData = new FormData();
+    formData.append('file', file, file.name);
+    try {
+      await uploadDocument({
+        formData,
+        onUploadProgress: (percentCompleted): void => {
+          let newfiles = [...files];
+          newfiles[index].percent = percentCompleted;
+          setFiles(newfiles);
+          const currentProgress = newfiles
+            .map((item) => item.percent)
+            .reduce((prev, next) => prev + next);
+          const totalProgress = Math.round(currentProgress / numberOfFiles);
+          setFilesProgress(totalProgress);
+        },
       });
+      let newfiles = [...files];
+      newfiles[index].status = UploadStatus.SUCCESS;
+      setFiles(newfiles);
+    } catch (ex) {
+      let newfiles = [...files];
+      newfiles[index].status = UploadStatus.FAILED;
+      setFiles(newfiles);
+    } finally {
+      onComplete();
+    }
+  };
+
+  const renderDropZone = (): ReactElement | undefined => {
+    if (
+      !hasFiles ||
+      (hasFiles && !files.find((file) => file.status !== UploadStatus.REMOVED))
+    )
+      return <DropZone setItems={setFiles} />;
   };
 
   const renderListItemsComponent = (): ReactElement => {
-    let completedCount = 0;
-
-    files.forEach(({ percent }) => {
-      if (percent === 100) completedCount++;
-    });
-
     return (
-      <Container>
-        <Stack gap={1} className={styles.stack_list_file_items}>
-          {files.map(({ file, percent }, idx) => {
-            return (
-              <Card className={styles.card_file_item_list} key={idx}>
-                <FileItem fileName={file.name} progress={percent} />
-              </Card>
-            );
-          })}
-        </Stack>
-        <div className={styles.files_progress__status_file_completed}>
-          <Card>
-            <ProgressBar
-              className={styles.files_progress}
-              now={filesProgress}
-              label={`${filesProgress}%`}
+      <Stack gap={1}>
+        {files.map(({ file, percent, status }, index) => {
+          return (
+            <FileItem
+              key={index}
+              fileName={file.name}
+              progress={percent}
+              size={file.size}
+              status={status}
             />
-          </Card>
-          <div>
-            <Navbar.Text className={styles.text_upload_file_status}>{`${
-              files ? completedCount : 0
-            } out of ${numberOfFiles} Completed`}</Navbar.Text>
-          </div>
-        </div>
-      </Container>
+          );
+        })}
+      </Stack>
     );
   };
 
-  const renderUploadComponent = (): ReactElement => {
-    return (
-      <Container>
-        <Row>
-          <S3Uploader setItems={setFiles} />
-        </Row>
-        <Row>{renderListItemsComponent()}</Row>
-      </Container>
-    );
+  const getCompletedCount = (): number => {
+    return hasFiles
+      ? files.filter((file) => file.status === UploadStatus.SUCCESS).length
+      : 0;
+  };
+
+  const renderProgressBar = (): ReactElement | undefined => {
+    if (hasFiles)
+      return (
+        <div>
+          <ProgressBar
+            variant={filesProgress === 100 ? 'success' : 'info'}
+            className="mt-3"
+            now={filesProgress}
+            label={`${filesProgress}%`}
+          />
+          <p className="text-end mb-0">{`${getCompletedCount()} out of ${numberOfFiles} Completed`}</p>
+        </div>
+      );
   };
 
   const renderUploadModal = (): ReactElement => (
@@ -178,33 +134,34 @@ export const UploadFilesModal = ({
       show={isVisible}
       arial-labelledby="contained-modal-title-vcenter"
       onHide={onClose}
-      contentClassName={styles.upload_modal}
     >
-      <Modal.Header className={styles.modal_header_s3_upload} closeButton>
+      <Modal.Header closeButton>
         <Modal.Title as="h6" id="contained-modal-title-vcenter">
           Documents Upload
         </Modal.Title>
       </Modal.Header>
-      <Modal.Body className={styles.modal_body}>
-        {renderUploadComponent()}
+      <Modal.Body>
+        {renderDropZone()}
+        {renderListItemsComponent()}
+        {renderProgressBar()}
       </Modal.Body>
-      <Modal.Footer className={styles.modal_footer_s3_upload}>
-        <Button variant="primary" size="sm" onClick={clearFiles}>
-          Reset
+      <Modal.Footer>
+        <Button variant="primary" onClick={clearFiles}>
+          Clear
         </Button>
-        <Button variant="primary" size="sm" onClick={onClose}>
-          Close
+        <Button variant="secondary" onClick={onClose}>
+          Hide
         </Button>
       </Modal.Footer>
     </Modal>
   );
 
   useEffect(() => {
-    if (numberOfFiles) {
-      uploadFiles();
-    }
+    if (hasFiles) uploadAgain(currentItemIndex);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [numberOfFiles]);
+  }, [currentItemIndex, hasFiles]);
 
   return renderUploadModal();
 };
+
+export default UploadFilesModal;

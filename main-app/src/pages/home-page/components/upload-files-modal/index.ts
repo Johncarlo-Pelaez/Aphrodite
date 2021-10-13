@@ -1,1 +1,2 @@
-export * from './UploadFilesModal';
+export { default, UploadFilesModal} from './UploadFilesModal';
+export * from './UploadFilesModal.types';

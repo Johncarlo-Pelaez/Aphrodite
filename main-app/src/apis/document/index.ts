@@ -1,2 +1,2 @@
 export * from './document.api';
-export * from './document.type';
+export * from './document.types';

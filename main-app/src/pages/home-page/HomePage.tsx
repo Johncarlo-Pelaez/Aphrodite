@@ -10,7 +10,7 @@ export const HomePage = () => {
     <Container>
       <div className="homepage">
         <Button className="mt-5" variant="primary" onClick={handleShow}>
-          New
+          Upload
         </Button>
         <UploadFilesModal
           isVisible={modalShow}
