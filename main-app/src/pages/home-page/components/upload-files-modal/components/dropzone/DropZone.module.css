@@ -1,8 +1,9 @@
 .dropzone {
-  height: 100px;
-  line-height: 100px;
+  height: max-content;
   text-align: center;
   border: 2px dashed #d6d1d1;
+  box-sizing: border-box;
+  padding: 5rem 0 5rem 0;
 }
 
 .drag_message {

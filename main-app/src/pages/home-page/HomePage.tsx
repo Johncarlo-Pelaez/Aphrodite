@@ -3,21 +3,23 @@ import { Container, Button } from 'react-bootstrap';
 import { UploadFilesModal, DocumentsTable } from './components';
 
 export const HomePage = () => {
-  const [modalShow, setModalShow] = useState(false);
-  const handleShow = () => setModalShow(true);
+  const [uploadModalShow, setUploadModalShow] = useState(false);
+  const handleShow = (show: boolean) => setUploadModalShow(show);
 
   return (
     <Container>
-      <div className="homepage">
-        <Button className="mt-5" variant="primary" onClick={handleShow}>
-          Upload
-        </Button>
-        <UploadFilesModal
-          isVisible={modalShow}
-          onClose={() => setModalShow(false)}
-        />
-      </div>
+      <Button
+        className="mt-5"
+        variant="outline-dark"
+        onClick={() => handleShow(true)}
+      >
+        Upload
+      </Button>
       <DocumentsTable />
+      <UploadFilesModal
+        isVisible={uploadModalShow}
+        onClose={() => handleShow(false)}
+      />
     </Container>
   );
 };

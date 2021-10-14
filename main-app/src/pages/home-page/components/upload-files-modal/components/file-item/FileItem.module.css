@@ -2,6 +2,22 @@
   height: 0.8rem;
 }
 
-.itemFileSizeText {
+.itemFileNameText {
+  font-size: 0.8rem;
+}
+
+.itemFileStatusText {
   font-size: 0.6rem;
+}
+
+.itemButtonEnabled {
+  margin-top: 0.2rem;
+  cursor: pointer;
+}
+
+.itemButtonDisabled {
+  margin-top: 0.2rem;
+  cursor: not-allowed;
+  pointer-events: 'none';
+  opacity: 0.5;
 }

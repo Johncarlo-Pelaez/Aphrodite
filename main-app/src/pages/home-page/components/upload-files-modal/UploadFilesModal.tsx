@@ -1,5 +1,11 @@
 import { ReactElement, useEffect, useState } from 'react';
 import { Modal, Button, Stack, ProgressBar } from 'react-bootstrap';
+import {
+  CancelTokenSource,
+  isCanceled,
+  cancelRequest,
+  createCancelTokenSource,
+} from 'apis/request';
 import { useUploadDoc } from 'hooks/document';
 import { FileItem, DropZone } from './components';
 import {
@@ -7,52 +13,110 @@ import {
   FileInfo,
   UploadStatus,
 } from './UploadFilesModal.types';
+import styles from './UploadFilesModal.module.css';
 
 export const UploadFilesModal = ({
   isVisible,
   onClose,
 }: UploadModalProps): ReactElement => {
   const [files, setFiles] = useState<FileInfo[]>([]);
-  const [currentItemIndex, setCurrentItemIndex] = useState<number>(0);
-  const [filesProgress, setFilesProgress] = useState<number>(0);
-  const numberOfFiles = files?.length;
+  const [currentItemNumber, setCurrentItemNumber] = useState<number>(1);
+  const totalFiles = files?.length;
   const hasFiles = !!files.length;
+  const successCount = hasFiles
+    ? files.filter((file) => file.status === UploadStatus.SUCCESS).length
+    : 0;
+  const forCancel = files.filter(
+    ({ status }) =>
+      status === UploadStatus.PENDING || status === UploadStatus.UPLOADING,
+  ).length;
+  const forRetry = files.filter(
+    ({ status }) =>
+      status === UploadStatus.FAILED || status === UploadStatus.CANCELED,
+  ).length;
+  const hideRetry =
+    !hasFiles || currentItemNumber > 0 || successCount === totalFiles
+      ? true
+      : false;
+  const hideCancel = forCancel <= 0 ? true : false;
+  const filesProgress = Math.round((successCount / totalFiles) * 100);
+
   const { reset: resetUseUploadDoc, mutateAsync: uploadDocument } =
     useUploadDoc();
 
-  const uploadAgain = (itemIndex: number) => {
+  const uploadAgain = (itemNumber: number) => {
     if (
       hasFiles &&
-      itemIndex >= 0 &&
+      itemNumber > 0 &&
       files.find((file) => file.status === UploadStatus.PENDING)
     ) {
-      const { file, status } = files[itemIndex];
-      const nextItemIndex = (itemIndex + 1) % numberOfFiles;
+      const currentItemIndex = itemNumber - 1;
+      const { file, status, cancelToken } = files[currentItemIndex];
+      const nextItemNumber = (itemNumber + 1) % (totalFiles + 1);
       if (status === UploadStatus.SUCCESS || status === UploadStatus.REMOVED)
-        setCurrentItemIndex(nextItemIndex);
+        setCurrentItemNumber(nextItemNumber);
       else
-        uploadFile(
-          file,
-          () => {
-            if (nextItemIndex < numberOfFiles)
-              setCurrentItemIndex(nextItemIndex);
-          },
-          itemIndex,
-        );
+        uploadFile(file, currentItemIndex, cancelToken, () => {
+          if (nextItemNumber <= totalFiles)
+            setCurrentItemNumber(nextItemNumber);
+        });
+    }
+  };
+
+  const retryUpload = (itemNumber: number) => {
+    const retryItemIndex = itemNumber - 1;
+    const itemFile = files[retryItemIndex];
+    if (hasFiles && itemNumber > 0 && itemFile) {
+      let newFiles = [...files];
+      const newCancelToken = createCancelTokenSource();
+      const file = newFiles[retryItemIndex].file;
+      newFiles[retryItemIndex].status = UploadStatus.PENDING;
+      newFiles[retryItemIndex].cancelToken = newCancelToken;
+      setFiles(newFiles);
+      uploadFile(file, retryItemIndex, newCancelToken);
     }
   };
 
   const clearFiles = () => {
     setFiles([]);
-    setCurrentItemIndex(1);
-    setFilesProgress(0);
+    setCurrentItemNumber(1);
     resetUseUploadDoc();
+  };
+
+  const cancelAllUploads = (): void => {
+    files.forEach(({ status, percent, cancelToken }) => {
+      if (
+        status !== UploadStatus.SUCCESS &&
+        status !== UploadStatus.REMOVED &&
+        percent < 100
+      )
+        cancelRequest(cancelToken);
+    });
+  };
+
+  const retryAllCancelledAndError = (): void => {
+    setFiles(
+      [...files].map((file) => {
+        let itemFile = { ...file };
+        const { status } = itemFile;
+        if (
+          status === UploadStatus.FAILED ||
+          status === UploadStatus.CANCELED
+        ) {
+          itemFile.status = UploadStatus.PENDING;
+          itemFile.cancelToken = createCancelTokenSource();
+        }
+        return itemFile;
+      }),
+    );
+    setCurrentItemNumber(1);
   };
 
   const uploadFile = async (
     file: File,
-    onComplete: () => void,
     index: number,
+    cancelToken?: CancelTokenSource,
+    onComplete?: () => void,
   ) => {
     const formData = new FormData();
     formData.append('file', file, file.name);
@@ -61,24 +125,26 @@ export const UploadFilesModal = ({
         formData,
         onUploadProgress: (percentCompleted): void => {
           let newfiles = [...files];
+          newfiles[index].status = UploadStatus.UPLOADING;
           newfiles[index].percent = percentCompleted;
           setFiles(newfiles);
-          const currentProgress = newfiles
-            .map((item) => item.percent)
-            .reduce((prev, next) => prev + next);
-          const totalProgress = Math.round(currentProgress / numberOfFiles);
-          setFilesProgress(totalProgress);
         },
+        cancelToken,
       });
       let newfiles = [...files];
       newfiles[index].status = UploadStatus.SUCCESS;
       setFiles(newfiles);
     } catch (ex) {
       let newfiles = [...files];
-      newfiles[index].status = UploadStatus.FAILED;
+      let newItemFile = newfiles[index];
+      let newStatus: UploadStatus;
+      if (isCanceled(ex) && newItemFile.percent < 100)
+        newStatus = UploadStatus.CANCELED;
+      else newStatus = UploadStatus.FAILED;
+      newfiles[index].status = newStatus;
       setFiles(newfiles);
     } finally {
-      onComplete();
+      if (onComplete && typeof onComplete === 'function') onComplete();
     }
   };
 
@@ -90,28 +156,23 @@ export const UploadFilesModal = ({
       return <DropZone setItems={setFiles} />;
   };
 
-  const renderListItemsComponent = (): ReactElement => {
+  const renderListItems = (): ReactElement => {
     return (
       <Stack gap={1}>
-        {files.map(({ file, percent, status }, index) => {
+        {files.map(({ file, percent, status, cancelToken }, index) => {
           return (
             <FileItem
               key={index}
               fileName={file.name}
               progress={percent}
-              size={file.size}
               status={status}
+              cancelToken={cancelToken}
+              onRetryUpload={() => retryUpload(index + 1)}
             />
           );
         })}
       </Stack>
     );
-  };
-
-  const getCompletedCount = (): number => {
-    return hasFiles
-      ? files.filter((file) => file.status === UploadStatus.SUCCESS).length
-      : 0;
   };
 
   const renderProgressBar = (): ReactElement | undefined => {
@@ -124,7 +185,7 @@ export const UploadFilesModal = ({
             now={filesProgress}
             label={`${filesProgress}%`}
           />
-          <p className="text-end mb-0">{`${getCompletedCount()} out of ${numberOfFiles} Completed`}</p>
+          <p className="text-end mb-0">{`${successCount} out of ${totalFiles} Completed`}</p>
         </div>
       );
   };
@@ -140,16 +201,30 @@ export const UploadFilesModal = ({
           Documents Upload
         </Modal.Title>
       </Modal.Header>
-      <Modal.Body>
+      <Modal.Body className={styles.modalBody}>
         {renderDropZone()}
-        {renderListItemsComponent()}
+        {renderListItems()}
         {renderProgressBar()}
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="primary" onClick={clearFiles}>
+        <Button
+          variant="dark"
+          onClick={retryAllCancelledAndError}
+          hidden={hideRetry}
+        >
+          Retry {forRetry}
+        </Button>
+        <Button
+          variant="outline-danger"
+          onClick={cancelAllUploads}
+          hidden={hideCancel}
+        >
+          Cancel {forCancel}
+        </Button>
+        <Button variant="outline-dark" onClick={clearFiles} hidden={!hasFiles}>
           Clear
         </Button>
-        <Button variant="secondary" onClick={onClose}>
+        <Button variant="outline-dark" onClick={onClose}>
           Hide
         </Button>
       </Modal.Footer>
@@ -157,9 +232,9 @@ export const UploadFilesModal = ({
   );
 
   useEffect(() => {
-    if (hasFiles) uploadAgain(currentItemIndex);
+    if (hasFiles) uploadAgain(currentItemNumber);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentItemIndex, hasFiles]);
+  }, [currentItemNumber, hasFiles]);
 
   return renderUploadModal();
 };

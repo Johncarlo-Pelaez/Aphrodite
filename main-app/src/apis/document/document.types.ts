@@ -1,3 +1,4 @@
+import {  CancelTokenSource } from '../request';
 import { Document } from 'models';
 
 export type GetDocsResult = {
@@ -12,4 +13,5 @@ export type UploadDocResult = {
 export type UploadDocParams = {
   formData: FormData;
   onUploadProgress: (percentCompleted: number) => void;
+  cancelToken?: CancelTokenSource;
 };
