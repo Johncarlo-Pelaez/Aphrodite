@@ -38,6 +38,7 @@ services:
     environment:
       - REDIS_HOST=queue-redis
       - FILE_PATH=/usr/src/files
+      - BARCODE_LICENSE=t0068NQAAAEsnp86A2NZdml4Heh3CIwJq3m/tenO5/NDZl6zGcnHzTRrV722gnmfPwjY2xwxagR/xQJZIMxRb3DwxnbpFAJg=
   queue-redis:
     container_name: epds-aphrodite_queue-redis
     image: redis:6-alpine

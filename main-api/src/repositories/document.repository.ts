@@ -1,6 +1,6 @@
-import { Document, DocumentHistory } from 'src/entities';
+import { Document, DocumentStatus, DocumentHistory } from 'src/entities';
 import { EntityManager, EntityRepository, ILike } from 'typeorm';
-import { CreateDocumentParam, GetDocumentsParam } from './document.params';
+import { CreateDocumentParam, GetDocumentsParam, BeginQrDocumentParam, QrDocumentParams, FailQrDocumentParam } from './document.params';
 
 @EntityRepository()
 export class DocumentRepository {
@@ -70,7 +70,6 @@ export class DocumentRepository {
 
   async createDocument(param: CreateDocumentParam): Promise<number> {
     const description = 'Successfully uploaded.';
-
     const documentId = await this.manager.transaction(
       async (transaction): Promise<number> => {
         const document = new Document();
@@ -79,6 +78,8 @@ export class DocumentRepository {
         document.documentSize = param.documentSize;
         document.description = description;
         document.modifiedDate = param.createdDate;
+        document.modifiedBy = param.userId;
+        document.status = DocumentStatus.UPLOADED;
         document.userId = param.userId;
         await transaction.save(document);
 
@@ -95,5 +96,76 @@ export class DocumentRepository {
     );
 
     return documentId;
+  }
+
+  async beginQrDocument(param: BeginQrDocumentParam): Promise<Document> {
+    const description = 'Begin QR Code.';
+    return await this.manager.transaction(
+      async (transaction): Promise<Document> => {
+        const document = await this.manager.findOneOrFail(Document, param.documentId);
+        document.status = DocumentStatus.QR_BEGIN;
+        document.modifiedDate = param.beginAt;
+        document.description = description;
+        await this.manager.save(document);
+
+        const history = new DocumentHistory();
+        history.description = document.description;
+        history.documentSize = document.documentSize;
+        history.createdDate = document.modifiedDate;
+        history.userId = document.userId;
+        history.documentId = document.id;
+        await transaction.save(history);
+
+        return document;
+      },
+    );
+  }
+
+  async qrDocument(param: QrDocumentParams): Promise<Document> {
+    const description = 'Successfully done QR Code.';
+    return await this.manager.transaction(
+      async (transaction): Promise<Document> => {
+        const document = await transaction.findOneOrFail(Document, param.documentId);
+        document.status = DocumentStatus.QR_DONE;
+        document.qrCode = param.qrCode;
+        document.qrAt = param.qrAt;
+        document.modifiedDate = param.qrAt;
+        document.description = description;
+        await transaction.save(document);
+
+        const history = new DocumentHistory();
+        history.description = document.description;
+        history.documentSize = document.documentSize;
+        history.createdDate = document.modifiedDate;
+        history.userId = document.userId;
+        history.documentId = document.id;
+        await transaction.save(history);
+
+        return document;
+      },
+    );
+  }
+
+  async failQrDocument(param: FailQrDocumentParam): Promise<Document> {
+    const description = 'Failed QR Code.';
+    return await this.manager.transaction(
+      async (transaction): Promise<Document> => {
+        const document = await this.manager.findOneOrFail(Document, param.documentId);
+        document.status = DocumentStatus.QR_FAILED;
+        document.modifiedDate = param.failedAt;
+        document.description = description;
+        await transaction.save(document);
+
+        const history = new DocumentHistory();
+        history.description = document.description;
+        history.documentSize = document.documentSize;
+        history.createdDate = document.modifiedDate;
+        history.userId = document.userId;
+        history.documentId = document.id;
+        await transaction.save(history);
+
+        return document;
+      },
+    );
   }
 }

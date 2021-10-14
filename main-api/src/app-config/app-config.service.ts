@@ -45,4 +45,8 @@ export class AppConfigService {
   get filePath(): string {
     return this.configService.get('FILE_PATH');
   }
+
+  get barcodeLicense(): string {
+    return this.configService.get('BARCODE_LICENSE');
+  }
 }

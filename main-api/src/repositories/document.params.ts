@@ -11,3 +11,19 @@ export interface CreateDocumentParam {
   createdDate: Date;
   userId: number;
 }
+
+export interface BeginQrDocumentParam {
+  documentId: number;
+  beginAt: Date;
+}
+
+export interface QrDocumentParams {
+  documentId: number;
+  qrCode: string;
+  qrAt: Date;
+}
+
+export interface FailQrDocumentParam {
+  documentId: number;
+  failedAt: Date;
+}

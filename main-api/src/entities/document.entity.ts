@@ -32,6 +32,22 @@ export class Document {
 
   @ApiProperty()
   @Column()
+  modifiedBy: number;
+
+  @ApiProperty()
+  @Column()
+  status: string;
+
+  @ApiProperty()
+  @Column()
+  qrCode: string;
+
+  @ApiProperty()
+  @Column()
+  qrAt: Date;
+
+  @ApiProperty()
+  @Column()
   userId: number;
 
   @ApiProperty()

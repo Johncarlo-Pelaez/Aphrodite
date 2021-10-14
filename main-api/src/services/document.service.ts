@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
-import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
+import { v4 as uuidv4 } from 'uuid';
 import { DatesUtil } from 'src/utils';
 import { AppConfigService } from 'src/app-config';
 import { DocumentRepository } from 'src/repositories';
@@ -22,13 +22,14 @@ export class DocumentsService {
     const dateRightNow = this.datesUtil.getDateNow(); 
     let file = data.file;
     const uuid = uuidv4();
-    const fullPath = path.join(this.appConfigService.filePath, uuid);
+    const fileName = uuid;
+    const fullPath = path.join(this.appConfigService.filePath, fileName);
 
     await fs.promises.writeFile(fullPath, file.buffer);
 
     const response = new CreatedResponse();
     response.id = await this.documentRepository.createDocument({
-      uuid,
+      uuid: fileName,
       documentName: file.originalname,
       documentSize: file.size,
       createdDate: dateRightNow,
