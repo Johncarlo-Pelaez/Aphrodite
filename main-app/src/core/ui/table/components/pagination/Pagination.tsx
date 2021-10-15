@@ -55,87 +55,89 @@ export const Pagination = (props: PaginationProps): ReactElement => {
   }, [currentPage, paginationNumber, totalPage]);
 
   return (
-    <Row className="d-flex justify-content-end">
-      <Col xs="auto">
-        <BPagination>
-          <BPagination.First
-            onClick={() => onPageChanged(1)}
-            hidden={isGotoFirstPageHidden}
-            disabled={isGotoFirstPageHidden || disabled}
-          />
-          <BPagination.Prev
-            onClick={() => onPageChanged(currentPage - 1)}
-            hidden={isPrevPageHidden}
-            disabled={isPrevPageHidden || disabled}
-          />
-          {paginations.map((pageNumber: number, index: number) => (
-            <BPagination.Item
-              key={index}
-              active={pageNumber === currentPage}
-              onClick={() => onPageChanged(pageNumber)}
-              disabled={disabled}
-            >
-              {pageNumber}
-            </BPagination.Item>
-          ))}
-          <BPagination.Next
-            onClick={() => onPageChanged(currentPage + 1)}
-            hidden={isNextPageHidden}
-            disabled={isNextPageHidden || disabled}
-          />
-          <BPagination.Last
-            onClick={() => onPageChanged(totalPage)}
-            hidden={isGotoLastPageHidden}
-            disabled={isGotoLastPageHidden || disabled}
-          />
-        </BPagination>
-      </Col>
-      <Col xs="auto">
-        <Form>
-          <Form.Group as={Row} className="align-items-center">
-            <Col xs="auto">
-              <Form.Label>
-                {`Showing ${totalPage > 0 ? showingFrom : 0} to ${
-                  totalPage > 0 ? showingTo : 0
-                } of ${total} entries `}
-                | Go to page:{' '}
-              </Form.Label>
-            </Col>
-            <Col xs="auto">
-              <Form.Control
+    <div className="d-flex justify-content-between align-items-center">
+      <p>
+        {`Showing ${totalPage > 0 ? showingFrom : 0} to ${
+          totalPage > 0 ? showingTo : 0
+        } of ${total} entries `}
+      </p>
+      <Row className="d-flex justify-content-end">
+        <Col xs="auto">
+          <BPagination>
+            <BPagination.First
+              onClick={() => onPageChanged(1)}
+              hidden={isGotoFirstPageHidden}
+              disabled={isGotoFirstPageHidden || disabled}
+            />
+            <BPagination.Prev
+              onClick={() => onPageChanged(currentPage - 1)}
+              hidden={isPrevPageHidden}
+              disabled={isPrevPageHidden || disabled}
+            />
+            {paginations.map((pageNumber: number, index: number) => (
+              <BPagination.Item
+                key={index}
+                active={pageNumber === currentPage}
+                onClick={() => onPageChanged(pageNumber)}
                 disabled={disabled}
-                placeholder="page"
-                type="number"
-                min={1}
-                max={totalPage}
-                value={currentPage}
-                onChange={(e) => {
-                  let page = e.target.value ? Number(e.target.value) : 0;
-                  if (page > totalPage) page = totalPage;
-                  if (page <= 0) page = 1;
-                  onPageChanged(page);
-                }}
-              />
-            </Col>
-            <Col xs="auto">
-              <Form.Select
-                disabled={disabled}
-                value={pageSize}
-                onChange={(event: ChangeEvent<HTMLSelectElement>) => {
-                  onSizeChange(Number(event.target.value));
-                }}
               >
-                {[5, 10, 15, 20, 30].map((pageSize) => (
-                  <option key={pageSize} value={pageSize}>
-                    Show {pageSize}
-                  </option>
-                ))}
-              </Form.Select>
-            </Col>
-          </Form.Group>
-        </Form>
-      </Col>
-    </Row>
+                {pageNumber}
+              </BPagination.Item>
+            ))}
+            <BPagination.Next
+              onClick={() => onPageChanged(currentPage + 1)}
+              hidden={isNextPageHidden}
+              disabled={isNextPageHidden || disabled}
+            />
+            <BPagination.Last
+              onClick={() => onPageChanged(totalPage)}
+              hidden={isGotoLastPageHidden}
+              disabled={isGotoLastPageHidden || disabled}
+            />
+          </BPagination>
+        </Col>
+        <Col xs="auto">
+          <Form>
+            <Form.Group as={Row} className="align-items-center">
+              <Col xs="auto">
+                <Form.Label>Go to page:</Form.Label>
+              </Col>
+              <Col xs="auto">
+                <Form.Control
+                  disabled={disabled}
+                  placeholder="page"
+                  type="number"
+                  min={1}
+                  max={totalPage}
+                  value={currentPage}
+                  onChange={(e) => {
+                    let page = e.target.value ? Number(e.target.value) : 0;
+                    if (page > totalPage) page = totalPage;
+                    if (page <= 0) page = 1;
+                    onPageChanged(page);
+                  }}
+                />
+              </Col>
+              <Col xs="auto">
+                <Form.Select
+                  disabled={disabled}
+                  value={pageSize}
+                  onChange={(event: ChangeEvent<HTMLSelectElement>) => {
+                    onSizeChange(Number(event.target.value));
+                  }}
+                >
+                  {[5, 10, 15, 20, 30].map((pageSize) => (
+                    <option key={pageSize} value={pageSize}>
+                      Show {pageSize}
+                    </option>
+                  ))}
+                </Form.Select>
+              </Col>
+            </Form.Group>
+          </Form>
+        </Col>
+      </Row>
+    </div>
   );
 };
 

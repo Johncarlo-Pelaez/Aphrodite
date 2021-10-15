@@ -32,13 +32,15 @@ export const Table = <T extends Record<string, any> = {}>(
   const rowCount = data.length;
 
   const showRowHighlight = (rowData: T): string => {
-    if (!selectedRow) return '';
-    if (typeof rowKey === 'function') {
-      return rowKey(rowData) === rowKey(selectedRow) ? styles.highlightRow : '';
-    } else if (typeof rowKey === 'string') {
-      return rowData[rowKey] === selectedRow[rowKey] ? styles.highlightRow : '';
-    }
-    return '';
+    if (typeof rowKey === 'function' && selectedRow) {
+      return rowKey(rowData) === rowKey(selectedRow)
+        ? styles.highlightRow
+        : styles.tableRow;
+    } else if (typeof rowKey === 'string' && selectedRow) {
+      return rowData[rowKey] === selectedRow[rowKey]
+        ? styles.highlightRow
+        : styles.tableRow;
+    } else return styles.tableRow;
   };
 
   const setSelectedRow = (rowData: T): void => {
@@ -91,7 +93,7 @@ export const Table = <T extends Record<string, any> = {}>(
   const renderTable = (): ReactElement => {
     if (loading) {
       return (
-        <div className="w-100 p-4 d-flex justify-content-center align-items-center">
+        <div className="w-100 h-100 p-5 d-flex justify-content-center align-items-center">
           <Spinner animation="border" />
         </div>
       );
@@ -114,26 +116,28 @@ export const Table = <T extends Record<string, any> = {}>(
     }
 
     return (
-      <BTable striped bordered hover>
-        <thead>
-          <tr>{renderTableColumns()}</tr>
-        </thead>
-        <tbody>
-          {data.map((data, index) => (
-            <tr
-              key={index}
-              className={showRowHighlight(data)}
-              onClick={() => setSelectedRow(data)}
-            >
-              {columns.map(({ dataIndex, render }, index) => (
-                <td key={index}>
-                  {(render && render(data)) || data[dataIndex]}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </BTable>
+      <div className={styles.tableContainer}>
+        <BTable bordered hover>
+          <thead className={styles.tableTHead}>
+            <tr>{renderTableColumns()}</tr>
+          </thead>
+          <tbody>
+            {data.map((data, index) => (
+              <tr
+                key={index}
+                className={showRowHighlight(data)}
+                onClick={() => setSelectedRow(data)}
+              >
+                {columns.map(({ dataIndex, render }, index) => (
+                  <td key={index}>
+                    {(render && render(data)) || data[dataIndex]}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </BTable>
+      </div>
     );
   };
 
