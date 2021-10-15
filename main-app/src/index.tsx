@@ -1,11 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './styles/main.scss';
+import { PublicClientApplication } from '@azure/msal-browser';
 import App from './App';
+import './styles/main.scss';
+import { msalConfig } from 'authConfig';
+
+export const msalInstance = new PublicClientApplication(msalConfig);
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <App msalInstance={msalInstance} />
   </React.StrictMode>,
   document.getElementById('root'),
 );

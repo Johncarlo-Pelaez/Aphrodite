@@ -27,7 +27,7 @@ export class DocumentConsumer {
     const document = await this.documentRepository.getDocument(job.data);
     this.runQr({
       documentId: document.id,
-      fileName: document.uuid.toLowerCase(),
+      fileName: document.uuid,
     });
   }
 
