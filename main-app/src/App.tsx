@@ -1,3 +1,5 @@
+import { IPublicClientApplication } from '@azure/msal-browser';
+import { MsalProvider } from '@azure/msal-react';
 import { QueryClientProvider, QueryClient } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
@@ -11,18 +13,24 @@ const queryClient = new QueryClient({
   },
 });
 
-function App() {
+export interface AppProps {
+  msalInstance: IPublicClientApplication;
+}
+
+function App({ msalInstance }: AppProps) {
   return (
-    <QueryClientProvider client={queryClient}>
-      <Router>
-        <Switch>
-          <Route exact path="/" component={HomePage} />
-          <Route path="/login" component={LoginPage} />
-          <Route component={NotFoundPage} />
-        </Switch>
-      </Router>
-      <ReactQueryDevtools />
-    </QueryClientProvider>
+    <MsalProvider instance={msalInstance}>
+      <QueryClientProvider client={queryClient}>
+        <Router>
+          <Switch>
+            <Route exact path="/" component={LoginPage} />
+            <Route path="/app" component={HomePage} />
+            <Route component={NotFoundPage} />
+          </Switch>
+        </Router>
+        <ReactQueryDevtools />
+      </QueryClientProvider>
+    </MsalProvider>
   );
 }
 
