@@ -55,7 +55,7 @@ export const Pagination = (props: PaginationProps): ReactElement => {
   }, [currentPage, paginationNumber, totalPage]);
 
   return (
-    <div className="d-flex justify-content-between align-items-center">
+    <div className="b-table__pagination">
       <p>
         {`Showing ${totalPage > 0 ? showingFrom : 0} to ${
           totalPage > 0 ? showingTo : 0

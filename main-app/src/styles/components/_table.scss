@@ -1,0 +1,60 @@
+$table-height: 50vh;
+
+.table-container {
+  display: inline-block;
+  height: $table-height;
+  overflow: auto;
+  width: 100%;
+}
+
+.b-table {
+  position: relative;
+
+  &__spinner {
+    display: flex;
+    flex-flow: row;
+    justify-content: center;
+    align-items: center;
+    height: $table-height;
+  }
+
+  &__pagination {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+
+    @include breakpoint-up(md) {
+      flex-direction: row;
+    }
+  }
+}
+
+.b-table > thead {
+  background-color: $page-bg;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+
+  & > tr {
+    cursor: pointer;
+  }
+}
+
+.b-table > tbody {
+  & > tr {
+    cursor: pointer;
+  }
+
+  & > tr.highlight-row:hover {
+    & > td {
+      background-color: #2286e3;
+    }
+  }
+}
+
+.highlight-row {
+  background-color: $primary-color;
+  color: $white;
+}

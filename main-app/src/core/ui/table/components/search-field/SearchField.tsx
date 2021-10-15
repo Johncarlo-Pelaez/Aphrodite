@@ -1,6 +1,6 @@
 import { ReactElement, useRef } from 'react';
 import FormControl from 'react-bootstrap/FormControl';
-import styles from './SearchField.module.css';
+import styles from './SearchField.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 

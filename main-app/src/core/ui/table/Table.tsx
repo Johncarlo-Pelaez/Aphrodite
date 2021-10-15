@@ -8,7 +8,6 @@ import {
   faSortAlphaDown,
   faSortAlphaUp,
 } from '@fortawesome/free-solid-svg-icons';
-import styles from './Table.module.scss';
 import { TableProps, Sorter } from './Table.types';
 import { Pagination, SearchField } from './components';
 
@@ -33,14 +32,10 @@ export const Table = <T extends Record<string, any> = {}>(
 
   const showRowHighlight = (rowData: T): string => {
     if (typeof rowKey === 'function' && selectedRow) {
-      return rowKey(rowData) === rowKey(selectedRow)
-        ? styles.highlightRow
-        : styles.tableRow;
+      return rowKey(rowData) === rowKey(selectedRow) ? 'highlight-row' : '';
     } else if (typeof rowKey === 'string' && selectedRow) {
-      return rowData[rowKey] === selectedRow[rowKey]
-        ? styles.highlightRow
-        : styles.tableRow;
-    } else return styles.tableRow;
+      return rowData[rowKey] === selectedRow[rowKey] ? 'highlight-row' : '';
+    } else return '';
   };
 
   const setSelectedRow = (rowData: T): void => {
@@ -66,7 +61,6 @@ export const Table = <T extends Record<string, any> = {}>(
       return (
         <th
           key={index}
-          className={styles.tableHeaderCol}
           onClick={() => {
             if (!sorterConfig) return;
             if (isSelf) {
@@ -93,7 +87,7 @@ export const Table = <T extends Record<string, any> = {}>(
   const renderTable = (): ReactElement => {
     if (loading) {
       return (
-        <div className="w-100 h-100 p-5 d-flex justify-content-center align-items-center">
+        <div className="b-table__spinner">
           <Spinner animation="border" />
         </div>
       );
@@ -116,9 +110,9 @@ export const Table = <T extends Record<string, any> = {}>(
     }
 
     return (
-      <div className={styles.tableContainer}>
-        <BTable bordered hover>
-          <thead className={styles.tableTHead}>
+      <div className="table-container">
+        <BTable className="b-table" bordered hover>
+          <thead>
             <tr>{renderTableColumns()}</tr>
           </thead>
           <tbody>
