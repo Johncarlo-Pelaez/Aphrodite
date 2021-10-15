@@ -18,12 +18,15 @@ export class DocumentsService {
     private readonly documentProducer: DocumentProducer,
   ) {}
 
-  async uploadDocument(data: UploadDocuments): Promise<CreatedResponse> {    
-    const dateRightNow = this.datesUtil.getDateNow(); 
+  async uploadDocument(data: UploadDocuments): Promise<CreatedResponse> {
+    const dateRightNow = this.datesUtil.getDateNow();
     let file = data.file;
     const uuid = uuidv4();
-    const fileName = uuid;
-    const fullPath = path.join(this.appConfigService.filePath, fileName);
+    let fileName: string = uuid;
+    const fullPath = path.join(
+      this.appConfigService.filePath,
+      fileName.toUpperCase(),
+    );
 
     await fs.promises.writeFile(fullPath, file.buffer);
 
