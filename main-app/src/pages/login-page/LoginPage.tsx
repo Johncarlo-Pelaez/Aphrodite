@@ -3,12 +3,13 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { useSignIn } from 'hooks/auth';
 import { loginRequest } from 'authConfig';
+import { FullWidthSpinner } from 'core/ui';
 import styles from './LoginPage.module.css';
 
 export const LoginPage = (): ReactElement => {
-  const { isLoading, error, signInAsync } = useSignIn({ loginRequest });
+  const { isLoading, signInAsync } = useSignIn({ loginRequest });
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <FullWidthSpinner />;
 
   return (
     <div className={styles.loginContainer}>

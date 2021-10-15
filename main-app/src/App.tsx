@@ -4,9 +4,9 @@ import { Suspense, lazy } from 'react';
 import { QueryClientProvider, QueryClient } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import Spinner from 'react-bootstrap/Spinner';
 import { MainLayout, PublicLayout } from 'layouts';
 import { AuthRoute, ProtectedRoute } from 'routes';
+import { FullWidthSpinner } from 'core/ui';
 
 const HomePage = lazy(() => import('pages/home-page'));
 const LoginPage = lazy(() => import('pages/login-page'));
@@ -29,7 +29,7 @@ function App({ msalInstance }: AppProps) {
   return (
     <MsalProvider instance={msalInstance}>
       <QueryClientProvider client={queryClient}>
-        <Suspense fallback={<Spinner animation="border" />}>
+        <Suspense fallback={<FullWidthSpinner />}>
           <Router>
             <Switch>
               <AuthRoute

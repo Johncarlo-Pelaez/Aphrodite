@@ -9,11 +9,11 @@ const getMainMenuItems = (): MenuItem[] => {
       path: '/home',
     },
     {
-      label: 'User',
+      label: 'Users',
       path: '/users',
     },
     {
-      label: 'Report',
+      label: 'Reports',
       path: '/reports',
     },
   ];

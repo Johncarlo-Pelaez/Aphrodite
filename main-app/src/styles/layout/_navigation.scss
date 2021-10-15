@@ -1,0 +1,21 @@
+.navbar {
+  position: relative;
+
+  &-mobile {
+    display: block;
+  }
+
+  &-desktop {
+    display: none;
+  }
+
+  @include breakpoint-up(lg) {
+    &-mobile {
+      display: none;
+    }
+
+    &-desktop {
+      display: block;
+    }
+  }
+}

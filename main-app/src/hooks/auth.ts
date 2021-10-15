@@ -1,11 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useMsal } from '@azure/msal-react';
-import { PopupRequest, BrowserAuthError } from '@azure/msal-browser';
+import {
+  PopupRequest,
+  BrowserAuthError,
+  InteractionStatus,
+} from '@azure/msal-browser';
 import { removeToken, setToken } from 'utils/token';
-export {
-  useSignIn,
-  //useSignOut
-};
+export { useSignIn, useSignOut };
 
 interface UseSignInParams {
   loginRequest: PopupRequest;
@@ -22,42 +23,46 @@ const useSignIn = (params: UseSignInParams): useSignInResult => {
   const { loginRequest } = params;
   const [isError, setIsError] = useState<boolean>(false);
   const [error, setError] = useState<BrowserAuthError | undefined>(undefined);
-  const { instance, accounts, inProgress } = useMsal();
-  const isLoading = inProgress === 'login';
+  const { instance, inProgress } = useMsal();
+  const isLoading = inProgress === InteractionStatus.Login;
 
   const signInAsync = async (): Promise<void> => {
     try {
-      await instance.loginPopup(loginRequest);
+      const res = await instance.loginPopup(loginRequest);
+      setIsError(false);
+      setToken(res.accessToken);
     } catch (err) {
       setIsError(true);
       setError(err as BrowserAuthError);
     }
   };
 
-  useEffect(() => {
-    if (inProgress === 'none' && accounts.length > 0) {
-      instance
-        .acquireTokenSilent({
-          account: accounts[0],
-          scopes: ['User.Read'],
-        })
-        .then((response) => {
-          if (response.accessToken) {
-            setToken(response.accessToken);
-          }
-        });
-    }
-  }, [inProgress, accounts, instance]);
-
   return { isLoading, isError, error, signInAsync };
 };
 
-// const useSignOut = (): UseMutationResult<void, ApiError, void> => {
-//   return useMutation<void, ApiError>(deleteAuth, {
-//     onSuccess: () => {
-//       removeAuthBearer();
-//       removeBusinessUnitIdInHeader();
-//       removeToken();
-//     },
-//   });
-// };
+interface UseSignOutResult {
+  isLoading: boolean;
+  isError: boolean;
+  error?: BrowserAuthError;
+  signOutAsync: () => Promise<void>;
+}
+
+const useSignOut = (): UseSignOutResult => {
+  const [isError, setIsError] = useState<boolean>(false);
+  const [error, setError] = useState<BrowserAuthError | undefined>(undefined);
+  const { instance, inProgress } = useMsal();
+  const isLoading = inProgress === InteractionStatus.Logout;
+
+  const signOutAsync = async (): Promise<void> => {
+    try {
+      await instance.logoutPopup();
+      setIsError(false);
+      removeToken();
+    } catch (err) {
+      setIsError(true);
+      setError(err as BrowserAuthError);
+    }
+  };
+
+  return { isLoading, isError, error, signOutAsync };
+};
