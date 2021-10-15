@@ -5,10 +5,13 @@ import { QueryClientProvider, QueryClient } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Spinner from 'react-bootstrap/Spinner';
+import { MainLayout, PublicLayout } from 'layouts';
+import { AuthRoute, ProtectedRoute } from 'routes';
 
 const HomePage = lazy(() => import('pages/home-page'));
 const LoginPage = lazy(() => import('pages/login-page'));
 const NotFoundPage = lazy(() => import('pages/not-found-page'));
+const Forbidden = lazy(() => import('pages/forbidden'));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -29,9 +32,20 @@ function App({ msalInstance }: AppProps) {
         <Suspense fallback={<Spinner animation="border" />}>
           <Router>
             <Switch>
-              <Route exact path="/" component={LoginPage} />
-              <Route path="/app" component={HomePage} />
+              <AuthRoute
+                exact
+                path="/auth"
+                layout={PublicLayout}
+                component={LoginPage}
+              />
+              <ProtectedRoute
+                exact
+                path="/"
+                layout={MainLayout}
+                component={HomePage}
+              />
               <Route component={NotFoundPage} />
+              <Route exact path="/forbidden" component={Forbidden} />
             </Switch>
           </Router>
         </Suspense>
