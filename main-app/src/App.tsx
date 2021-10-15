@@ -6,7 +6,7 @@ import { ReactQueryDevtools } from 'react-query/devtools';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { MainLayout, PublicLayout } from 'layouts';
 import { AuthRoute, ProtectedRoute } from 'routes';
-import { FullWidthSpinner } from 'core/ui';
+import { FullHeightSpinner } from 'core/ui';
 
 const HomePage = lazy(() => import('pages/home-page'));
 const LoginPage = lazy(() => import('pages/login-page'));
@@ -29,7 +29,7 @@ function App({ msalInstance }: AppProps) {
   return (
     <MsalProvider instance={msalInstance}>
       <QueryClientProvider client={queryClient}>
-        <Suspense fallback={<FullWidthSpinner />}>
+        <Suspense fallback={<FullHeightSpinner />}>
           <Router>
             <Switch>
               <AuthRoute

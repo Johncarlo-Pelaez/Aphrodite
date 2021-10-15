@@ -1,6 +1,5 @@
 import { ReactElement, useRef } from 'react';
 import FormControl from 'react-bootstrap/FormControl';
-import styles from './SearchField.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
@@ -18,11 +17,10 @@ export const SearchField = (props: SearchFieldProps): ReactElement => {
   };
 
   return (
-    <div className="d-flex justify-content-end">
-      <div className={styles.searchField}>
-        <FontAwesomeIcon className={styles.searchIcon} icon={faSearch} />
+    <div className="b-table__search__container">
+      <div className="b-table__search">
+        <FontAwesomeIcon icon={faSearch} />
         <FormControl
-          className={styles.searchInput}
           ref={searchInputRef}
           placeholder="Search"
           aria-label="Search"

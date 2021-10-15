@@ -18,6 +18,28 @@ $table-height: 50vh;
     height: $table-height;
   }
 
+  &__search__container {
+    display: flex;
+    justify-content: end;
+  }
+
+  &__search {
+    position: relative;
+    margin-bottom: 1rem;
+    width: 20rem;
+
+    & > svg {
+      position: absolute;
+      left: 15px;
+      top: 30%;
+      color: silver;
+    }
+
+    & > input {
+      padding-left: 40px;
+    }
+  }
+
   &__pagination {
     display: flex;
     flex-direction: column;
