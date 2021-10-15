@@ -1,8 +1,27 @@
+.tableContainer {
+  display: inline-block;
+  height: 50vh;
+  overflow: auto;
+  width: 100%;
+}
+
 .highlightRow {
   background-color: #1890ff;
   color: #ffffff;
 }
 
+.tableTHead {
+  background-color: white;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+}
+
 .tableHeaderCol {
+  cursor: pointer;
+  position: relative;
+}
+
+.tableRow {
   cursor: pointer;
 }

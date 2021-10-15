@@ -1,7 +1,5 @@
 import { ReactElement, useRef } from 'react';
-import InputGroup from 'react-bootstrap/InputGroup';
 import FormControl from 'react-bootstrap/FormControl';
-import Button from 'react-bootstrap/Button';
 import styles from './SearchField.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
@@ -21,8 +19,10 @@ export const SearchField = (props: SearchFieldProps): ReactElement => {
 
   return (
     <div className="d-flex justify-content-end">
-      <InputGroup className={styles.searchField}>
+      <div className={styles.searchField}>
+        <FontAwesomeIcon className={styles.searchIcon} icon={faSearch} />
         <FormControl
+          className={styles.searchInput}
           ref={searchInputRef}
           placeholder="Search"
           aria-label="Search"
@@ -36,14 +36,7 @@ export const SearchField = (props: SearchFieldProps): ReactElement => {
           }}
           onChange={(e) => onSearchDocument(e.target.value ?? '')}
         />
-        <Button
-          variant="outline-secondary"
-          id="button-addon2"
-          onClick={() => searchDocs()}
-        >
-          <FontAwesomeIcon icon={faSearch} />
-        </Button>
-      </InputGroup>
+      </div>
     </div>
   );
 };

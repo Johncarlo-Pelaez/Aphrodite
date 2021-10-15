@@ -1,4 +1,16 @@
 .searchField {
+  position: relative;
   margin-bottom: 1rem;
-  width: max-content;
+  width: 20rem;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 15px;
+  top: 30%;
+  color: silver;
+}
+
+.searchInput {
+  padding-left: 40px;
 }

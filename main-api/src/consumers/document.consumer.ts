@@ -18,16 +18,16 @@ export class DocumentConsumer {
     private readonly documentRepository: DocumentRepository,
     private readonly appConfigService: AppConfigService,
     private readonly datesUtil: DatesUtil,
-    ) {
-      Dynamsoft.BarcodeReader.productKeys = this.appConfigService.barcodeLicense;
-    }
+  ) {
+    Dynamsoft.BarcodeReader.productKeys = this.appConfigService.barcodeLicense;
+  }
 
   @Process('migrate')
   async migrate(job: Job<number>): Promise<void> {
     const document = await this.documentRepository.getDocument(job.data);
     this.runQr({
       documentId: document.id,
-      fileName: document.uuid.toLowerCase(), 
+      fileName: document.uuid,
     });
   }
 
@@ -52,7 +52,10 @@ export class DocumentConsumer {
   }
 
   private async readFile(jobData: JobData): Promise<Buffer> {
-    const location = path.join(this.appConfigService.filePath, jobData.fileName);
+    const location = path.join(
+      this.appConfigService.filePath,
+      jobData.fileName,
+    );
     const buffer = await fs.promises.readFile(location);
     return buffer;
   }

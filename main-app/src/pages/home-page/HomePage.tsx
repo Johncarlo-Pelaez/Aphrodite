@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Container, Button } from 'react-bootstrap';
+import { Container, Button, Stack } from 'react-bootstrap';
 import { UploadFilesModal, DocumentsTable } from './components';
 
 export const HomePage = () => {
@@ -8,13 +8,27 @@ export const HomePage = () => {
 
   return (
     <Container>
-      <Button
-        className="mt-5"
-        variant="outline-dark"
-        onClick={() => handleShow(true)}
-      >
-        Upload
-      </Button>
+      <Stack className="mt-5" direction="horizontal" gap={3}>
+        <Button
+          className="px-4"
+          variant="dark"
+          onClick={() => handleShow(true)}
+        >
+          Upload
+        </Button>
+        <Button className="px-4" variant="secondary">
+          Filters
+        </Button>
+        <Button className="px-4" variant="light">
+          View
+        </Button>
+        <Button className="px-4" variant="outline-dark">
+          Retry
+        </Button>
+        <Button className="px-4" variant="danger">
+          Delete
+        </Button>
+      </Stack>
       <DocumentsTable />
       <UploadFilesModal
         isVisible={uploadModalShow}
