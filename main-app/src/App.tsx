@@ -1,7 +1,8 @@
+import { Suspense, lazy } from 'react';
 import { QueryClientProvider, QueryClient } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import { HomePage, LoginPage, NotFoundPage } from './pages';
+import Spinner from 'react-bootstrap/Spinner';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -11,16 +12,22 @@ const queryClient = new QueryClient({
   },
 });
 
+const HomePage = lazy(() => import('pages/home-page'));
+const LoginPage = lazy(() => import('pages/login-page'));
+const NotFoundPage = lazy(() => import('pages/not-found-page'));
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router>
-        <Switch>
-          <Route exact path="/" component={HomePage} />
-          <Route path="/login" component={LoginPage} />
-          <Route component={NotFoundPage} />
-        </Switch>
-      </Router>
+      <Suspense fallback={<Spinner animation="border" />}>
+        <Router>
+          <Switch>
+            <Route exact path="/" component={HomePage} />
+            <Route path="/login" component={LoginPage} />
+            <Route component={NotFoundPage} />
+          </Switch>
+        </Router>
+      </Suspense>
       <ReactQueryDevtools />
     </QueryClientProvider>
   );
