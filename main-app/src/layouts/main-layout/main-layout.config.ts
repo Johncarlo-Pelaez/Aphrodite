@@ -6,7 +6,7 @@ const getMainMenuItems = (): MenuItem[] => {
   return [
     {
       label: 'Home',
-      path: '/home',
+      path: '/',
     },
     {
       label: 'Users',
