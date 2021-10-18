@@ -191,14 +191,10 @@ export const UploadFilesModal = ({
   };
 
   const renderUploadModal = (): ReactElement => (
-    <Modal
-      show={isVisible}
-      arial-labelledby="contained-modal-title-vcenter"
-      onHide={onClose}
-    >
+    <Modal show={isVisible} onHide={onClose}>
       <Modal.Header closeButton>
-        <Modal.Title as="h6" id="contained-modal-title-vcenter">
-          Documents Upload
+        <Modal.Title as="h6">
+          <b>UPLOAD DOCUMENTS</b>
         </Modal.Title>
       </Modal.Header>
       <Modal.Body className={styles.modalBody}>
