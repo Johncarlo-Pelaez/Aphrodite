@@ -1,10 +1,16 @@
 import { useState } from 'react';
 import { Container, Button, Stack } from 'react-bootstrap';
-import { UploadFilesModal, DocumentsTable } from './components';
+import { Document } from 'models';
+import { UploadFilesModal, DocumentsTable, ViewDocModal } from './components';
 
 export const HomePage = () => {
-  const [uploadModalShow, setUploadModalShow] = useState(false);
-  const handleShow = (show: boolean) => setUploadModalShow(show);
+  const [selectedDocument, setSelectedDocument] = useState<
+    Document | undefined
+  >(undefined);
+  const [uploadModalShow, setUploadModalShow] = useState<boolean>(false);
+  const [viewDocModalShow, setViewDocModalShow] = useState<boolean>(false);
+  const handleShowUploadModal = (show: boolean) => setUploadModalShow(show);
+  const handleShowViewDocModal = (show: boolean) => setViewDocModalShow(show);
 
   return (
     <Container>
@@ -12,14 +18,19 @@ export const HomePage = () => {
         <Button
           className="px-4"
           variant="dark"
-          onClick={() => handleShow(true)}
+          onClick={() => handleShowUploadModal(true)}
         >
           Upload
         </Button>
         <Button className="px-4" variant="secondary">
           Filters
         </Button>
-        <Button className="px-4" variant="light">
+        <Button
+          className="px-4"
+          variant="light"
+          disabled={!selectedDocument}
+          onClick={() => handleShowViewDocModal(true)}
+        >
           View
         </Button>
         <Button className="px-4" variant="outline-dark">
@@ -29,10 +40,18 @@ export const HomePage = () => {
           Delete
         </Button>
       </Stack>
-      <DocumentsTable />
+      <DocumentsTable
+        selectedDoc={selectedDocument}
+        onSelectDoc={setSelectedDocument}
+      />
       <UploadFilesModal
         isVisible={uploadModalShow}
-        onClose={() => handleShow(false)}
+        onClose={() => handleShowUploadModal(false)}
+      />
+      <ViewDocModal
+        isVisible={viewDocModalShow}
+        documentId={selectedDocument?.id}
+        onClose={() => handleShowViewDocModal(false)}
       />
     </Container>
   );
