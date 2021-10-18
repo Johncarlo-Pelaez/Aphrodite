@@ -9,8 +9,6 @@ export const HomePage = () => {
   >(undefined);
   const [uploadModalShow, setUploadModalShow] = useState<boolean>(false);
   const [viewDocModalShow, setViewDocModalShow] = useState<boolean>(false);
-  const handleShowUploadModal = (show: boolean) => setUploadModalShow(show);
-  const handleShowViewDocModal = (show: boolean) => setViewDocModalShow(show);
 
   return (
     <Container>
@@ -18,7 +16,7 @@ export const HomePage = () => {
         <Button
           className="px-4"
           variant="dark"
-          onClick={() => handleShowUploadModal(true)}
+          onClick={() => setUploadModalShow(true)}
         >
           Upload
         </Button>
@@ -29,7 +27,7 @@ export const HomePage = () => {
           className="px-4"
           variant="light"
           disabled={!selectedDocument}
-          onClick={() => handleShowViewDocModal(true)}
+          onClick={() => setViewDocModalShow(true)}
         >
           View
         </Button>
@@ -46,12 +44,12 @@ export const HomePage = () => {
       />
       <UploadFilesModal
         isVisible={uploadModalShow}
-        onClose={() => handleShowUploadModal(false)}
+        onClose={() => setUploadModalShow(false)}
       />
       <ViewDocModal
         isVisible={viewDocModalShow}
         documentId={selectedDocument?.id}
-        onClose={() => handleShowViewDocModal(false)}
+        onClose={() => setViewDocModalShow(false)}
       />
     </Container>
   );

@@ -20,7 +20,9 @@ export const ViewDocModal = ({
       size="xl"
     >
       <Modal.Header closeButton>
-        <Modal.Title>View Document</Modal.Title>
+        <Modal.Title as="h6">
+          <b>VIEW DOCUMENT</b>
+        </Modal.Title>
       </Modal.Header>
       <Modal.Body className={styles.modalBody}>
         <PdfViewer documentId={documentId} />
