@@ -6,8 +6,10 @@ import {
   Post,
   Query,
   UploadedFile,
+  Res,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
+import { Response } from 'express';
 import {
   ApiPaginatedResponse,
   CreatedResponse,
@@ -66,5 +68,26 @@ export class DocumentController {
       file,
       uploadedBy: userId,
     });
+  }
+
+  @ApiOkResponse({
+    type: Buffer,
+  })
+  @Get('/:id/file')
+  async getDocumentFile(
+    @Param('id', ParseIntPipe)
+    documentId: number,
+    @Res() res: Response,
+  ): Promise<void> {
+    const [document, buffer] = await this.documentsService.getDocumentFile(
+      documentId,
+    );
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${document.documentName}"`,
+    );
+    res.setHeader('Content-Length', buffer.length);
+    res.setHeader('Content-Type', 'application/octet-stream');
+    res.send(buffer);
   }
 }

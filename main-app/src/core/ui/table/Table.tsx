@@ -111,7 +111,7 @@ export const Table = <T extends Record<string, any> = {}>(
 
     return (
       <div className="table-container">
-        <BTable className="b-table" bordered hover>
+        <BTable className="b-table" borderless hover>
           <thead>
             <tr>{renderTableColumns()}</tr>
           </thead>

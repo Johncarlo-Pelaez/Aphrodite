@@ -2,25 +2,25 @@ import { useState } from 'react';
 import { useMsal } from '@azure/msal-react';
 import { BrowserAuthError, InteractionStatus } from '@azure/msal-browser';
 import { removeToken, setToken } from 'utils/token';
-import {
-  UseSignInParams,
-  useSignInResult,
-  UseSignOutResult,
-} from './auth.types';
+import { useSignInResult, UseSignOutResult, SignInParams } from './auth.types';
 
 export { useSignIn, useSignOut, useGetCurrentSignInUserName };
 
-const useSignIn = (params: UseSignInParams): useSignInResult => {
-  const { loginRequest } = params;
+const useSignIn = (): useSignInResult => {
   const [isError, setIsError] = useState<boolean>(false);
   const [error, setError] = useState<BrowserAuthError | undefined>(undefined);
   const { instance, inProgress } = useMsal();
   const isLoading = inProgress === InteractionStatus.Login;
 
-  const signInAsync = async (): Promise<void> => {
+  const signInAsync = async (signInParams: SignInParams): Promise<void> => {
     try {
-      const res = await instance.loginPopup(loginRequest);
+      const loginRequest = {
+        loginHint: signInParams.email,
+        scopes: ['User.Read'],
+      };
       setIsError(false);
+      setError(undefined);
+      const res = await instance.loginPopup(loginRequest);
       setToken(res.accessToken);
     } catch (err) {
       setIsError(true);
@@ -39,8 +39,9 @@ const useSignOut = (): UseSignOutResult => {
 
   const signOutAsync = async (): Promise<void> => {
     try {
-      await instance.logoutPopup();
       setIsError(false);
+      setError(undefined);
+      await instance.logoutPopup();
       removeToken();
     } catch (err) {
       setIsError(true);

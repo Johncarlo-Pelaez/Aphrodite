@@ -14,7 +14,7 @@ export const ProtectedRoute = (props: ProtectedRouteProps): ReactElement => {
 
   const authenticated = (
     <AuthenticatedTemplate>
-      <Route {...rest} />;
+      <Route {...rest} />
     </AuthenticatedTemplate>
   );
 

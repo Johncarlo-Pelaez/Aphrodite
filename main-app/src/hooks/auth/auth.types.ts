@@ -1,14 +1,10 @@
-import { PopupRequest, BrowserAuthError } from '@azure/msal-browser';
-
-export interface UseSignInParams {
-  loginRequest: PopupRequest;
-}
+import { BrowserAuthError } from '@azure/msal-browser';
 
 export interface useSignInResult {
   isLoading: boolean;
   isError: boolean;
   error?: BrowserAuthError;
-  signInAsync: () => Promise<void>;
+  signInAsync: (signInParams: SignInParams) => Promise<void>;
 }
 
 export interface UseSignOutResult {
@@ -17,3 +13,7 @@ export interface UseSignOutResult {
   error?: BrowserAuthError;
   signOutAsync: () => Promise<void>;
 }
+
+export type SignInParams = {
+  email: string;
+};

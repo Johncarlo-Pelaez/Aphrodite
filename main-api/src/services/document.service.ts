@@ -7,7 +7,9 @@ import { AppConfigService } from 'src/app-config';
 import { DocumentRepository } from 'src/repositories';
 import { DocumentProducer } from 'src/producers';
 import { CreatedResponse } from 'src/core';
+import { Document } from 'src/entities';
 import { UploadDocuments } from './documents.inputs';
+const { readFile, writeFile } = fs.promises;
 
 @Injectable()
 export class DocumentsService {
@@ -28,7 +30,7 @@ export class DocumentsService {
       fileName.toUpperCase(),
     );
 
-    await fs.promises.writeFile(fullPath, file.buffer);
+    await writeFile(fullPath, file.buffer);
 
     const response = new CreatedResponse();
     response.id = await this.documentRepository.createDocument({
@@ -41,5 +43,13 @@ export class DocumentsService {
 
     await this.documentProducer.migrate(response.id);
     return response;
+  }
+
+  async getDocumentFile(documentId: number): Promise<[Document, Buffer]> {
+    const document = await this.documentRepository.getDocument(documentId);
+    const buffer = await readFile(
+      path.join(this.appConfigService.filePath, document.uuid),
+    );
+    return [document, buffer];
   }
 }

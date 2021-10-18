@@ -13,7 +13,7 @@ export const AuthRoute = (props: AuthRouteProps): ReactElement => {
   const { layout: Layout, ...rest } = props;
   const unAuthenticated = (
     <UnauthenticatedTemplate>
-      <Route {...rest} />;
+      <Route {...rest} />
     </UnauthenticatedTemplate>
   );
 

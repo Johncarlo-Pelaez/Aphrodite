@@ -6,6 +6,7 @@ import { useDocuments } from 'hooks/document';
 import { useDebounce } from 'hooks/debounce';
 import { Table, TableColumnProps } from 'core/ui/table';
 import { Document } from 'models';
+import { DocumentsTableProps } from './DocumentsTable.types';
 
 const columns: TableColumnProps<Document>[] = [
   { title: 'Name', dataIndex: 'documentName' },
@@ -29,10 +30,10 @@ const columns: TableColumnProps<Document>[] = [
   },
 ];
 
-export const DocumentsTable = (): ReactElement => {
-  const [selectedDocument, setSelectedDocument] = useState<
-    Document | undefined
-  >(undefined);
+export const DocumentsTable = ({
+  selectedDoc,
+  onSelectDoc,
+}: DocumentsTableProps): ReactElement => {
   const [searchKey, setSearchKey] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(15);
@@ -67,8 +68,8 @@ export const DocumentsTable = (): ReactElement => {
         onSizeChange: setPageSize,
       }}
       searchKey={searchKey}
-      selectedRow={selectedDocument}
-      onSelectRow={setSelectedDocument}
+      selectedRow={selectedDoc}
+      onSelectRow={onSelectDoc}
       onSearch={setSearchKey}
     />
   );
