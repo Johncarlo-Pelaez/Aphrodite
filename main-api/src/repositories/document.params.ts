@@ -28,19 +28,19 @@ export interface FailQrDocumentParam {
   failedAt: Date;
 }
 
-export interface UpdateDocTypeParam {
+export interface BeginIndexingParam {
+  documentId: number;
+  beginAt: Date;
+}
+
+export interface IndexedDocumentParam {
   documentId: number;
   documentType: string;
-  updatedAt: Date;
-}
-
-export interface UpdateDocContractDetailsParam {
-  documentId: number;
   contractDetails: string;
-  updatedAt: Date;
+  indexedAt: Date;
 }
 
-export interface FailSalesForceParam {
+export interface FailIndexingParam {
   documentId: number;
   failedAt: Date;
 }
