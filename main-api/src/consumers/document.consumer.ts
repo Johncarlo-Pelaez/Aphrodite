@@ -1,13 +1,17 @@
 import { Process, Processor } from '@nestjs/bull';
 import { Logger } from '@nestjs/common';
 import { Job } from 'bull';
-import Dynamsoft from 'dbr/dbr';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as gm from 'gm';
 import { AppConfigService } from 'src/app-config';
 import { DatesUtil } from 'src/utils';
 import { DocumentRepository } from 'src/repositories';
+import { QRService } from 'src/qr-service';
+import {
+  SalesForceService,
+  GetDocumentTypeResult,
+} from 'src/sales-force-service';
 import { JobData } from './document.interfaces';
 const imageMagick = gm.subClass({ imageMagick: true });
 
@@ -15,31 +19,83 @@ const imageMagick = gm.subClass({ imageMagick: true });
 export class DocumentConsumer {
   private readonly logger = new Logger(DocumentConsumer.name);
   constructor(
-    private readonly documentRepository: DocumentRepository,
     private readonly appConfigService: AppConfigService,
+    private readonly documentRepository: DocumentRepository,
+    private readonly qrService: QRService,
+    private readonly salesForceService: SalesForceService,
     private readonly datesUtil: DatesUtil,
-  ) {
-    Dynamsoft.BarcodeReader.productKeys = this.appConfigService.barcodeLicense;
-  }
+  ) {}
 
   @Process('migrate')
   async migrate(job: Job<number>): Promise<void> {
-    const document = await this.documentRepository.getDocument(job.data);
-    this.runQr({
-      documentId: document.id,
-      fileName: document.uuid,
-    });
+    try {
+      const document = await this.documentRepository.getDocument(job.data);
+      const jobData: JobData = {
+        documentId: document.id,
+        fileName: document.uuid,
+      };
+      const qrCode = document.qrCode ?? (await this.runQr(jobData));
+      const docTypeResult = await this.runGetDocType(qrCode, jobData);
+      await this.runGetContractDetails(docTypeResult, jobData);
+    } catch (err) {
+      throw err;
+    }
   }
 
-  private async runQr(jobData: JobData): Promise<void> {
+  private async runQr(jobData: JobData): Promise<string> {
     try {
       await this.updateToQrBegin(jobData);
       const buffer = await this.readFile(jobData);
       const imageBuffer = await this.convertToImage(buffer, jobData);
-      const qrText = await this.decode(imageBuffer);
-      await this.updateToQrDone(qrText, jobData);
+      const qrCode = await this.qrService.readQRCode(imageBuffer);
+      await this.updateToQrDone(qrCode, jobData);
+      return qrCode;
     } catch (err) {
       await this.updateToQrFailed(err, jobData);
+      throw err;
+    }
+  }
+
+  private async runGetDocType(
+    qrCode: string,
+    jobData: JobData,
+  ): Promise<GetDocumentTypeResult> {
+    try {
+      const docTypeResult = await this.salesForceService.getDocumentType({
+        BarCode: qrCode,
+      });
+      const updatedAt = this.datesUtil.getDateNow();
+      await this.documentRepository.updateDocType({
+        documentId: jobData.documentId,
+        documentType: JSON.stringify(docTypeResult),
+        updatedAt,
+      });
+      return docTypeResult;
+    } catch (err) {
+      this.updateToSaleForceFailed(err, jobData);
+      throw err;
+    }
+  }
+
+  private async runGetContractDetails(
+    docTypeResult: GetDocumentTypeResult,
+    jobData: JobData,
+  ): Promise<void> {
+    try {
+      const contractDetailsResult =
+        await this.salesForceService.getContractDetails({
+          contractNumber: docTypeResult.response[0]?.ContractNumber,
+          CompanyCode: docTypeResult.response[0]?.CompanyCode,
+        });
+      const updatedAt = this.datesUtil.getDateNow();
+      await this.documentRepository.updateDocContractDetails({
+        documentId: jobData.documentId,
+        contractDetails: JSON.stringify(contractDetailsResult),
+        updatedAt,
+      });
+    } catch (err) {
+      this.updateToSaleForceFailed(err, jobData);
+      throw err;
     }
   }
 
@@ -78,16 +134,6 @@ export class DocumentConsumer {
     });
   }
 
-  private async decode(buffer: Buffer): Promise<string> {
-    const reader = await Dynamsoft.BarcodeReader.createInstance();
-    const results = await reader.decode(buffer);
-    reader.destroy();
-    if (!results.length) {
-      throw new Error('QR result is empty.');
-    }
-    return results[0].barcodeText;
-  }
-
   private async updateToQrDone(
     qrText: string,
     jobData: JobData,
@@ -103,6 +149,18 @@ export class DocumentConsumer {
   private async updateToQrFailed(err: any, jobData: JobData): Promise<void> {
     const failedAt = this.datesUtil.getDateNow();
     await this.documentRepository.failQrDocument({
+      documentId: jobData.documentId,
+      failedAt,
+    });
+    this.logger.error(err);
+  }
+
+  private async updateToSaleForceFailed(
+    err: any,
+    jobData: JobData,
+  ): Promise<void> {
+    const failedAt = this.datesUtil.getDateNow();
+    await this.documentRepository.failSalesForce({
       documentId: jobData.documentId,
       failedAt,
     });

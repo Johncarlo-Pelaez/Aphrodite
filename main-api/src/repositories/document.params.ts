@@ -27,3 +27,20 @@ export interface FailQrDocumentParam {
   documentId: number;
   failedAt: Date;
 }
+
+export interface UpdateDocTypeParam {
+  documentId: number;
+  documentType: string;
+  updatedAt: Date;
+}
+
+export interface UpdateDocContractDetailsParam {
+  documentId: number;
+  contractDetails: string;
+  updatedAt: Date;
+}
+
+export interface FailSalesForceParam {
+  documentId: number;
+  failedAt: Date;
+}
