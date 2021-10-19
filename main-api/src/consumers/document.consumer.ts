@@ -8,10 +8,7 @@ import { AppConfigService } from 'src/app-config';
 import { DatesUtil } from 'src/utils';
 import { DocumentRepository } from 'src/repositories';
 import { QRService } from 'src/qr-service';
-import {
-  SalesForceService,
-  GetDocumentTypeResult,
-} from 'src/sales-force-service';
+import { SalesForceService } from 'src/sales-force-service';
 import { JobData } from './document.interfaces';
 const imageMagick = gm.subClass({ imageMagick: true });
 
@@ -35,8 +32,7 @@ export class DocumentConsumer {
         fileName: document.uuid,
       };
       const qrCode = document.qrCode ?? (await this.runQr(jobData));
-      const docTypeResult = await this.runGetDocType(qrCode, jobData);
-      await this.runGetContractDetails(docTypeResult, jobData);
+      await this.runIndexing(qrCode, jobData);
     } catch (err) {
       throw err;
     }
@@ -56,45 +52,24 @@ export class DocumentConsumer {
     }
   }
 
-  private async runGetDocType(
-    qrCode: string,
-    jobData: JobData,
-  ): Promise<GetDocumentTypeResult> {
+  private async runIndexing(qrCode: string, jobData: JobData): Promise<void> {
     try {
+      this.updateToIndexingBegin(jobData);
       const docTypeResult = await this.salesForceService.getDocumentType({
         BarCode: qrCode,
       });
-      const updatedAt = this.datesUtil.getDateNow();
-      await this.documentRepository.updateDocType({
-        documentId: jobData.documentId,
-        documentType: JSON.stringify(docTypeResult),
-        updatedAt,
-      });
-      return docTypeResult;
-    } catch (err) {
-      this.updateToSaleForceFailed(err, jobData);
-      throw err;
-    }
-  }
-
-  private async runGetContractDetails(
-    docTypeResult: GetDocumentTypeResult,
-    jobData: JobData,
-  ): Promise<void> {
-    try {
       const contractDetailsResult =
         await this.salesForceService.getContractDetails({
           contractNumber: docTypeResult.response[0]?.ContractNumber,
           CompanyCode: docTypeResult.response[0]?.CompanyCode,
         });
-      const updatedAt = this.datesUtil.getDateNow();
-      await this.documentRepository.updateDocContractDetails({
-        documentId: jobData.documentId,
-        contractDetails: JSON.stringify(contractDetailsResult),
-        updatedAt,
-      });
+      this.updateToIndexingDone(
+        JSON.stringify(docTypeResult),
+        JSON.stringify(contractDetailsResult),
+        jobData,
+      );
     } catch (err) {
-      this.updateToSaleForceFailed(err, jobData);
+      this.updateToIndexingFailed(err, jobData);
       throw err;
     }
   }
@@ -155,12 +130,34 @@ export class DocumentConsumer {
     this.logger.error(err);
   }
 
-  private async updateToSaleForceFailed(
+  private async updateToIndexingDone(
+    docType: string,
+    contractDetails: string,
+    jobData: JobData,
+  ): Promise<void> {
+    const indexedAt = this.datesUtil.getDateNow();
+    await this.documentRepository.indexedDocument({
+      documentId: jobData.documentId,
+      documentType: docType,
+      contractDetails: contractDetails,
+      indexedAt,
+    });
+  }
+
+  private async updateToIndexingBegin(jobData: JobData): Promise<void> {
+    const beginAt = this.datesUtil.getDateNow();
+    await this.documentRepository.beginIndexing({
+      documentId: jobData.documentId,
+      beginAt,
+    });
+  }
+
+  private async updateToIndexingFailed(
     err: any,
     jobData: JobData,
   ): Promise<void> {
     const failedAt = this.datesUtil.getDateNow();
-    await this.documentRepository.failSalesForce({
+    await this.documentRepository.failIndexing({
       documentId: jobData.documentId,
       failedAt,
     });

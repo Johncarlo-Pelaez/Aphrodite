@@ -6,9 +6,9 @@ import {
   BeginQrDocumentParam,
   QrDocumentParams,
   FailQrDocumentParam,
-  UpdateDocTypeParam,
-  UpdateDocContractDetailsParam,
-  FailSalesForceParam,
+  BeginIndexingParam,
+  IndexedDocumentParam,
+  FailIndexingParam,
 } from './document.params';
 
 @EntityRepository()
@@ -187,46 +187,44 @@ export class DocumentRepository {
     );
   }
 
-  async updateDocType(param: UpdateDocTypeParam): Promise<Document> {
-    const description =
-      'Successfully retrieved document type from sales force.';
+  async beginIndexing(param: BeginIndexingParam): Promise<Document> {
+    const description = 'Begin indexing.';
     return await this.manager.transaction(
       async (transaction): Promise<Document> => {
         const document = await this.manager.findOneOrFail(
           Document,
           param.documentId,
         );
+        document.status = DocumentStatus.INDEXING_BEGIN;
+        document.modifiedDate = param.beginAt;
+        document.description = description;
+        await transaction.save(document);
+
+        const history = new DocumentHistory();
+        history.description = document.description;
+        history.documentSize = document.documentSize;
+        history.createdDate = document.modifiedDate;
+        history.userId = document.userId;
+        history.documentId = document.id;
+        await transaction.save(history);
+
+        return document;
+      },
+    );
+  }
+
+  async indexedDocument(param: IndexedDocumentParam): Promise<Document> {
+    const description = 'Successfully retrieved indexes from sales force.';
+    return await this.manager.transaction(
+      async (transaction): Promise<Document> => {
+        const document = await this.manager.findOneOrFail(
+          Document,
+          param.documentId,
+        );
+        document.status = DocumentStatus.INDEXING_DONE;
         document.documentType = param.documentType;
-        document.modifiedDate = param.updatedAt;
-        document.description = description;
-        await transaction.save(document);
-
-        const history = new DocumentHistory();
-        history.description = document.description;
-        history.documentSize = document.documentSize;
-        history.createdDate = document.modifiedDate;
-        history.userId = document.userId;
-        history.documentId = document.id;
-        await transaction.save(history);
-
-        return document;
-      },
-    );
-  }
-
-  async updateDocContractDetails(
-    param: UpdateDocContractDetailsParam,
-  ): Promise<Document> {
-    const description =
-      'Successfully retrieved contract details from sales force.';
-    return await this.manager.transaction(
-      async (transaction): Promise<Document> => {
-        const document = await this.manager.findOneOrFail(
-          Document,
-          param.documentId,
-        );
         document.contractDetails = param.contractDetails;
-        document.modifiedDate = param.updatedAt;
+        document.modifiedDate = param.indexedAt;
         document.description = description;
         await transaction.save(document);
 
@@ -243,15 +241,15 @@ export class DocumentRepository {
     );
   }
 
-  async failSalesForce(param: FailSalesForceParam): Promise<Document> {
-    const description =
-      'Failed to retrieve of document type or contract details from sales force.';
+  async failIndexing(param: FailIndexingParam): Promise<Document> {
+    const description = 'Failed to retrieve indexes from sales force.';
     return await this.manager.transaction(
       async (transaction): Promise<Document> => {
         const document = await this.manager.findOneOrFail(
           Document,
           param.documentId,
         );
+        document.status = DocumentStatus.INDEXING_FAILED;
         document.modifiedDate = param.failedAt;
         document.description = description;
         await transaction.save(document);
