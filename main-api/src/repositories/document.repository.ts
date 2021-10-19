@@ -1,6 +1,15 @@
 import { Document, DocumentStatus, DocumentHistory } from 'src/entities';
 import { EntityManager, EntityRepository, ILike } from 'typeorm';
-import { CreateDocumentParam, GetDocumentsParam, BeginQrDocumentParam, QrDocumentParams, FailQrDocumentParam } from './document.params';
+import {
+  CreateDocumentParam,
+  GetDocumentsParam,
+  BeginQrDocumentParam,
+  QrDocumentParams,
+  FailQrDocumentParam,
+  UpdateDocTypeParam,
+  UpdateDocContractDetailsParam,
+  FailSalesForceParam,
+} from './document.params';
 
 @EntityRepository()
 export class DocumentRepository {
@@ -102,7 +111,10 @@ export class DocumentRepository {
     const description = 'Begin QR Code.';
     return await this.manager.transaction(
       async (transaction): Promise<Document> => {
-        const document = await this.manager.findOneOrFail(Document, param.documentId);
+        const document = await this.manager.findOneOrFail(
+          Document,
+          param.documentId,
+        );
         document.status = DocumentStatus.QR_BEGIN;
         document.modifiedDate = param.beginAt;
         document.description = description;
@@ -125,7 +137,10 @@ export class DocumentRepository {
     const description = 'Successfully done QR Code.';
     return await this.manager.transaction(
       async (transaction): Promise<Document> => {
-        const document = await transaction.findOneOrFail(Document, param.documentId);
+        const document = await transaction.findOneOrFail(
+          Document,
+          param.documentId,
+        );
         document.status = DocumentStatus.QR_DONE;
         document.qrCode = param.qrCode;
         document.qrAt = param.qrAt;
@@ -150,8 +165,93 @@ export class DocumentRepository {
     const description = 'Failed QR Code.';
     return await this.manager.transaction(
       async (transaction): Promise<Document> => {
-        const document = await this.manager.findOneOrFail(Document, param.documentId);
+        const document = await this.manager.findOneOrFail(
+          Document,
+          param.documentId,
+        );
         document.status = DocumentStatus.QR_FAILED;
+        document.modifiedDate = param.failedAt;
+        document.description = description;
+        await transaction.save(document);
+
+        const history = new DocumentHistory();
+        history.description = document.description;
+        history.documentSize = document.documentSize;
+        history.createdDate = document.modifiedDate;
+        history.userId = document.userId;
+        history.documentId = document.id;
+        await transaction.save(history);
+
+        return document;
+      },
+    );
+  }
+
+  async updateDocType(param: UpdateDocTypeParam): Promise<Document> {
+    const description =
+      'Successfully retrieved document type from sales force.';
+    return await this.manager.transaction(
+      async (transaction): Promise<Document> => {
+        const document = await this.manager.findOneOrFail(
+          Document,
+          param.documentId,
+        );
+        document.documentType = param.documentType;
+        document.modifiedDate = param.updatedAt;
+        document.description = description;
+        await transaction.save(document);
+
+        const history = new DocumentHistory();
+        history.description = document.description;
+        history.documentSize = document.documentSize;
+        history.createdDate = document.modifiedDate;
+        history.userId = document.userId;
+        history.documentId = document.id;
+        await transaction.save(history);
+
+        return document;
+      },
+    );
+  }
+
+  async updateDocContractDetails(
+    param: UpdateDocContractDetailsParam,
+  ): Promise<Document> {
+    const description =
+      'Successfully retrieved contract details from sales force.';
+    return await this.manager.transaction(
+      async (transaction): Promise<Document> => {
+        const document = await this.manager.findOneOrFail(
+          Document,
+          param.documentId,
+        );
+        document.contractDetails = param.contractDetails;
+        document.modifiedDate = param.updatedAt;
+        document.description = description;
+        await transaction.save(document);
+
+        const history = new DocumentHistory();
+        history.description = document.description;
+        history.documentSize = document.documentSize;
+        history.createdDate = document.modifiedDate;
+        history.userId = document.userId;
+        history.documentId = document.id;
+        await transaction.save(history);
+
+        return document;
+      },
+    );
+  }
+
+  async failSalesForce(param: FailSalesForceParam): Promise<Document> {
+    const description =
+      'Failed to retrieve of document type or contract details from sales force.';
+    return await this.manager.transaction(
+      async (transaction): Promise<Document> => {
+        const document = await this.manager.findOneOrFail(
+          Document,
+          param.documentId,
+        );
         document.modifiedDate = param.failedAt;
         document.description = description;
         await transaction.save(document);

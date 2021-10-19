@@ -5,6 +5,7 @@ import {
   IsOptional,
   IsString,
   validateSync,
+  IsUrl,
 } from 'class-validator';
 
 export enum Environment {
@@ -46,6 +47,16 @@ class EnvironmentVariables {
   @IsOptional()
   @IsNumber()
   REDIS_PORT: number;
+
+  @IsString()
+  FILE_PATH: string;
+
+  @IsString()
+  BARCODE_LICENSE: string;
+
+  @IsOptional()
+  @IsUrl()
+  SALESFORCE_URL: string;
 }
 
 export function validate(config: Record<string, unknown>) {

@@ -49,4 +49,11 @@ export class AppConfigService {
   get barcodeLicense(): string {
     return this.configService.get('BARCODE_LICENSE');
   }
+
+  get salesForceURl(): string {
+    return (
+      this.configService.get('SALESFORCE_URL') ||
+      'http://alicas201.ayalaland.com.ph'
+    );
+  }
 }

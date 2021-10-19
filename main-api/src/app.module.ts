@@ -8,7 +8,9 @@ import { DocumentController, UserController } from './controllers';
 import { UtilsModule } from './utils/utils.module';
 import { DocumentProducer } from './producers';
 import { DocumentRepository, UserRepository } from './repositories';
-import { DocumentsService } from './services'
+import { DocumentsService } from './services';
+import { QRService } from 'src/qr-service';
+import { SalesForceService } from './sales-force-service';
 const logger = new Logger('AppModule');
 
 @Module({
@@ -54,6 +56,8 @@ const logger = new Logger('AppModule');
   ],
   controllers: [DocumentController, UserController],
   providers: [
+    QRService,
+    SalesForceService,
     DocumentsService,
     DocumentRepository,
     UserRepository,

@@ -48,6 +48,14 @@ export class Document {
 
   @ApiProperty()
   @Column()
+  documentType: string;
+
+  @ApiProperty()
+  @Column()
+  contractDetails: string;
+
+  @ApiProperty()
+  @Column()
   userId: number;
 
   @ApiProperty()
