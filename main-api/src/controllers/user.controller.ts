@@ -5,6 +5,7 @@ import {
   Get,
   Post,
   ValidationPipe,
+  Query,
 } from '@nestjs/common';
 import {
   ApiConflictResponse,
@@ -14,7 +15,7 @@ import {
 import { CreatedResponse, GetUserId } from 'src/core';
 import { Role, User } from 'src/entities';
 import { UserRepository } from 'src/repositories';
-import { CreateUserAccountDto } from './user.dto';
+import { CreateUserAccountDto, UserIsExistDto } from './user.dto';
 
 @Controller('/users')
 export class UserController {
@@ -113,5 +114,13 @@ export class UserController {
     });
 
     return response;
+  }
+
+  @ApiOkResponse({
+    type: User,
+  })
+  @Get('/exist')
+  async checkUserEmailIfExist(@Query() dto: UserIsExistDto): Promise<User> {
+    return this.userRepository.getUserByEmail(dto.email);
   }
 }
