@@ -19,7 +19,7 @@ export const Pagination = (props: PaginationProps): ReactElement => {
   } = props;
   const pageRemain = total % pageSize > 0 ? 1 : 0;
   const totalPage = Math.trunc(total / pageSize) + pageRemain;
-  const showingFrom = currentPage * pageSize + 1 - pageSize;
+  const showingFrom = (currentPage - 1) * pageSize + 1;
   const showingTo = showingFrom + rowCount - 1;
   const disabled = isLoading || totalPage <= 0;
   const isGotoFirstPageHidden = !!paginations.find((p) => p === 1);

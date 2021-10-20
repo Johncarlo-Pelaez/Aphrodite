@@ -54,6 +54,7 @@ export const DocumentsTable = ({
 
   return (
     <Table<Document>
+      isServerSide
       rowKey={(doc) => doc.id}
       loading={isDocsLoading}
       isError={hasDocsError}

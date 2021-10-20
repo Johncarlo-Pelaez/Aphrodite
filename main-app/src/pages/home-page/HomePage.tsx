@@ -11,8 +11,8 @@ export const HomePage = () => {
   const [viewDocModalShow, setViewDocModalShow] = useState<boolean>(false);
 
   return (
-    <Container>
-      <Stack className="mt-5" direction="horizontal" gap={3}>
+    <Container className="my-5">
+      <Stack className="mb-1" direction="horizontal" gap={3}>
         <Button
           className="px-4"
           variant="dark"

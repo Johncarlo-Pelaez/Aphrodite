@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsString } from 'class-validator';
+import { IsEmail, IsString, IsOptional } from 'class-validator';
 
-export class CreateAdminUserDto {
+export class CreateUserAccountDto {
   @ApiProperty({
     format: 'email',
   })
@@ -10,10 +10,12 @@ export class CreateAdminUserDto {
   email: string;
 
   @ApiProperty()
+  @IsOptional()
   @IsString()
   firstName: string;
 
   @ApiProperty()
+  @IsOptional()
   @IsString()
   lastName: string;
 }

@@ -1,4 +1,4 @@
-import { ReactElement, useState } from 'react';
+import { ReactElement, useState, useEffect } from 'react';
 import BTable from 'react-bootstrap/Table';
 import Alert from 'react-bootstrap/Alert';
 import Spinner from 'react-bootstrap/Spinner';
@@ -14,8 +14,10 @@ import { Pagination, SearchField } from './components';
 export const Table = <T extends Record<string, any> = {}>(
   props: TableProps<T>,
 ): ReactElement => {
+  const [dataList, setDataList] = useState<T[]>([]);
   const [sorter, setSorter] = useState<Sorter | undefined>(undefined);
   const {
+    isServerSide,
     rowKey,
     loading,
     isError,
@@ -116,7 +118,7 @@ export const Table = <T extends Record<string, any> = {}>(
             <tr>{renderTableColumns()}</tr>
           </thead>
           <tbody>
-            {data.map((data, index) => (
+            {dataList.map((data, index) => (
               <tr
                 key={index}
                 className={showRowHighlight(data)}
@@ -153,6 +155,18 @@ export const Table = <T extends Record<string, any> = {}>(
       );
     }
   };
+
+  const getdataList = (): T[] => {
+    if (!pagination || isServerSide) return data;
+    const start = (pagination?.current - 1) * pagination?.pageSize;
+    const end = pagination?.current * pagination?.pageSize;
+    return data.slice(start, end);
+  };
+
+  useEffect(() => {
+    setDataList(getdataList());
+    // eslint-disable-next-line
+  }, [data, pagination]);
 
   return (
     <>

@@ -5,4 +5,5 @@ export type User = {
   lastName: string;
   role: string;
   createdDate: string;
-};  
+  modifiedDate: string;
+};

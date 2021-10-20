@@ -23,6 +23,12 @@ export class UserRepository {
     return this.manager.count(User);
   }
 
+  async getUserByEmail(email: string): Promise<User> {
+    return this.manager.findOne(User, {
+      where: { email },
+    });
+  }
+
   async createUser(param: CreateUserParam): Promise<number> {
     const user = new User();
     user.email = param.email;

@@ -14,7 +14,7 @@ import {
 import { CreatedResponse, GetUserId } from 'src/core';
 import { Role, User } from 'src/entities';
 import { UserRepository } from 'src/repositories';
-import { CreateAdminUserDto } from './user.dto';
+import { CreateUserAccountDto } from './user.dto';
 
 @Controller('/users')
 export class UserController {
@@ -45,7 +45,7 @@ export class UserController {
   })
   @Post('/admin')
   async createAdminUser(
-    @Body(ValidationPipe) dto: CreateAdminUserDto,
+    @Body(ValidationPipe) dto: CreateUserAccountDto,
   ): Promise<CreatedResponse> {
     const total = await this.userRepository.count([Role.ADMIN]);
     if (total > 0) {
@@ -58,6 +58,56 @@ export class UserController {
     response.id = await this.userRepository.createUser({
       ...dto,
       role: Role.ADMIN,
+      createdDate: rightNow,
+    });
+
+    return response;
+  }
+
+  @ApiCreatedResponse({
+    type: CreatedResponse,
+  })
+  @ApiConflictResponse({
+    description: 'User already exist.',
+  })
+  @Post('/encoder')
+  async createEncoderUser(
+    @Body(ValidationPipe) dto: CreateUserAccountDto,
+  ): Promise<CreatedResponse> {
+    const user = await this.userRepository.getUserByEmail(dto.email);
+    if (user) throw new ConflictException();
+
+    const response = new CreatedResponse();
+    const rightNow = new Date();
+
+    response.id = await this.userRepository.createUser({
+      ...dto,
+      role: Role.ENCODER,
+      createdDate: rightNow,
+    });
+
+    return response;
+  }
+
+  @ApiCreatedResponse({
+    type: CreatedResponse,
+  })
+  @ApiConflictResponse({
+    description: 'User already exist.',
+  })
+  @Post('/reviewer')
+  async createReviewerUser(
+    @Body(ValidationPipe) dto: CreateUserAccountDto,
+  ): Promise<CreatedResponse> {
+    const user = await this.userRepository.getUserByEmail(dto.email);
+    if (user) throw new ConflictException();
+
+    const response = new CreatedResponse();
+    const rightNow = new Date();
+
+    response.id = await this.userRepository.createUser({
+      ...dto,
+      role: Role.REVIEWER,
       createdDate: rightNow,
     });
 

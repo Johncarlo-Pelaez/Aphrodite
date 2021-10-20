@@ -1,0 +1,64 @@
+import { ReactElement, useState } from 'react';
+import moment from 'moment';
+import { DEFAULT_DATE_FORMAT } from 'core/constants';
+import { useUsers } from 'hooks/user';
+import { Table, TableColumnProps } from 'core/ui/table';
+import { User } from 'models';
+import { UsersTableProps } from './UsersTable.types';
+
+const columns: TableColumnProps<User>[] = [
+  {
+    title: 'Name',
+    dataIndex: 'firstName',
+    render: (user: User) => `${user.firstName} ${user.lastName}`,
+  },
+  {
+    title: 'Email',
+    dataIndex: 'email',
+  },
+  {
+    title: 'Date Modified',
+    dataIndex: 'modifiedDate',
+    render: (user: User) =>
+      moment(user.modifiedDate).format(DEFAULT_DATE_FORMAT),
+    sorter: true,
+  },
+];
+
+export const UsersTable = ({
+  selectedUser,
+  onSelectUser,
+}: UsersTableProps): ReactElement => {
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(15);
+
+  const {
+    isLoading: isDocsLoading,
+    isError: hasDocsError,
+    data: users = [],
+  } = useUsers();
+
+  const total = users.length;
+
+  return (
+    <Table<User>
+      rowKey={(doc) => doc.id}
+      loading={isDocsLoading}
+      isError={hasDocsError}
+      columns={columns}
+      data={users}
+      pagination={{
+        total: total,
+        pageSize: pageSize,
+        current: currentPage,
+        pageNumber: 5,
+        onChange: setCurrentPage,
+        onSizeChange: setPageSize,
+      }}
+      selectedRow={selectedUser}
+      onSelectRow={onSelectUser}
+    />
+  );
+};
+
+export default UsersTable;

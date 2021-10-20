@@ -1,7 +1,7 @@
 export interface TableColumnProps<T> {
   title: string;
   dataIndex: string;
-  render?: (obj: T) => any
+  render?: (obj: T) => any;
   sorter?: boolean;
 }
 
@@ -17,12 +17,13 @@ export interface TablePaginationConfig {
 export declare type SortOrder = 'ASC' | 'DESC' | null;
 
 export type Sorter = {
-  field: string; 
+  field: string;
   order: SortOrder;
   orderIndex: number;
-}
+};
 
 export interface TableProps<T> {
+  isServerSide?: boolean;
   rowKey?: string | ((obj: T) => any);
   loading?: boolean;
   isError?: boolean;
@@ -35,4 +36,3 @@ export interface TableProps<T> {
   onChange?: (sorter: Sorter | undefined) => void;
   onSearch?: (seachKey: string) => void;
 }
-  
