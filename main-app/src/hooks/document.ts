@@ -12,7 +12,6 @@ import {
   UseMutationResult,
   useQueryClient,
 } from 'react-query';
-import { UseDocumentsParams } from './document.types';
 import { QueryCacheKey } from 'core/enums';
 import { ApiError } from 'core/types';
 import {
@@ -21,6 +20,13 @@ import {
 } from 'utils/query-string';
 
 export { useDocuments, useUploadDoc };
+
+type UseDocumentsParams = {
+  searchKey: string;
+  currentPage: number;
+  pageSize: number;
+  isEnabled?: boolean;
+};
 
 const useDocuments = (
   params: UseDocumentsParams,

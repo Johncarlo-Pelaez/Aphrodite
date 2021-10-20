@@ -47,8 +47,9 @@ export class UserController {
   async createAdminUser(
     @Body(ValidationPipe) dto: CreateUserAccountDto,
   ): Promise<CreatedResponse> {
+    const user = await this.userRepository.getUserByEmail(dto.email);
     const total = await this.userRepository.count([Role.ADMIN]);
-    if (total > 0) {
+    if (total > 0 || user) {
       throw new ConflictException();
     }
 

@@ -2,9 +2,19 @@ import { useState } from 'react';
 import { useMsal } from '@azure/msal-react';
 import { BrowserAuthError, InteractionStatus } from '@azure/msal-browser';
 import { removeToken, setToken } from 'utils/token';
-import { useSignInResult, UseSignOutResult, SignInParams } from './auth.types';
 
 export { useSignIn, useSignOut, useGetCurrentSignInUserName };
+
+export type SignInParams = {
+  email: string;
+};
+
+type useSignInResult = {
+  isLoading: boolean;
+  isError: boolean;
+  error?: BrowserAuthError;
+  signInAsync: (signInParams: SignInParams) => Promise<void>;
+};
 
 const useSignIn = (): useSignInResult => {
   const [isError, setIsError] = useState<boolean>(false);
@@ -29,6 +39,13 @@ const useSignIn = (): useSignInResult => {
   };
 
   return { isLoading, isError, error, signInAsync };
+};
+
+type UseSignOutResult = {
+  isLoading: boolean;
+  isError: boolean;
+  error?: BrowserAuthError;
+  signOutAsync: () => Promise<void>;
 };
 
 const useSignOut = (): UseSignOutResult => {

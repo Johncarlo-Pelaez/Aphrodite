@@ -1,4 +1,4 @@
-/****** Object:  Table [dbo].[document]    Script Date: 10/19/2021 6:48:03 PM ******/
+/****** Object:  Table [dbo].[document]    Script Date: 10/20/2021 5:39:42 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -23,7 +23,7 @@ CREATE TABLE [dbo].[document](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[document_history]    Script Date: 10/19/2021 6:48:03 PM ******/
+/****** Object:  Table [dbo].[document_history]    Script Date: 10/20/2021 5:39:42 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -41,7 +41,7 @@ CREATE TABLE [dbo].[document_history](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[user]    Script Date: 10/19/2021 6:48:03 PM ******/
+/****** Object:  Table [dbo].[user]    Script Date: 10/20/2021 5:39:42 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -49,8 +49,8 @@ GO
 CREATE TABLE [dbo].[user](
 	[id] [int] IDENTITY(1,1) NOT NULL,
 	[email] [nvarchar](255) NOT NULL,
-	[firstName] [nvarchar](255) NOT NULL,
-	[lastName] [nvarchar](255) NOT NULL,
+	[firstName] [nvarchar](255) NULL,
+	[lastName] [nvarchar](255) NULL,
 	[role] [nvarchar](50) NOT NULL,
 	[createdDate] [datetime] NOT NULL,
  CONSTRAINT [PK_cace4a159ff9f2512dd42373760] PRIMARY KEY CLUSTERED 

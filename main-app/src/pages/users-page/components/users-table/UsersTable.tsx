@@ -10,17 +10,23 @@ const columns: TableColumnProps<User>[] = [
   {
     title: 'Name',
     dataIndex: 'firstName',
-    render: (user: User) => `${user.firstName} ${user.lastName}`,
+    render: (user: User) => {
+      return user.firstName
+        ? `${
+            user.firstName?.charAt(0).toUpperCase() + user.firstName?.slice(1)
+          } ${user.lastName?.charAt(0).toUpperCase() + user.lastName?.slice(1)}`
+        : '';
+    },
   },
   {
     title: 'Email',
     dataIndex: 'email',
   },
   {
-    title: 'Date Modified',
-    dataIndex: 'modifiedDate',
+    title: 'Date Created',
+    dataIndex: 'createdDate',
     render: (user: User) =>
-      moment(user.modifiedDate).format(DEFAULT_DATE_FORMAT),
+      moment(user.createdDate).format(DEFAULT_DATE_FORMAT),
     sorter: true,
   },
 ];
