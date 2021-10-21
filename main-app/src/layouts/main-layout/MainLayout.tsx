@@ -50,7 +50,7 @@ export const MainLayout = (props: MainLayoutProps): ReactElement => {
                 </NavDropdown.Item>
               </NavDropdown>
               <span className="nav-link__avatar">
-                <FontAwesomeIcon icon={faUserCircle} size="2x" />
+                <FontAwesomeIcon icon={faUserCircle} size="lg" />
               </span>
             </Nav>
           </Navbar.Collapse>
