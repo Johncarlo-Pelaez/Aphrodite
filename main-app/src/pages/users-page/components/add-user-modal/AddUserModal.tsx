@@ -62,9 +62,9 @@ export const AddUserModal = ({
   };
 
   const closeModal = (): void => {
-    onClose();
-    resetForm();
+    resetForm({ email: '' });
     resetUseAddUser();
+    onClose();
   };
 
   return (
