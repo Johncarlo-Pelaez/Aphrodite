@@ -8,8 +8,9 @@ export const UsersPage = () => {
   const [openAddModal, setOpenModal] = useState<boolean>(false);
 
   return (
-    <Container className="my-5">
-      <Stack className="mb-5" direction="horizontal" gap={3}>
+    <Container className="my-4">
+      <h4 className="fw-normal py-3">Users List</h4>
+      <Stack className="my-2" direction="horizontal" gap={3}>
         <Button
           className="px-4"
           variant="dark"

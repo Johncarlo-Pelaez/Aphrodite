@@ -11,8 +11,9 @@ export const HomePage = () => {
   const [viewDocModalShow, setViewDocModalShow] = useState<boolean>(false);
 
   return (
-    <Container className="my-5">
-      <Stack className="mb-1" direction="horizontal" gap={3}>
+    <Container className="my-4">
+      <h4 className="fw-normal py-3">Upload List</h4>
+      <Stack className="my-2" direction="horizontal" gap={3}>
         <Button
           className="px-4"
           variant="dark"
