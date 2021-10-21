@@ -33,6 +33,14 @@ export class UserController {
   @ApiOkResponse({
     type: User,
   })
+  @Get('/email-exist')
+  async checkUserEmailIfExist(@Query() dto: UserIsExistDto): Promise<boolean> {
+    return !!(await this.userRepository.getUserByEmail(dto.email));
+  }
+
+  @ApiOkResponse({
+    type: User,
+  })
   @Get('/current')
   async getCurrentUser(@GetUserId() id: number): Promise<User> {
     return this.userRepository.getUser(id);
@@ -114,13 +122,5 @@ export class UserController {
     });
 
     return response;
-  }
-
-  @ApiOkResponse({
-    type: User,
-  })
-  @Get('/exist')
-  async checkUserEmailIfExist(@Query() dto: UserIsExistDto): Promise<User> {
-    return this.userRepository.getUserByEmail(dto.email);
   }
 }

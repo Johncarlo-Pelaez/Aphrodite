@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useMsal } from '@azure/msal-react';
-import { BrowserAuthError, InteractionStatus } from '@azure/msal-browser';
+import { InteractionStatus } from '@azure/msal-browser';
+import { getIsUserEmailExist } from 'apis/user';
 import { removeToken, setToken } from 'utils/token';
 
 export { useSignIn, useSignOut, useGetCurrentSignInUserName };
-
 export type SignInParams = {
   email: string;
 };
@@ -12,20 +12,24 @@ export type SignInParams = {
 type useSignInResult = {
   isLoading: boolean;
   isError: boolean;
-  error?: BrowserAuthError;
+  error: any;
   signInAsync: (signInParams: SignInParams) => Promise<void>;
 };
 
 const useSignIn = (): useSignInResult => {
   const [isError, setIsError] = useState<boolean>(false);
-  const [error, setError] = useState<BrowserAuthError | undefined>(undefined);
+  const [error, setError] = useState<any>(undefined);
   const { instance, inProgress } = useMsal();
   const isLoading = inProgress === InteractionStatus.Login;
 
-  const signInAsync = async (signInParams: SignInParams): Promise<void> => {
+  const signInAsync = async ({ email }: SignInParams): Promise<void> => {
     try {
+      if (!(await getIsUserEmailExist(`email=${email}`))) {
+        alert('User does not exist.');
+        return;
+      }
       const loginRequest = {
-        loginHint: signInParams.email,
+        loginHint: email,
         scopes: ['User.Read'],
       };
       setIsError(false);
@@ -34,7 +38,7 @@ const useSignIn = (): useSignInResult => {
       setToken(res.accessToken);
     } catch (err) {
       setIsError(true);
-      setError(err as BrowserAuthError);
+      setError(err);
     }
   };
 
@@ -44,13 +48,13 @@ const useSignIn = (): useSignInResult => {
 type UseSignOutResult = {
   isLoading: boolean;
   isError: boolean;
-  error?: BrowserAuthError;
+  error: any;
   signOutAsync: () => Promise<void>;
 };
 
 const useSignOut = (): UseSignOutResult => {
   const [isError, setIsError] = useState<boolean>(false);
-  const [error, setError] = useState<BrowserAuthError | undefined>(undefined);
+  const [error, setError] = useState<any>(undefined);
   const { instance, inProgress } = useMsal();
   const isLoading = inProgress === InteractionStatus.Logout;
 
@@ -62,7 +66,7 @@ const useSignOut = (): UseSignOutResult => {
       removeToken();
     } catch (err) {
       setIsError(true);
-      setError(err as BrowserAuthError);
+      setError(err);
     }
   };
 

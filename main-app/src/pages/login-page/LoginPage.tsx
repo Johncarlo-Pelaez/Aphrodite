@@ -12,7 +12,6 @@ import { signinFormSchema } from './loginPage.schema';
 
 export const LoginPage = (): ReactElement => {
   const { isLoading, signInAsync } = useSignIn();
-
   const {
     control,
     handleSubmit,
