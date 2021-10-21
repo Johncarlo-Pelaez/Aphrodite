@@ -1,0 +1,45 @@
+.navbar {
+  padding: 1rem 0;
+  box-shadow: 0 0.125rem 0.25rem rgba(black, 0.075);
+
+  &-brand {
+    cursor: pointer;
+  }
+
+  &-nav {
+    align-items: flex-start;
+  }
+
+  &-nav > .nav-link {
+    margin-right: 1rem;
+  }
+
+  &-nav > .nav-link__devider {
+    display: none;
+    margin-right: 1rem;
+    border-left: 1px solid black;
+    height: 1.5rem;
+  }
+
+  &-nav > .nav-link__avatar {
+    display: none;
+  }
+
+  &-collapse {
+    justify-content: end;
+  }
+
+  @include breakpoint-up(lg) {
+    &-nav {
+      align-items: center;
+    }
+
+    &-nav > .nav-link__devider {
+      display: block;
+    }
+
+    &-nav > .nav-link__avatar {
+      display: block;
+    }
+  }
+}
