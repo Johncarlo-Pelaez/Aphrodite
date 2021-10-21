@@ -11,6 +11,7 @@ import { FullHeightSpinner } from 'core/ui';
 const HomePage = lazy(() => import('pages/home-page'));
 const LoginPage = lazy(() => import('pages/login-page'));
 const UsersPage = lazy(() => import('pages/users-page'));
+const ReportsPage = lazy(() => import('pages/reports-page'));
 const NotFoundPage = lazy(() => import('pages/not-found-page'));
 const Forbidden = lazy(() => import('pages/forbidden'));
 
@@ -50,6 +51,12 @@ function App({ msalInstance }: AppProps) {
                 path="/users"
                 layout={MainLayout}
                 component={UsersPage}
+              />
+              <ProtectedRoute
+                exact
+                path="/reports"
+                layout={MainLayout}
+                component={ReportsPage}
               />
               <Route component={NotFoundPage} />
               <Route exact path="/forbidden" component={Forbidden} />
