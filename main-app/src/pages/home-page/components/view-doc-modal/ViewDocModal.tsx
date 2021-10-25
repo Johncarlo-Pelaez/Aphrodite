@@ -1,15 +1,28 @@
 import { ReactElement } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
+import Spinner from 'react-bootstrap/Spinner';
+import { useDocument } from 'hooks/document';
 import { ViewDocModalProps } from './ViewDocModal.types';
-import { PdfViewer } from './components';
-import styles from './ViewDocModal.module.css';
+import { PdfViewer, Indexes } from './components';
+import styles from './ViewDocModal.module.scss';
 
 export const ViewDocModal = ({
   documentId,
   isVisible,
   onClose,
 }: ViewDocModalProps): ReactElement => {
+  const { isLoading, data: document } = useDocument({
+    documentId,
+    isEnabled: isVisible,
+  });
+
+  const spinner: ReactElement = (
+    <div className="d-flex justify-content-center align-items-center w-100 h-100">
+      <Spinner animation="border" />
+    </div>
+  );
+
   return (
     <Modal
       backdrop="static"
@@ -17,7 +30,7 @@ export const ViewDocModal = ({
       show={isVisible}
       onHide={onClose}
       centered
-      size="xl"
+      dialogClassName={styles.viewModal}
     >
       <Modal.Header closeButton>
         <Modal.Title as="h6">
@@ -25,7 +38,12 @@ export const ViewDocModal = ({
         </Modal.Title>
       </Modal.Header>
       <Modal.Body className={styles.modalBody}>
-        <PdfViewer documentId={documentId} />
+        <div className={styles.pdfViewerWrapper}>
+          <PdfViewer documentId={documentId} />
+        </div>
+        <div className={styles.indexesCardWrapper}>
+          {isLoading ? spinner : <Indexes document={document} />}
+        </div>
       </Modal.Body>
       <Modal.Footer>
         <Button variant="outline-danger" onClick={onClose}>

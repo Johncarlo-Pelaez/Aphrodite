@@ -31,7 +31,7 @@ export class UserController {
   }
 
   @ApiOkResponse({
-    type: User,
+    type: Boolean,
   })
   @Get('/email-exist')
   async checkUserEmailIfExist(@Query() dto: UserIsExistDto): Promise<boolean> {

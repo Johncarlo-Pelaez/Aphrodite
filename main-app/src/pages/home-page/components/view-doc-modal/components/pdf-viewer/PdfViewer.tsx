@@ -1,8 +1,8 @@
 import { ReactElement, useEffect } from 'react';
 
-export type PdfViewerProps = {
+export interface PdfViewerProps {
   documentId?: number;
-};
+}
 
 export const PdfViewer = (props: PdfViewerProps): ReactElement => {
   const { documentId } = props;

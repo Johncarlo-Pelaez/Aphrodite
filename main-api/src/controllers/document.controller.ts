@@ -45,6 +45,14 @@ export class DocumentController {
   }
 
   @ApiOkResponse({
+    type: Document,
+  })
+  @Get('/:id')
+  async getDocument(@Param('id', ParseIntPipe) id: number): Promise<Document> {
+    return await this.documentRepository.getDocument(id);
+  }
+
+  @ApiOkResponse({
     type: DocumentHistory,
     isArray: true,
   })
@@ -52,7 +60,7 @@ export class DocumentController {
   async getDocumentHistory(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<DocumentHistory[]> {
-    return this.documentRepository.getHistory(id);
+    return await this.documentRepository.getHistory(id);
   }
 
   @ApiCreatedResponse({

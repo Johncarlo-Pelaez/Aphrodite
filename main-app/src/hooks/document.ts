@@ -1,5 +1,6 @@
 import {
   getDocuments,
+  getDocument,
   uploadDocument,
   GetDocsResult,
   UploadDocResult,
@@ -12,6 +13,7 @@ import {
   UseMutationResult,
   useQueryClient,
 } from 'react-query';
+import { Document } from 'models';
 import { QueryCacheKey } from 'core/enums';
 import { ApiError } from 'core/types';
 import {
@@ -19,7 +21,7 @@ import {
   createQueryString,
 } from 'utils/query-string';
 
-export { useDocuments, useUploadDoc };
+export { useDocuments, useUploadDoc, useDocument };
 
 type UseDocumentsParams = {
   searchKey: string;
@@ -50,6 +52,28 @@ const useDocuments = (
     () => getDocuments(`${paginationQuery}&${filterQuery}`),
     {
       enabled: isEnabled,
+    },
+  );
+};
+
+type UseDocumentParams = {
+  documentId?: number;
+  isEnabled?: boolean;
+};
+
+const useDocument = (params: UseDocumentParams): UseQueryResult<Document> => {
+  const { documentId, isEnabled } = params;
+  const queryClient = useQueryClient();
+  return useQuery<Document>(
+    [QueryCacheKey.DOCUMENTS, documentId],
+    () => getDocument(documentId as number),
+    {
+      enabled: isEnabled,
+      placeholderData: () => {
+        return queryClient
+          .getQueryData<Document[]>(QueryCacheKey.DOCUMENTS)
+          ?.find((document) => document.id === documentId);
+      },
     },
   );
 };

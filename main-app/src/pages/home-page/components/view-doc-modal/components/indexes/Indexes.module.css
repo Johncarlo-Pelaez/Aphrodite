@@ -1,0 +1,11 @@
+.indexesCard {
+  height: 100%;
+}
+
+.headerTitle {
+  text-align: center;
+}
+
+.fileInfoTable > tbody > tr > td {
+  padding-right: 1rem;
+}
