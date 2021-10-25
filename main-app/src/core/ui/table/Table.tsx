@@ -8,14 +8,17 @@ import {
   faSortAlphaDown,
   faSortAlphaUp,
 } from '@fortawesome/free-solid-svg-icons';
-import { TableProps, Sorter } from './Table.types';
+import { TableProps, SorterResult, TableColumnProps } from './Table.types';
+import { OrderDirection } from './Table.enum';
 import { Pagination, SearchField } from './components';
 
 export const Table = <T extends Record<string, any> = {}>(
   props: TableProps<T>,
 ): ReactElement => {
+  const [defaultSorter, setDefaultSorter] = useState<SorterResult | undefined>(
+    undefined,
+  );
   const [dataList, setDataList] = useState<T[]>([]);
-  const [sorter, setSorter] = useState<Sorter | undefined>(undefined);
   const {
     isServerSide,
     rowKey,
@@ -31,6 +34,11 @@ export const Table = <T extends Record<string, any> = {}>(
     onSearch,
   } = props;
   const rowCount = data.length;
+  const sortOrderSequence = [
+    OrderDirection.ASC,
+    OrderDirection.DESC,
+    undefined,
+  ];
 
   const showRowHighlight = (rowData: T): string => {
     if (typeof rowKey === 'function' && selectedRow) {
@@ -45,9 +53,8 @@ export const Table = <T extends Record<string, any> = {}>(
       onSelectRow(selectedRow?.id === rowData.id ? undefined : rowData);
   };
 
-  const triggerOnChange = (sorter?: Sorter): void => {
+  const triggerOnChange = (sorter?: SorterResult): void => {
     if (onChange && typeof onChange === 'function') onChange(sorter);
-    setSorter(sorter);
   };
 
   const renderSearchField = (): ReactElement | undefined => {
@@ -55,30 +62,61 @@ export const Table = <T extends Record<string, any> = {}>(
       return <SearchField searchKey={searchKey} onSearchDocument={onSearch} />;
   };
 
+  const getCurrentColumnSorter = (): TableColumnProps<T> | null => {
+    return (
+      columns.find(
+        (column) =>
+          !!column.sorter &&
+          typeof column.sorter === 'function' &&
+          column.sortOrder,
+      ) ?? null
+    );
+  };
+
   const renderTableColumns = (): ReactElement[] => {
-    return columns.map(({ title, dataIndex, sorter: sorterConfig }, index) => {
-      let newSorter: Sorter = { field: dataIndex, order: 'ASC', orderIndex: 0 };
-      const isSelf = sorter?.field === newSorter.field;
-      const isAsc = sorter?.order === 'ASC';
+    return columns.map(({ title, dataIndex, sortOrder, sorter }, index) => {
+      const sorterConfig = typeof sorter === 'function';
+      const currentColSorter = getCurrentColumnSorter();
+      const isDefaultSorter = dataIndex === defaultSorter?.field;
+      const isSelfCurrentSorter = currentColSorter?.dataIndex === dataIndex;
+      const isAsc = sortOrder === OrderDirection.ASC;
       return (
         <th
           key={index}
           onClick={() => {
             if (!sorterConfig) return;
-            if (isSelf) {
-              var currentSorter = { ...sorter };
-              currentSorter.order = isAsc ? 'DESC' : 'ASC';
-              currentSorter.orderIndex = ++currentSorter.orderIndex % 3;
-              triggerOnChange(
-                currentSorter.orderIndex < 2 ? currentSorter : undefined,
-              );
-            } else triggerOnChange(newSorter);
+            let newSortOrder;
+            if (isDefaultSorter) {
+              if (
+                defaultSorter.order === sortOrder &&
+                defaultSorter.order &&
+                sortOrder
+              )
+                newSortOrder = isAsc ? OrderDirection.DESC : OrderDirection.ASC;
+              else if (!sortOrder) newSortOrder = defaultSorter.order;
+              else newSortOrder = undefined;
+            } else {
+              const nextSorterIndex =
+                (sortOrderSequence.findIndex((od) => od === sortOrder) + 1) % 3;
+              newSortOrder = sortOrderSequence[nextSorterIndex];
+            }
+            triggerOnChange(
+              newSortOrder
+                ? { field: dataIndex, order: newSortOrder }
+                : undefined,
+            );
           }}
         >
           {title}{' '}
           {sorterConfig && (
             <FontAwesomeIcon
-              icon={isSelf ? (isAsc ? faSortAlphaUp : faSortAlphaDown) : faSort}
+              icon={
+                isSelfCurrentSorter
+                  ? isAsc
+                    ? faSortAlphaUp
+                    : faSortAlphaDown
+                  : faSort
+              }
             />
           )}
         </th>
@@ -87,29 +125,26 @@ export const Table = <T extends Record<string, any> = {}>(
   };
 
   const renderTable = (): ReactElement => {
-    if (loading) {
+    if (loading)
       return (
         <div className="b-table__spinner">
           <Spinner animation="border" />
         </div>
       );
-    }
 
-    if (rowCount <= 0) {
+    if (rowCount <= 0)
       return (
         <Alert className="text-center" variant="light">
           No Data.
         </Alert>
       );
-    }
 
-    if (isError) {
+    if (isError)
       return (
         <Alert className="text-center" variant="danger">
           Could not load data, Please try again.
         </Alert>
       );
-    }
 
     return (
       <div className="table-container">
@@ -138,35 +173,75 @@ export const Table = <T extends Record<string, any> = {}>(
   };
 
   const renderPagination = (): ReactElement | undefined => {
-    if (pagination && typeof pagination === 'object') {
-      const { total, pageSize, current, pageNumber, onChange, onSizeChange } =
-        pagination;
+    if (pagination && typeof pagination === 'object')
       return (
         <Pagination
           isLoading={loading}
-          total={total}
+          total={pagination.total}
           rowCount={rowCount}
-          pageSize={pageSize}
-          currentPage={current}
-          paginationNumber={pageNumber}
-          onPageChanged={onChange}
-          onSizeChange={onSizeChange}
+          pageSize={pagination.pageSize}
+          currentPage={pagination.current}
+          paginationNumber={pagination.pageNumber}
+          onPageChanged={pagination.onChange}
+          onSizeChange={pagination.onSizeChange}
         />
       );
-    }
   };
 
-  const getdataList = (): T[] => {
-    if (!pagination || isServerSide) return data;
-    const start = (pagination?.current - 1) * pagination?.pageSize;
-    const end = pagination?.current * pagination?.pageSize;
-    return data.slice(start, end);
-  };
-
-  useEffect(() => {
-    setDataList(getdataList());
+  useEffect(function getDefaultColumnSorter() {
+    const columnSorter = getCurrentColumnSorter();
+    setDefaultSorter(
+      columnSorter && columnSorter.sortOrder
+        ? {
+            field: columnSorter.dataIndex,
+            order: columnSorter.sortOrder,
+          }
+        : undefined,
+    );
     // eslint-disable-next-line
-  }, [data, pagination]);
+  }, []);
+
+  useEffect(
+    function getPageDataList() {
+      if (isServerSide || !pagination) setDataList(data);
+      else {
+        const start = (pagination?.current - 1) * pagination?.pageSize;
+        const end = pagination?.current * pagination?.pageSize;
+        let newPageDataList = data;
+        if (searchKey)
+          newPageDataList = newPageDataList?.filter((data: T) =>
+            Object.values(data).some((value) =>
+              value?.toString().toLowerCase().includes(searchKey.toLowerCase()),
+            ),
+          );
+        setDataList(newPageDataList.slice(start, end));
+      }
+    },
+    // eslint-disable-next-line
+    [data, pagination],
+  );
+
+  useEffect(
+    function sortDataList() {
+      const colSorter = getCurrentColumnSorter();
+      if (
+        colSorter &&
+        colSorter.sorter &&
+        typeof colSorter.sorter === 'function' &&
+        colSorter.sortOrder
+      ) {
+        const { sorter, sortOrder } = colSorter;
+        setDataList((currentDataList) =>
+          currentDataList.sort((a: T, b: T) => {
+            if (sortOrder === OrderDirection.ASC) return sorter(a, b);
+            else return sorter(b, a);
+          }),
+        );
+      }
+    },
+    // eslint-disable-next-line
+    [columns],
+  );
 
   return (
     <>

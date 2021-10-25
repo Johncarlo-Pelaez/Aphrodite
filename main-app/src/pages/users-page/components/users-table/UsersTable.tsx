@@ -27,7 +27,6 @@ const columns: TableColumnProps<User>[] = [
     dataIndex: 'createdDate',
     render: (user: User) =>
       moment(user.createdDate).format(DEFAULT_DATE_FORMAT),
-    sorter: true,
   },
 ];
 

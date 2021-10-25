@@ -1,8 +1,11 @@
+import { OrderDirection } from './Table.enum';
+
 export interface TableColumnProps<T> {
   title: string;
   dataIndex: string;
   render?: (obj: T) => any;
-  sorter?: boolean;
+  sorter?: (a: T, b: T) => number;
+  sortOrder?: OrderDirection;
 }
 
 export interface TablePaginationConfig {
@@ -14,12 +17,9 @@ export interface TablePaginationConfig {
   onSizeChange: (pageSize: number) => void;
 }
 
-export declare type SortOrder = 'ASC' | 'DESC' | null;
-
-export type Sorter = {
+export type SorterResult = {
   field: string;
-  order: SortOrder;
-  orderIndex: number;
+  order: OrderDirection;
 };
 
 export interface TableProps<T> {
@@ -33,6 +33,6 @@ export interface TableProps<T> {
   searchKey?: string;
   selectedRow?: T;
   onSelectRow?: (row?: T) => void;
-  onChange?: (sorter: Sorter | undefined) => void;
+  onChange?: (sorter?: SorterResult) => void;
   onSearch?: (seachKey: string) => void;
 }
