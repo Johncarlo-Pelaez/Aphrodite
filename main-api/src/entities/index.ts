@@ -1,3 +1,3 @@
 export * from './document.entity';
-export * from './document.types';
+export * from './document.enum';
 export * from './user.entity';

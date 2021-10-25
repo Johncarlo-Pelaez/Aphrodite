@@ -23,7 +23,7 @@ export class SalesForceService {
     const result = await this.request.get<GetContractDetailsResult>(
       '/GetContractDetails',
       {
-        params: {
+        data: {
           ...params,
         },
       },
@@ -37,7 +37,7 @@ export class SalesForceService {
     const result = await this.request.get<GetDocumentTypeResult>(
       '/GetDocumentType',
       {
-        params: {
+        data: {
           ...params,
         },
       },

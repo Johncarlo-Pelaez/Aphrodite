@@ -52,8 +52,7 @@ export class AppConfigService {
 
   get salesForceURl(): string {
     return (
-      this.configService.get('SALESFORCE_URL') ||
-      'http://alicas201.ayalaland.com.ph'
+      this.configService.get('SALESFORCE_URL') || 'http://10.202.17.246/ci'
     );
   }
 }
