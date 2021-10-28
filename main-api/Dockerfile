@@ -1,4 +1,4 @@
-FROM node:lts-alpine
+FROM node:fermium-alpine
 
 RUN apk --no-cache --update add imagemagick
 RUN mkdir -p /usr/src/files
