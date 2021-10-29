@@ -185,9 +185,8 @@ export const Table = <T extends Record<string, any> = {}>(
         typeof column.sorter === 'function' &&
         column.sortOrder,
     );
-
     setDefaultSorter(
-      columnSorter && columnSorter.sortOrder
+      columnSorter?.sortOrder
         ? {
             field: columnSorter.dataIndex,
             order: columnSorter.sortOrder,
@@ -234,10 +233,9 @@ export const Table = <T extends Record<string, any> = {}>(
   useEffect(
     function sortDataList() {
       if (
-        currentColumnSorter &&
-        currentColumnSorter.sorter &&
-        typeof currentColumnSorter.sorter === 'function' &&
-        currentColumnSorter.sortOrder
+        currentColumnSorter?.sorter &&
+        typeof currentColumnSorter?.sorter === 'function' &&
+        currentColumnSorter?.sortOrder
       ) {
         const { sorter, sortOrder } = currentColumnSorter;
         setDataList((currentDataList) =>
