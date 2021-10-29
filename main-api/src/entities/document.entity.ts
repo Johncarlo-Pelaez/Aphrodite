@@ -56,6 +56,10 @@ export class Document {
 
   @ApiProperty()
   @Column()
+  springCMUploadResponse: string;
+
+  @ApiProperty()
+  @Column()
   userId: number;
 
   @ApiProperty()

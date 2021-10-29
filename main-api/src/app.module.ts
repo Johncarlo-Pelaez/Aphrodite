@@ -11,6 +11,7 @@ import { DocumentRepository, UserRepository } from './repositories';
 import { DocumentsService } from './services';
 import { QRService } from 'src/qr-service';
 import { SalesForceService } from './sales-force-service';
+import { SpringCMService } from './spring-cm-service';
 const logger = new Logger('AppModule');
 
 @Module({
@@ -58,6 +59,7 @@ const logger = new Logger('AppModule');
   providers: [
     QRService,
     SalesForceService,
+    SpringCMService,
     DocumentsService,
     DocumentRepository,
     UserRepository,
