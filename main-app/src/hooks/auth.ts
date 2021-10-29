@@ -3,6 +3,7 @@ import { useMsal } from '@azure/msal-react';
 import { InteractionStatus } from '@azure/msal-browser';
 import { getIsUserEmailExist } from 'apis/user';
 import { removeToken, setToken } from 'utils/token';
+import { setAuthorization } from 'apis/request';
 
 export { useSignIn, useSignOut, useGetCurrentSignInUserName };
 export type SignInParams = {
@@ -36,6 +37,7 @@ const useSignIn = (): useSignInResult => {
       setError(undefined);
       const res = await instance.loginPopup(loginRequest);
       setToken(res.accessToken);
+      setAuthorization(res.idToken);
     } catch (err) {
       setIsError(true);
       setError(err);

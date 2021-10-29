@@ -2,7 +2,13 @@ import axios from 'axios';
 import { API_BASE_URL } from 'core/constants';
 import { CancelTokenSource } from './request.types';
 
-export { request, createCancelTokenSource, cancelRequest, isCanceled };
+export {
+  request,
+  createCancelTokenSource,
+  cancelRequest,
+  isCanceled,
+  setAuthorization,
+};
 
 const request = axios.create({
   baseURL: API_BASE_URL,
@@ -18,4 +24,8 @@ const cancelRequest = (cancelTokenSource?: CancelTokenSource): void => {
 
 const isCanceled = (error: any): boolean => {
   return axios.isCancel(error);
-}
+};
+
+const setAuthorization = (token: string): void => {
+  request.defaults.headers['Authorization'] = 'Bearer ' + token;
+};

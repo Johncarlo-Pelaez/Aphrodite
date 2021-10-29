@@ -11,7 +11,10 @@ import { DocumentRepository, UserRepository } from './repositories';
 import { DocumentsService } from './services';
 import { QRService } from 'src/qr-service';
 import { SalesForceService } from './sales-force-service';
+import { PassportModule } from '@nestjs/passport';
+import { AzureADStrategy } from './core';
 import { SpringCMService } from './spring-cm-service';
+
 const logger = new Logger('AppModule');
 
 @Module({
@@ -54,6 +57,7 @@ const logger = new Logger('AppModule');
     BullModule.registerQueue({
       name: 'document',
     }),
+    PassportModule,
   ],
   controllers: [DocumentController, UserController],
   providers: [
@@ -65,6 +69,7 @@ const logger = new Logger('AppModule');
     UserRepository,
     DocumentProducer,
     DocumentConsumer,
+    AzureADStrategy,
   ],
 })
 export class AppModule {}

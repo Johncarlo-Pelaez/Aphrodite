@@ -55,4 +55,12 @@ export class AppConfigService {
       this.configService.get('SALESFORCE_URL') || 'http://10.202.17.246/ci'
     );
   }
+
+  get azureAdClientId(): string {
+    return this.configService.get('AZURE_AD_CLIENT_ID');
+  }
+
+  get azureAdTenantId(): string {
+    return this.configService.get('AZURE_AD_TENANT_ID');
+  }
 }
