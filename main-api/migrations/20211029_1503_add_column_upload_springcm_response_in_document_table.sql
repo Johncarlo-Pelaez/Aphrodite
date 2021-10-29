@@ -10,7 +10,8 @@ COMMIT
 BEGIN TRANSACTION
 GO
 ALTER TABLE dbo.[document] ADD
-	springCMUploadResponse nvarchar(MAX) NULL
+	mimeType nvarchar(100) NOT NULL,
+	springResponse nvarchar(MAX) NULL
 GO
 ALTER TABLE dbo.[document] SET (LOCK_ESCALATION = TABLE)
 GO

@@ -7,7 +7,7 @@ export interface GetDocumentTypeParams {
   BarCode: string;
 }
 
-interface ItemDetail {
+export interface ContractDetail {
   ContractNumber: string;
   CompanyCode: string;
   Brand: string;
@@ -18,15 +18,11 @@ interface ItemDetail {
   CustomerName: string;
 }
 
-interface ContractDetail {
-  items: ItemDetail[];
-}
-
 export interface GetContractDetailsResult {
-  reponse: ContractDetail[];
+  reponse: { items: ContractDetail[] };
 }
 
-interface DocumentType {
+export interface DocumentType {
   CompanyCode: string;
   ContractNumber: string;
   Brand: string;

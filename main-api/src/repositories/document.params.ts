@@ -8,11 +8,12 @@ export interface CreateDocumentParam {
   uuid: string;
   documentName: string;
   documentSize: number;
+  mimeType: string;
   createdDate: Date;
   userId: number;
 }
 
-export interface BeginQrDocumentParam {
+export interface BeginDocProcessParam {
   documentId: number;
   beginAt: Date;
 }
@@ -23,14 +24,9 @@ export interface QrDocumentParams {
   qrAt: Date;
 }
 
-export interface FailQrDocumentParam {
+export interface FailDocProcessParam {
   documentId: number;
   failedAt: Date;
-}
-
-export interface BeginIndexingParam {
-  documentId: number;
-  beginAt: Date;
 }
 
 export interface IndexedDocumentParam {
@@ -40,7 +36,14 @@ export interface IndexedDocumentParam {
   indexedAt: Date;
 }
 
-export interface FailIndexingParam {
+export interface DocumentMigrateParam {
+  documentId: number;
+  migratedAt: Date;
+  springResponse: string;
+}
+
+export interface FailDocMigrateParam {
   documentId: number;
   failedAt: Date;
+  springResponse: string;
 }

@@ -3,12 +3,12 @@ import { EntityManager, EntityRepository, ILike } from 'typeorm';
 import {
   CreateDocumentParam,
   GetDocumentsParam,
-  BeginQrDocumentParam,
+  BeginDocProcessParam,
   QrDocumentParams,
-  FailQrDocumentParam,
-  BeginIndexingParam,
+  FailDocProcessParam,
   IndexedDocumentParam,
-  FailIndexingParam,
+  DocumentMigrateParam,
+  FailDocMigrateParam,
 } from './document.params';
 
 @EntityRepository()
@@ -85,6 +85,7 @@ export class DocumentRepository {
         document.uuid = param.uuid;
         document.documentName = param.documentName;
         document.documentSize = param.documentSize;
+        document.mimeType = param.mimeType;
         document.description = description;
         document.modifiedDate = param.createdDate;
         document.modifiedBy = param.userId;
@@ -107,7 +108,7 @@ export class DocumentRepository {
     return documentId;
   }
 
-  async beginQrDocument(param: BeginQrDocumentParam): Promise<Document> {
+  async beginQrDocument(param: BeginDocProcessParam): Promise<Document> {
     const description = 'Begin QR Code.';
     return await this.manager.transaction(
       async (transaction): Promise<Document> => {
@@ -161,7 +162,7 @@ export class DocumentRepository {
     );
   }
 
-  async failQrDocument(param: FailQrDocumentParam): Promise<Document> {
+  async failQrDocument(param: FailDocProcessParam): Promise<Document> {
     const description = 'Failed QR Code.';
     return await this.manager.transaction(
       async (transaction): Promise<Document> => {
@@ -187,7 +188,7 @@ export class DocumentRepository {
     );
   }
 
-  async beginIndexing(param: BeginIndexingParam): Promise<Document> {
+  async beginIndexing(param: BeginDocProcessParam): Promise<Document> {
     const description = 'Begin indexing.';
     return await this.manager.transaction(
       async (transaction): Promise<Document> => {
@@ -241,7 +242,7 @@ export class DocumentRepository {
     );
   }
 
-  async failIndexing(param: FailIndexingParam): Promise<Document> {
+  async failIndexing(param: FailDocProcessParam): Promise<Document> {
     const description = 'Failed to retrieve indexes from sales force.';
     return await this.manager.transaction(
       async (transaction): Promise<Document> => {
@@ -251,6 +252,86 @@ export class DocumentRepository {
         );
         document.status = DocumentStatus.INDEXING_FAILED;
         document.modifiedDate = param.failedAt;
+        document.description = description;
+        await transaction.save(document);
+
+        const history = new DocumentHistory();
+        history.description = document.description;
+        history.documentSize = document.documentSize;
+        history.createdDate = document.modifiedDate;
+        history.userId = document.userId;
+        history.documentId = document.id;
+        await transaction.save(history);
+
+        return document;
+      },
+    );
+  }
+
+  async beginMigrate(param: BeginDocProcessParam): Promise<Document> {
+    const description = 'Begin migrate.';
+    return await this.manager.transaction(
+      async (transaction): Promise<Document> => {
+        const document = await this.manager.findOneOrFail(
+          Document,
+          param.documentId,
+        );
+        document.status = DocumentStatus.MIGRATE_BEGIN;
+        document.modifiedDate = param.beginAt;
+        document.description = description;
+        await transaction.save(document);
+
+        const history = new DocumentHistory();
+        history.description = document.description;
+        history.documentSize = document.documentSize;
+        history.createdDate = document.modifiedDate;
+        history.userId = document.userId;
+        history.documentId = document.id;
+        await transaction.save(history);
+
+        return document;
+      },
+    );
+  }
+
+  async documentMigrate(param: DocumentMigrateParam): Promise<Document> {
+    const description = 'Successfully migrated.';
+    return await this.manager.transaction(
+      async (transaction): Promise<Document> => {
+        const document = await this.manager.findOneOrFail(
+          Document,
+          param.documentId,
+        );
+        document.status = DocumentStatus.MIGRATE_DONE;
+        document.modifiedDate = param.migratedAt;
+        document.springResponse = param.springResponse;
+        document.description = description;
+        await transaction.save(document);
+
+        const history = new DocumentHistory();
+        history.description = document.description;
+        history.documentSize = document.documentSize;
+        history.createdDate = document.modifiedDate;
+        history.userId = document.userId;
+        history.documentId = document.id;
+        await transaction.save(history);
+
+        return document;
+      },
+    );
+  }
+
+  async failMigrate(param: FailDocMigrateParam): Promise<Document> {
+    const description = 'Migration failed.';
+    return await this.manager.transaction(
+      async (transaction): Promise<Document> => {
+        const document = await this.manager.findOneOrFail(
+          Document,
+          param.documentId,
+        );
+        document.status = DocumentStatus.MIGRATE_FAILED;
+        document.modifiedDate = param.failedAt;
+        document.springResponse = param.springResponse;
         document.description = description;
         await transaction.save(document);
 

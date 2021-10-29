@@ -37,6 +37,7 @@ export class DocumentsService {
       uuid: fileName,
       documentName: file.originalname,
       documentSize: file.size,
+      mimeType: file.mimetype,
       createdDate: dateRightNow,
       userId: data.uploadedBy,
     });

@@ -24,6 +24,10 @@ export class Document {
 
   @ApiProperty()
   @Column()
+  mimeType: string;
+
+  @ApiProperty()
+  @Column()
   description: string;
 
   @ApiProperty()
@@ -56,7 +60,7 @@ export class Document {
 
   @ApiProperty()
   @Column()
-  springCMUploadResponse: string;
+  springResponse: string;
 
   @ApiProperty()
   @Column()

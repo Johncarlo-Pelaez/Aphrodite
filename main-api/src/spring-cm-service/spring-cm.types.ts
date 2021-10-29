@@ -23,6 +23,7 @@ export interface UploadDocToSpringParams {
   SourceSystem: string;
   DataCapDocSource: string;
   DataCapRemarks: string;
+  Remarks: string;
   FileSize: string;
   B64Attachment: string;
 }

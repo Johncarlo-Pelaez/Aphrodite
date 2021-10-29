@@ -1,5 +1,11 @@
+import { ContractDetail, DocumentType } from 'src/sales-force-service';
+
 export interface JobData {
   documentId: number;
-  fileName: string;
+  sysSrcFileName: string;
 }
-  
+
+export interface JobIndexingResults {
+  contractDetail?: ContractDetail;
+  documentType?: DocumentType;
+}

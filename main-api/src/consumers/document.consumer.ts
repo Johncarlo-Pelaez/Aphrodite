@@ -9,7 +9,11 @@ import { DatesUtil } from 'src/utils';
 import { DocumentRepository } from 'src/repositories';
 import { QRService } from 'src/qr-service';
 import { SalesForceService } from 'src/sales-force-service';
-import { JobData } from './document.interfaces';
+import {
+  SpringCMService,
+  UploadDocToSpringParams,
+} from 'src/spring-cm-service';
+import { JobData, JobIndexingResults } from './document.interfaces';
 const imageMagick = gm.subClass({ imageMagick: true });
 
 @Processor('document')
@@ -20,6 +24,7 @@ export class DocumentConsumer {
     private readonly documentRepository: DocumentRepository,
     private readonly qrService: QRService,
     private readonly salesForceService: SalesForceService,
+    private readonly springCMService: SpringCMService,
     private readonly datesUtil: DatesUtil,
   ) {}
 
@@ -29,20 +34,55 @@ export class DocumentConsumer {
       const document = await this.documentRepository.getDocument(job.data);
       const jobData: JobData = {
         documentId: document.id,
-        fileName: document.uuid,
+        sysSrcFileName: document.uuid,
       };
-      const qrCode = document.qrCode ?? (await this.runQr(jobData));
-      await this.runIndexing(qrCode, jobData);
+      const buffer = await this.readFile(jobData);
+      const imageBuffer = await this.convertToImage(buffer, jobData);
+      const qrCode =
+        document.qrCode ?? (await this.runQr(imageBuffer, jobData));
+      const { documentType, contractDetail } = await this.runIndexing(
+        qrCode,
+        jobData,
+      );
+      const empty = '';
+      const uploadParams = {
+        Brand: documentType?.Brand ?? empty,
+        CompanyCode: documentType?.CompanyCode ?? empty,
+        ContractNo: documentType?.ContractNumber ?? empty,
+        ProjectCode: documentType?.ProjectCode ?? empty,
+        Tower_Phase: documentType?.Tower_Phase ?? empty,
+        CustomerCode: documentType?.CustomerCode ?? empty,
+        ProjectName: documentType?.ProjectName ?? empty,
+        CustomerName: contractDetail?.CustomerName ?? empty,
+        UnitDescription: documentType?.UnitDetails ?? empty,
+        DocumentGroupID: empty,
+        DocumentGroupDescription: documentType?.DocumentGroup ?? empty,
+        DocumentGroupShortDescription: empty,
+        DocumentTypeID: empty,
+        DocumentTypeDescription: documentType?.Nomenclature ?? empty,
+        DocumentTypeShortDescription: empty,
+        DocumentName: documentType?.Nomenclature ?? empty,
+        ExternalSourceCaptureDate: empty,
+        FileName: document.documentName,
+        MIMEType: document.mimeType,
+        DocumentDate: empty,
+        ExternalSourceUserID: empty,
+        SourceSystem: empty,
+        DataCapDocSource: empty,
+        DataCapRemarks: empty,
+        FileSize: document.documentSize.toString(),
+        Remarks: empty,
+        B64Attachment: buffer.toString('base64'),
+      };
+      await this.runUploadToSpringCM(jobData, uploadParams);
     } catch (err) {
       throw err;
     }
   }
 
-  private async runQr(jobData: JobData): Promise<string> {
+  private async runQr(imageBuffer: Buffer, jobData: JobData): Promise<string> {
     try {
       await this.updateToQrBegin(jobData);
-      const buffer = await this.readFile(jobData);
-      const imageBuffer = await this.convertToImage(buffer, jobData);
       const qrCode = await this.qrService.readQRCode(imageBuffer);
       await this.updateToQrDone(qrCode, jobData);
       return qrCode;
@@ -52,7 +92,10 @@ export class DocumentConsumer {
     }
   }
 
-  private async runIndexing(qrCode: string, jobData: JobData): Promise<void> {
+  private async runIndexing(
+    qrCode: string,
+    jobData: JobData,
+  ): Promise<JobIndexingResults> {
     try {
       this.updateToIndexingBegin(jobData);
       const docTypeResult = await this.salesForceService.getDocumentType({
@@ -68,8 +111,38 @@ export class DocumentConsumer {
         JSON.stringify(contractDetailsResult),
         jobData,
       );
+
+      const documentType = !!docTypeResult.response.length
+        ? docTypeResult.response[0]
+        : undefined;
+      const contractDetail = !!contractDetailsResult?.reponse?.items.length
+        ? contractDetailsResult.reponse.items[0]
+        : undefined;
+      return {
+        documentType,
+        contractDetail,
+      };
     } catch (err) {
       this.updateToIndexingFailed(err, jobData);
+      throw err;
+    }
+  }
+
+  private async runUploadToSpringCM(
+    jobData: JobData,
+    params: UploadDocToSpringParams,
+  ): Promise<void> {
+    let uploadResult;
+    try {
+      this.updateToMigrateBegin(jobData);
+      uploadResult = await this.springCMService.uploadDocToSpring(params);
+      this.updateToMigrateDone(JSON.stringify(uploadResult.data), jobData);
+    } catch (err) {
+      this.updateToMigrateFailed(
+        err,
+        JSON.stringify(uploadResult.data),
+        jobData,
+      );
       throw err;
     }
   }
@@ -85,7 +158,7 @@ export class DocumentConsumer {
   private async readFile(jobData: JobData): Promise<Buffer> {
     const location = path.join(
       this.appConfigService.filePath,
-      jobData.fileName,
+      jobData.sysSrcFileName,
     );
     const buffer = await fs.promises.readFile(location);
     return buffer;
@@ -96,7 +169,7 @@ export class DocumentConsumer {
     jobData: JobData,
   ): Promise<Buffer> {
     return new Promise((resolve, reject) => {
-      imageMagick(buffer, `${jobData.fileName}[0]`).toBuffer(
+      imageMagick(buffer, `${jobData.sysSrcFileName}[0]`).toBuffer(
         'png',
         async (err, imageBuffer) => {
           if (!!err) {
@@ -130,6 +203,14 @@ export class DocumentConsumer {
     this.logger.error(err);
   }
 
+  private async updateToIndexingBegin(jobData: JobData): Promise<void> {
+    const beginAt = this.datesUtil.getDateNow();
+    await this.documentRepository.beginIndexing({
+      documentId: jobData.documentId,
+      beginAt,
+    });
+  }
+
   private async updateToIndexingDone(
     docType: string,
     contractDetails: string,
@@ -144,14 +225,6 @@ export class DocumentConsumer {
     });
   }
 
-  private async updateToIndexingBegin(jobData: JobData): Promise<void> {
-    const beginAt = this.datesUtil.getDateNow();
-    await this.documentRepository.beginIndexing({
-      documentId: jobData.documentId,
-      beginAt,
-    });
-  }
-
   private async updateToIndexingFailed(
     err: any,
     jobData: JobData,
@@ -159,6 +232,40 @@ export class DocumentConsumer {
     const failedAt = this.datesUtil.getDateNow();
     await this.documentRepository.failIndexing({
       documentId: jobData.documentId,
+      failedAt,
+    });
+    this.logger.error(err);
+  }
+
+  private async updateToMigrateBegin(jobData: JobData): Promise<void> {
+    const beginAt = this.datesUtil.getDateNow();
+    await this.documentRepository.beginMigrate({
+      documentId: jobData.documentId,
+      beginAt,
+    });
+  }
+
+  private async updateToMigrateDone(
+    springResponse: string,
+    jobData: JobData,
+  ): Promise<void> {
+    const migratedAt = this.datesUtil.getDateNow();
+    await this.documentRepository.documentMigrate({
+      documentId: jobData.documentId,
+      springResponse,
+      migratedAt,
+    });
+  }
+
+  private async updateToMigrateFailed(
+    err: any,
+    springResponse: string,
+    jobData: JobData,
+  ): Promise<void> {
+    const failedAt = this.datesUtil.getDateNow();
+    await this.documentRepository.failMigrate({
+      documentId: jobData.documentId,
+      springResponse,
       failedAt,
     });
     this.logger.error(err);
