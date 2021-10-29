@@ -18,6 +18,8 @@ export const Table = <T extends Record<string, any> = {}>(
   const [defaultSorter, setDefaultSorter] = useState<SorterResult | undefined>(
     undefined,
   );
+  const [currentColumnSorter, setCurrentColumnSorter] =
+    useState<TableColumnProps<T> | null>(null);
   const [dataList, setDataList] = useState<T[]>([]);
   const {
     isServerSide,
@@ -62,23 +64,11 @@ export const Table = <T extends Record<string, any> = {}>(
       return <SearchField searchKey={searchKey} onSearchDocument={onSearch} />;
   };
 
-  const getCurrentColumnSorter = (): TableColumnProps<T> | null => {
-    return (
-      columns.find(
-        (column) =>
-          !!column.sorter &&
-          typeof column.sorter === 'function' &&
-          column.sortOrder,
-      ) ?? null
-    );
-  };
-
   const renderTableColumns = (): ReactElement[] => {
     return columns.map(({ title, dataIndex, sortOrder, sorter }, index) => {
       const sorterConfig = typeof sorter === 'function';
-      const currentColSorter = getCurrentColumnSorter();
       const isDefaultSorter = dataIndex === defaultSorter?.field;
-      const isSelfCurrentSorter = currentColSorter?.dataIndex === dataIndex;
+      const isSelfCurrentSorter = currentColumnSorter?.dataIndex === dataIndex;
       const isAsc = sortOrder === OrderDirection.ASC;
       return (
         <th
@@ -189,7 +179,13 @@ export const Table = <T extends Record<string, any> = {}>(
   };
 
   useEffect(function getDefaultColumnSorter() {
-    const columnSorter = getCurrentColumnSorter();
+    const columnSorter = columns.find(
+      (column) =>
+        !!column.sorter &&
+        typeof column.sorter === 'function' &&
+        column.sortOrder,
+    );
+
     setDefaultSorter(
       columnSorter && columnSorter.sortOrder
         ? {
@@ -222,17 +218,30 @@ export const Table = <T extends Record<string, any> = {}>(
   );
 
   useEffect(
+    () =>
+      setCurrentColumnSorter(
+        columns.find(
+          (column) =>
+            !!column.sorter &&
+            typeof column.sorter === 'function' &&
+            column.sortOrder,
+        ) ?? null,
+      ),
+    // eslint-disable-next-line
+    [columns],
+  );
+
+  useEffect(
     function sortDataList() {
-      const colSorter = getCurrentColumnSorter();
       if (
-        colSorter &&
-        colSorter.sorter &&
-        typeof colSorter.sorter === 'function' &&
-        colSorter.sortOrder
+        currentColumnSorter &&
+        currentColumnSorter.sorter &&
+        typeof currentColumnSorter.sorter === 'function' &&
+        currentColumnSorter.sortOrder
       ) {
-        const { sorter, sortOrder } = colSorter;
+        const { sorter, sortOrder } = currentColumnSorter;
         setDataList((currentDataList) =>
-          currentDataList.sort((a: T, b: T) => {
+          [...currentDataList].sort((a: T, b: T) => {
             if (sortOrder === OrderDirection.ASC) return sorter(a, b);
             else return sorter(b, a);
           }),
@@ -240,7 +249,7 @@ export const Table = <T extends Record<string, any> = {}>(
       }
     },
     // eslint-disable-next-line
-    [columns],
+    [currentColumnSorter],
   );
 
   return (
