@@ -7,6 +7,7 @@ import {
   Query,
   UploadedFile,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
 import { Response } from 'express';
@@ -17,6 +18,9 @@ import {
   PaginatedResponse,
   ApiFile,
   fileMimetypeFilter,
+  AzureADGuard,
+  GetAzureUser,
+  AzureUser,
 } from 'src/core';
 import { Document, DocumentHistory } from 'src/entities';
 import { DocumentRepository } from 'src/repositories';
@@ -33,7 +37,9 @@ export class DocumentController {
 
   @ApiPaginatedResponse(Document)
   @Get('/')
+  // @UseGuards(AzureADGuard)
   async getDocuments(
+    // @GetAzureUser() azureUser: AzureUser,
     @Query(GetDocumentsIntPipe) dto: GetDocumentsDto,
   ): Promise<PaginatedResponse<Document>> {
     const response = new PaginatedResponse<Document>();

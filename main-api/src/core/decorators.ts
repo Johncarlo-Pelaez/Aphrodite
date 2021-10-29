@@ -1,4 +1,9 @@
-import { applyDecorators, createParamDecorator, Type, UseInterceptors } from '@nestjs/common';
+import {
+  applyDecorators,
+  createParamDecorator,
+  Type,
+  UseInterceptors,
+} from '@nestjs/common';
 import { ApiOkResponse, getSchemaPath } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
@@ -55,3 +60,24 @@ export function ApiFile(
     }),
   );
 }
+
+export interface AzureUser {
+  aud: string;
+  iss: string;
+  iat: number;
+  nbf: number;
+  exp: number;
+  name: string;
+  nonce: string;
+  oid: string;
+  preferred_username: string;
+  rh: string;
+  sub: string;
+  tid: string;
+  uti: string;
+  ver: string;
+}
+
+export const GetAzureUser = createParamDecorator((_data, req) => {
+  return req.args[0].user;
+});
