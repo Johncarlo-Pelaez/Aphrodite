@@ -2,7 +2,7 @@ import { ReactElement } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Spinner from 'react-bootstrap/Spinner';
-import { useDocument } from 'hooks/document';
+import { useDocument } from 'hooks';
 import { ViewDocModalProps } from './ViewDocModal.types';
 import { PdfViewer, Indexes } from './components';
 import styles from './ViewDocModal.module.scss';
@@ -12,10 +12,9 @@ export const ViewDocModal = ({
   isVisible,
   onClose,
 }: ViewDocModalProps): ReactElement => {
-  const { isLoading, data: document } = useDocument({
-    documentId,
-    isEnabled: isVisible,
-  });
+  const { isLoading, data: document } = useDocument(
+    isVisible ? documentId : undefined,
+  );
 
   const spinner: ReactElement = (
     <div className="d-flex justify-content-center align-items-center w-100 h-100">

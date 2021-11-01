@@ -1,4 +1,4 @@
-import {  CancelTokenSource } from 'apis/request';
+import { CancelTokenSource } from 'apis';
 
 export interface UploadModalProps {
   isVisible: boolean;
@@ -11,7 +11,7 @@ export enum UploadStatus {
   PENDING,
   REMOVED,
   CANCELED,
-  UPLOADING
+  UPLOADING,
 }
 
 export interface FileInfo {

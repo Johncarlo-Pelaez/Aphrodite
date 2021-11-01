@@ -5,31 +5,41 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Alert from 'react-bootstrap/Alert';
 import Spinner from 'react-bootstrap/Spinner';
-import { useSignIn } from 'hooks/auth';
+import { useSignIn } from 'hooks';
 import styles from './LoginPage.module.css';
-import { SignInParams } from 'hooks/auth';
-import { signinFormSchema } from './loginPage.schema';
+import * as yup from 'yup';
+
+export interface SigninForm {
+  email: string;
+}
+
+const signinFormSchema: yup.SchemaOf<SigninForm> = yup.object().shape({
+  email: yup.string().email().required('Email is required.'),
+});
 
 export const LoginPage = (): ReactElement => {
-  const { isLoading, signInAsync } = useSignIn();
+  const { isLoading, error, signIn } = useSignIn();
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<SignInParams>({
+  } = useForm<SigninForm>({
     resolver: yupResolver(signinFormSchema),
   });
+  const emailError = errors.email?.message || error;
 
-  const signIn: SubmitHandler<SignInParams> = async (params): Promise<void> => {
-    if (!isLoading) await signInAsync(params);
+  const handleSignin: SubmitHandler<SigninForm> = async (
+    params,
+  ): Promise<void> => {
+    await signIn(params.email);
   };
 
   return (
     <div className={styles.loginContainer}>
-      <Form className={styles.loginForm} onSubmit={handleSubmit(signIn)}>
+      <Form className={styles.loginForm} onSubmit={handleSubmit(handleSignin)}>
         <div className="d-grid">
-          <Alert variant="danger" show={!!errors.email}>
-            {errors.email?.message}
+          <Alert variant="danger" show={!!emailError}>
+            {emailError}
           </Alert>
           <Form.Group className="mb-3">
             <Form.Label>Email address</Form.Label>
@@ -55,7 +65,7 @@ export const LoginPage = (): ReactElement => {
               role="status"
               aria-hidden="true"
             />
-            {isLoading ? ' Loging In...' : 'Log In'}
+            {isLoading ? ' Logging In...' : 'Log In'}
           </Button>
         </div>
       </Form>

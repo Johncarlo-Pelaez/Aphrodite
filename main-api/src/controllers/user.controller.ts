@@ -6,13 +6,19 @@ import {
   Post,
   ValidationPipe,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiOkResponse,
 } from '@nestjs/swagger';
-import { CreatedResponse, GetUserId } from 'src/core';
+import {
+  AzureADGuard,
+  AzureUser,
+  CreatedResponse,
+  GetAzureUser,
+} from 'src/core';
 import { Role, User } from 'src/entities';
 import { UserRepository } from 'src/repositories';
 import { CreateUserAccountDto, UserIsExistDto } from './user.dto';
@@ -26,6 +32,7 @@ export class UserController {
     isArray: true,
   })
   @Get('/')
+  @UseGuards(AzureADGuard)
   async getUsers(): Promise<User[]> {
     return this.userRepository.getUsers();
   }
@@ -42,8 +49,9 @@ export class UserController {
     type: User,
   })
   @Get('/current')
-  async getCurrentUser(@GetUserId() id: number): Promise<User> {
-    return this.userRepository.getUser(id);
+  @UseGuards(AzureADGuard)
+  async getCurrentUser(@GetAzureUser() azureUser: AzureUser): Promise<User> {
+    return this.userRepository.getUserByEmail(azureUser.preferred_username);
   }
 
   @ApiCreatedResponse({
@@ -81,6 +89,7 @@ export class UserController {
     description: 'User already exist.',
   })
   @Post('/encoder')
+  @UseGuards(AzureADGuard)
   async createEncoderUser(
     @Body(ValidationPipe) dto: CreateUserAccountDto,
   ): Promise<CreatedResponse> {
@@ -106,6 +115,7 @@ export class UserController {
     description: 'User already exist.',
   })
   @Post('/reviewer')
+  @UseGuards(AzureADGuard)
   async createReviewerUser(
     @Body(ValidationPipe) dto: CreateUserAccountDto,
   ): Promise<CreatedResponse> {

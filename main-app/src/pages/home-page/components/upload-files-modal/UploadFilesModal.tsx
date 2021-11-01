@@ -5,8 +5,8 @@ import {
   isCanceled,
   cancelRequest,
   createCancelTokenSource,
-} from 'apis/request';
-import { useUploadDoc } from 'hooks/document';
+} from 'apis';
+import { useUploadDocument } from 'hooks';
 import { FileItem, DropZone } from './components';
 import {
   UploadModalProps,
@@ -42,7 +42,7 @@ export const UploadFilesModal = ({
   const filesProgress = Math.round((successCount / totalFiles) * 100);
 
   const { reset: resetUseUploadDoc, mutateAsync: uploadDocument } =
-    useUploadDoc();
+    useUploadDocument();
 
   const uploadAgain = (itemNumber: number) => {
     if (
@@ -118,11 +118,9 @@ export const UploadFilesModal = ({
     cancelToken?: CancelTokenSource,
     onComplete?: () => void,
   ) => {
-    const formData = new FormData();
-    formData.append('file', file, file.name);
     try {
       await uploadDocument({
-        formData,
+        file,
         onUploadProgress: (percentCompleted): void => {
           let newfiles = [...files];
           newfiles[index].status = UploadStatus.UPLOADING;

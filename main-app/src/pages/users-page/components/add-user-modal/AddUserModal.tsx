@@ -1,4 +1,4 @@
-import { ReactElement, useState } from 'react';
+import { ReactElement } from 'react';
 import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Form from 'react-bootstrap/Form';
@@ -6,39 +6,50 @@ import Alert from 'react-bootstrap/Alert';
 import Spinner from 'react-bootstrap/Spinner';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
-import { useAddUser } from 'hooks/user';
-import { CreateUserParams } from 'apis/user';
-import { Role } from 'core/enums';
-import { AddUserModalProps } from './AddUserModal.types';
-import { addUserFormSchema } from './AddUserModal.schema';
+import { useCreateUser } from 'hooks';
+import * as yup from 'yup';
+import { CreateUserApi } from 'apis';
+import { Role } from 'models';
+
+const createUserSchema = yup.object().shape({
+  email: yup.string().email().required('Email is required.'),
+  role: yup
+    .mixed<Role>()
+    .oneOf(Object.values(Role))
+    .required('Role is required.'),
+});
+
+export interface AddUserModalProps {
+  isVisible: boolean;
+  onClose: () => void;
+}
 
 export const AddUserModal = ({
   isVisible,
   onClose,
 }: AddUserModalProps): ReactElement => {
-  const [role, setRole] = useState<Role>(Role.ENCODER);
   const {
     isLoading,
     isError,
     error,
-    mutateAsync: addUserAsync,
+    mutateAsync: createUserAsync,
     reset: resetUseAddUser,
-  } = useAddUser({ role: role });
+  } = useCreateUser();
 
   const {
     control,
     handleSubmit,
     reset: resetForm,
     formState: { errors },
-  } = useForm<CreateUserParams>({
-    resolver: yupResolver(addUserFormSchema),
+  } = useForm<CreateUserApi>({
+    resolver: yupResolver(createUserSchema),
   });
 
-  const addUser: SubmitHandler<CreateUserParams> = async (
+  const addUser: SubmitHandler<CreateUserApi> = async (
     params,
   ): Promise<void> => {
     if (!isLoading) {
-      await addUserAsync(params);
+      await createUserAsync(params);
       closeModal();
     }
   };
@@ -62,7 +73,7 @@ export const AddUserModal = ({
   };
 
   const closeModal = (): void => {
-    resetForm({ email: '' });
+    resetForm({ email: '', role: Role.ENCODER });
     resetUseAddUser();
     onClose();
   };
@@ -85,14 +96,17 @@ export const AddUserModal = ({
           {renderErrorAlert()}
           <Form.Group className="mb-3">
             <Form.Label>Role</Form.Label>
-            <Form.Select
-              onChange={(e) => setRole(e.currentTarget.value as Role)}
-              disabled={isLoading}
+            <Controller
+              name="role"
+              control={control}
               defaultValue={Role.ENCODER}
-            >
-              <option value={Role.ENCODER}>Encoder</option>
-              <option value={Role.REVIEWER}>Reviewer</option>
-            </Form.Select>
+              render={({ field }) => (
+                <Form.Select {...field} disabled={isLoading}>
+                  <option value={Role.ENCODER}>Encoder</option>
+                  <option value={Role.REVIEWER}>Reviewer</option>
+                </Form.Select>
+              )}
+            />
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>Email address</Form.Label>

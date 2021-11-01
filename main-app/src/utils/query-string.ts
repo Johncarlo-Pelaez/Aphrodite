@@ -23,9 +23,13 @@ const createTablePaginationQuery = (tableQuery: TableQueryParams): string => {
 
 const createQueryString = (
   params: ParsedUrlQueryInput,
-  options?: ParseOptions
+  options?: ParseOptions,
 ): string => {
-  return queryString.stringify(params, options);
+  const theOptions: ParseOptions = {
+    arrayFormat: 'index',
+    ...options,
+  };
+  return queryString.stringify(params, theOptions);
 };
 
 const calculatePageSkip = (pageSkips: CalculatePageSkipParams): number => {

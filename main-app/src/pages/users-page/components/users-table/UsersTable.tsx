@@ -1,7 +1,7 @@
 import { ReactElement, useState } from 'react';
 import moment from 'moment';
 import { DEFAULT_DATE_FORMAT } from 'core/constants';
-import { useUsers } from 'hooks/user';
+import { useUsers } from 'hooks';
 import { Table, TableColumnProps } from 'core/ui/table';
 import { User } from 'models';
 import { UsersTableProps } from './UsersTable.types';
