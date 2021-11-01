@@ -6,8 +6,13 @@ export class CreateUserAccountDto {
     format: 'email',
   })
   @IsString()
-  @IsEmail()
+  @IsEmail({}, { message: 'Email is invalid.' })
   email: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty({ message: 'Object ID is required.' })
+  objectId: string;
 
   @ApiProperty()
   @IsOptional()

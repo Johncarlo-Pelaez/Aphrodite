@@ -26,6 +26,7 @@ const checkEmailExistsApi = async (email: string): Promise<boolean> => {
 
 export interface CreateUserApi {
   email: string;
+  objectId: string;
   role: Role;
 }
 

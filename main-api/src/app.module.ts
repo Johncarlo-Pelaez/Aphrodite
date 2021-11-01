@@ -13,6 +13,7 @@ import { QRService } from 'src/qr-service';
 import { SalesForceService } from './sales-force-service';
 import { PassportModule } from '@nestjs/passport';
 import { AzureADStrategy } from './core';
+import { AzureAdService } from './azure-ad-service';
 
 const logger = new Logger('AppModule');
 
@@ -62,6 +63,7 @@ const logger = new Logger('AppModule');
   providers: [
     QRService,
     SalesForceService,
+    AzureAdService,
     DocumentsService,
     DocumentRepository,
     UserRepository,

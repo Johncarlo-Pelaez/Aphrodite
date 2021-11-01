@@ -13,6 +13,7 @@ import { Role } from 'models';
 
 const createUserSchema = yup.object().shape({
   email: yup.string().email().required('Email is required.'),
+  objectId: yup.string().required('Object ID is required.'),
   role: yup
     .mixed<Role>()
     .oneOf(Object.values(Role))
@@ -58,17 +59,12 @@ export const AddUserModal = ({
     const show = !!errors.email || isError;
     if (show)
       return (
-        <div>
-          <Alert variant="danger" show={!!errors.email}>
-            {!!errors.email && errors.email?.message}
-          </Alert>
-          <Alert variant="danger" show={isError}>
-            {isError &&
-              (error?.response?.statusText === 'Conflict'
-                ? 'Email already exist'
-                : error?.response?.statusText)}
-          </Alert>
-        </div>
+        <Alert variant="danger" show={isError}>
+          {isError &&
+            (error?.response?.statusText === 'Conflict'
+              ? 'Email already exist'
+              : error?.response?.statusText)}
+        </Alert>
       );
   };
 
@@ -119,6 +115,21 @@ export const AddUserModal = ({
                   {...field}
                   disabled={isLoading}
                   placeholder="Enter email"
+                />
+              )}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Object ID</Form.Label>
+            <Controller
+              name="objectId"
+              control={control}
+              defaultValue=""
+              render={({ field }) => (
+                <Form.Control
+                  {...field}
+                  disabled={isLoading}
+                  placeholder="Enter object ID"
                 />
               )}
             />

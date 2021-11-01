@@ -6,7 +6,7 @@ import {
   PopupRequest,
   SilentRequest,
 } from '@azure/msal-browser';
-import { removeApiAuthorization, setApiAuthorization } from 'apis';
+import { removeApiHeaders, setApiAccessToken, setApiAuthorization } from 'apis';
 import { useEmailExists } from './user.hook';
 import { scopes } from 'authConfig';
 import { useRecoilState } from 'recoil';
@@ -31,12 +31,13 @@ const buildLoginRequest = (email?: string): PopupRequest => ({
   scopes,
 });
 
-const onSigninSuccess = (idToken: string): void => {
+const onSigninSuccess = (idToken: string, accessToken: string): void => {
   setApiAuthorization(idToken);
+  setApiAccessToken(accessToken);
 };
 
 const onSignoutSuccess = (): void => {
-  removeApiAuthorization();
+  removeApiHeaders();
   queryClient.clear();
 };
 
@@ -75,7 +76,7 @@ const useLoadAccountToken = (): UseLoadAccountTokenResult => {
         if (response.account) {
           const exists = await checkEmailExists(response.account.username);
           if (exists) {
-            onSigninSuccess(response.idToken);
+            onSigninSuccess(response.idToken, response.accessToken);
           }
           setEmailAllowed(exists);
           setIsLoaded(true);
@@ -131,8 +132,10 @@ const useSignIn = (): UseSignInResult => {
         setError('User does not exists.');
       } else {
         const loginRequest = buildLoginRequest(email);
-        const { idToken } = await instance.loginPopup(loginRequest);
-        onSigninSuccess(idToken);
+        const { idToken, accessToken } = await instance.loginPopup(
+          loginRequest,
+        );
+        onSigninSuccess(idToken, accessToken);
       }
     } catch (err) {
       setError('Could not sign in.');

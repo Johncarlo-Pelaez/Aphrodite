@@ -10,7 +10,8 @@ export {
   cancelRequest,
   isCanceled,
   setApiAuthorization,
-  removeApiAuthorization,
+  setApiAccessToken,
+  removeApiHeaders,
 };
 
 export type Canceler = AxiosCanceler | null;
@@ -40,6 +41,15 @@ const setApiAuthorization = (token: string): void => {
   }
 };
 
-const removeApiAuthorization = (): void => {
+const setApiAccessToken = (token: string): void => {
+  if (token) {
+    request.defaults.headers['access-token'] = token;
+  } else {
+    request.defaults.headers['access-token'] = undefined;
+  }
+};
+
+const removeApiHeaders = (): void => {
   setApiAuthorization('');
+  setApiAccessToken('');
 };

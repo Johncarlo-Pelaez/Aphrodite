@@ -39,8 +39,8 @@ export const ApiPaginatedResponse = <TModel extends Type<any>>(
 };
 
 export function ApiFile(
-  fieldName: string = 'file',
-  required: boolean = false,
+  fieldName = 'file',
+  required = false,
   localOptions?: MulterOptions,
 ) {
   return applyDecorators(
@@ -80,4 +80,8 @@ export interface AzureUser {
 
 export const GetAzureUser = createParamDecorator((_data, req) => {
   return req.args[0].user;
+});
+
+export const GetAccessToken = createParamDecorator((_data, req) => {
+  return req.args[0].headers['access-token'];
 });

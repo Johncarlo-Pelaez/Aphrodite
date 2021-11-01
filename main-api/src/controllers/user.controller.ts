@@ -13,10 +13,12 @@ import {
   ApiCreatedResponse,
   ApiOkResponse,
 } from '@nestjs/swagger';
+import { AzureAdService } from 'src/azure-ad-service';
 import {
   AzureADGuard,
   AzureUser,
   CreatedResponse,
+  GetAccessToken,
   GetAzureUser,
 } from 'src/core';
 import { Role, User } from 'src/entities';
@@ -25,7 +27,10 @@ import { CreateUserAccountDto, UserIsExistDto } from './user.dto';
 
 @Controller('/users')
 export class UserController {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly azureAdService: AzureAdService,
+  ) {}
 
   @ApiOkResponse({
     type: User,
@@ -92,15 +97,24 @@ export class UserController {
   @UseGuards(AzureADGuard)
   async createEncoderUser(
     @Body(ValidationPipe) dto: CreateUserAccountDto,
+    @GetAccessToken() accessToken: string,
   ): Promise<CreatedResponse> {
     const user = await this.userRepository.getUserByEmail(dto.email);
     if (user) throw new ConflictException();
+
+    const data = await this.azureAdService.getUserById(
+      accessToken,
+      dto.objectId,
+    );
+    console.log(data);
 
     const response = new CreatedResponse();
     const rightNow = new Date();
 
     response.id = await this.userRepository.createUser({
-      ...dto,
+      email: data.userPrincipalName,
+      firstName: data.givenName,
+      lastName: data.surname,
       role: Role.ENCODER,
       createdDate: rightNow,
     });
