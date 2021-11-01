@@ -4,6 +4,7 @@ import {
   AuthenticatedTemplate,
   UnauthenticatedTemplate,
 } from '@azure/msal-react';
+import { useEmailAllowed, useLoadAccountToken } from 'hooks';
 
 interface PrivateRouteProps extends RouteProps {
   layout?: React.FC;
@@ -11,6 +12,12 @@ interface PrivateRouteProps extends RouteProps {
 
 export const PrivateRoute = (props: PrivateRouteProps) => {
   const { layout: Layout, ...rest } = props;
+  const { isAllowed } = useEmailAllowed();
+  const { isLoaded } = useLoadAccountToken();
+
+  if (isLoaded && !isAllowed) {
+    return <Redirect to="/forbidden-account" />;
+  }
 
   return (
     <Fragment>

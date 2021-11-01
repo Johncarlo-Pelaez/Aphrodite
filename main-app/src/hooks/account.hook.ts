@@ -10,10 +10,16 @@ import { removeApiAuthorization, setApiAuthorization } from 'apis';
 import { useEmailExists } from './user.hook';
 import { scopes } from 'authConfig';
 import { useRecoilState } from 'recoil';
-import { isAccountTokenLoadedState } from 'states';
+import { isAccountTokenLoadedState, isEmailAccountAllowedState } from 'states';
 import { queryClient } from 'query-client';
 
-export { useAccount, useLoadAccountToken, useSignIn, useSignOut };
+export {
+  useAccount,
+  useLoadAccountToken,
+  useEmailAllowed,
+  useSignIn,
+  useSignOut,
+};
 
 const buildSilentRequest = (account: AccountInfo): SilentRequest => ({
   scopes,
@@ -50,6 +56,7 @@ const useAccount = (): UseAccountResult => {
 };
 
 type UseLoadAccountTokenResult = {
+  isLoaded: boolean;
   isAuthenticatedButTokenNotLoaded: boolean;
 };
 
@@ -57,19 +64,49 @@ const useLoadAccountToken = (): UseLoadAccountTokenResult => {
   const [isLoaded, setIsLoaded] = useRecoilState(isAccountTokenLoadedState);
   const { account } = useAccount();
   const { instance } = useMsal();
+  const { checkEmailExists } = useEmailExists();
+  const { setEmailAllowed } = useEmailAllowed();
   const isAuthenticatedButTokenNotLoaded = !!account && !isLoaded;
 
   useEffect(() => {
     if (account && !isLoaded) {
       const request = buildSilentRequest(account);
-      instance.acquireTokenSilent(request).then((response) => {
-        onSigninSuccess(response.idToken);
-        setIsLoaded(true);
+      instance.acquireTokenSilent(request).then(async (response) => {
+        if (response.account) {
+          const exists = await checkEmailExists(response.account.username);
+          if (exists) {
+            onSigninSuccess(response.idToken);
+          }
+          setEmailAllowed(exists);
+          setIsLoaded(true);
+        }
       });
     }
-  }, [isLoaded, account, instance, setIsLoaded]);
+  }, [
+    isLoaded,
+    account,
+    instance,
+    checkEmailExists,
+    setEmailAllowed,
+    setIsLoaded,
+  ]);
 
-  return { isAuthenticatedButTokenNotLoaded };
+  return { isLoaded, isAuthenticatedButTokenNotLoaded };
+};
+
+type UseEmailAllowedResult = {
+  isAllowed: boolean;
+  setEmailAllowed: (allow: boolean) => void;
+};
+
+const useEmailAllowed = (): UseEmailAllowedResult => {
+  const [isAllowed, setIsAllowed] = useRecoilState(isEmailAccountAllowedState);
+
+  const setEmailAllowed = (allow: boolean): void => {
+    setIsAllowed(allow);
+  };
+
+  return { isAllowed, setEmailAllowed };
 };
 
 type UseSignInResult = {

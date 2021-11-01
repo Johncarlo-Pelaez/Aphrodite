@@ -9,6 +9,7 @@ import { AnonymousRoute, PrivateRoute } from 'routes';
 import { FullHeightSpinner } from 'core/ui';
 import { useLoadAccountToken } from 'hooks';
 import { RecoilRoot } from 'recoil';
+import { ForbiddenAccount } from 'pages';
 
 const HomePage = lazy(() => import('pages/home-page'));
 const LoginPage = lazy(() => import('pages/login-page'));
@@ -70,8 +71,9 @@ const AppContent = () => {
             layout={MainLayout}
             component={ReportsPage}
           />
+          <Route path="/forbidden-account" component={ForbiddenAccount} />
+          <Route path="/forbidden" component={Forbidden} />
           <Route component={NotFoundPage} />
-          <Route exact path="/forbidden" component={Forbidden} />
         </Switch>
       </Router>
     </Suspense>
