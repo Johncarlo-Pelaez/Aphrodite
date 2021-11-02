@@ -2,8 +2,7 @@ import { ReactElement, useState } from 'react';
 import fileSize from 'filesize';
 import moment from 'moment';
 import { DEFAULT_DATE_FORMAT } from 'core/constants';
-import { useDocuments } from 'hooks/document';
-import { useDebounce } from 'hooks/debounce';
+import { useDebounce, useDocuments } from 'hooks';
 import {
   Table,
   TableColumnProps,
@@ -36,7 +35,7 @@ export const DocumentsTable = ({
     isError: hasDocsError,
     data: result,
   } = useDocuments({
-    searchKey: debouncedSearch,
+    search: debouncedSearch,
     currentPage,
     pageSize,
   });

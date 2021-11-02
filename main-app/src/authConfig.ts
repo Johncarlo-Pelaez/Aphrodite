@@ -1,4 +1,4 @@
-import { Configuration, PopupRequest } from '@azure/msal-browser';
+import { Configuration } from '@azure/msal-browser';
 
 export const msalConfig: Configuration = {
   auth: {
@@ -14,6 +14,4 @@ export const msalConfig: Configuration = {
   },
 };
 
-export const loginRequest: PopupRequest = {
-  scopes: [],
-};
+export const scopes = ['User.Read'];

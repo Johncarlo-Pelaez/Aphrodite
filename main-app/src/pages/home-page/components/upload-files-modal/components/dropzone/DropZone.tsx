@@ -2,7 +2,7 @@ import { ReactElement, useCallback, Dispatch, SetStateAction } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUpload } from '@fortawesome/free-solid-svg-icons';
-import { createCancelTokenSource } from 'apis/request';
+import { createCancelTokenSource } from 'apis';
 import styles from './DropZone.module.css';
 import { FileInfo, UploadStatus } from '../../';
 

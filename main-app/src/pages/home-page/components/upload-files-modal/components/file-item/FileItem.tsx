@@ -2,7 +2,7 @@ import { ReactElement } from 'react';
 import { ProgressBar, Stack, Card } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilePdf, faTimes, faRedo } from '@fortawesome/free-solid-svg-icons';
-import { CancelTokenSource, cancelRequest } from 'apis/request';
+import { CancelTokenSource, cancelRequest } from 'apis';
 import styles from './FileItem.module.css';
 import { UploadStatus } from '../../';
 

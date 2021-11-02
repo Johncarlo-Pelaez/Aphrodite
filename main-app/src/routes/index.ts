@@ -1,3 +1,3 @@
-export { AuthRoute } from './auth-route';
-export { ProtectedRoute } from './protected-route';
-export { PublicRoute } from './public-route';
+export * from './AnonymousRoute';
+export * from './PrivateRoute';
+export * from './PublicRoute';

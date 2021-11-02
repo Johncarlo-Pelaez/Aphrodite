@@ -6,26 +6,38 @@ import {
   Post,
   ValidationPipe,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiOkResponse,
 } from '@nestjs/swagger';
-import { CreatedResponse, GetUserId } from 'src/core';
+import { AzureAdService } from 'src/azure-ad-service';
+import {
+  AzureADGuard,
+  AzureUser,
+  CreatedResponse,
+  GetAccessToken,
+  GetAzureUser,
+} from 'src/core';
 import { Role, User } from 'src/entities';
 import { UserRepository } from 'src/repositories';
 import { CreateUserAccountDto, UserIsExistDto } from './user.dto';
 
 @Controller('/users')
 export class UserController {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly azureAdService: AzureAdService,
+  ) {}
 
   @ApiOkResponse({
     type: User,
     isArray: true,
   })
   @Get('/')
+  @UseGuards(AzureADGuard)
   async getUsers(): Promise<User[]> {
     return this.userRepository.getUsers();
   }
@@ -42,8 +54,9 @@ export class UserController {
     type: User,
   })
   @Get('/current')
-  async getCurrentUser(@GetUserId() id: number): Promise<User> {
-    return this.userRepository.getUser(id);
+  @UseGuards(AzureADGuard)
+  async getCurrentUser(@GetAzureUser() azureUser: AzureUser): Promise<User> {
+    return this.userRepository.getUserByEmail(azureUser.preferred_username);
   }
 
   @ApiCreatedResponse({
@@ -81,17 +94,27 @@ export class UserController {
     description: 'User already exist.',
   })
   @Post('/encoder')
+  @UseGuards(AzureADGuard)
   async createEncoderUser(
     @Body(ValidationPipe) dto: CreateUserAccountDto,
+    @GetAccessToken() accessToken: string,
   ): Promise<CreatedResponse> {
     const user = await this.userRepository.getUserByEmail(dto.email);
     if (user) throw new ConflictException();
+
+    const data = await this.azureAdService.getUserById(
+      accessToken,
+      dto.objectId,
+    );
+    console.log(data);
 
     const response = new CreatedResponse();
     const rightNow = new Date();
 
     response.id = await this.userRepository.createUser({
-      ...dto,
+      email: data.userPrincipalName,
+      firstName: data.givenName,
+      lastName: data.surname,
       role: Role.ENCODER,
       createdDate: rightNow,
     });
@@ -106,6 +129,7 @@ export class UserController {
     description: 'User already exist.',
   })
   @Post('/reviewer')
+  @UseGuards(AzureADGuard)
   async createReviewerUser(
     @Body(ValidationPipe) dto: CreateUserAccountDto,
   ): Promise<CreatedResponse> {

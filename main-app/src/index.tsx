@@ -4,12 +4,13 @@ import { PublicClientApplication } from '@azure/msal-browser';
 import App from './App';
 import './styles/main.scss';
 import { msalConfig } from 'authConfig';
+import { queryClient } from 'query-client';
 
-export const msalInstance = new PublicClientApplication(msalConfig);
+const msalInstance = new PublicClientApplication(msalConfig);
 
 ReactDOM.render(
   <React.StrictMode>
-    <App msalInstance={msalInstance} />
+    <App msalInstance={msalInstance} queryClient={queryClient} />
   </React.StrictMode>,
   document.getElementById('root'),
 );

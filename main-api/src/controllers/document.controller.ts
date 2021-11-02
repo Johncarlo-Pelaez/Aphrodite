@@ -19,8 +19,6 @@ import {
   ApiFile,
   fileMimetypeFilter,
   AzureADGuard,
-  GetAzureUser,
-  AzureUser,
 } from 'src/core';
 import { Document, DocumentHistory } from 'src/entities';
 import { DocumentRepository } from 'src/repositories';
@@ -29,6 +27,7 @@ import { GetDocumentsDto } from './document.dto';
 import { GetDocumentsIntPipe } from './document.pipe';
 
 @Controller('/documents')
+@UseGuards(AzureADGuard)
 export class DocumentController {
   constructor(
     private readonly documentsService: DocumentsService,
@@ -37,9 +36,7 @@ export class DocumentController {
 
   @ApiPaginatedResponse(Document)
   @Get('/')
-  // @UseGuards(AzureADGuard)
   async getDocuments(
-    // @GetAzureUser() azureUser: AzureUser,
     @Query(GetDocumentsIntPipe) dto: GetDocumentsDto,
   ): Promise<PaginatedResponse<Document>> {
     const response = new PaginatedResponse<Document>();

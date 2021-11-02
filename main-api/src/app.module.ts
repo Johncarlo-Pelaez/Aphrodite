@@ -11,9 +11,10 @@ import { DocumentRepository, UserRepository } from './repositories';
 import { DocumentsService } from './services';
 import { QRService } from 'src/qr-service';
 import { SalesForceService } from './sales-force-service';
+import { SpringCMService } from './spring-cm-service';
 import { PassportModule } from '@nestjs/passport';
 import { AzureADStrategy } from './core';
-import { SpringCMService } from './spring-cm-service';
+import { AzureAdService } from './azure-ad-service';
 
 const logger = new Logger('AppModule');
 
@@ -64,6 +65,7 @@ const logger = new Logger('AppModule');
     QRService,
     SalesForceService,
     SpringCMService,
+    AzureAdService,
     DocumentsService,
     DocumentRepository,
     UserRepository,
