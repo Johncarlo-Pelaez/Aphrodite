@@ -1,7 +1,6 @@
 import {
   getUsersApi,
-  createEncoderUserApi,
-  createReviewerUserApi,
+  createUserApi,
   checkEmailExistsApi,
   CreateUserApi,
 } from 'apis';
@@ -12,7 +11,7 @@ import {
   UseMutationResult,
   useQueryClient,
 } from 'react-query';
-import { Role, User } from 'models';
+import { User } from 'models';
 import { ApiError } from 'core/types';
 import { useState } from 'react';
 import { QueryKey } from 'utils';
@@ -27,9 +26,7 @@ const useCreateUser = (): UseMutationResult<void, ApiError, CreateUserApi> => {
   const queryClient = useQueryClient();
   return useMutation<void, ApiError, CreateUserApi>(
     (data) => {
-      return data.role === Role.ENCODER
-        ? createEncoderUserApi(data)
-        : createReviewerUserApi(data);
+      return createUserApi(data);
     },
     {
       onSuccess: () => {

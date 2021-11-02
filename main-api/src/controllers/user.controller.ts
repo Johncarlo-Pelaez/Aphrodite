@@ -93,7 +93,7 @@ export class UserController {
   @ApiConflictResponse({
     description: 'User already exist.',
   })
-  @Post('/encoder')
+  @Post('/create')
   @UseGuards(AzureADGuard)
   async createEncoderUser(
     @Body(ValidationPipe) dto: CreateUserAccountDto,
@@ -106,7 +106,6 @@ export class UserController {
       accessToken,
       dto.objectId,
     );
-    console.log(data);
 
     const response = new CreatedResponse();
     const rightNow = new Date();
@@ -115,33 +114,7 @@ export class UserController {
       email: data.userPrincipalName,
       firstName: data.givenName,
       lastName: data.surname,
-      role: Role.ENCODER,
-      createdDate: rightNow,
-    });
-
-    return response;
-  }
-
-  @ApiCreatedResponse({
-    type: CreatedResponse,
-  })
-  @ApiConflictResponse({
-    description: 'User already exist.',
-  })
-  @Post('/reviewer')
-  @UseGuards(AzureADGuard)
-  async createReviewerUser(
-    @Body(ValidationPipe) dto: CreateUserAccountDto,
-  ): Promise<CreatedResponse> {
-    const user = await this.userRepository.getUserByEmail(dto.email);
-    if (user) throw new ConflictException();
-
-    const response = new CreatedResponse();
-    const rightNow = new Date();
-
-    response.id = await this.userRepository.createUser({
-      ...dto,
-      role: Role.REVIEWER,
+      role: dto.role,
       createdDate: rightNow,
     });
 

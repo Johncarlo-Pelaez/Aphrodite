@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsString, IsOptional, IsNotEmpty } from 'class-validator';
+import { Role } from 'src/entities';
 
 export class CreateUserAccountDto {
   @ApiProperty({
@@ -13,6 +14,10 @@ export class CreateUserAccountDto {
   @IsString()
   @IsNotEmpty({ message: 'Object ID is required.' })
   objectId: string;
+
+  @ApiProperty()
+  @IsString()
+  role: Role;
 
   @ApiProperty()
   @IsOptional()
