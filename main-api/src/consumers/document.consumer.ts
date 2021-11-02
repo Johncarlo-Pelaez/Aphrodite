@@ -132,17 +132,22 @@ export class DocumentConsumer {
     jobData: JobData,
     params: UploadDocToSpringParams,
   ): Promise<void> {
-    let uploadResult;
     try {
       this.updateToMigrateBegin(jobData);
-      uploadResult = await this.springCMService.uploadDocToSpring(params);
-      this.updateToMigrateDone(JSON.stringify(uploadResult.data), jobData);
+      const { data: response }: any =
+        await this.springCMService.uploadDocToSpring(params);
+      if (
+        response?.SpringCMAccessToken?.Code === 200 &&
+        response?.SpringCMGetFolder?.Code === 200 &&
+        response?.SpringCMUploadResponse?.Code === 200 &&
+        !!response?.SalesForce.length &&
+        response?.SalesForce[0].created === 'true' &&
+        response?.SalesForce[0].success === 'true'
+      )
+        this.updateToMigrateDone(JSON.stringify(response), jobData);
+      else this.updateToMigrateFailed(null, JSON.stringify(response), jobData);
     } catch (err) {
-      this.updateToMigrateFailed(
-        err,
-        JSON.stringify(uploadResult.data),
-        jobData,
-      );
+      this.updateToMigrateFailed(err, null, jobData);
       throw err;
     }
   }
