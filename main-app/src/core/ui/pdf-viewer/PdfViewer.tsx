@@ -1,4 +1,5 @@
 import { ReactElement, useEffect } from 'react';
+import { getApiAuthorization, getApiAccessToken } from 'apis';
 
 export interface PdfViewerProps {
   documentId?: number;
@@ -28,12 +29,15 @@ export const PdfViewer = (props: PdfViewerProps): ReactElement => {
     PDFViewerApplication.close();
     PDFViewerApplication.loadingBar.show();
     PDFViewerApplication.loadingBar.percent = 0;
-    PDFViewerApplication.open(`/api/documents/${documentId}/file`).catch(
-      (error: Object) => {
-        PDFViewerApplication.loadingBar.hide();
-        alert(error.toString());
+    PDFViewerApplication.open(`/api/documents/${documentId}/file`, {
+      httpHeaders: {
+        Authorization: getApiAuthorization(),
+        'access-token': getApiAccessToken(),
       },
-    );
+    }).catch((error: Object) => {
+      PDFViewerApplication.loadingBar.hide();
+      alert(error.toString());
+    });
   };
 
   const resetPdfViewer = (): void => {

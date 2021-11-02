@@ -13,14 +13,6 @@ import { useRecoilState } from 'recoil';
 import { isAccountTokenLoadedState, isEmailAccountAllowedState } from 'states';
 import { queryClient } from 'query-client';
 
-export {
-  useAccount,
-  useLoadAccountToken,
-  useEmailAllowed,
-  useSignIn,
-  useSignOut,
-};
-
 const buildSilentRequest = (account: AccountInfo): SilentRequest => ({
   scopes,
   account,
@@ -45,7 +37,7 @@ type UseAccountResult = {
   account: AccountInfo | undefined;
 };
 
-const useAccount = (): UseAccountResult => {
+export const useAccount = (): UseAccountResult => {
   const { accounts } = useMsal();
   let account: AccountInfo | undefined;
 
@@ -61,7 +53,7 @@ type UseLoadAccountTokenResult = {
   isAuthenticatedButTokenNotLoaded: boolean;
 };
 
-const useLoadAccountToken = (): UseLoadAccountTokenResult => {
+export const useLoadAccountToken = (): UseLoadAccountTokenResult => {
   const [isLoaded, setIsLoaded] = useRecoilState(isAccountTokenLoadedState);
   const { account } = useAccount();
   const { instance } = useMsal();
@@ -100,7 +92,7 @@ type UseEmailAllowedResult = {
   setEmailAllowed: (allow: boolean) => void;
 };
 
-const useEmailAllowed = (): UseEmailAllowedResult => {
+export const useEmailAllowed = (): UseEmailAllowedResult => {
   const [isAllowed, setIsAllowed] = useRecoilState(isEmailAccountAllowedState);
 
   const setEmailAllowed = (allow: boolean): void => {
@@ -116,7 +108,7 @@ type UseSignInResult = {
   signIn: (email: string) => Promise<void>;
 };
 
-const useSignIn = (): UseSignInResult => {
+export const useSignIn = (): UseSignInResult => {
   const [error, setError] = useState<string>();
   const { isLoading: isEmailChecking, checkEmailExists } = useEmailExists();
   const { inProgress, instance } = useMsal();
@@ -150,7 +142,7 @@ type UseSignOutResult = {
   signOut: () => Promise<void>;
 };
 
-const useSignOut = (): UseSignOutResult => {
+export const useSignOut = (): UseSignOutResult => {
   const { instance, inProgress } = useMsal();
   const isLoading = inProgress === InteractionStatus.Logout;
 

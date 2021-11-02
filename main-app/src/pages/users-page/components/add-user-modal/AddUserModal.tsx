@@ -69,7 +69,7 @@ export const AddUserModal = ({
   };
 
   const closeModal = (): void => {
-    resetForm({ email: '', role: Role.ENCODER });
+    resetForm({ email: '', role: Role.ENCODER, objectId: '' });
     resetUseAddUser();
     onClose();
   };

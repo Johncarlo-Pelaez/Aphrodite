@@ -17,15 +17,13 @@ import {
 } from 'apis';
 import { QueryKey } from 'utils';
 
-export { useDocuments, useDocument, useUploadDocument };
-
 export interface UseDocuments {
   search: string;
   currentPage: number;
   pageSize: number;
 }
 
-const useDocuments = (
+export const useDocuments = (
   params: UseDocuments,
 ): UseQueryResult<GetDocumentsApiResponse, ApiError> => {
   return useQuery(QueryKey.buildPaginatedDocuments(params), () =>
@@ -33,7 +31,9 @@ const useDocuments = (
   );
 };
 
-const useDocument = (id?: number): UseQueryResult<Document, ApiError> => {
+export const useDocument = (
+  id?: number,
+): UseQueryResult<Document, ApiError> => {
   const queryClient = useQueryClient();
   return useQuery(
     QueryKey.buildDocument(id),
@@ -51,7 +51,7 @@ const useDocument = (id?: number): UseQueryResult<Document, ApiError> => {
   );
 };
 
-const useUploadDocument = (): UseMutationResult<
+export const useUploadDocument = (): UseMutationResult<
   uploadDocumentApiResponse,
   ApiError,
   UploadDocumentApi

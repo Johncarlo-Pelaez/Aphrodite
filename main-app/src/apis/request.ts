@@ -4,36 +4,26 @@ import axios, {
 } from 'axios';
 import { API_BASE_URL } from 'core/constants';
 
-export {
-  request,
-  createCancelTokenSource,
-  cancelRequest,
-  isCanceled,
-  setApiAuthorization,
-  setApiAccessToken,
-  removeApiHeaders,
-};
-
 export type Canceler = AxiosCanceler | null;
 export type CancelTokenSource = AxiosCancelTokenSource | null;
 
-const request = axios.create({
+export const request = axios.create({
   baseURL: API_BASE_URL,
 });
 
-const createCancelTokenSource = (): CancelTokenSource => {
+export const createCancelTokenSource = (): CancelTokenSource => {
   return axios.CancelToken.source();
 };
 
-const cancelRequest = (cancelTokenSource?: CancelTokenSource): void => {
+export const cancelRequest = (cancelTokenSource?: CancelTokenSource): void => {
   cancelTokenSource?.cancel();
 };
 
-const isCanceled = (error: any): boolean => {
+export const isCanceled = (error: any): boolean => {
   return axios.isCancel(error);
 };
 
-const setApiAuthorization = (token: string): void => {
+export const setApiAuthorization = (token: string): void => {
   if (token) {
     request.defaults.headers['Authorization'] = 'Bearer ' + token;
   } else {
@@ -41,7 +31,11 @@ const setApiAuthorization = (token: string): void => {
   }
 };
 
-const setApiAccessToken = (token: string): void => {
+export const getApiAuthorization = (): void => {
+  return request.defaults.headers['Authorization'] ?? undefined;
+};
+
+export const setApiAccessToken = (token: string): void => {
   if (token) {
     request.defaults.headers['access-token'] = token;
   } else {
@@ -49,7 +43,11 @@ const setApiAccessToken = (token: string): void => {
   }
 };
 
-const removeApiHeaders = (): void => {
+export const getApiAccessToken = (): void => {
+  return request.defaults.headers['access-token'] ?? undefined;
+};
+
+export const removeApiHeaders = (): void => {
   setApiAuthorization('');
   setApiAccessToken('');
 };

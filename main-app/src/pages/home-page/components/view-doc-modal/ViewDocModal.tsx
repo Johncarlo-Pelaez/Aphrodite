@@ -3,8 +3,9 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Spinner from 'react-bootstrap/Spinner';
 import { useDocument } from 'hooks';
+import { PdfViewer } from 'core/ui';
 import { ViewDocModalProps } from './ViewDocModal.types';
-import { PdfViewer, Indexes } from './components';
+import { Indexes } from './components';
 import styles from './ViewDocModal.module.scss';
 
 export const ViewDocModal = ({
