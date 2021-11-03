@@ -2,7 +2,7 @@ import { OrderDirection } from './Table.enum';
 
 export interface TableColumnProps<T> {
   title: string;
-  dataIndex: string;
+  dataIndex?: string;
   render?: (obj: T) => any;
   sorter?: (a: T, b: T) => number;
   sortOrder?: OrderDirection;

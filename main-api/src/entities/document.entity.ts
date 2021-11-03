@@ -64,6 +64,10 @@ export class Document {
 
   @ApiProperty()
   @Column()
+  remarks: string;
+
+  @ApiProperty()
+  @Column()
   userId: number;
 
   @ApiProperty()

@@ -44,25 +44,6 @@ export const UploadFilesModal = ({
   const { reset: resetUseUploadDoc, mutateAsync: uploadDocument } =
     useUploadDocument();
 
-  const uploadAgain = (itemNumber: number) => {
-    if (
-      hasFiles &&
-      itemNumber > 0 &&
-      files.find((file) => file.status === UploadStatus.PENDING)
-    ) {
-      const currentItemIndex = itemNumber - 1;
-      const { file, status, cancelToken } = files[currentItemIndex];
-      const nextItemNumber = (itemNumber + 1) % (totalFiles + 1);
-      if (status === UploadStatus.SUCCESS || status === UploadStatus.REMOVED)
-        setCurrentItemNumber(nextItemNumber);
-      else
-        uploadFile(file, currentItemIndex, cancelToken, () => {
-          if (nextItemNumber <= totalFiles)
-            setCurrentItemNumber(nextItemNumber);
-        });
-    }
-  };
-
   const retryUpload = (itemNumber: number) => {
     const retryItemIndex = itemNumber - 1;
     const itemFile = files[retryItemIndex];
@@ -225,10 +206,28 @@ export const UploadFilesModal = ({
     </Modal>
   );
 
-  useEffect(() => {
-    if (hasFiles) uploadAgain(currentItemNumber);
+  useEffect(
+    function uploadAgain() {
+      if (
+        hasFiles &&
+        currentItemNumber > 0 &&
+        files.find((file) => file.status === UploadStatus.PENDING)
+      ) {
+        const currentItemIndex = currentItemNumber - 1;
+        const { file, status, cancelToken } = files[currentItemIndex];
+        const nextItemNumber = (currentItemNumber + 1) % (totalFiles + 1);
+        if (status === UploadStatus.SUCCESS || status === UploadStatus.REMOVED)
+          setCurrentItemNumber(nextItemNumber);
+        else
+          uploadFile(file, currentItemIndex, cancelToken, () => {
+            if (nextItemNumber <= totalFiles)
+              setCurrentItemNumber(nextItemNumber);
+          });
+      }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentItemNumber, hasFiles]);
+    [currentItemNumber, hasFiles],
+  );
 
   return renderUploadModal();
 };

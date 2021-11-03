@@ -3,39 +3,43 @@
 .viewModal {
   max-width: 100vw !important;
   width: 95vw !important;
+}
 
-  .modalBody {
-    height: 80vh;
-    display: block;
-    overflow: auto;
+.viewDocMainTab {
+  margin-bottom: 1rem;
+  width: 100%;
+}
 
-    .pdfViewerWrapper {
-      width: 100%;
-      height: 76vh;
-      margin-bottom: 1rem;
-    }
+.tabContent {
+  width: 100%;
+  display: block;
+  padding: 1rem;
 
-    .indexesCardWrapper {
-      width: 100%;
-      height: auto;
-    }
+  .pdfViewerWrapper {
+    width: 100%;
+    height: 90vh;
+    margin-bottom: 1rem;
+  }
+
+  .indexesCardWrapper {
+    width: 100%;
+    height: fit-content;
   }
 
   @include breakpoint-up(lg) {
-    .modalBody {
-      display: flex;
-      flex-direction: row;
-      gap: 1rem;
+    height: 72vh;
+    overflow: auto;
+    display: flex;
+    flex-flow: row nowrap;
+    gap: 1rem;
 
-      .pdfViewerWrapper {
-        width: 75%;
-        margin: 0;
-      }
+    .pdfViewerWrapper {
+      width: 75%;
+      margin: 0;
+    }
 
-      .indexesCardWrapper {
-        width: 25%;
-        height: 100%;
-      }
+    .indexesCardWrapper {
+      width: 25%;
     }
   }
 }

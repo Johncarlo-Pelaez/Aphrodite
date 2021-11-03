@@ -1,1 +1,1 @@
-export { default, Indexes } from './Indexes';
+export * from './Indexes';

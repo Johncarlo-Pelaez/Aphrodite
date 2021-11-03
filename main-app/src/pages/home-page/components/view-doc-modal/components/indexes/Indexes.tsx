@@ -74,13 +74,26 @@ export const Indexes = ({ document }: IndexesProps): ReactElement => {
         </Form.Group>
         <Form.Group>
           <Form.Label>
-            <b>Account Name:</b>
+            <b>Account Name</b>
           </Form.Label>
           <Form.Control
             readOnly
             type="text"
             placeholder="Account Name"
             value={documentType?.AccountName ?? ''}
+          />
+        </Form.Group>
+        <Form.Group>
+          <Form.Label>
+            <b>Remarks</b>
+          </Form.Label>
+          <Form.Control
+            readOnly
+            as="textarea"
+            rows={4}
+            type="text"
+            placeholder="Remarks"
+            value={document?.remarks ?? ''}
           />
         </Form.Group>
       </Form>

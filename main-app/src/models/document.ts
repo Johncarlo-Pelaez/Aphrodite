@@ -1,6 +1,6 @@
 import { User } from './user';
 
-export type Document = {
+export interface Document {
   id: number;
   documentName: string;
   documentSize: number;
@@ -12,9 +12,10 @@ export type Document = {
   documentType: string;
   contractDetails: string;
   user: User;
-};
+  remarks: string;
+}
 
-export type DocumentType = {
+export interface DocumentType {
   CompanyCode: string;
   ContractNumber: string;
   Brand: string;
@@ -28,4 +29,15 @@ export type DocumentType = {
   CodeType: string;
   ProjectCode: string;
   Tower_Phase: string;
-};
+}
+
+export interface DocumentHistory {
+  id: number;
+  description: string;
+  documentSize: number;
+  createdDate: Date;
+  documentId: number;
+  document: Document;
+  userId: number;
+  user: User;
+}

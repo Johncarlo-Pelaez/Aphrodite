@@ -1,4 +1,4 @@
-/****** Object:  Table [dbo].[document]    Script Date: 10/29/2021 5:45:13 PM ******/
+/****** Object:  Table [dbo].[document]    Script Date: 11/3/2021 12:37:44 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -19,13 +19,14 @@ CREATE TABLE [dbo].[document](
 	[contractDetails] [nvarchar](max) NULL,
 	[mimeType] [nvarchar](100) NOT NULL,
 	[springResponse] [nvarchar](max) NULL,
+	[remarks] [nvarchar](max) NULL,
  CONSTRAINT [PK_document] PRIMARY KEY CLUSTERED 
 (
 	[id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[document_history]    Script Date: 10/29/2021 5:45:13 PM ******/
+/****** Object:  Table [dbo].[document_history]    Script Date: 11/3/2021 12:37:44 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -43,7 +44,7 @@ CREATE TABLE [dbo].[document_history](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[user]    Script Date: 10/29/2021 5:45:13 PM ******/
+/****** Object:  Table [dbo].[user]    Script Date: 11/3/2021 12:37:44 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON

@@ -5,7 +5,7 @@ import {
   UseMutationResult,
   useQueryClient,
 } from 'react-query';
-import { Document } from 'models';
+import { Document, DocumentHistory } from 'models';
 import { ApiError } from 'core/types';
 import {
   getDocumentApi,
@@ -14,6 +14,7 @@ import {
   UploadDocumentApi,
   uploadDocumentApiResponse,
   uploadDocumentApi,
+  getDocumentHistoryApi,
 } from 'apis';
 import { QueryKey } from 'utils';
 
@@ -63,6 +64,18 @@ export const useUploadDocument = (): UseMutationResult<
       onSuccess: () => {
         queryClient.invalidateQueries(QueryKey.paginatedDocuments);
       },
+    },
+  );
+};
+
+export const useDocumentHistory = (
+  id?: number,
+): UseQueryResult<DocumentHistory[], ApiError> => {
+  return useQuery(
+    QueryKey.buildDocumentHistory(id),
+    () => getDocumentHistoryApi(id as number),
+    {
+      enabled: !!id,
     },
   );
 };

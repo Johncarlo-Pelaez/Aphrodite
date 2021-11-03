@@ -1,5 +1,5 @@
 import { CancelTokenSource, request } from './request';
-import { Document } from 'models';
+import { Document, DocumentHistory } from 'models';
 import {
   createQueryString,
   createTablePaginationQuery,
@@ -73,5 +73,14 @@ const uploadDocumentApi = async (
     },
   );
 
+  return res.data;
+};
+
+export const getDocumentHistoryApi = async (
+  id: number,
+): Promise<DocumentHistory[]> => {
+  const res = await request.get<DocumentHistory[]>(
+    `/api/documents/${id}/history`,
+  );
   return res.data;
 };

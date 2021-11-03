@@ -66,7 +66,8 @@ export const Table = <T extends Record<string, any> = {}>(
 
   const renderTableColumns = (): ReactElement[] => {
     return columns.map(({ title, dataIndex, sortOrder, sorter }, index) => {
-      const sorterConfig = typeof sorter === 'function';
+      const sorterConfig =
+        dataIndex && typeof sorter === 'function' && sortOrder;
       const isDefaultSorter = dataIndex === defaultSorter?.field;
       const isSelfCurrentSorter = currentColumnSorter?.dataIndex === dataIndex;
       const isAsc = sortOrder === OrderDirection.ASC;
@@ -78,12 +79,12 @@ export const Table = <T extends Record<string, any> = {}>(
             let newSortOrder;
             if (isDefaultSorter) {
               if (
-                defaultSorter.order === sortOrder &&
-                defaultSorter.order &&
+                defaultSorter?.order === sortOrder &&
+                defaultSorter?.order &&
                 sortOrder
               )
                 newSortOrder = isAsc ? OrderDirection.DESC : OrderDirection.ASC;
-              else if (!sortOrder) newSortOrder = defaultSorter.order;
+              else if (!sortOrder) newSortOrder = defaultSorter?.order;
               else newSortOrder = undefined;
             } else {
               const nextSorterIndex =
@@ -151,7 +152,9 @@ export const Table = <T extends Record<string, any> = {}>(
               >
                 {columns.map(({ dataIndex, render }, index) => (
                   <td key={index}>
-                    {(render && render(data)) || data[dataIndex]}
+                    {typeof render === 'function'
+                      ? render(data)
+                      : (dataIndex && data && data[dataIndex]) || ''}
                   </td>
                 ))}
               </tr>
@@ -186,7 +189,7 @@ export const Table = <T extends Record<string, any> = {}>(
         column.sortOrder,
     );
     setDefaultSorter(
-      columnSorter?.sortOrder
+      columnSorter?.sortOrder && columnSorter.dataIndex
         ? {
             field: columnSorter.dataIndex,
             order: columnSorter.sortOrder,
