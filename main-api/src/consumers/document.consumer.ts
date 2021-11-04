@@ -137,9 +137,9 @@ export class DocumentConsumer {
       const { data: response }: any =
         await this.springCMService.uploadDocToSpring(params);
       if (
-        response?.SpringCMAccessToken?.Code === 200 &&
-        response?.SpringCMGetFolder?.Code === 200 &&
-        response?.SpringCMUploadResponse?.Code === 200 &&
+        +response?.SpringCMAccessToken?.Code === 200 &&
+        +response?.SpringCMGetFolder?.Code === 200 &&
+        +response?.SpringCMUploadResponse?.Code === 201 &&
         !!response?.SalesForce.length &&
         response?.SalesForce[0].created === 'true' &&
         response?.SalesForce[0].success === 'true'
