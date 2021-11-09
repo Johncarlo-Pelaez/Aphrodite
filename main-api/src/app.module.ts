@@ -4,10 +4,18 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { createConnection } from 'typeorm';
 import { AppConfigModule, AppConfigService, Environment } from './app-config';
 import { DocumentConsumer } from './consumers';
-import { DocumentController, UserController } from './controllers';
+import {
+  DocumentController,
+  UserController,
+  NomenClatureController,
+} from './controllers';
 import { UtilsModule } from './utils/utils.module';
 import { DocumentProducer } from './producers';
-import { DocumentRepository, UserRepository } from './repositories';
+import {
+  DocumentRepository,
+  UserRepository,
+  NomenClatureRepository,
+} from './repositories';
 import { DocumentsService } from './services';
 import { QRService } from 'src/qr-service';
 import { SalesForceService } from './sales-force-service';
@@ -60,7 +68,7 @@ const logger = new Logger('AppModule');
     }),
     PassportModule,
   ],
-  controllers: [DocumentController, UserController],
+  controllers: [DocumentController, UserController, NomenClatureController],
   providers: [
     QRService,
     SalesForceService,
@@ -72,6 +80,7 @@ const logger = new Logger('AppModule');
     DocumentProducer,
     DocumentConsumer,
     AzureADStrategy,
+    NomenClatureRepository,
   ],
 })
 export class AppModule {}
