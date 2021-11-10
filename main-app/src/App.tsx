@@ -15,6 +15,7 @@ const HomePage = lazy(() => import('pages/home-page'));
 const LoginPage = lazy(() => import('pages/login-page'));
 const UsersPage = lazy(() => import('pages/users-page'));
 const ReportsPage = lazy(() => import('pages/reports-page'));
+const SettingsPage = lazy(() => import('pages/settings-page'));
 const NotFoundPage = lazy(() => import('pages/not-found-page'));
 const Forbidden = lazy(() => import('pages/forbidden'));
 
@@ -70,6 +71,12 @@ const AppContent = () => {
             path="/reports"
             layout={MainLayout}
             component={ReportsPage}
+          />
+          <PrivateRoute
+            exact
+            path="/settings"
+            layout={MainLayout}
+            component={SettingsPage}
           />
           <Route path="/forbidden-account" component={ForbiddenAccount} />
           <Route path="/forbidden" component={Forbidden} />

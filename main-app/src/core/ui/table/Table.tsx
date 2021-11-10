@@ -35,7 +35,7 @@ export const Table = <T extends Record<string, any> = {}>(
     onChange,
     onSearch,
   } = props;
-  const rowCount = data.length;
+  const rowCount = dataList.length;
   const sortOrderSequence = [
     OrderDirection.ASC,
     OrderDirection.DESC,

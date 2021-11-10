@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, ReactElement } from 'react';
 import { Container, Button, Stack } from 'react-bootstrap';
 import { User } from 'models';
 import { UsersTable, AddUserModal } from './components';
 
-export const UsersPage = () => {
+export const UsersPage = (): ReactElement => {
   const [selectedUser, setSelectedUser] = useState<User | undefined>(undefined);
   const [openAddModal, setOpenModal] = useState<boolean>(false);
 

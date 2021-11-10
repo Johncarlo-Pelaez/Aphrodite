@@ -55,17 +55,25 @@ export const AddUserModal = ({
     }
   };
 
-  const renderErrorAlert = (): ReactElement | undefined => {
-    const show = !!errors.email || isError;
-    if (show)
-      return (
-        <Alert variant="danger" show={isError}>
-          {isError &&
-            (error?.response?.statusText === 'Conflict'
-              ? 'Email already exist'
-              : error?.response?.statusText)}
-        </Alert>
-      );
+  const renderErrorAlert = (): ReactElement => {
+    let errorMessage: string | undefined = '';
+    const show =
+      !!errors.email || !!errors.objectId || !!errors.role || isError;
+
+    if (isError && error?.response?.statusText === 'Conflict') {
+      errorMessage = 'Email already exist';
+    } else if (!!errors.email || !!errors.objectId || !!errors.role) {
+      errorMessage =
+        errors?.email?.message ||
+        errors?.objectId?.message ||
+        errors?.role?.message;
+    }
+
+    return (
+      <Alert variant="danger" show={show}>
+        {errorMessage}
+      </Alert>
+    );
   };
 
   const closeModal = (): void => {

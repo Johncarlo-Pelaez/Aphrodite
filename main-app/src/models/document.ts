@@ -41,3 +41,8 @@ export interface DocumentHistory {
   userId: number;
   user: User;
 }
+
+export interface NomenClature {
+  id: number;
+  description: string;
+}

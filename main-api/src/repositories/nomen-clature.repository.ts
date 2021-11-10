@@ -17,21 +17,21 @@ export class NomenClatureRepository {
     return this.manager.findOne(NomenClature, id);
   }
 
-  async createNomenClature(param: CreateNomenClatureParam): Promise<number> {
+  async createNomenClature({
+    description,
+  }: CreateNomenClatureParam): Promise<number> {
     const nomenClature = new NomenClature();
-    nomenClature.description = param.description;
+    nomenClature.description = description;
     await this.manager.save(nomenClature);
     return nomenClature.id;
   }
 
-  async updateNomenClature(
-    param: UpdateNomenClatureParam,
-  ): Promise<NomenClature> {
-    const nomenClature = await this.manager.findOneOrFail(
-      NomenClature,
-      param.id,
-    );
-    nomenClature.description = param.description;
+  async updateNomenClature({
+    id,
+    description,
+  }: UpdateNomenClatureParam): Promise<NomenClature> {
+    const nomenClature = await this.manager.findOneOrFail(NomenClature, id);
+    nomenClature.description = description;
     return await this.manager.save(nomenClature);
   }
 

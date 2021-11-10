@@ -2,7 +2,7 @@ $table-height: 50vh;
 
 .table-container {
   display: inline-block;
-  height: $table-height;
+  max-height: $table-height;
   overflow: auto;
   width: 100%;
 }
