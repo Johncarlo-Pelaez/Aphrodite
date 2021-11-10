@@ -16,5 +16,9 @@ const getMainMenuItems = (): MenuItem[] => {
       label: 'Reports',
       path: '/reports',
     },
+    {
+      label: 'Settings',
+      path: '/settings',
+    },
   ];
 };
