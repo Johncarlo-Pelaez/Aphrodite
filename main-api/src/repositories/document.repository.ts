@@ -215,7 +215,8 @@ export class DocumentRepository {
   }
 
   async indexedDocument(param: IndexedDocumentParam): Promise<Document> {
-    const description = 'Successfully retrieved indexes from sales force.';
+    const description =
+      'Successfully retrieved account details from sales force.';
     return await this.manager.transaction(
       async (transaction): Promise<Document> => {
         const document = await this.manager.findOneOrFail(
@@ -243,7 +244,7 @@ export class DocumentRepository {
   }
 
   async failIndexing(param: FailDocProcessParam): Promise<Document> {
-    const description = 'Failed to retrieve indexes from sales force.';
+    const description = 'Failed to retrieve account details from sales force.';
     return await this.manager.transaction(
       async (transaction): Promise<Document> => {
         const document = await this.manager.findOneOrFail(

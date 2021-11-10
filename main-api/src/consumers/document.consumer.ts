@@ -118,26 +118,38 @@ export class DocumentConsumer {
   ): Promise<JobIndexingResults> {
     try {
       this.updateToIndexingBegin(jobData);
+
       const docTypeResult = await this.salesForceService.getDocumentType({
         BarCode: qrCode,
       });
-      const contractDetailsResult =
-        await this.salesForceService.getContractDetails({
-          contractNumber: docTypeResult.response[0]?.ContractNumber,
-          CompanyCode: docTypeResult.response[0]?.CompanyCode,
-        });
+
+      const documentType = !!docTypeResult.response.length
+        ? docTypeResult.response[0]
+        : undefined;
+
+      let contractDetailsResult;
+
+      if (documentType)
+        contractDetailsResult = await this.salesForceService.getContractDetails(
+          {
+            contractNumber: documentType.ContractNumber,
+            CompanyCode: documentType.CompanyCode,
+          },
+        );
+
+      const contractDetail = !!contractDetailsResult?.reponse?.items.length
+        ? contractDetailsResult.reponse.items[0]
+        : undefined;
+
+      if (!documentType || !contractDetail)
+        throw new Error('Account details is empty.');
+
       this.updateToIndexingDone(
         JSON.stringify(docTypeResult),
         JSON.stringify(contractDetailsResult),
         jobData,
       );
 
-      const documentType = !!docTypeResult.response.length
-        ? docTypeResult.response[0]
-        : undefined;
-      const contractDetail = !!contractDetailsResult?.reponse?.items.length
-        ? contractDetailsResult.reponse.items[0]
-        : undefined;
       return {
         documentType,
         contractDetail,
