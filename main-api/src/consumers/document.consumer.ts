@@ -36,14 +36,16 @@ export class DocumentConsumer {
         documentId: document.id,
         sysSrcFileName: document.uuid,
       };
+
       const buffer = await this.readFile(jobData);
-      const imageBuffer = await this.convertToImage(buffer, jobData);
-      const qrCode =
-        document.qrCode ?? (await this.runQr(imageBuffer, jobData));
+
+      const qrCode = document.qrCode ?? (await this.runQr(buffer, jobData));
+
       const { documentType, contractDetail } = await this.runIndexing(
         qrCode,
         jobData,
       );
+
       const empty = '';
       const uploadParams = {
         Brand: documentType?.Brand ?? empty,
@@ -74,17 +76,35 @@ export class DocumentConsumer {
         Remarks: empty,
         B64Attachment: buffer.toString('base64'),
       };
+
       await this.runUploadToSpringCM(jobData, uploadParams);
     } catch (err) {
       throw err;
     }
   }
 
-  private async runQr(imageBuffer: Buffer, jobData: JobData): Promise<string> {
+  private async runQr(buffer: Buffer, jobData: JobData): Promise<string> {
     try {
       await this.updateToQrBegin(jobData);
-      const qrCode = await this.qrService.readQRCode(imageBuffer);
+      let qrCode;
+      let pageIndex = 0;
+      const pageCount = await this.countPage(buffer);
+
+      do {
+        const imageBuffer = await this.convertToImage(
+          buffer,
+          jobData,
+          pageIndex,
+        );
+
+        qrCode = await this.qrService.readQRCode(imageBuffer);
+        pageIndex++;
+      } while (pageIndex < pageCount && !qrCode);
+
+      if (!qrCode || qrCode === '') throw new Error('QR result is empty.');
+
       await this.updateToQrDone(qrCode, jobData);
+
       return qrCode;
     } catch (err) {
       await this.updateToQrFailed(err, jobData);
@@ -172,9 +192,10 @@ export class DocumentConsumer {
   private async convertToImage(
     buffer: Buffer,
     jobData: JobData,
+    pageIndex: number,
   ): Promise<Buffer> {
     return new Promise((resolve, reject) => {
-      imageMagick(buffer, `${jobData.sysSrcFileName}[0]`).toBuffer(
+      imageMagick(buffer, `${jobData.sysSrcFileName}[${pageIndex}]`).toBuffer(
         'png',
         async (err, imageBuffer) => {
           if (!!err) {
@@ -184,6 +205,20 @@ export class DocumentConsumer {
           }
         },
       );
+    });
+  }
+
+  private async countPage(buffer: Buffer): Promise<number> {
+    return new Promise((resolve, reject) => {
+      imageMagick(buffer).identify(async (err, imageInfo) => {
+        if (!!err) {
+          reject(err);
+        } else {
+          resolve(
+            Array.isArray(imageInfo.Format) ? imageInfo.Format.length : 1,
+          );
+        }
+      });
     });
   }
 
