@@ -16,9 +16,8 @@ export const createNomenClatureApi = async (
   await request.post('/api/nomen-clature', params);
 };
 
-export interface UpdateNomenClatureApi {
+export interface UpdateNomenClatureApi extends CreateNomenClatureApi {
   id: number;
-  description: string;
 }
 
 export const updateNomenClatureApi = async ({

@@ -10,7 +10,9 @@ export class NomenClatureRepository {
   constructor(private readonly manager: EntityManager) {}
 
   async getNomenClatures(): Promise<NomenClature[]> {
-    return this.manager.find(NomenClature);
+    return this.manager.find(NomenClature, {
+      order: { description: 'ASC' },
+    });
   }
 
   async getNomenClature(id: number): Promise<NomenClature> {

@@ -73,7 +73,7 @@ export class DocumentRepository {
     return this.manager.find(DocumentHistory, {
       relations: ['document', 'user'],
       where: { documentId },
-      order: { createdDate: 'DESC' },
+      order: { createdDate: 'DESC', id: 'DESC' },
     });
   }
 
