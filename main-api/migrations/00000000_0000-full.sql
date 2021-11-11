@@ -1,4 +1,4 @@
-/****** Object:  Table [dbo].[document]    Script Date: 11/9/2021 10:54:31 AM ******/
+/****** Object:  Table [dbo].[document]    Script Date: 11/11/2021 11:04:02 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -26,7 +26,7 @@ CREATE TABLE [dbo].[document](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[document_history]    Script Date: 11/9/2021 10:54:31 AM ******/
+/****** Object:  Table [dbo].[document_history]    Script Date: 11/11/2021 11:04:02 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -44,7 +44,7 @@ CREATE TABLE [dbo].[document_history](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[nomen_clature]    Script Date: 11/9/2021 10:54:31 AM ******/
+/****** Object:  Table [dbo].[nomen_clature]    Script Date: 11/11/2021 11:04:02 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -54,7 +54,7 @@ CREATE TABLE [dbo].[nomen_clature](
 	[description] [nvarchar](255) NOT NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[user]    Script Date: 11/9/2021 10:54:31 AM ******/
+/****** Object:  Table [dbo].[user]    Script Date: 11/11/2021 11:04:02 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -66,11 +66,17 @@ CREATE TABLE [dbo].[user](
 	[lastName] [nvarchar](255) NULL,
 	[role] [nvarchar](50) NOT NULL,
 	[createdDate] [datetime] NOT NULL,
+	[IsActive] [bit] NOT NULL,
+	[isDeleted] [bit] NOT NULL,
  CONSTRAINT [PK_cace4a159ff9f2512dd42373760] PRIMARY KEY CLUSTERED 
 (
 	[id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[user] ADD  CONSTRAINT [DF_user_IsActive]  DEFAULT ((1)) FOR [IsActive]
+GO
+ALTER TABLE [dbo].[user] ADD  CONSTRAINT [DF_user_isDeleted]  DEFAULT ((0)) FOR [isDeleted]
 GO
 ALTER TABLE [dbo].[document]  WITH CHECK ADD  CONSTRAINT [FK_7424ddcbdf1e9b067669eb0d3fd] FOREIGN KEY([userId])
 REFERENCES [dbo].[user] ([id])

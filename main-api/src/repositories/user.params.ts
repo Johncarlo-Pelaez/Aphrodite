@@ -6,4 +6,5 @@ export interface CreateUserParam {
   lastName?: string;
   role: Role;
   createdDate: Date;
+  isActive: boolean;
 }

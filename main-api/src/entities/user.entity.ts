@@ -36,4 +36,12 @@ export class User {
   @ApiProperty()
   @Column()
   createdDate: Date;
+
+  @ApiProperty()
+  @Column()
+  isActive: boolean;
+
+  @ApiProperty()
+  @Column()
+  isDeleted: boolean;
 }

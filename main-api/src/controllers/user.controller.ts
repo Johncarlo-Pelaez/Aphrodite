@@ -47,7 +47,7 @@ export class UserController {
   })
   @Get('/email-exist')
   async checkUserEmailIfExist(@Query() dto: UserIsExistDto): Promise<boolean> {
-    return !!(await this.userRepository.getUserByEmail(dto.email));
+    return !!(await this.userRepository.getAuthUserByEmail(dto.email));
   }
 
   @ApiOkResponse({
@@ -56,7 +56,7 @@ export class UserController {
   @Get('/current')
   @UseGuards(AzureADGuard)
   async getCurrentUser(@GetAzureUser() azureUser: AzureUser): Promise<User> {
-    return this.userRepository.getUserByEmail(azureUser.preferred_username);
+    return this.userRepository.getAuthUserByEmail(azureUser.preferred_username);
   }
 
   @ApiCreatedResponse({
@@ -69,7 +69,7 @@ export class UserController {
   async createAdminUser(
     @Body(ValidationPipe) dto: CreateUserAccountDto,
   ): Promise<CreatedResponse> {
-    const user = await this.userRepository.getUserByEmail(dto.email);
+    const user = await this.userRepository.getAuthUserByEmail(dto.email);
     const total = await this.userRepository.count([Role.ADMIN]);
     if (total > 0 || user) {
       throw new ConflictException();
@@ -99,7 +99,7 @@ export class UserController {
     @Body(ValidationPipe) dto: CreateUserAccountDto,
     @GetAccessToken() accessToken: string,
   ): Promise<CreatedResponse> {
-    const user = await this.userRepository.getUserByEmail(dto.email);
+    const user = await this.userRepository.getAuthUserByEmail(dto.email);
     if (user) throw new ConflictException();
 
     const data = await this.azureAdService.getUserById(
@@ -116,6 +116,7 @@ export class UserController {
       lastName: data.surname,
       role: dto.role,
       createdDate: rightNow,
+      isActive: dto.isActive,
     });
 
     return response;
