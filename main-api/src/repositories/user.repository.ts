@@ -1,6 +1,10 @@
 import { Role, User } from 'src/entities';
 import { EntityManager, EntityRepository, In } from 'typeorm';
-import { CreateUserParam } from './user.params';
+import {
+  CreateUserParam,
+  UpdateUserParam,
+  DeleteUserParam,
+} from './user.params';
 
 @EntityRepository()
 export class UserRepository {
@@ -35,6 +39,12 @@ export class UserRepository {
     });
   }
 
+  async getUserByEmail(email: string): Promise<User> {
+    return this.manager.findOne(User, {
+      where: { email, isDeleted: false },
+    });
+  }
+
   async createUser(param: CreateUserParam): Promise<number> {
     const user = new User();
     user.email = param.email;
@@ -46,5 +56,23 @@ export class UserRepository {
     await this.manager.save(user);
 
     return user.id;
+  }
+
+  async updateUser(param: UpdateUserParam): Promise<User> {
+    const user = await this.manager.findOneOrFail(User, param.id);
+    user.email = param.email;
+    user.firstName = param.firstName;
+    user.lastName = param.lastName;
+    user.isActive = param.isActive;
+    user.role = param.role;
+    user.modifiedDate = param.modifiedDate;
+    return await this.manager.save(user);
+  }
+
+  async deleteUser({ id, modifiedDate }: DeleteUserParam): Promise<User> {
+    const user = await this.manager.findOneOrFail(User, id);
+    user.isDeleted = true;
+    user.modifiedDate = modifiedDate;
+    return await this.manager.save(user);
   }
 }

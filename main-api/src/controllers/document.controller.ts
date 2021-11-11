@@ -22,7 +22,7 @@ import {
 } from 'src/core';
 import { Document, DocumentHistory } from 'src/entities';
 import { DocumentRepository } from 'src/repositories';
-import { DocumentsService } from 'src/services';
+import { DocumentService } from 'src/services';
 import { GetDocumentsDto } from './document.dto';
 import { GetDocumentsIntPipe } from './document.pipe';
 
@@ -30,7 +30,7 @@ import { GetDocumentsIntPipe } from './document.pipe';
 @UseGuards(AzureADGuard)
 export class DocumentController {
   constructor(
-    private readonly documentsService: DocumentsService,
+    private readonly documentsService: DocumentService,
     private readonly documentRepository: DocumentRepository,
   ) {}
 

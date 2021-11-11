@@ -65,6 +65,6 @@ export class NomenClatureController {
   async deleteNomenClature(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<void> {
-    return await this.nomenClatureRepository.deleteNomenClature(id);
+    await this.nomenClatureRepository.deleteNomenClature(id);
   }
 }

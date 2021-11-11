@@ -8,11 +8,11 @@ import { DocumentRepository } from 'src/repositories';
 import { DocumentProducer } from 'src/producers';
 import { CreatedResponse } from 'src/core';
 import { Document } from 'src/entities';
-import { UploadDocuments } from './documents.inputs';
+import { UploadDocuments } from './document.inputs';
 const { readFile, writeFile } = fs.promises;
 
 @Injectable()
-export class DocumentsService {
+export class DocumentService {
   constructor(
     private readonly documentRepository: DocumentRepository,
     private readonly datesUtil: DatesUtil,

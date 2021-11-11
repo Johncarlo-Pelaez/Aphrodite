@@ -44,4 +44,8 @@ export class User {
   @ApiProperty()
   @Column()
   isDeleted: boolean;
+
+  @ApiProperty()
+  @Column()
+  modifiedDate: Date;
 }

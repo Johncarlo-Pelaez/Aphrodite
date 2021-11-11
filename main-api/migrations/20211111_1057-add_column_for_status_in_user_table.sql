@@ -11,7 +11,8 @@ BEGIN TRANSACTION
 GO
 ALTER TABLE dbo.[user] ADD
 	IsActive bit NOT NULL CONSTRAINT DF_user_IsActive DEFAULT 1,
-	isDeleted bit NOT NULL CONSTRAINT DF_user_isDeleted DEFAULT 0
+	isDeleted bit NOT NULL CONSTRAINT DF_user_isDeleted DEFAULT 0,
+	modifiedDate datetime NULL
 GO
 ALTER TABLE dbo.[user] SET (LOCK_ESCALATION = TABLE)
 GO

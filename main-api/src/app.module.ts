@@ -16,7 +16,7 @@ import {
   UserRepository,
   NomenClatureRepository,
 } from './repositories';
-import { DocumentsService } from './services';
+import { DocumentService } from './services';
 import { QRService } from 'src/qr-service';
 import { SalesForceService } from './sales-force-service';
 import { SpringCMService } from './spring-cm-service';
@@ -74,7 +74,7 @@ const logger = new Logger('AppModule');
     SalesForceService,
     SpringCMService,
     AzureAdService,
-    DocumentsService,
+    DocumentService,
     DocumentRepository,
     UserRepository,
     DocumentProducer,
