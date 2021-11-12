@@ -29,21 +29,30 @@ export interface FailDocProcessParam {
   failedAt: Date;
 }
 
-export interface IndexedDocumentParam {
+export interface DoneIndexingParam {
   documentId: number;
-  documentType: string;
-  contractDetails: string;
   indexedAt: Date;
+  documentType?: string;
+  contractDetails?: string;
+  docTypeReqParams?: string;
+  contractDetailsReqParams?: string;
+}
+
+export interface FailIndexingParam extends FailDocProcessParam {
+  documentType?: string;
+  contractDetails?: string;
+  docTypeReqParams?: string;
+  contractDetailsReqParams?: string;
 }
 
 export interface DocumentMigrateParam {
   documentId: number;
   migratedAt: Date;
   springResponse: string;
+  springReqParams: string;
 }
 
-export interface FailDocMigrateParam {
-  documentId: number;
-  failedAt: Date;
+export interface FailDocMigrateParam extends FailDocProcessParam {
   springResponse: string;
+  springReqParams: string;
 }

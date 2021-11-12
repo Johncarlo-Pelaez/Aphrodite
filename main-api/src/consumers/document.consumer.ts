@@ -3,7 +3,6 @@ import { Logger } from '@nestjs/common';
 import { Job } from 'bull';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as gm from 'gm';
 import { AppConfigService } from 'src/app-config';
 import { DatesUtil } from 'src/utils';
 import { DocumentRepository } from 'src/repositories';
@@ -13,8 +12,12 @@ import {
   SpringCMService,
   UploadDocToSpringParams,
 } from 'src/spring-cm-service';
-import { JobData, JobIndexingResults } from './document.interfaces';
-const imageMagick = gm.subClass({ imageMagick: true });
+import {
+  JobData,
+  JobIndexingResults,
+  UpdateToIndexingDoneParams,
+  UpdateToIndexingFailedParams,
+} from './document.interfaces';
 
 @Processor('document')
 export class DocumentConsumer {
@@ -37,13 +40,13 @@ export class DocumentConsumer {
         sysSrcFileName: document.uuid,
       };
 
-      const buffer = await this.readFile(jobData);
+      const buffer = await this.readFile(jobData.sysSrcFileName);
 
       const qrCode = document.qrCode ?? (await this.runQr(buffer, jobData));
 
       const { documentType, contractDetail } = await this.runIndexing(
         qrCode,
-        jobData,
+        jobData.documentId,
       );
 
       const empty = '';
@@ -77,249 +80,261 @@ export class DocumentConsumer {
         B64Attachment: buffer.toString('base64'),
       };
 
-      await this.runUploadToSpringCM(jobData, uploadParams);
-    } catch (err) {
-      throw err;
+      await this.runUploadToSpringCM(jobData.documentId, uploadParams);
+    } catch (error) {
+      throw error;
     }
   }
 
-  private async runQr(buffer: Buffer, jobData: JobData): Promise<string> {
+  private async runQr(
+    buffer: Buffer,
+    { documentId, sysSrcFileName }: JobData,
+  ): Promise<string> {
+    await this.documentRepository.beginMigrate({
+      documentId,
+      beginAt: this.datesUtil.getDateNow(),
+    });
+
+    let qrCode;
+
     try {
-      await this.updateToQrBegin(jobData);
-      let qrCode;
-      let pageIndex = 0;
-      const pageCount = await this.countPage(buffer);
-
-      do {
-        const imageBuffer = await this.convertToImage(
-          buffer,
-          jobData,
-          pageIndex,
-        );
-
-        qrCode = await this.qrService.readQRCode(imageBuffer);
-        pageIndex++;
-      } while (pageIndex < pageCount && !qrCode);
-
-      if (!qrCode || qrCode === '') throw new Error('QR result is empty.');
-
-      await this.updateToQrDone(qrCode, jobData);
-
-      return qrCode;
-    } catch (err) {
-      await this.updateToQrFailed(err, jobData);
-      throw err;
+      (qrCode = await this),
+        this.qrService.readPdfQrCode(buffer, sysSrcFileName);
+    } catch (error) {
+      await this.updateToQrFailed(error, documentId);
+      throw error;
     }
+
+    await this.updateToQrDone(qrCode, documentId);
+
+    return qrCode;
   }
 
   private async runIndexing(
     qrCode: string,
-    jobData: JobData,
+    documentId: number,
   ): Promise<JobIndexingResults> {
+    await this.documentRepository.beginIndexing({
+      documentId,
+      beginAt: this.datesUtil.getDateNow(),
+    });
+
+    const getDocTypeReqParams = {
+      BarCode: qrCode,
+    };
+    let getDocTypeResult;
+
     try {
-      this.updateToIndexingBegin(jobData);
-
-      const docTypeResult = await this.salesForceService.getDocumentType({
-        BarCode: qrCode,
-      });
-
-      const documentType = !!docTypeResult.response.length
-        ? docTypeResult.response[0]
-        : undefined;
-
-      let contractDetailsResult;
-
-      if (documentType)
-        contractDetailsResult = await this.salesForceService.getContractDetails(
-          {
-            contractNumber: documentType.ContractNumber,
-            CompanyCode: documentType.CompanyCode,
-          },
-        );
-
-      const contractDetail = !!contractDetailsResult?.reponse?.items.length
-        ? contractDetailsResult.reponse.items[0]
-        : undefined;
-
-      if (!documentType || !contractDetail)
-        throw new Error('Account details is empty.');
-
-      this.updateToIndexingDone(
-        JSON.stringify(docTypeResult),
-        JSON.stringify(contractDetailsResult),
-        jobData,
+      getDocTypeResult = await this.salesForceService.getDocumentType(
+        getDocTypeReqParams,
       );
-
-      return {
-        documentType,
-        contractDetail,
-      };
-    } catch (err) {
-      this.updateToIndexingFailed(err, jobData);
-      throw err;
+    } catch (error) {
+      this.updateToIndexingFailed({
+        documentId,
+        documentType: error,
+        docTypeReqParams: JSON.stringify(getDocTypeReqParams),
+        error,
+      });
+      throw error;
+    } finally {
+      this.updateToIndexingDone({
+        documentId,
+        documentType: JSON.stringify(getDocTypeResult),
+        docTypeReqParams: JSON.stringify(getDocTypeReqParams),
+      });
     }
+
+    const documentType = !!getDocTypeResult.response.length
+      ? getDocTypeResult.response[0]
+      : undefined;
+
+    if (!documentType) throw new Error('Document type is empty.');
+
+    const getContractDetailsReqParams = {
+      contractNumber: documentType?.ContractNumber,
+      CompanyCode: documentType?.CompanyCode,
+    };
+    let getContractDetailsResult;
+
+    try {
+      getContractDetailsResult =
+        await this.salesForceService.getContractDetails(
+          getContractDetailsReqParams,
+        );
+    } catch (error) {
+      this.updateToIndexingFailed({
+        documentId,
+        contractDetails: error,
+        contractDetailsReqParams: JSON.stringify(getContractDetailsReqParams),
+        error,
+      });
+      throw error;
+    } finally {
+      this.updateToIndexingDone({
+        documentId,
+        contractDetails: JSON.stringify(getContractDetailsResult),
+        contractDetailsReqParams: JSON.stringify(getContractDetailsReqParams),
+      });
+    }
+
+    const contractDetail = !!getContractDetailsResult?.reponse?.items.length
+      ? getContractDetailsResult.reponse.items[0]
+      : undefined;
+
+    if (!contractDetail) throw new Error('Contract details is empty.');
+
+    await this.documentRepository.doneIndexing({
+      documentId,
+      indexedAt: this.datesUtil.getDateNow(),
+    });
+
+    return {
+      documentType,
+      contractDetail,
+    };
   }
 
   private async runUploadToSpringCM(
-    jobData: JobData,
-    params: UploadDocToSpringParams,
+    documentId: number,
+    uploadParams: UploadDocToSpringParams,
   ): Promise<void> {
-    try {
-      this.updateToMigrateBegin(jobData);
-      const { data: response }: any =
-        await this.springCMService.uploadDocToSpring(params);
-      if (
-        +response?.SpringCMAccessToken?.Code === 200 &&
-        +response?.SpringCMGetFolder?.Code === 200 &&
-        +response?.SpringCMUploadResponse?.Code === 201 &&
-        !!response?.SalesForce.length &&
-        response?.SalesForce[0].created === 'true' &&
-        response?.SalesForce[0].success === 'true'
-      )
-        this.updateToMigrateDone(JSON.stringify(response), jobData);
-      else this.updateToMigrateFailed(null, JSON.stringify(response), jobData);
-    } catch (err) {
-      this.updateToMigrateFailed(err, null, jobData);
-      throw err;
-    }
-  }
+    const { B64Attachment, ...forStrUploadParams } = uploadParams;
+    const strUploadParams = JSON.stringify(forStrUploadParams);
 
-  private async updateToQrBegin(jobData: JobData): Promise<void> {
-    const beginAt = this.datesUtil.getDateNow();
-    await this.documentRepository.beginQrDocument({
-      documentId: jobData.documentId,
-      beginAt,
+    this.documentRepository.beginMigrate({
+      documentId,
+      beginAt: this.datesUtil.getDateNow(),
     });
+
+    let uploadDocToSpringResult;
+
+    try {
+      uploadDocToSpringResult = await this.springCMService.uploadDocToSpring(
+        uploadParams,
+      );
+    } catch (error) {
+      this.updateToMigrateFailed(documentId, strUploadParams, error);
+      throw error;
+    }
+
+    const { data: response }: any = uploadDocToSpringResult;
+
+    if (
+      +response?.SpringCMAccessToken?.Code === 200 &&
+      +response?.SpringCMGetFolder?.Code === 200 &&
+      +response?.SpringCMUploadResponse?.Code === 201 &&
+      !!response?.SalesForce.length &&
+      response?.SalesForce[0].created === 'true' &&
+      response?.SalesForce[0].success === 'true'
+    )
+      this.updateToMigrateDone(
+        documentId,
+        JSON.stringify(response),
+        strUploadParams,
+      );
+    else this.updateToMigrateFailed(documentId, strUploadParams);
   }
 
-  private async readFile(jobData: JobData): Promise<Buffer> {
-    const location = path.join(
-      this.appConfigService.filePath,
-      jobData.sysSrcFileName,
-    );
+  private async readFile(filename: string): Promise<Buffer> {
+    const location = path.join(this.appConfigService.filePath, filename);
     const buffer = await fs.promises.readFile(location);
     return buffer;
   }
 
-  private async convertToImage(
-    buffer: Buffer,
-    jobData: JobData,
-    pageIndex: number,
-  ): Promise<Buffer> {
-    return new Promise((resolve, reject) => {
-      imageMagick(buffer, `${jobData.sysSrcFileName}[${pageIndex}]`).toBuffer(
-        'png',
-        async (err, imageBuffer) => {
-          if (!!err) {
-            reject(err);
-          } else {
-            resolve(imageBuffer);
-          }
-        },
-      );
-    });
-  }
-
-  private async countPage(buffer: Buffer): Promise<number> {
-    return new Promise((resolve, reject) => {
-      imageMagick(buffer).identify(async (err, imageInfo) => {
-        if (!!err) {
-          reject(err);
-        } else {
-          resolve(
-            Array.isArray(imageInfo.Format) ? imageInfo.Format.length : 1,
-          );
-        }
-      });
-    });
-  }
-
   private async updateToQrDone(
-    qrText: string,
-    jobData: JobData,
+    qrCode: string,
+    documentId: number,
   ): Promise<void> {
     const decodedAt = this.datesUtil.getDateNow();
     await this.documentRepository.qrDocument({
-      documentId: jobData.documentId,
-      qrCode: qrText,
+      documentId,
+      qrCode,
       qrAt: decodedAt,
     });
   }
 
-  private async updateToQrFailed(err: any, jobData: JobData): Promise<void> {
+  private async updateToQrFailed(
+    error: any,
+    documentId: number,
+  ): Promise<void> {
     const failedAt = this.datesUtil.getDateNow();
     await this.documentRepository.failQrDocument({
-      documentId: jobData.documentId,
+      documentId,
       failedAt,
     });
-    this.logger.error(err);
-  }
-
-  private async updateToIndexingBegin(jobData: JobData): Promise<void> {
-    const beginAt = this.datesUtil.getDateNow();
-    await this.documentRepository.beginIndexing({
-      documentId: jobData.documentId,
-      beginAt,
-    });
+    this.logger.error(error);
   }
 
   private async updateToIndexingDone(
-    docType: string,
-    contractDetails: string,
-    jobData: JobData,
+    params: UpdateToIndexingDoneParams,
   ): Promise<void> {
+    const {
+      documentId,
+      documentType,
+      contractDetails,
+      docTypeReqParams,
+      contractDetailsReqParams,
+    } = params;
     const indexedAt = this.datesUtil.getDateNow();
-    await this.documentRepository.indexedDocument({
-      documentId: jobData.documentId,
-      documentType: docType,
-      contractDetails: contractDetails,
+    await this.documentRepository.doneIndexing({
+      documentId,
+      documentType,
+      contractDetails,
+      docTypeReqParams,
+      contractDetailsReqParams,
       indexedAt,
     });
   }
 
   private async updateToIndexingFailed(
-    err: any,
-    jobData: JobData,
+    params: UpdateToIndexingFailedParams,
   ): Promise<void> {
+    const {
+      error,
+      documentId,
+      documentType,
+      contractDetails,
+      docTypeReqParams,
+      contractDetailsReqParams,
+    } = params;
     const failedAt = this.datesUtil.getDateNow();
     await this.documentRepository.failIndexing({
-      documentId: jobData.documentId,
+      documentId,
+      documentType,
+      contractDetails,
+      docTypeReqParams,
+      contractDetailsReqParams,
       failedAt,
     });
-    this.logger.error(err);
-  }
-
-  private async updateToMigrateBegin(jobData: JobData): Promise<void> {
-    const beginAt = this.datesUtil.getDateNow();
-    await this.documentRepository.beginMigrate({
-      documentId: jobData.documentId,
-      beginAt,
-    });
+    this.logger.error(error);
   }
 
   private async updateToMigrateDone(
+    documentId: number,
     springResponse: string,
-    jobData: JobData,
+    springReqParams: string,
   ): Promise<void> {
     const migratedAt = this.datesUtil.getDateNow();
     await this.documentRepository.documentMigrate({
-      documentId: jobData.documentId,
+      documentId,
       springResponse,
+      springReqParams,
       migratedAt,
     });
   }
 
   private async updateToMigrateFailed(
-    err: any,
-    springResponse: string,
-    jobData: JobData,
+    documentId: number,
+    springReqParams: string,
+    error?: any,
   ): Promise<void> {
     const failedAt = this.datesUtil.getDateNow();
     await this.documentRepository.failMigrate({
-      documentId: jobData.documentId,
-      springResponse,
+      documentId,
+      springResponse: error,
+      springReqParams,
       failedAt,
     });
-    this.logger.error(err);
+    this.logger.error(error);
   }
 }

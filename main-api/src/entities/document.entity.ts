@@ -68,6 +68,18 @@ export class Document {
 
   @ApiProperty()
   @Column()
+  docTypeReqParams: string;
+
+  @ApiProperty()
+  @Column()
+  contractDetailsReqParams: string;
+
+  @ApiProperty()
+  @Column()
+  springReqParams: string;
+
+  @ApiProperty()
+  @Column()
   userId: number;
 
   @ApiProperty()

@@ -6,9 +6,10 @@ import {
   BeginDocProcessParam,
   QrDocumentParams,
   FailDocProcessParam,
-  IndexedDocumentParam,
+  DoneIndexingParam,
   DocumentMigrateParam,
   FailDocMigrateParam,
+  FailIndexingParam,
 } from './document.params';
 
 @EntityRepository()
@@ -214,7 +215,7 @@ export class DocumentRepository {
     );
   }
 
-  async indexedDocument(param: IndexedDocumentParam): Promise<Document> {
+  async doneIndexing(param: DoneIndexingParam): Promise<Document> {
     const description =
       'Successfully retrieved account details from sales force.';
     return await this.manager.transaction(
@@ -224,8 +225,13 @@ export class DocumentRepository {
           param.documentId,
         );
         document.status = DocumentStatus.INDEXING_DONE;
-        document.documentType = param.documentType;
-        document.contractDetails = param.contractDetails;
+        document.documentType = param.documentType ?? document.documentType;
+        document.contractDetails =
+          param.contractDetails ?? document.contractDetails;
+        document.docTypeReqParams =
+          param.docTypeReqParams ?? document.docTypeReqParams;
+        document.contractDetailsReqParams =
+          param.contractDetailsReqParams ?? document.contractDetailsReqParams;
         document.modifiedDate = param.indexedAt;
         document.description = description;
         await transaction.save(document);
@@ -243,7 +249,7 @@ export class DocumentRepository {
     );
   }
 
-  async failIndexing(param: FailDocProcessParam): Promise<Document> {
+  async failIndexing(param: FailIndexingParam): Promise<Document> {
     const description = 'Failed to retrieve account details from sales force.';
     return await this.manager.transaction(
       async (transaction): Promise<Document> => {
@@ -252,6 +258,13 @@ export class DocumentRepository {
           param.documentId,
         );
         document.status = DocumentStatus.INDEXING_FAILED;
+        document.documentType = param.documentType ?? document.documentType;
+        document.contractDetails =
+          param.contractDetails ?? document.contractDetails;
+        document.docTypeReqParams =
+          param.docTypeReqParams ?? document.docTypeReqParams;
+        document.contractDetailsReqParams =
+          param.contractDetailsReqParams ?? document.contractDetailsReqParams;
         document.modifiedDate = param.failedAt;
         document.description = description;
         await transaction.save(document);
