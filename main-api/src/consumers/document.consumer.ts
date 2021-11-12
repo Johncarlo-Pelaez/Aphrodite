@@ -133,7 +133,7 @@ export class DocumentConsumer {
     buffer: Buffer,
     { documentId, sysSrcFileName }: JobData,
   ): Promise<string> {
-    await this.documentRepository.beginMigrate({
+    await this.documentRepository.beginQrDocument({
       documentId,
       beginAt: this.datesUtil.getDateNow(),
     });
