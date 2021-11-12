@@ -178,13 +178,13 @@ export class DocumentConsumer {
         error,
       });
       throw error;
-    } finally {
-      this.updateToIndexingDone({
-        documentId,
-        documentType: JSON.stringify(getDocTypeResult),
-        docTypeReqParams: JSON.stringify(getDocTypeReqParams),
-      });
     }
+
+    this.updateToIndexingDone({
+      documentId,
+      documentType: JSON.stringify(getDocTypeResult),
+      docTypeReqParams: JSON.stringify(getDocTypeReqParams),
+    });
 
     const documentType = !!getDocTypeResult.response.length
       ? getDocTypeResult.response[0]
@@ -211,13 +211,13 @@ export class DocumentConsumer {
         error,
       });
       throw error;
-    } finally {
-      this.updateToIndexingDone({
-        documentId,
-        contractDetails: JSON.stringify(getContractDetailsResult),
-        contractDetailsReqParams: JSON.stringify(getContractDetailsReqParams),
-      });
     }
+
+    this.updateToIndexingDone({
+      documentId,
+      contractDetails: JSON.stringify(getContractDetailsResult),
+      contractDetailsReqParams: JSON.stringify(getContractDetailsReqParams),
+    });
 
     const contractDetail = !!getContractDetailsResult?.reponse?.items.length
       ? getContractDetailsResult.reponse.items[0]
