@@ -12,6 +12,7 @@ import {
   SpringCMService,
   UploadDocToSpringParams,
 } from 'src/spring-cm-service';
+import { DocumentStatus } from 'src/entities';
 import {
   JobData,
   JobIndexingResults,
@@ -39,15 +40,56 @@ export class DocumentConsumer {
         documentId: document.id,
         sysSrcFileName: document.uuid,
       };
+      const { documentId, sysSrcFileName } = jobData;
+      const {
+        documentName,
+        qrCode: docQrCode,
+        status,
+        documentType: strDocType,
+        contractDetails: strContDetails,
+      } = document;
+      const filename = path
+        .basename(documentName, path.extname(documentName))
+        .replace(/\.$/, '');
+      let qrCode: string;
+      const buffer = await this.readFile(sysSrcFileName);
 
-      const buffer = await this.readFile(jobData.sysSrcFileName);
+      if (status === DocumentStatus.QR_DONE && docQrCode && docQrCode !== '') {
+        qrCode = docQrCode;
+      } else if (filename.match(/^ecr/i) || filename.match(/^ecp/i)) {
+        qrCode = filename;
+      } else if (filename.match(/_/g)) {
+        qrCode = filename.replace(/_/g, '|');
+      } else if (filename.length === 18) {
+        qrCode = filename.substr(0, 15);
+      } else {
+        qrCode = await this.runQr(buffer, jobData);
+      }
 
-      const qrCode = document.qrCode ?? (await this.runQr(buffer, jobData));
+      let indexingResults: JobIndexingResults;
 
-      const { documentType, contractDetail } = await this.runIndexing(
-        qrCode,
-        jobData.documentId,
-      );
+      if (
+        status === DocumentStatus.INDEXING_DONE &&
+        strDocType !== '' &&
+        strContDetails !== ''
+      ) {
+        const parsedDocType = JSON.parse(strDocType),
+          parsedContDetails = JSON.parse(strContDetails);
+        const documentType = !!parsedDocType.response.length
+          ? parsedDocType.response[0]
+          : undefined;
+        const contractDetail = !!parsedContDetails?.reponse?.items.length
+          ? parsedContDetails.reponse.items[0]
+          : undefined;
+        indexingResults = {
+          documentType,
+          contractDetail,
+        };
+      } else {
+        indexingResults = await this.runIndexing(qrCode, documentId);
+      }
+
+      const { documentType, contractDetail } = indexingResults;
 
       const empty = '';
       const uploadParams = {
@@ -80,8 +122,9 @@ export class DocumentConsumer {
         B64Attachment: buffer.toString('base64'),
       };
 
-      await this.runUploadToSpringCM(jobData.documentId, uploadParams);
+      await this.runUploadToSpringCM(documentId, uploadParams);
     } catch (error) {
+      this.logger.error(error);
       throw error;
     }
   }
@@ -98,8 +141,7 @@ export class DocumentConsumer {
     let qrCode;
 
     try {
-      (qrCode = await this),
-        this.qrService.readPdfQrCode(buffer, sysSrcFileName);
+      qrCode = await this.qrService.readPdfQrCode(buffer, sysSrcFileName);
     } catch (error) {
       await this.updateToQrFailed(error, documentId);
       throw error;
