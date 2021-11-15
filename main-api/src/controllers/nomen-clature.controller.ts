@@ -16,7 +16,7 @@ import { NomenClature } from 'src/entities';
 import { NomenClatureRepository } from 'src/repositories';
 import { NomenClatureDto } from './nomen-clature.dto';
 
-@Controller('/nomen-clature')
+@Controller('/nomen-clatures')
 @UseGuards(AzureADGuard)
 export class NomenClatureController {
   constructor(

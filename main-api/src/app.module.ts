@@ -8,6 +8,7 @@ import {
   DocumentController,
   UserController,
   NomenClatureController,
+  LookupController,
 } from './controllers';
 import { UtilsModule } from './utils/utils.module';
 import { DocumentProducer } from './producers';
@@ -15,6 +16,7 @@ import {
   DocumentRepository,
   UserRepository,
   NomenClatureRepository,
+  LookupRepository,
 } from './repositories';
 import { DocumentService } from './services';
 import { QRService } from 'src/qr-service';
@@ -68,7 +70,12 @@ const logger = new Logger('AppModule');
     }),
     PassportModule,
   ],
-  controllers: [DocumentController, UserController, NomenClatureController],
+  controllers: [
+    DocumentController,
+    UserController,
+    NomenClatureController,
+    LookupController,
+  ],
   providers: [
     QRService,
     SalesForceService,
@@ -81,6 +88,7 @@ const logger = new Logger('AppModule');
     DocumentConsumer,
     AzureADStrategy,
     NomenClatureRepository,
+    LookupRepository,
   ],
 })
 export class AppModule {}
