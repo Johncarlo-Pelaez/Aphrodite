@@ -1,5 +1,5 @@
 import { NomenClature } from 'src/entities';
-import { EntityManager, EntityRepository } from 'typeorm';
+import { EntityManager, EntityRepository, ILike } from 'typeorm';
 import {
   CreateNomenClatureParam,
   UpdateNomenClatureParam,
@@ -10,13 +10,19 @@ export class NomenClatureRepository {
   constructor(private readonly manager: EntityManager) {}
 
   async getNomenClatures(): Promise<NomenClature[]> {
-    return this.manager.find(NomenClature, {
+    return await this.manager.find(NomenClature, {
       order: { description: 'ASC' },
     });
   }
 
   async getNomenClature(id: number): Promise<NomenClature> {
-    return this.manager.findOne(NomenClature, id);
+    return await this.manager.findOne(NomenClature, id);
+  }
+
+  async checkNomenClatureIfExist(description: string): Promise<boolean> {
+    return await !!this.manager.findOne(NomenClature, {
+      where: { description: ILike(`%${description}%`) },
+    });
   }
 
   async createNomenClature({
@@ -31,10 +37,10 @@ export class NomenClatureRepository {
   async updateNomenClature({
     id,
     description,
-  }: UpdateNomenClatureParam): Promise<NomenClature> {
+  }: UpdateNomenClatureParam): Promise<void> {
     const nomenClature = await this.manager.findOneOrFail(NomenClature, id);
     nomenClature.description = description;
-    return await this.manager.save(nomenClature);
+    await this.manager.save(nomenClature);
   }
 
   async deleteNomenClature(id: number): Promise<void> {

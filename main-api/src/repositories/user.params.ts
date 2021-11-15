@@ -6,7 +6,7 @@ export interface CreateUserParam {
   lastName?: string;
   role: Role;
   createdDate: Date;
-  isActive: boolean;
+  isActive?: boolean;
 }
 
 export interface UpdateUserParam {
@@ -16,7 +16,7 @@ export interface UpdateUserParam {
   lastName?: string;
   role: Role;
   modifiedDate: Date;
-  isActive: boolean;
+  isActive?: boolean;
 }
 
 export interface DeleteUserParam {

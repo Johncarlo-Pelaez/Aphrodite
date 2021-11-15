@@ -5,9 +5,14 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { AppConfigService } from 'src/app-config';
 import { DatesUtil } from 'src/utils';
-import { DocumentRepository } from 'src/repositories';
+import { DocumentRepository, NomenClatureRepository } from 'src/repositories';
 import { QRService } from 'src/qr-service';
-import { SalesForceService } from 'src/sales-force-service';
+import {
+  SalesForceService,
+  GetDocumentTypeResult,
+  DocumentType,
+  ContractDetail,
+} from 'src/sales-force-service';
 import {
   SpringCMService,
   UploadDocToSpringParams,
@@ -15,7 +20,6 @@ import {
 import { DocumentStatus } from 'src/entities';
 import {
   JobData,
-  JobIndexingResults,
   UpdateToIndexingDoneParams,
   UpdateToIndexingFailedParams,
 } from './document.interfaces';
@@ -26,6 +30,7 @@ export class DocumentConsumer {
   constructor(
     private readonly appConfigService: AppConfigService,
     private readonly documentRepository: DocumentRepository,
+    private readonly nomenClatureRepository: NomenClatureRepository,
     private readonly qrService: QRService,
     private readonly salesForceService: SalesForceService,
     private readonly springCMService: SpringCMService,
@@ -34,27 +39,44 @@ export class DocumentConsumer {
 
   @Process('migrate')
   async migrate(job: Job<number>): Promise<void> {
-    try {
-      const document = await this.documentRepository.getDocument(job.data);
-      const jobData: JobData = {
-        documentId: document.id,
-        sysSrcFileName: document.uuid,
-      };
-      const { documentId, sysSrcFileName } = jobData;
-      const {
-        documentName,
-        qrCode: docQrCode,
-        status,
-        documentType: strDocType,
-        contractDetails: strContDetails,
-      } = document;
-      const filename = path
-        .basename(documentName, path.extname(documentName))
-        .replace(/\.$/, '');
-      let qrCode: string;
-      const buffer = await this.readFile(sysSrcFileName);
+    const document = await this.documentRepository.getDocument(job.data);
+    const jobData: JobData = {
+      documentId: document.id,
+      sysSrcFileName: document.uuid,
+    };
+    const { documentId, sysSrcFileName } = jobData;
+    const {
+      documentName,
+      qrCode: docQrCode,
+      status,
+      documentType: strGetDocTypeReqRes,
+      contractDetails: strGetContDetailsReqRes,
+    } = document;
+    const filename = path
+      .basename(documentName, path.extname(documentName))
+      .replace(/\.$/, '');
+    let qrCode: string;
+    const buffer = await this.readFile(sysSrcFileName);
 
-      if (status === DocumentStatus.QR_DONE && docQrCode && docQrCode !== '') {
+    let documentType: DocumentType | undefined = undefined,
+      contractDetail: ContractDetail | undefined = undefined;
+
+    if (strGetDocTypeReqRes && strGetDocTypeReqRes !== '') {
+      const getDocTypeReqResult = JSON.parse(strGetDocTypeReqRes);
+      documentType = !!getDocTypeReqResult.response.length
+        ? getDocTypeReqResult.response[0]
+        : undefined;
+    }
+
+    if (strGetContDetailsReqRes && strGetContDetailsReqRes !== '') {
+      const getContDetailsReqRes = JSON.parse(strGetContDetailsReqRes);
+      contractDetail = !!getContDetailsReqRes?.reponse?.items.length
+        ? getContDetailsReqRes.reponse.items[0]
+        : undefined;
+    }
+
+    if (!documentType) {
+      if (docQrCode && docQrCode !== '') {
         qrCode = docQrCode;
       } else if (filename.match(/^ecr/i) || filename.match(/^ecp/i)) {
         qrCode = filename;
@@ -66,31 +88,25 @@ export class DocumentConsumer {
         qrCode = await this.runQr(buffer, jobData);
       }
 
-      let indexingResults: JobIndexingResults;
-
-      if (
-        status === DocumentStatus.INDEXING_DONE &&
-        strDocType !== '' &&
-        strContDetails !== ''
-      ) {
-        const parsedDocType = JSON.parse(strDocType),
-          parsedContDetails = JSON.parse(strContDetails);
-        const documentType = !!parsedDocType.response.length
-          ? parsedDocType.response[0]
-          : undefined;
-        const contractDetail = !!parsedContDetails?.reponse?.items.length
-          ? parsedContDetails.reponse.items[0]
-          : undefined;
-        indexingResults = {
-          documentType,
-          contractDetail,
-        };
-      } else {
-        indexingResults = await this.runIndexing(qrCode, documentId);
+      if (qrCode === '') {
+        await this.updateForManualEncode(documentId);
+        return;
       }
 
-      const { documentType, contractDetail } = indexingResults;
+      documentType = await this.runIndexing(qrCode, documentId);
+    }
 
+    if (!documentType) {
+      await this.updateForManualEncode(documentId);
+      return;
+    }
+
+    const isWhiteListed =
+      await this.nomenClatureRepository.checkNomenClatureIfExist(
+        documentType.Nomenclature,
+      );
+
+    if (!isWhiteListed || status === DocumentStatus.APPROVED) {
       const empty = '';
       const uploadParams = {
         Brand: documentType?.Brand ?? empty,
@@ -122,10 +138,17 @@ export class DocumentConsumer {
         B64Attachment: buffer.toString('base64'),
       };
 
-      await this.runUploadToSpringCM(documentId, uploadParams);
-    } catch (error) {
-      this.logger.error(error);
-      throw error;
+      try {
+        await this.runUploadToSpringCM(documentId, uploadParams);
+      } catch (error) {
+        await this.updateToQrFailed(error, documentId);
+        throw error;
+      }
+    }
+
+    if (isWhiteListed && status !== DocumentStatus.APPROVED) {
+      await this.updateForChecking(documentId);
+      return;
     }
   }
 
@@ -155,7 +178,7 @@ export class DocumentConsumer {
   private async runIndexing(
     qrCode: string,
     documentId: number,
-  ): Promise<JobIndexingResults> {
+  ): Promise<DocumentType | undefined> {
     await this.documentRepository.beginIndexing({
       documentId,
       beginAt: this.datesUtil.getDateNow(),
@@ -164,76 +187,32 @@ export class DocumentConsumer {
     const getDocTypeReqParams = {
       BarCode: qrCode,
     };
-    let getDocTypeResult;
+    let getDocTypeResult: GetDocumentTypeResult;
 
     try {
       getDocTypeResult = await this.salesForceService.getDocumentType(
         getDocTypeReqParams,
       );
     } catch (error) {
-      this.updateToIndexingFailed({
+      await this.updateToIndexingFailed({
         documentId,
-        documentType: error,
         docTypeReqParams: JSON.stringify(getDocTypeReqParams),
         error,
       });
       throw error;
     }
 
-    this.updateToIndexingDone({
+    const documentType = !!getDocTypeResult.response.length
+      ? getDocTypeResult.response[0]
+      : undefined;
+
+    await this.updateToIndexingDone({
       documentId,
       documentType: JSON.stringify(getDocTypeResult),
       docTypeReqParams: JSON.stringify(getDocTypeReqParams),
     });
 
-    const documentType = !!getDocTypeResult.response.length
-      ? getDocTypeResult.response[0]
-      : undefined;
-
-    if (!documentType) throw new Error('Document type is empty.');
-
-    const getContractDetailsReqParams = {
-      contractNumber: documentType?.ContractNumber,
-      CompanyCode: documentType?.CompanyCode,
-    };
-    let getContractDetailsResult;
-
-    try {
-      getContractDetailsResult =
-        await this.salesForceService.getContractDetails(
-          getContractDetailsReqParams,
-        );
-    } catch (error) {
-      this.updateToIndexingFailed({
-        documentId,
-        contractDetails: error,
-        contractDetailsReqParams: JSON.stringify(getContractDetailsReqParams),
-        error,
-      });
-      throw error;
-    }
-
-    this.updateToIndexingDone({
-      documentId,
-      contractDetails: JSON.stringify(getContractDetailsResult),
-      contractDetailsReqParams: JSON.stringify(getContractDetailsReqParams),
-    });
-
-    const contractDetail = !!getContractDetailsResult?.reponse?.items.length
-      ? getContractDetailsResult.reponse.items[0]
-      : undefined;
-
-    if (!contractDetail) throw new Error('Contract details is empty.');
-
-    await this.documentRepository.doneIndexing({
-      documentId,
-      indexedAt: this.datesUtil.getDateNow(),
-    });
-
-    return {
-      documentType,
-      contractDetail,
-    };
+    return documentType;
   }
 
   private async runUploadToSpringCM(
@@ -243,7 +222,7 @@ export class DocumentConsumer {
     const { B64Attachment, ...forStrUploadParams } = uploadParams;
     const strUploadParams = JSON.stringify(forStrUploadParams);
 
-    this.documentRepository.beginMigrate({
+    await this.documentRepository.beginMigrate({
       documentId,
       beginAt: this.datesUtil.getDateNow(),
     });
@@ -255,7 +234,12 @@ export class DocumentConsumer {
         uploadParams,
       );
     } catch (error) {
-      this.updateToMigrateFailed(documentId, strUploadParams, error);
+      await this.updateToMigrateFailed(
+        documentId,
+        strUploadParams,
+        undefined,
+        error,
+      );
       throw error;
     }
 
@@ -269,12 +253,17 @@ export class DocumentConsumer {
       response?.SalesForce[0].created === 'true' &&
       response?.SalesForce[0].success === 'true'
     )
-      this.updateToMigrateDone(
+      await this.updateToMigrateDone(
         documentId,
         JSON.stringify(response),
         strUploadParams,
       );
-    else this.updateToMigrateFailed(documentId, strUploadParams);
+    else
+      await this.updateToMigrateFailed(
+        documentId,
+        strUploadParams,
+        JSON.stringify(response),
+      );
   }
 
   private async readFile(filename: string): Promise<Buffer> {
@@ -310,20 +299,13 @@ export class DocumentConsumer {
   private async updateToIndexingDone(
     params: UpdateToIndexingDoneParams,
   ): Promise<void> {
-    const {
-      documentId,
-      documentType,
-      contractDetails,
-      docTypeReqParams,
-      contractDetailsReqParams,
-    } = params;
     const indexedAt = this.datesUtil.getDateNow();
     await this.documentRepository.doneIndexing({
-      documentId,
-      documentType,
-      contractDetails,
-      docTypeReqParams,
-      contractDetailsReqParams,
+      documentId: params.documentId,
+      documentType: params.documentType,
+      contractDetails: params.contractDetails,
+      docTypeReqParams: params.docTypeReqParams,
+      contractDetailsReqParams: params.contractDetailsReqParams,
       indexedAt,
     });
   }
@@ -331,36 +313,28 @@ export class DocumentConsumer {
   private async updateToIndexingFailed(
     params: UpdateToIndexingFailedParams,
   ): Promise<void> {
-    const {
-      error,
-      documentId,
-      documentType,
-      contractDetails,
-      docTypeReqParams,
-      contractDetailsReqParams,
-    } = params;
     const failedAt = this.datesUtil.getDateNow();
     await this.documentRepository.failIndexing({
-      documentId,
-      documentType,
-      contractDetails,
-      docTypeReqParams,
-      contractDetailsReqParams,
+      documentId: params.documentId,
+      documentType: params.documentType,
+      contractDetails: params.contractDetails,
+      docTypeReqParams: params.docTypeReqParams,
+      contractDetailsReqParams: params.contractDetailsReqParams,
       failedAt,
     });
-    this.logger.error(error);
+    this.logger.error(params.error);
   }
 
   private async updateToMigrateDone(
     documentId: number,
-    springResponse: string,
     springReqParams: string,
+    springResponse: string,
   ): Promise<void> {
     const migratedAt = this.datesUtil.getDateNow();
-    await this.documentRepository.documentMigrate({
+    await this.documentRepository.migrateDocument({
       documentId,
-      springResponse,
       springReqParams,
+      springResponse,
       migratedAt,
     });
   }
@@ -368,15 +342,32 @@ export class DocumentConsumer {
   private async updateToMigrateFailed(
     documentId: number,
     springReqParams: string,
+    springResponse?: string,
     error?: any,
   ): Promise<void> {
     const failedAt = this.datesUtil.getDateNow();
     await this.documentRepository.failMigrate({
       documentId,
-      springResponse: error,
       springReqParams,
+      springResponse,
       failedAt,
     });
     this.logger.error(error);
+  }
+
+  private async updateForManualEncode(documentId: number): Promise<void> {
+    const beginAt = this.datesUtil.getDateNow();
+    await this.documentRepository.updateForManualEncode({
+      documentId,
+      beginAt,
+    });
+  }
+
+  private async updateForChecking(documentId: number): Promise<void> {
+    const beginAt = this.datesUtil.getDateNow();
+    await this.documentRepository.updateForChecking({
+      documentId,
+      beginAt,
+    });
   }
 }

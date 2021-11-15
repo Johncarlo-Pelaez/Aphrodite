@@ -28,17 +28,17 @@ export class CreateUserAccountDto {
   @ApiProperty()
   @IsOptional()
   @IsString()
-  firstName: string;
+  firstName?: string;
 
   @ApiProperty()
   @IsOptional()
   @IsString()
-  lastName: string;
+  lastName?: string;
 
   @ApiProperty()
   @IsOptional()
   @IsBoolean()
-  isActive: boolean;
+  isActive?: boolean;
 }
 
 export class UserIsExistDto {

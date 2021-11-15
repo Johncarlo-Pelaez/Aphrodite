@@ -32,9 +32,7 @@ export class QRService {
       pageIndex++;
     } while (pageIndex < pageCount && !qrCode);
 
-    if (!qrCode || qrCode === '') throw new Error('QR result is empty.');
-
-    return qrCode;
+    return qrCode ?? '';
   }
 
   private async convertToImage(

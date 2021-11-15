@@ -7,7 +7,7 @@ import {
   QrDocumentParams,
   FailDocProcessParam,
   DoneIndexingParam,
-  DocumentMigrateParam,
+  MigrateDocumentParam,
   FailDocMigrateParam,
   FailIndexingParam,
 } from './document.params';
@@ -109,188 +109,251 @@ export class DocumentRepository {
     return documentId;
   }
 
-  async beginQrDocument(param: BeginDocProcessParam): Promise<Document> {
+  async beginQrDocument(param: BeginDocProcessParam): Promise<void> {
     const description = 'Begin QR Code.';
-    return await this.manager.transaction(
-      async (transaction): Promise<Document> => {
-        const document = await this.manager.findOneOrFail(
-          Document,
-          param.documentId,
-        );
-        document.status = DocumentStatus.QR_BEGIN;
-        document.modifiedDate = param.beginAt;
-        document.description = description;
-        await this.manager.save(document);
+    await this.manager.transaction(async (transaction): Promise<void> => {
+      const document = await this.manager.findOneOrFail(
+        Document,
+        param.documentId,
+      );
+      document.status = DocumentStatus.QR_BEGIN;
+      document.modifiedDate = param.beginAt;
+      document.description = description;
+      await this.manager.save(document);
 
-        const history = new DocumentHistory();
-        history.description = document.description;
-        history.documentSize = document.documentSize;
-        history.createdDate = document.modifiedDate;
-        history.userId = document.userId;
-        history.documentId = document.id;
-        await transaction.save(history);
-
-        return document;
-      },
-    );
+      const history = new DocumentHistory();
+      history.description = document.description;
+      history.documentSize = document.documentSize;
+      history.createdDate = document.modifiedDate;
+      history.userId = document.userId;
+      history.documentId = document.id;
+      await transaction.save(history);
+    });
   }
 
-  async qrDocument(param: QrDocumentParams): Promise<Document> {
+  async qrDocument(param: QrDocumentParams): Promise<void> {
     const description = 'Successfully done QR Code.';
-    return await this.manager.transaction(
-      async (transaction): Promise<Document> => {
-        const document = await transaction.findOneOrFail(
-          Document,
-          param.documentId,
-        );
-        document.status = DocumentStatus.QR_DONE;
-        document.qrCode = param.qrCode;
-        document.qrAt = param.qrAt;
-        document.modifiedDate = param.qrAt;
-        document.description = description;
-        await transaction.save(document);
+    await this.manager.transaction(async (transaction): Promise<void> => {
+      const document = await transaction.findOneOrFail(
+        Document,
+        param.documentId,
+      );
+      document.status = DocumentStatus.QR_DONE;
+      document.qrCode = param.qrCode;
+      document.qrAt = param.qrAt;
+      document.modifiedDate = param.qrAt;
+      document.modifiedBy = param.modifiedBy ?? document.modifiedBy;
+      document.description = description;
+      await transaction.save(document);
 
-        const history = new DocumentHistory();
-        history.description = document.description;
-        history.documentSize = document.documentSize;
-        history.createdDate = document.modifiedDate;
-        history.userId = document.userId;
-        history.documentId = document.id;
-        await transaction.save(history);
-
-        return document;
-      },
-    );
+      const history = new DocumentHistory();
+      history.description = document.description;
+      history.documentSize = document.documentSize;
+      history.createdDate = document.modifiedDate;
+      history.userId = document.userId;
+      history.documentId = document.id;
+      await transaction.save(history);
+    });
   }
 
-  async failQrDocument(param: FailDocProcessParam): Promise<Document> {
+  async failQrDocument(param: FailDocProcessParam): Promise<void> {
     const description = 'Failed QR Code.';
-    return await this.manager.transaction(
-      async (transaction): Promise<Document> => {
-        const document = await this.manager.findOneOrFail(
-          Document,
-          param.documentId,
-        );
-        document.status = DocumentStatus.QR_FAILED;
-        document.modifiedDate = param.failedAt;
-        document.description = description;
-        await transaction.save(document);
+    await this.manager.transaction(async (transaction): Promise<void> => {
+      const document = await this.manager.findOneOrFail(
+        Document,
+        param.documentId,
+      );
+      document.status = DocumentStatus.QR_FAILED;
+      document.modifiedDate = param.failedAt;
+      document.description = description;
+      await transaction.save(document);
 
-        const history = new DocumentHistory();
-        history.description = document.description;
-        history.documentSize = document.documentSize;
-        history.createdDate = document.modifiedDate;
-        history.userId = document.userId;
-        history.documentId = document.id;
-        await transaction.save(history);
-
-        return document;
-      },
-    );
+      const history = new DocumentHistory();
+      history.description = document.description;
+      history.documentSize = document.documentSize;
+      history.createdDate = document.modifiedDate;
+      history.userId = document.userId;
+      history.documentId = document.id;
+      await transaction.save(history);
+    });
   }
 
-  async beginIndexing(param: BeginDocProcessParam): Promise<Document> {
+  async beginIndexing(param: BeginDocProcessParam): Promise<void> {
     const description = 'Begin indexing.';
-    return await this.manager.transaction(
-      async (transaction): Promise<Document> => {
-        const document = await this.manager.findOneOrFail(
-          Document,
-          param.documentId,
-        );
-        document.status = DocumentStatus.INDEXING_BEGIN;
-        document.modifiedDate = param.beginAt;
-        document.description = description;
-        await transaction.save(document);
+    await this.manager.transaction(async (transaction): Promise<void> => {
+      const document = await this.manager.findOneOrFail(
+        Document,
+        param.documentId,
+      );
+      document.status = DocumentStatus.INDEXING_BEGIN;
+      document.modifiedDate = param.beginAt;
+      document.description = description;
+      await transaction.save(document);
 
-        const history = new DocumentHistory();
-        history.description = document.description;
-        history.documentSize = document.documentSize;
-        history.createdDate = document.modifiedDate;
-        history.userId = document.userId;
-        history.documentId = document.id;
-        await transaction.save(history);
-
-        return document;
-      },
-    );
+      const history = new DocumentHistory();
+      history.description = document.description;
+      history.documentSize = document.documentSize;
+      history.createdDate = document.modifiedDate;
+      history.userId = document.userId;
+      history.documentId = document.id;
+      await transaction.save(history);
+    });
   }
 
-  async doneIndexing(param: DoneIndexingParam): Promise<Document> {
+  async doneIndexing(param: DoneIndexingParam): Promise<void> {
     const description =
       'Successfully retrieved account details from sales force.';
-    return await this.manager.transaction(
-      async (transaction): Promise<Document> => {
-        const document = await this.manager.findOneOrFail(
-          Document,
-          param.documentId,
-        );
-        document.status = DocumentStatus.INDEXING_DONE;
-        document.documentType = param.documentType ?? document.documentType;
-        document.contractDetails =
-          param.contractDetails ?? document.contractDetails;
-        document.docTypeReqParams =
-          param.docTypeReqParams ?? document.docTypeReqParams;
-        document.contractDetailsReqParams =
-          param.contractDetailsReqParams ?? document.contractDetailsReqParams;
-        document.modifiedDate = param.indexedAt;
-        document.description = description;
-        await transaction.save(document);
+    await this.manager.transaction(async (transaction): Promise<void> => {
+      const document = await this.manager.findOneOrFail(
+        Document,
+        param.documentId,
+      );
+      document.status = DocumentStatus.INDEXING_DONE;
+      document.documentType = param.documentType;
+      document.contractDetails = param.contractDetails;
+      document.docTypeReqParams = param.docTypeReqParams;
+      document.contractDetailsReqParams = param.contractDetailsReqParams;
+      document.modifiedDate = param.indexedAt;
+      document.description = description;
+      await transaction.save(document);
 
-        const history = new DocumentHistory();
-        history.description = document.description;
-        history.documentSize = document.documentSize;
-        history.createdDate = document.modifiedDate;
-        history.userId = document.userId;
-        history.documentId = document.id;
-        await transaction.save(history);
-
-        return document;
-      },
-    );
+      const history = new DocumentHistory();
+      history.description = document.description;
+      history.documentSize = document.documentSize;
+      history.createdDate = document.modifiedDate;
+      history.userId = document.userId;
+      history.documentId = document.id;
+      await transaction.save(history);
+    });
   }
 
-  async failIndexing(param: FailIndexingParam): Promise<Document> {
+  async failIndexing(param: FailIndexingParam): Promise<void> {
     const description = 'Failed to retrieve account details from sales force.';
-    return await this.manager.transaction(
-      async (transaction): Promise<Document> => {
-        const document = await this.manager.findOneOrFail(
-          Document,
-          param.documentId,
-        );
-        document.status = DocumentStatus.INDEXING_FAILED;
-        document.documentType = param.documentType ?? document.documentType;
-        document.contractDetails =
-          param.contractDetails ?? document.contractDetails;
-        document.docTypeReqParams =
-          param.docTypeReqParams ?? document.docTypeReqParams;
-        document.contractDetailsReqParams =
-          param.contractDetailsReqParams ?? document.contractDetailsReqParams;
-        document.modifiedDate = param.failedAt;
-        document.description = description;
-        await transaction.save(document);
+    await this.manager.transaction(async (transaction): Promise<void> => {
+      const document = await this.manager.findOneOrFail(
+        Document,
+        param.documentId,
+      );
+      document.status = DocumentStatus.INDEXING_FAILED;
+      document.documentType = param.documentType;
+      document.contractDetails = param.contractDetails;
+      document.docTypeReqParams = param.docTypeReqParams;
+      document.contractDetailsReqParams = param.contractDetailsReqParams;
+      document.modifiedDate = param.failedAt;
+      document.description = description;
+      await transaction.save(document);
 
-        const history = new DocumentHistory();
-        history.description = document.description;
-        history.documentSize = document.documentSize;
-        history.createdDate = document.modifiedDate;
-        history.userId = document.userId;
-        history.documentId = document.id;
-        await transaction.save(history);
-
-        return document;
-      },
-    );
+      const history = new DocumentHistory();
+      history.description = document.description;
+      history.documentSize = document.documentSize;
+      history.createdDate = document.modifiedDate;
+      history.userId = document.userId;
+      history.documentId = document.id;
+      await transaction.save(history);
+    });
   }
 
-  async beginMigrate(param: BeginDocProcessParam): Promise<Document> {
+  async beginMigrate(param: BeginDocProcessParam): Promise<void> {
     const description = 'Begin migrate.';
+    await this.manager.transaction(async (transaction): Promise<void> => {
+      const document = await this.manager.findOneOrFail(
+        Document,
+        param.documentId,
+      );
+      document.status = DocumentStatus.MIGRATE_BEGIN;
+      document.modifiedDate = param.beginAt;
+      document.description = description;
+      await transaction.save(document);
+
+      const history = new DocumentHistory();
+      history.description = document.description;
+      history.documentSize = document.documentSize;
+      history.createdDate = document.modifiedDate;
+      history.userId = document.userId;
+      history.documentId = document.id;
+      await transaction.save(history);
+    });
+  }
+
+  async migrateDocument(param: MigrateDocumentParam): Promise<void> {
+    const description = 'Successfully migrated.';
+    await this.manager.transaction(async (transaction): Promise<void> => {
+      const document = await this.manager.findOneOrFail(
+        Document,
+        param.documentId,
+      );
+      document.status = DocumentStatus.MIGRATE_DONE;
+      document.modifiedDate = param.migratedAt;
+      document.springReqParams = param.springReqParams;
+      document.springResponse = param.springResponse;
+      document.description = description;
+      await transaction.save(document);
+
+      const history = new DocumentHistory();
+      history.description = document.description;
+      history.documentSize = document.documentSize;
+      history.createdDate = document.modifiedDate;
+      history.userId = document.userId;
+      history.documentId = document.id;
+      await transaction.save(history);
+    });
+  }
+
+  async failMigrate(param: FailDocMigrateParam): Promise<void> {
+    const description = 'Migration failed.';
+    await this.manager.transaction(async (transaction): Promise<void> => {
+      const document = await this.manager.findOneOrFail(
+        Document,
+        param.documentId,
+      );
+      document.status = DocumentStatus.MIGRATE_FAILED;
+      document.modifiedDate = param.failedAt;
+      document.springReqParams = param.springReqParams;
+      document.springResponse = param.springResponse;
+      document.description = description;
+      await transaction.save(document);
+
+      const history = new DocumentHistory();
+      history.description = document.description;
+      history.documentSize = document.documentSize;
+      history.createdDate = document.modifiedDate;
+      history.userId = document.userId;
+      history.documentId = document.id;
+      await transaction.save(history);
+    });
+  }
+
+  async updateForChecking(param: BeginDocProcessParam): Promise<void> {
+    const description = 'For quality checking..';
+    await this.manager.transaction(async (transaction): Promise<void> => {
+      const document = await this.manager.findOneOrFail(
+        Document,
+        param.documentId,
+      );
+      document.status = DocumentStatus.FOR_CHECKING;
+      document.modifiedDate = param.beginAt;
+      document.description = description;
+      await transaction.save(document);
+
+      const history = new DocumentHistory();
+      history.description = document.description;
+      history.documentSize = document.documentSize;
+      history.createdDate = document.modifiedDate;
+      history.userId = document.userId;
+      history.documentId = document.id;
+      await transaction.save(history);
+    });
+  }
+
+  async updateForManualEncode(param: BeginDocProcessParam): Promise<void> {
+    const description = 'For manual encode..';
     return await this.manager.transaction(
-      async (transaction): Promise<Document> => {
+      async (transaction): Promise<void> => {
         const document = await this.manager.findOneOrFail(
           Document,
           param.documentId,
         );
-        document.status = DocumentStatus.MIGRATE_BEGIN;
+        document.status = DocumentStatus.FOR_MANUAL_ENCODE;
         document.modifiedDate = param.beginAt;
         document.description = description;
         await transaction.save(document);
@@ -302,62 +365,6 @@ export class DocumentRepository {
         history.userId = document.userId;
         history.documentId = document.id;
         await transaction.save(history);
-
-        return document;
-      },
-    );
-  }
-
-  async documentMigrate(param: DocumentMigrateParam): Promise<Document> {
-    const description = 'Successfully migrated.';
-    return await this.manager.transaction(
-      async (transaction): Promise<Document> => {
-        const document = await this.manager.findOneOrFail(
-          Document,
-          param.documentId,
-        );
-        document.status = DocumentStatus.MIGRATE_DONE;
-        document.modifiedDate = param.migratedAt;
-        document.springResponse = param.springResponse;
-        document.description = description;
-        await transaction.save(document);
-
-        const history = new DocumentHistory();
-        history.description = document.description;
-        history.documentSize = document.documentSize;
-        history.createdDate = document.modifiedDate;
-        history.userId = document.userId;
-        history.documentId = document.id;
-        await transaction.save(history);
-
-        return document;
-      },
-    );
-  }
-
-  async failMigrate(param: FailDocMigrateParam): Promise<Document> {
-    const description = 'Migration failed.';
-    return await this.manager.transaction(
-      async (transaction): Promise<Document> => {
-        const document = await this.manager.findOneOrFail(
-          Document,
-          param.documentId,
-        );
-        document.status = DocumentStatus.MIGRATE_FAILED;
-        document.modifiedDate = param.failedAt;
-        document.springResponse = param.springResponse;
-        document.description = description;
-        await transaction.save(document);
-
-        const history = new DocumentHistory();
-        history.description = document.description;
-        history.documentSize = document.documentSize;
-        history.createdDate = document.modifiedDate;
-        history.userId = document.userId;
-        history.documentId = document.id;
-        await transaction.save(history);
-
-        return document;
       },
     );
   }

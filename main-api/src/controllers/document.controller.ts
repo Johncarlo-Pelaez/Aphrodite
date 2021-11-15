@@ -4,6 +4,9 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Put,
+  ValidationPipe,
+  Body,
   Query,
   UploadedFile,
   Res,
@@ -23,7 +26,7 @@ import {
 import { Document, DocumentHistory } from 'src/entities';
 import { DocumentRepository } from 'src/repositories';
 import { DocumentService } from 'src/services';
-import { GetDocumentsDto } from './document.dto';
+import { GetDocumentsDto, EncodeDocumentDto } from './document.dto';
 import { GetDocumentsIntPipe } from './document.pipe';
 
 @Controller('/documents')
@@ -100,5 +103,24 @@ export class DocumentController {
     res.setHeader('Content-Length', buffer.length);
     res.setHeader('Content-Type', 'application/octet-stream');
     res.send(buffer);
+  }
+
+  @ApiOkResponse()
+  @Put('/:id/encode')
+  async encodeDocument(
+    @Param('id', ParseIntPipe)
+    documentId: number,
+    @Body(ValidationPipe) dto: EncodeDocumentDto,
+    @GetUserId() userId: number,
+  ): Promise<void> {
+    return await this.documentsService.encodeDocument({
+      documentId,
+      qrCode: dto.qrCode,
+      companyCode: dto.companyCode,
+      contractNumber: dto.contractNumber,
+      nomenClature: dto.nomenClature,
+      documentGroup: dto.documentGroup,
+      encodedBy: userId,
+    });
   }
 }

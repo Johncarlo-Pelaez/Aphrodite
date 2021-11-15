@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { DocumentStatus } from './document.enum';
 import { User } from './user.entity';
 
 @Entity()
@@ -40,43 +41,43 @@ export class Document {
 
   @ApiProperty()
   @Column()
-  status: string;
+  status: DocumentStatus;
 
   @ApiProperty()
-  @Column()
-  qrCode: string;
+  @Column({ nullable: true })
+  qrCode?: string;
 
   @ApiProperty()
-  @Column()
-  qrAt: Date;
+  @Column({ nullable: true })
+  qrAt?: Date;
 
   @ApiProperty()
-  @Column()
-  documentType: string;
+  @Column({ nullable: true })
+  documentType?: string;
 
   @ApiProperty()
-  @Column()
-  contractDetails: string;
+  @Column({ nullable: true })
+  contractDetails?: string;
 
   @ApiProperty()
-  @Column()
-  springResponse: string;
+  @Column({ nullable: true })
+  springResponse?: string;
 
   @ApiProperty()
-  @Column()
-  remarks: string;
+  @Column({ nullable: true })
+  remarks?: string;
 
   @ApiProperty()
-  @Column()
-  docTypeReqParams: string;
+  @Column({ nullable: true })
+  docTypeReqParams?: string;
 
   @ApiProperty()
-  @Column()
-  contractDetailsReqParams: string;
+  @Column({ nullable: true })
+  contractDetailsReqParams?: string;
 
   @ApiProperty()
-  @Column()
-  springReqParams: string;
+  @Column({ nullable: true })
+  springReqParams?: string;
 
   @ApiProperty()
   @Column()

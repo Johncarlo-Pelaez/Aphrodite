@@ -46,14 +46,12 @@ export class NomenClatureController {
     return response;
   }
 
-  @ApiOkResponse({
-    type: NomenClature,
-  })
+  @ApiOkResponse()
   @Put('/:id')
   async updateNomenClature(
     @Param('id', ParseIntPipe) id: number,
     @Body(ValidationPipe) dto: NomenClatureDto,
-  ): Promise<NomenClature> {
+  ): Promise<void> {
     return await this.nomenClatureRepository.updateNomenClature({
       id,
       description: dto.description,
@@ -65,6 +63,6 @@ export class NomenClatureController {
   async deleteNomenClature(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<void> {
-    await this.nomenClatureRepository.deleteNomenClature(id);
+    return await this.nomenClatureRepository.deleteNomenClature(id);
   }
 }

@@ -43,7 +43,7 @@ export class UserController {
   @Get('/')
   @UseGuards(AzureADGuard)
   async getUsers(): Promise<User[]> {
-    return this.userRepository.getUsers();
+    return await this.userRepository.getUsers();
   }
 
   @ApiOkResponse({
@@ -123,9 +123,7 @@ export class UserController {
     return response;
   }
 
-  @ApiOkResponse({
-    type: User,
-  })
+  @ApiOkResponse()
   @ApiConflictResponse({
     description: 'User already exist.',
   })
@@ -135,7 +133,7 @@ export class UserController {
     @Param('id', ParseIntPipe) id: number,
     @Body(ValidationPipe) dto: CreateUserAccountDto,
     @GetAccessToken() accessToken: string,
-  ): Promise<CreatedResponse> {
+  ): Promise<void> {
     const user = await this.userRepository.getUserByEmail(dto.email);
     if (user && user.id !== id) throw new ConflictException();
 
@@ -160,7 +158,7 @@ export class UserController {
   @UseGuards(AzureADGuard)
   async deleteUser(@Param('id', ParseIntPipe) id: number): Promise<void> {
     const rightNow = new Date();
-    await this.userRepository.deleteUser({
+    return await this.userRepository.deleteUser({
       id,
       modifiedDate: rightNow,
     });

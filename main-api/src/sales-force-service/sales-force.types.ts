@@ -1,5 +1,5 @@
 export interface GetContractDetailsParams {
-  contractNumber: string;
+  ContractNumber: string;
   CompanyCode: string;
 }
 

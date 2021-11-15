@@ -8,7 +8,15 @@ import { DocumentRepository } from 'src/repositories';
 import { DocumentProducer } from 'src/producers';
 import { CreatedResponse } from 'src/core';
 import { Document } from 'src/entities';
-import { UploadDocuments } from './document.inputs';
+import {
+  SalesForceService,
+  GetContractDetailsResult,
+  GetDocumentTypeResult,
+  DocumentType,
+  ContractDetail,
+} from 'src/sales-force-service';
+import { UploadDocuments, EncodeDocument } from './document.inputs';
+import e from 'express';
 const { readFile, writeFile } = fs.promises;
 
 @Injectable()
@@ -18,6 +26,7 @@ export class DocumentService {
     private readonly datesUtil: DatesUtil,
     private readonly appConfigService: AppConfigService,
     private readonly documentProducer: DocumentProducer,
+    private readonly salesForceService: SalesForceService,
   ) {}
 
   async uploadDocument(data: UploadDocuments): Promise<CreatedResponse> {
@@ -52,5 +61,86 @@ export class DocumentService {
       path.join(this.appConfigService.filePath, document.uuid),
     );
     return [document, buffer];
+  }
+
+  async encodeDocument(data: EncodeDocument): Promise<void> {
+    const {
+      documentId,
+      qrCode,
+      companyCode,
+      contractNumber,
+      nomenClature,
+      documentGroup,
+      encodedBy,
+    } = data;
+    const document = await this.documentRepository.getDocument(documentId);
+    let dateRightNow = this.datesUtil.getDateNow();
+
+    if (qrCode && qrCode !== '' && qrCode !== document.qrCode) {
+      await this.documentRepository.qrDocument({
+        documentId,
+        qrCode,
+        qrAt: dateRightNow,
+        modifiedBy: encodedBy,
+      });
+    } else {
+      const getContractDetailsReqParams = {
+        ContractNumber: contractNumber,
+        CompanyCode: companyCode,
+      };
+      let getContractDetailsResult: GetContractDetailsResult;
+
+      try {
+        getContractDetailsResult =
+          await this.salesForceService.getContractDetails(
+            getContractDetailsReqParams,
+          );
+      } catch (error) {
+        dateRightNow = this.datesUtil.getDateNow();
+        await this.documentRepository.failIndexing({
+          documentId,
+          contractDetailsReqParams: JSON.stringify(getContractDetailsReqParams),
+          failedAt: dateRightNow,
+        });
+        throw error;
+      }
+
+      let getDocTypeReqResult: GetDocumentTypeResult = JSON.parse(
+        document.documentType,
+      );
+
+      const contractDetail = !!getContractDetailsResult?.reponse?.items.length
+        ? getContractDetailsResult.reponse.items[0]
+        : undefined;
+
+      getDocTypeReqResult.response = [
+        {
+          Nomenclature: nomenClature,
+          DocumentGroup: documentGroup,
+          ContractNumber: contractDetail?.ContractNumber,
+          CompanyCode: contractDetail?.CompanyCode,
+          Brand: contractDetail?.Brand,
+          ProjectCode: contractDetail?.ProjectCode,
+          Tower_Phase: contractDetail?.Tower_Phase,
+          CustomerCode: contractDetail?.CustomerCode,
+          UnitDetails: contractDetail?.UnitDescription,
+          AccountName: '',
+          ProjectName: '',
+          Transmittal: '',
+          CodeType: '',
+        },
+      ];
+
+      dateRightNow = this.datesUtil.getDateNow();
+      await this.documentRepository.doneIndexing({
+        documentId,
+        documentType: JSON.stringify(getDocTypeReqResult),
+        contractDetails: JSON.stringify(getContractDetailsResult),
+        contractDetailsReqParams: JSON.stringify(getContractDetailsReqParams),
+        indexedAt: dateRightNow,
+      });
+    }
+
+    await this.documentProducer.migrate(documentId);
   }
 }

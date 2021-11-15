@@ -39,3 +39,25 @@ export class CreateDocumentDto {
   @IsNumber()
   documentSize: number;
 }
+
+export class EncodeDocumentDto {
+  @ApiProperty()
+  @IsString()
+  qrCode: string;
+
+  @ApiProperty()
+  @IsString()
+  companyCode: string;
+
+  @ApiProperty()
+  @IsString()
+  contractNumber: string;
+
+  @ApiProperty()
+  @IsString()
+  nomenClature: string;
+
+  @ApiProperty()
+  @IsString()
+  documentGroup: string;
+}

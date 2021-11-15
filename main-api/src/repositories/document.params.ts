@@ -22,6 +22,7 @@ export interface QrDocumentParams {
   documentId: number;
   qrCode: string;
   qrAt: Date;
+  modifiedBy?: number;
 }
 
 export interface FailDocProcessParam {
@@ -45,14 +46,14 @@ export interface FailIndexingParam extends FailDocProcessParam {
   contractDetailsReqParams?: string;
 }
 
-export interface DocumentMigrateParam {
+export interface MigrateDocumentParam {
   documentId: number;
   migratedAt: Date;
-  springResponse: string;
   springReqParams: string;
+  springResponse: string;
 }
 
 export interface FailDocMigrateParam extends FailDocProcessParam {
-  springResponse: string;
   springReqParams: string;
+  springResponse?: string;
 }
