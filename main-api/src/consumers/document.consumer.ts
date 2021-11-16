@@ -116,7 +116,8 @@ export class DocumentConsumer {
         Tower_Phase: documentType?.Tower_Phase ?? empty,
         CustomerCode: documentType?.CustomerCode ?? empty,
         ProjectName: documentType?.ProjectName ?? empty,
-        CustomerName: contractDetail?.CustomerName ?? empty,
+        CustomerName:
+          (documentType?.AccountName ?? contractDetail?.CustomerName) || empty,
         UnitDescription: documentType?.UnitDetails ?? empty,
         DocumentGroupID: empty,
         DocumentGroupDescription: documentType?.DocumentGroup ?? empty,
@@ -125,16 +126,19 @@ export class DocumentConsumer {
         DocumentTypeDescription: documentType?.Nomenclature ?? empty,
         DocumentTypeShortDescription: empty,
         DocumentName: documentType?.Nomenclature ?? empty,
-        ExternalSourceCaptureDate: empty,
-        FileName: document.documentName,
+        ExternalSourceCaptureDate:
+          this.datesUtil.getTimestamp('M/D/YYYY h:mm:ss A'),
+        FileName: `${documentType?.Nomenclature}${path.extname(
+          document.documentName,
+        )}`,
         MIMEType: document.mimeType,
         DocumentDate: empty,
-        ExternalSourceUserID: empty,
-        SourceSystem: empty,
-        DataCapDocSource: empty,
-        DataCapRemarks: empty,
+        ExternalSourceUserID: document.user.email.split('@')[0],
+        SourceSystem: 'RIS',
+        DataCapDocSource: 'RIS',
+        DataCapRemarks: document.remarks ?? empty,
         FileSize: document.documentSize.toString(),
-        Remarks: empty,
+        Remarks: document.remarks ?? empty,
         B64Attachment: buffer.toString('base64'),
       };
 

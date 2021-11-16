@@ -12,6 +12,7 @@ export interface ContractDetail {
   CompanyCode: string;
   Brand: string;
   ProjectCode: string;
+  ProjectName: string;
   Tower_Phase: string;
   UnitDescription: string;
   CustomerCode: string;
@@ -33,7 +34,7 @@ export interface DocumentType {
   ProjectName: string;
   UnitDetails: string;
   Transmittal: string;
-  CodeType: string;
+  CopyType: string;
   ProjectCode: string;
   Tower_Phase: string;
 }

@@ -3,8 +3,8 @@ import * as moment from 'moment';
 
 @Injectable()
 export class DatesUtil {
-  getTimestamp(): string {
-    return moment().format();
+  getTimestamp(format?: string): string {
+    return moment().format(format);
   }
 
   getDateNow(): Date {

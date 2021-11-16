@@ -124,10 +124,10 @@ export class DocumentService {
           Tower_Phase: contractDetail?.Tower_Phase,
           CustomerCode: contractDetail?.CustomerCode,
           UnitDetails: contractDetail?.UnitDescription,
-          AccountName: '',
-          ProjectName: '',
+          AccountName: contractDetail?.CustomerName,
+          ProjectName: contractDetail?.ProjectName,
           Transmittal: '',
-          CodeType: '',
+          CopyType: '',
         },
       ];
 
