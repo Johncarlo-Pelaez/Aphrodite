@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   IsNumber,
   IsNumberString,
+  IsDateString,
   IsOptional,
   IsString,
   IsUUID,
@@ -60,4 +61,16 @@ export class EncodeDocumentDto {
   @ApiProperty()
   @IsString()
   documentGroup: string;
+}
+
+export class CheckerApproveDocDto {
+  @ApiProperty()
+  @IsDateString()
+  documentDate: Date;
+}
+
+export class CheckerDisApproveDocDto extends CheckerApproveDocDto {
+  @ApiProperty()
+  @IsString()
+  remarks: string;
 }

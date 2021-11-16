@@ -10,4 +10,8 @@ export class DatesUtil {
   getDateNow(): Date {
     return moment().toDate();
   }
+
+  formatDate(date: Date, format: string): string {
+    return moment(date).format(format);
+  }
 }

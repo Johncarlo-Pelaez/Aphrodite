@@ -26,7 +26,12 @@ import {
 import { Document, DocumentHistory } from 'src/entities';
 import { DocumentRepository } from 'src/repositories';
 import { DocumentService } from 'src/services';
-import { GetDocumentsDto, EncodeDocumentDto } from './document.dto';
+import {
+  GetDocumentsDto,
+  EncodeDocumentDto,
+  CheckerApproveDocDto,
+  CheckerDisApproveDocDto,
+} from './document.dto';
 import { GetDocumentsIntPipe } from './document.pipe';
 
 @Controller('/documents')
@@ -121,6 +126,63 @@ export class DocumentController {
       nomenClature: dto.nomenClature,
       documentGroup: dto.documentGroup,
       encodedBy: userId,
+    });
+  }
+
+  @ApiOkResponse()
+  @Put('/:id/checker/approve')
+  async checkerApproveDoc(
+    @Param('id', ParseIntPipe)
+    documentId: number,
+    @Body(ValidationPipe) dto: CheckerApproveDocDto,
+    @GetUserId() userId: number,
+  ): Promise<void> {
+    return await this.documentsService.checkerApproveDoc({
+      documentId,
+      documentDate: dto.documentDate,
+      checkedBy: userId,
+    });
+  }
+
+  @ApiOkResponse()
+  @Put('/:id/checker/disapprove')
+  async checkerDisApproveDoc(
+    @Param('id', ParseIntPipe)
+    documentId: number,
+    @Body(ValidationPipe) dto: CheckerDisApproveDocDto,
+    @GetUserId() userId: number,
+  ): Promise<void> {
+    return await this.documentsService.checkerDisapproveDoc({
+      documentId,
+      documentDate: dto.documentDate,
+      remarks: dto.remarks,
+      checkedBy: userId,
+    });
+  }
+
+  @ApiOkResponse()
+  @Put('/:id/approver/approve')
+  async approverApproveDoc(
+    @Param('id', ParseIntPipe)
+    documentId: number,
+    @GetUserId() userId: number,
+  ): Promise<void> {
+    return await this.documentsService.approverApproveDoc({
+      documentId,
+      approver: userId,
+    });
+  }
+
+  @ApiOkResponse()
+  @Put('/:id/approver/disapprove')
+  async approverDisapproveDoc(
+    @Param('id', ParseIntPipe)
+    documentId: number,
+    @GetUserId() userId: number,
+  ): Promise<void> {
+    return await this.documentsService.approverDisapproveDoc({
+      documentId,
+      approver: userId,
     });
   }
 }
