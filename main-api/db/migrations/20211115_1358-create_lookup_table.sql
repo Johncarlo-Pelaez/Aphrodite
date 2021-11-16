@@ -13,7 +13,7 @@ CREATE TABLE dbo.lookup
 	(
 	id int NOT NULL IDENTITY (1, 1),
 	nomenClature nvarchar(MAX) NOT NULL,
-	documentGroup nvarchar(MAX) NULL
+	documentGroup nvarchar(MAX) NOT NULL
 	)  ON [PRIMARY]
 GO
 ALTER TABLE dbo.lookup SET (LOCK_ESCALATION = TABLE)
