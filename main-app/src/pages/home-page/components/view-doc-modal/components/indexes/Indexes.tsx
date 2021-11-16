@@ -4,7 +4,6 @@ import Card from 'react-bootstrap/Card';
 import Form from 'react-bootstrap/Form';
 import { Document, DocumentType } from 'models';
 import styles from './Indexes.module.css';
-import { NomenClatureInput } from './components';
 
 export interface IndexesProps {
   document?: Document;
@@ -16,7 +15,7 @@ export const Indexes = ({ document }: IndexesProps): ReactElement => {
     : null;
 
   return (
-    <Card className={styles.indexesCard}>
+    <Card>
       <Card.Header className={styles.headerTitle}>INDEXES</Card.Header>
       <Card.Body>
         <table className={styles.fileInfoTable}>
@@ -70,7 +69,17 @@ export const Indexes = ({ document }: IndexesProps): ReactElement => {
               value={documentType?.ContractNumber ?? ''}
             />
           </Form.Group>
-          <NomenClatureInput value={documentType?.Nomenclature ?? undefined} />
+          <Form.Group>
+            <Form.Label>
+              <b>Nomenclature</b>
+            </Form.Label>
+            <Form.Control
+              readOnly
+              type="text"
+              placeholder="Nomenclature"
+              value={documentType?.Nomenclature ?? ''}
+            />
+          </Form.Group>
           <Form.Group>
             <Form.Label>
               <b>Document Group</b>

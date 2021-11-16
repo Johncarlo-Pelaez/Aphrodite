@@ -1,45 +1,42 @@
 import { ReactElement, useState, useEffect } from 'react';
 import Form from 'react-bootstrap/Form';
 import { Typeahead } from 'react-bootstrap-typeahead';
-import { Option } from 'react-bootstrap-typeahead/types/types';
-import { useNomenClatures } from 'hooks';
+import { useLookups } from 'hooks';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 
+export interface LookupOption extends Record<string, unknown> {
+  id: number;
+  label: string;
+  documentGroup?: string;
+}
+
 export interface NomenClatureInputProps {
-  value?: string;
+  value: LookupOption[];
+  onChange: (selected: LookupOption[]) => void;
 }
 
 export const NomenClatureInput = ({
   value,
+  onChange,
 }: NomenClatureInputProps): ReactElement => {
-  const [options, setOptions] = useState<Option[]>([]);
-  const [selectedNomenClature, setSelectedNomenClature] = useState<Option[]>(
-    [],
-  );
+  const [options, setOptions] = useState<LookupOption[]>([]);
 
-  const { isLoading, data: nomenClatures = [] } = useNomenClatures();
+  const { isLoading, data: lookups = [] } = useLookups();
 
   useEffect(
     function populateNomenClatureOptions() {
       setOptions(
-        nomenClatures.map((n) => {
+        lookups.map((l) => {
           return {
-            id: n.id,
-            label: n.description,
+            id: l.id,
+            label: l.nomenClature,
+            documentGroup: l.documentGroup,
           };
         }),
       );
     },
     // eslint-disable-next-line
-    [nomenClatures],
-  );
-
-  useEffect(
-    function setDefaultNomenClature() {
-      if (value) setSelectedNomenClature([{ id: Math.random(), label: value }]);
-    },
-    // eslint-disable-next-line
-    [value],
+    [lookups],
   );
 
   return (
@@ -50,12 +47,17 @@ export const NomenClatureInput = ({
       {/* 
       // @ts-ignore */}
       <Typeahead
-        disabled={!!value}
+        disabled={isLoading}
+        name="nomenclature"
+        // @ts-ignore
+        defaultSelected={[]}
         id="nomen-clature-input"
         isLoading={isLoading}
-        onChange={setSelectedNomenClature}
+        // @ts-ignore
+        onChange={onChange}
         options={options}
-        selected={selectedNomenClature}
+        // @ts-ignore
+        selected={value}
       />
     </Form.Group>
   );

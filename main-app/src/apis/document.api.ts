@@ -84,3 +84,22 @@ export const getDocumentHistoryApi = async (
   );
   return res.data;
 };
+
+export interface EncodeForm {
+  qrCode: string;
+  companyCode: string;
+  contractNumber: string;
+  nomenClature: string;
+  documentGroup: string;
+}
+
+export interface EncodeDocumentApi extends EncodeForm {
+  documentId: number;
+}
+
+export const encodeDocumentApi = async (
+  params: EncodeDocumentApi,
+): Promise<void> => {
+  const { documentId, ...rest } = params;
+  await request.put(`/api/documents/${documentId}/encode`, { ...rest });
+};

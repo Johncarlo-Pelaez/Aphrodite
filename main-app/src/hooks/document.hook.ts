@@ -15,6 +15,8 @@ import {
   uploadDocumentApiResponse,
   uploadDocumentApi,
   getDocumentHistoryApi,
+  EncodeDocumentApi,
+  encodeDocumentApi,
 } from 'apis';
 import { QueryKey } from 'utils';
 
@@ -76,6 +78,24 @@ export const useDocumentHistory = (
     () => getDocumentHistoryApi(id as number),
     {
       enabled: !!id,
+    },
+  );
+};
+
+export const useEncodeDocument = (): UseMutationResult<
+  void,
+  ApiError,
+  EncodeDocumentApi
+> => {
+  const queryClient = useQueryClient();
+  return useMutation<void, ApiError, EncodeDocumentApi>(
+    (data) => {
+      return encodeDocumentApi(data);
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(QueryKey.paginatedDocuments);
+      },
     },
   );
 };

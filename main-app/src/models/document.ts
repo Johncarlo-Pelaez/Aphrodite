@@ -1,3 +1,4 @@
+import { DocumentStatus } from 'core/enum';
 import { User } from './user';
 
 export interface Document {
@@ -6,7 +7,7 @@ export interface Document {
   documentSize: number;
   modifiedDate: string;
   description: string;
-  status: string;
+  status: DocumentStatus;
   qrCode: string;
   qrAt: string;
   documentType: string;
