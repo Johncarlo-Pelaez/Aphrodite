@@ -36,7 +36,7 @@ export interface DocumentType {
   Transmittal: string;
   CopyType: string;
   ProjectCode: string;
-  Tower_Phase: string;
+  TowerPhase: string;
 }
 
 export interface GetDocumentTypeResult {

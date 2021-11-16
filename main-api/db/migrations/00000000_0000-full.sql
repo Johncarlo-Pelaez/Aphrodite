@@ -1,4 +1,4 @@
-/****** Object:  Table [dbo].[document]    Script Date: 11/15/2021 2:34:04 PM ******/
+/****** Object:  Table [dbo].[document]    Script Date: 11/16/2021 6:39:42 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -23,13 +23,19 @@ CREATE TABLE [dbo].[document](
 	[docTypeReqParams] [nvarchar](max) NULL,
 	[contractDetailsReqParams] [nvarchar](max) NULL,
 	[springReqParams] [nvarchar](max) NULL,
+	[documentDate] [datetime] NULL,
+	[encoder] [int] NULL,
+	[encodedAt] [datetime] NULL,
+	[checker] [int] NULL,
+	[checkedAt] [datetime] NULL,
+	[approver] [int] NULL,
  CONSTRAINT [PK_document] PRIMARY KEY CLUSTERED 
 (
 	[id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[document_history]    Script Date: 11/15/2021 2:34:04 PM ******/
+/****** Object:  Table [dbo].[document_history]    Script Date: 11/16/2021 6:39:42 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -47,7 +53,7 @@ CREATE TABLE [dbo].[document_history](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[lookup]    Script Date: 11/15/2021 2:34:04 PM ******/
+/****** Object:  Table [dbo].[lookup]    Script Date: 11/16/2021 6:39:42 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -55,10 +61,10 @@ GO
 CREATE TABLE [dbo].[lookup](
 	[id] [int] IDENTITY(1,1) NOT NULL,
 	[nomenClature] [nvarchar](max) NOT NULL,
-	[documentGroup] [nvarchar](max) NULL
+	[documentGroup] [nvarchar](max) NOT NULL
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[nomen_clature]    Script Date: 11/15/2021 2:34:04 PM ******/
+/****** Object:  Table [dbo].[nomen_clature]    Script Date: 11/16/2021 6:39:42 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -68,7 +74,7 @@ CREATE TABLE [dbo].[nomen_clature](
 	[description] [nvarchar](255) NOT NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[user]    Script Date: 11/15/2021 2:34:04 PM ******/
+/****** Object:  Table [dbo].[user]    Script Date: 11/16/2021 6:39:42 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON

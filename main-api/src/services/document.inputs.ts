@@ -12,3 +12,18 @@ export interface EncodeDocument {
   documentGroup?: string;
   encodedBy: number;
 }
+
+export interface CheckerApproveDoc {
+  documentId: number;
+  documentDate: Date;
+  checkedBy: number;
+}
+
+export interface CheckerDisApproveDoc extends CheckerApproveDoc {
+  remarks: string;
+}
+
+export interface DocumentApprover {
+  documentId: number;
+  approver: number;
+}

@@ -1,7 +1,3 @@
-INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'1. Amendment to the Deed of Restriction and Design Guidelines (notarized)', NULL)
-GO
-INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'2. Amendment to the Deed of Restriction and Design Guidelines (notarized)', NULL)
-GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Acknowledgement Receipt - Safekeeping Fee', N'Ownership Documents - Buyer')
 GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Affidavit of Adjudication', N'Legal Authorization Documents')
@@ -176,15 +172,11 @@ INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Certificate of
 GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Certificate of No Tax Declaration (CNTD)', N'Ownership Documents - Developer')
 GO
-INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Certificate of No Tax Declaration/No Improvement', NULL)
-GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Certificate of Purchase (COP)', N'Payments and Billing Documents')
 GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Certificate of Registration  (COR)', N'Ownership Documents - Developer')
 GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Certificate of Registration (COR)', N'Ownership Documents - Developer')
-GO
-INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Certificate of Registration from HLURB (needed for BIR)', NULL)
 GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Certificate Of Registration� (COR)', N'Ownership Documents - Developer')
 GO
@@ -219,10 +211,6 @@ GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Contract to Sell (CTS) - Notarized', N'Sales Agreements')
 GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Contract to Sell (CTS) - Signed by Buyer', N'Sales Agreements')
-GO
-INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Copy of Articles of Inc. & By Laws', NULL)
-GO
-INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Copy of Mother Title and Tax Declaration', NULL)
 GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Corporate Buyer''s SEC General Information Sheet', N'Buyer Identification - Corporate')
 GO
@@ -300,8 +288,6 @@ INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Credit Life In
 GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Credit Waiver/ Exception/ Non-submission/ Late submission', N'Credit Documents')
 GO
-INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Current CTC (cedula) of the SELLER', NULL)
-GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Death Certificate', N'Legal Authorization Documents')
 GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Deed of Absolute Sale (DOAS) - Notarized', N'Sales Agreements')
@@ -319,8 +305,6 @@ GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Deed of Assignment with Special Power of Attorney', N'Pag-IBIG Financing Documents')
 GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Deed of Cancellation (DOC) - Notarized', N'Sales Agreements')
-GO
-INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Deed of Restriction and Design Guidelines (notarized)', NULL)
 GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Deed of Undertaking on REM Conversion', N'Pag-IBIG Financing Documents')
 GO
@@ -416,13 +400,9 @@ INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Final Collecti
 GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Final Reservation Agreement (FRA)', N'Sales Agreements')
 GO
-INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Financial Statement', NULL)
-GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'First Notice - UDOAS', N'Documentary Compliance Tracking')
 GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'First Recovery Letter - Buyer Deficiencies DOAS', N'Documentary Compliance Tracking')
-GO
-INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Floor Plan', NULL)
 GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Forfeiture Letter', N'Payments and Billing Documents')
 GO
@@ -434,19 +414,9 @@ INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'I.T. FEE CHECK
 GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Incident Report - Correction/Discrepancy for TD', N'Legal Authorization Documents')
 GO
-INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Individual House Plan', NULL)
-GO
-INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Individual Lot Plan', NULL)
-GO
-INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Individual Technical Descriptions', NULL)
-GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Insurance Claims Documents', N'Insurances')
 GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Joint & Solidary Undertaking', N'Legal Authorization Documents')
-GO
-INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Joint Venture Agreement of Seller (If project is with JV)', NULL)
-GO
-INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Latest RPT covering the property', NULL)
 GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Letter confirmation on signature of AIF', N'Sales Agreements')
 GO
@@ -481,8 +451,6 @@ GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Letter of Endorsement (LOE)', N'Bank Financing Documents')
 GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'License To Sell (LTS)', N'Ownership Documents - Developer')
-GO
-INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'License to Sell from HLURB (needed for BIR)', NULL)
 GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Loan Difference (LD) Clearance', N'Payments and Billing Documents')
 GO
@@ -547,8 +515,6 @@ GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Original (Owner''s Duplicate Certificate) TCT/CCT', N'Ownership Documents - Developer')
 GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Parking Acceptance', N'Turnover and Construction-related Documents')
-GO
-INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Parking Layout', NULL)
 GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Passport Date of Entry/Exit', N'Buyer Identification - Individual')
 GO
@@ -1036,8 +1002,6 @@ INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Second Notice 
 GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Second Recovery Letter - Buyer Deficiencies DOAS', N'Documentary Compliance Tracking')
 GO
-INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Secretary Certificate (Board Resolution) on signatory for CTS & DOS', NULL)
-GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Seller''s Discount Application Form (SDAF)', N'Sales Agreements')
 GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Share Certificate under Buyer''s Name (SC-B)', N'Ownership Documents - Buyer')
@@ -1080,10 +1044,6 @@ INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Tax Clearance 
 GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Tax Clearance for Buyer or Dev. - Lot', N'Transfer Related Payment Documents')
 GO
-INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'TIN and any Government Issued ID of the signatories', NULL)
-GO
-INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'TIN of the SELLER', NULL)
-GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Transfer Tax Receipt (TTR)', N'Transfer Related Payment Documents')
 GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Transmittal of Tax Payments Received by HDMF', N'Pag-IBIG Financing Documents')
@@ -1094,15 +1054,11 @@ INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Trust Agreemen
 GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Trust Receipt', N'Pag-IBIG Financing Documents')
 GO
-INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Turnover/Delivery Date (per house)', NULL)
-GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Unilateral Deed of Absolute Sale (UDOAS) - Notarized', N'Sales Agreements')
 GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Unilateral Notice of Cancellation (UNOC)', N'Payments and Billing Documents')
 GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Unit & Lot Acceptance', N'Turnover and Construction-related Documents')
-GO
-INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Unit Finishes / Specification of the Unit', NULL)
 GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Unit/Subdivided Tax Declaration under Buyer''s Name - Building (TD-BB)', N'Ownership Documents - Buyer')
 GO
@@ -1149,8 +1105,6 @@ GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Valid ID/Proof of Identification of Principal Buyer', N'Buyer Identification - Individual')
 GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Valid ID/Proof of Identification of Spouse', N'Buyer Identification - Individual')
-GO
-INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Vicinity Map/Subdivision Plan', NULL)
 GO
 INSERT [dbo].[lookup] ([nomenClature], [documentGroup]) VALUES (N'Waiver of CGT and DST', N'Legal Authorization Documents')
 GO

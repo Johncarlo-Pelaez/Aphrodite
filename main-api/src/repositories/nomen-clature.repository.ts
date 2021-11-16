@@ -20,9 +20,9 @@ export class NomenClatureRepository {
   }
 
   async checkNomenClatureIfExist(description: string): Promise<boolean> {
-    return await !!this.manager.findOne(NomenClature, {
+    return !!(await this.manager.findOne(NomenClature, {
       where: { description: ILike(`%${description}%`) },
-    });
+    }));
   }
 
   async createNomenClature({

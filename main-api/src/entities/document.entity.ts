@@ -80,7 +80,31 @@ export class Document {
   springReqParams?: string;
 
   @ApiProperty()
-  @Column()
+  @Column({ nullable: true })
+  documentDate?: Date;
+
+  @ApiProperty()
+  @Column({ nullable: true })
+  encoder?: number;
+
+  @ApiProperty()
+  @Column({ nullable: true })
+  encodedAt?: Date;
+
+  @ApiProperty()
+  @Column({ nullable: true })
+  checker?: number;
+
+  @ApiProperty()
+  @Column({ nullable: true })
+  checkedAt?: Date;
+
+  @ApiProperty()
+  @Column({ nullable: true })
+  approver?: number;
+
+  @ApiProperty()
+  @Column({ nullable: true })
   userId: number;
 
   @ApiProperty()

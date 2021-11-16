@@ -12,11 +12,14 @@ import {
   SalesForceService,
   GetContractDetailsResult,
   GetDocumentTypeResult,
-  DocumentType,
-  ContractDetail,
 } from 'src/sales-force-service';
-import { UploadDocuments, EncodeDocument } from './document.inputs';
-import e from 'express';
+import {
+  UploadDocuments,
+  EncodeDocument,
+  CheckerApproveDoc,
+  CheckerDisApproveDoc,
+  DocumentApprover,
+} from './document.inputs';
 const { readFile, writeFile } = fs.promises;
 
 @Injectable()
@@ -77,11 +80,11 @@ export class DocumentService {
     let dateRightNow = this.datesUtil.getDateNow();
 
     if (qrCode && qrCode !== '' && qrCode !== document.qrCode) {
-      await this.documentRepository.qrDocument({
+      await this.documentRepository.encodeQrBarcode({
         documentId,
-        qrCode,
-        qrAt: dateRightNow,
-        modifiedBy: encodedBy,
+        qrBarCode: qrCode,
+        encodedAt: dateRightNow,
+        encodedBy,
       });
     } else {
       const getContractDetailsReqParams = {
@@ -121,7 +124,7 @@ export class DocumentService {
           CompanyCode: contractDetail?.CompanyCode,
           Brand: contractDetail?.Brand,
           ProjectCode: contractDetail?.ProjectCode,
-          Tower_Phase: contractDetail?.Tower_Phase,
+          TowerPhase: contractDetail?.Tower_Phase,
           CustomerCode: contractDetail?.CustomerCode,
           UnitDetails: contractDetail?.UnitDescription,
           AccountName: contractDetail?.CustomerName,
@@ -132,15 +135,59 @@ export class DocumentService {
       ];
 
       dateRightNow = this.datesUtil.getDateNow();
-      await this.documentRepository.doneIndexing({
+      await this.documentRepository.encodeAccountDetails({
         documentId,
         documentType: JSON.stringify(getDocTypeReqResult),
         contractDetails: JSON.stringify(getContractDetailsResult),
         contractDetailsReqParams: JSON.stringify(getContractDetailsReqParams),
-        indexedAt: dateRightNow,
+        encodedAt: dateRightNow,
+        encodedBy,
       });
     }
 
     await this.documentProducer.migrate(documentId);
+  }
+
+  async checkerApproveDoc(data: CheckerApproveDoc): Promise<void> {
+    const { documentId, documentDate, checkedBy } = data;
+    await this.documentRepository.checkerApproveDoc({
+      documentId,
+      documentDate,
+      checkedBy,
+      checkedAt: this.datesUtil.getDateNow(),
+    });
+
+    await this.documentProducer.migrate(documentId);
+  }
+
+  async checkerDisapproveDoc(data: CheckerDisApproveDoc): Promise<void> {
+    const { documentId, documentDate, checkedBy, remarks } = data;
+    await this.documentRepository.checkerDisapproveDoc({
+      documentId,
+      documentDate,
+      remarks,
+      checkedBy,
+      checkedAt: this.datesUtil.getDateNow(),
+    });
+  }
+
+  async approverApproveDoc(data: DocumentApprover): Promise<void> {
+    const { documentId, approver } = data;
+    await this.documentRepository.approverApproveDoc({
+      documentId,
+      approver,
+      modifiedAt: this.datesUtil.getDateNow(),
+    });
+
+    await this.documentProducer.migrate(documentId);
+  }
+
+  async approverDisapproveDoc(data: DocumentApprover): Promise<void> {
+    const { documentId, approver } = data;
+    await this.documentRepository.approverDispproveDoc({
+      documentId,
+      approver,
+      modifiedAt: this.datesUtil.getDateNow(),
+    });
   }
 }

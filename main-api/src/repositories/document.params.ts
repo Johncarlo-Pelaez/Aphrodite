@@ -57,3 +57,36 @@ export interface FailDocMigrateParam extends FailDocProcessParam {
   springReqParams: string;
   springResponse?: string;
 }
+
+export interface EncodeQrBarcodeParams {
+  documentId: number;
+  qrBarCode: string;
+  encodedAt: Date;
+  encodedBy: number;
+}
+
+export interface EncodeAccountDetailsParams {
+  documentId: number;
+  documentType: string;
+  contractDetails: string;
+  contractDetailsReqParams: string;
+  encodedAt: Date;
+  encodedBy: number;
+}
+
+export interface CheckerApproveDocParam {
+  documentId: number;
+  documentDate: Date;
+  checkedAt: Date;
+  checkedBy: number;
+}
+
+export interface CheckerDispproveDocParam extends CheckerApproveDocParam {
+  remarks: string;
+}
+
+export interface ApproverApproveDisapproveDocParam {
+  documentId: number;
+  approver: number;
+  modifiedAt: Date;
+}

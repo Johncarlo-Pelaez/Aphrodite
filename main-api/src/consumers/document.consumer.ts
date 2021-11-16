@@ -106,6 +106,11 @@ export class DocumentConsumer {
         documentType.Nomenclature,
       );
 
+    if (isWhiteListed && status !== DocumentStatus.APPROVED) {
+      await this.updateForChecking(documentId);
+      return;
+    }
+
     if (!isWhiteListed || status === DocumentStatus.APPROVED) {
       const empty = '';
       const uploadParams = {
@@ -113,7 +118,7 @@ export class DocumentConsumer {
         CompanyCode: documentType?.CompanyCode ?? empty,
         ContractNo: documentType?.ContractNumber ?? empty,
         ProjectCode: documentType?.ProjectCode ?? empty,
-        Tower_Phase: documentType?.Tower_Phase ?? empty,
+        Tower_Phase: documentType?.TowerPhase ?? empty,
         CustomerCode: documentType?.CustomerCode ?? empty,
         ProjectName: documentType?.ProjectName ?? empty,
         CustomerName:
@@ -132,7 +137,9 @@ export class DocumentConsumer {
           document.documentName,
         )}`,
         MIMEType: document.mimeType,
-        DocumentDate: empty,
+        DocumentDate: document.documentDate
+          ? this.datesUtil.formatDate(document.documentDate, 'MMDDYYYY')
+          : empty,
         ExternalSourceUserID: document.user.email.split('@')[0],
         SourceSystem: 'RIS',
         DataCapDocSource: 'RIS',
@@ -142,17 +149,7 @@ export class DocumentConsumer {
         B64Attachment: buffer.toString('base64'),
       };
 
-      try {
-        await this.runUploadToSpringCM(documentId, uploadParams);
-      } catch (error) {
-        await this.updateToQrFailed(error, documentId);
-        throw error;
-      }
-    }
-
-    if (isWhiteListed && status !== DocumentStatus.APPROVED) {
-      await this.updateForChecking(documentId);
-      return;
+      await this.runUploadToSpringCM(documentId, uploadParams);
     }
   }
 
