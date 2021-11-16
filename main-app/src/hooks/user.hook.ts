@@ -3,6 +3,8 @@ import {
   createUserApi,
   checkEmailExistsApi,
   CreateUserApi,
+  UpdateUserIdentityApi,
+  updateUserApi,
 } from 'apis';
 import {
   useQuery,
@@ -29,6 +31,24 @@ export const useCreateUser = (): UseMutationResult<
   return useMutation<void, ApiError, CreateUserApi>(
     (data) => {
       return createUserApi(data);
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(QueryKey.users);
+      },
+    },
+  );
+};
+
+export const useUpdateUser = (): UseMutationResult<
+  void,
+  ApiError,
+  UpdateUserIdentityApi
+> => {
+  const queryClient = useQueryClient();
+  return useMutation<void, ApiError, UpdateUserIdentityApi>(
+    (data) => {
+      return updateUserApi(data);
     },
     {
       onSuccess: () => {
