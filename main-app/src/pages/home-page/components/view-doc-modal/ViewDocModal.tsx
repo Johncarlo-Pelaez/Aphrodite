@@ -10,7 +10,7 @@ import { useDocument, useEncodeDocument } from 'hooks';
 import { PdfViewer } from 'core/ui';
 import { DocumentStatus } from 'core/enum';
 import {
-  Indexes,
+  IndexesForm,
   FileProperties,
   DocHistoryTable,
   EncodeForm,
@@ -75,7 +75,7 @@ export const ViewDocModal = ({
           </>
         );
       default:
-        return <Indexes document={document} />;
+        return <IndexesForm document={document} />;
     }
   };
 
