@@ -74,37 +74,47 @@ export const ViewDocModal = ({
     }
   };
 
-  const handleEncodeSubmit: SubmitHandler<IEncodeFormValues> = (data) => {
-    console.log(data);
+  const handleEncodeSubmit: SubmitHandler<IEncodeFormValues> = async (
+    data,
+  ): Promise<void> => {
+    const {
+      qrBarCode,
+      companyCode,
+      contractNumber,
+      nomenclature,
+      documentGroup,
+    } = data;
 
-    // if (!nomenClature.length || nomenClature.length < 1) {
-    //   alert('Nomenclature is required.');
-    //   return;
-    // }
-    // if (
-    //   (!qrBarCode || qrBarCode === '') &&
-    //   (!companyCode ||
-    //     companyCode === '' ||
-    //     !contractNumber ||
-    //     contractNumber === '')
-    // ) {
-    //   alert(
-    //     'QR/ Barcode and Company code & Contract number cannot be both empty. Please provide value for either QR/ Barcode or Company Code & Contract Number.',
-    //   );
-    //   return;
-    // }
-    // const { label, documentGroup } = nomenClature[0];
-    // if (!isEncodeDocSaving && document) {
-    //   await encodeDocumentAsync({
-    //     documentId: document.id,
-    //     qrCode: qrBarCode,
-    //     companyCode,
-    //     contractNumber,
-    //     nomenClature: label,
-    //     documentGroup: documentGroup ?? '',
-    //   });
-    //   alert('Encode Saved.');
-    // }
+    if (!nomenclature.length || nomenclature.length < 1) {
+      alert('Nomenclature is required.');
+      return;
+    }
+
+    if (
+      (!qrBarCode || qrBarCode === '') &&
+      (!companyCode ||
+        companyCode === '' ||
+        !contractNumber ||
+        contractNumber === '')
+    ) {
+      alert(
+        'QR/ Barcode and Company code & Contract number cannot be both empty. Please provide value for either QR/ Barcode or Company Code & Contract Number.',
+      );
+      return;
+    }
+
+    const { label } = nomenclature[0];
+    if (!isEncodeDocSaving && document) {
+      await encodeDocumentAsync({
+        documentId: document.id,
+        qrCode: qrBarCode,
+        companyCode,
+        contractNumber,
+        nomenClature: label,
+        documentGroup,
+      });
+      alert('Encode Saved.');
+    }
   };
 
   const closeModal = (): void => {
