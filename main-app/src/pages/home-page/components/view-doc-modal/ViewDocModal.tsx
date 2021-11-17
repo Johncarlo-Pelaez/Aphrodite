@@ -46,8 +46,13 @@ export const ViewDocModal = ({
     reset: resetEncodeDocument,
   } = useEncodeDocument();
 
-  const { watch, handleSubmit, control, setValue } =
-    useForm<IEncodeFormValues>();
+  const {
+    control,
+    watch,
+    reset: resetForm,
+    handleSubmit,
+    setValue,
+  } = useForm<IEncodeFormValues>();
 
   const isEncode = document?.status === DocumentStatus.FOR_MANUAL_ENCODE;
   const nomenclature = watch('nomenclature');
@@ -118,6 +123,14 @@ export const ViewDocModal = ({
   };
 
   const closeModal = (): void => {
+    resetForm({
+      qrBarCode: '',
+      companyCode: '',
+      contractNumber: '',
+      nomenclature: [],
+      documentGroup: '',
+    });
+    resetEncodeDocument();
     onClose();
   };
 
@@ -128,7 +141,11 @@ export const ViewDocModal = ({
         : '';
 
     setValue('documentGroup', documentGroup);
-  }, [nomenclature]);
+  }, [nomenclature, setValue]);
+
+  useEffect(() => {
+    setValue('qrBarCode', document?.qrCode ?? '');
+  }, [document?.qrCode, setValue]);
 
   return (
     <Modal
