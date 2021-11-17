@@ -2,6 +2,7 @@ import { ReactElement, useState, useEffect } from 'react';
 import BTable from 'react-bootstrap/Table';
 import Alert from 'react-bootstrap/Alert';
 import Spinner from 'react-bootstrap/Spinner';
+import Form from 'react-bootstrap/Form';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faSort,
@@ -28,6 +29,7 @@ export const Table = <T extends Record<string, any> = {}>(
     isError,
     columns,
     data,
+    rowSelection,
     pagination,
     searchKey,
     selectedRow,
@@ -42,17 +44,50 @@ export const Table = <T extends Record<string, any> = {}>(
     undefined,
   ];
 
+  const getRowKey = (rowData: T): React.Key | undefined => {
+    if (typeof rowKey === 'function') return rowKey(rowData);
+    else if (typeof rowKey === 'string') return rowData[rowKey];
+    else return undefined;
+  };
+
   const showRowHighlight = (rowData: T): string => {
-    if (typeof rowKey === 'function' && selectedRow) {
-      return rowKey(rowData) === rowKey(selectedRow) ? 'highlight-row' : '';
-    } else if (typeof rowKey === 'string' && selectedRow) {
-      return rowData[rowKey] === selectedRow[rowKey] ? 'highlight-row' : '';
-    } else return '';
+    return getRowKey(rowData) === (selectedRow && getRowKey(selectedRow))
+      ? 'highlight-row'
+      : '';
   };
 
   const setSelectedRow = (rowData: T): void => {
-    if (onSelectRow && typeof onSelectRow === 'function')
-      onSelectRow(selectedRow?.id === rowData.id ? undefined : rowData);
+    if (onSelectRow && typeof onSelectRow === 'function') onSelectRow(rowData);
+  };
+
+  const handleRowSelectionChange = (checked: boolean, rowData: T): void => {
+    if (rowSelection) {
+      const { onChange: onRowsChange, selectedRowKeys } = rowSelection;
+      let newSelectedRowKey: React.Key | undefined = getRowKey(rowData),
+        newSelectedRows: T[],
+        newSelectedRowKeys: React.Key[];
+
+      if (!newSelectedRowKey) return;
+
+      const currentSelectedRows = dataList.filter((row) =>
+        selectedRowKeys.some((key) => key === getRowKey(row)),
+      );
+
+      if (checked) {
+        newSelectedRowKeys = [...selectedRowKeys, newSelectedRowKey];
+        newSelectedRows = [...currentSelectedRows, rowData];
+      } else {
+        newSelectedRowKeys = selectedRowKeys.filter(
+          (key) => key !== newSelectedRowKey,
+        );
+        newSelectedRows = currentSelectedRows.filter(
+          (row) => getRowKey(row) !== newSelectedRowKey,
+        );
+      }
+
+      if (onRowsChange && typeof onRowsChange === 'function')
+        onRowsChange(newSelectedRowKeys, newSelectedRows);
+    }
   };
 
   const triggerOnChange = (sorter?: SorterResult): void => {
@@ -115,6 +150,13 @@ export const Table = <T extends Record<string, any> = {}>(
     });
   };
 
+  const isRowSelected = (rowData: T): boolean => {
+    return (
+      rowSelection?.selectedRowKeys.some((key) => key === getRowKey(rowData)) ??
+      false
+    );
+  };
+
   const renderTable = (): ReactElement => {
     if (loading)
       return (
@@ -141,17 +183,32 @@ export const Table = <T extends Record<string, any> = {}>(
       <div className="table-container">
         <BTable className="b-table" borderless hover>
           <thead>
-            <tr>{renderTableColumns()}</tr>
+            <tr>
+              {rowSelection && <th>{''}</th>}
+              {renderTableColumns()}
+            </tr>
           </thead>
           <tbody>
             {dataList.map((data, index) => (
               <tr
-                key={index}
+                key={`row-${index}`}
                 className={showRowHighlight(data)}
                 onClick={() => setSelectedRow(data)}
               >
+                {rowSelection && (
+                  <td key={`selection-column-${index}`}>
+                    <Form.Check
+                      onChange={(event) =>
+                        handleRowSelectionChange(event.target.checked, data)
+                      }
+                      key={`selection-${index}`}
+                      type={rowSelection?.type ?? 'checkbox'}
+                      checked={isRowSelected(data)}
+                    />
+                  </td>
+                )}
                 {columns.map(({ dataIndex, render }, index) => (
-                  <td key={index}>
+                  <td key={`column-${index}`}>
                     {typeof render === 'function'
                       ? render(data)
                       : (dataIndex && data && data[dataIndex]) || ''}

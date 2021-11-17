@@ -1,27 +1,35 @@
 import { ReactElement, useState, useEffect } from 'react';
+import { useController, Control } from 'react-hook-form';
 import Form from 'react-bootstrap/Form';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { useLookups } from 'hooks';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
+import { IEncodeFormValues } from '../../EncodeForm';
 
 export interface LookupOption extends Record<string, unknown> {
   id: number;
   label: string;
-  documentGroup?: string;
+  documentGroup: string;
 }
 
-export interface NomenClatureInputProps {
-  value: LookupOption[];
-  onChange: (selected: LookupOption[]) => void;
+export interface NomenclatureFieldProps {
+  control: Control<IEncodeFormValues>;
 }
 
-export const NomenClatureInput = ({
-  value,
-  onChange,
-}: NomenClatureInputProps): ReactElement => {
+export const NomenclatureField = ({
+  control,
+}: NomenclatureFieldProps): ReactElement => {
   const [options, setOptions] = useState<LookupOption[]>([]);
-
   const { isLoading, data: lookups = [] } = useLookups();
+
+  const {
+    field: { onChange, value, ref },
+    fieldState: { error },
+  } = useController({
+    control,
+    name: 'nomenclature',
+    rules: { required: true },
+  });
 
   useEffect(
     function populateNomenClatureOptions() {
@@ -47,20 +55,25 @@ export const NomenClatureInput = ({
       {/* 
       // @ts-ignore */}
       <Typeahead
+        ref={ref}
+        id="nomen-clature-field"
         disabled={isLoading}
-        name="nomenclature"
         // @ts-ignore
         defaultSelected={[]}
-        id="nomen-clature-input"
         isLoading={isLoading}
         // @ts-ignore
         onChange={onChange}
         options={options}
         // @ts-ignore
-        selected={value}
+        selected={value ?? []}
+        isInvalid={!!error}
+        clearButton
       />
+      <Form.Control.Feedback type="invalid">
+        {error?.type === 'required' && 'Nomenclature is required.'}
+      </Form.Control.Feedback>
     </Form.Group>
   );
 };
 
-export default NomenClatureInput;
+export default NomenclatureField;

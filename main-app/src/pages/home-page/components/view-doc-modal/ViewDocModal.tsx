@@ -1,4 +1,5 @@
 import { ReactElement, useState, useEffect } from 'react';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Spinner from 'react-bootstrap/Spinner';
@@ -14,8 +15,8 @@ import {
   DocHistoryTable,
   EncodeForm,
 } from './components';
+import { IEncodeFormValues } from './components/encode-form';
 import styles from './ViewDocModal.module.scss';
-import { LookupOption } from './components/encode-form/components/nomen-clature-input';
 
 export interface ViewDocModalProps {
   documentId?: number;
@@ -35,10 +36,6 @@ export const ViewDocModal = ({
   onClose,
 }: ViewDocModalProps): ReactElement => {
   const [key, setKey] = useState<TabKey>(TabKey.File);
-  const [nomenClature, setNomenClature] = useState<LookupOption[]>([]);
-  const [qrBarCode, setQrBarCode] = useState<string>('');
-  const [companyCode, setCompanyCode] = useState<string>('');
-  const [contractNumber, setContractNumber] = useState<string>('');
   const { isLoading: isDocsLoading, data: document } = useDocument(
     isVisible ? documentId : undefined,
   );
@@ -48,8 +45,12 @@ export const ViewDocModal = ({
     mutateAsync: encodeDocumentAsync,
     reset: resetEncodeDocument,
   } = useEncodeDocument();
-  const qrCode = document?.qrCode || '';
+
+  const { watch, handleSubmit, control, setValue } =
+    useForm<IEncodeFormValues>();
+
   const isEncode = document?.status === DocumentStatus.FOR_MANUAL_ENCODE;
+  const nomenclature = watch('nomenclature');
 
   const spinner: ReactElement = (
     <div className="d-flex justify-content-center align-items-center w-100 h-100">
@@ -63,19 +64,9 @@ export const ViewDocModal = ({
         return (
           <>
             <Alert variant="danger" show={hasEncodeSaveError}>
-              Failed to Encode.
+              Failed to encode.
             </Alert>
-            <EncodeForm
-              document={document}
-              qrBarCode={qrBarCode}
-              setQRBarCode={setQrBarCode}
-              companyCode={companyCode}
-              setCompanyCode={setCompanyCode}
-              contractNumber={contractNumber}
-              setContractNumber={setContractNumber}
-              nomenClature={nomenClature}
-              setNomenClature={setNomenClature}
-            />
+            <EncodeForm control={control} document={document} />
           </>
         );
       default:
@@ -83,51 +74,51 @@ export const ViewDocModal = ({
     }
   };
 
-  const encodeSubmit = async (): Promise<void> => {
-    if (!documentId) return;
+  const handleEncodeSubmit: SubmitHandler<IEncodeFormValues> = (data) => {
+    console.log(data);
 
-    if (!nomenClature.length || nomenClature.length < 1) {
-      alert('Nomenclature is required.');
-      return;
-    }
-
-    if (
-      (!qrBarCode || qrBarCode === '') &&
-      (!companyCode ||
-        companyCode === '' ||
-        !contractNumber ||
-        contractNumber === '')
-    ) {
-      alert(
-        'QR/ Barcode and Company code & Contract number cannot be both empty. Please provide value for either QR/ Barcode or Company Code & Contract Number.',
-      );
-      return;
-    }
-
-    const { label, documentGroup } = nomenClature[0];
-
-    if (!isEncodeDocSaving) {
-      await encodeDocumentAsync({
-        documentId,
-        qrCode: qrBarCode,
-        companyCode,
-        contractNumber,
-        nomenClature: label,
-        documentGroup: documentGroup ?? '',
-      });
-      alert('Encode Saved.');
-      closeModal();
-    }
+    // if (!nomenClature.length || nomenClature.length < 1) {
+    //   alert('Nomenclature is required.');
+    //   return;
+    // }
+    // if (
+    //   (!qrBarCode || qrBarCode === '') &&
+    //   (!companyCode ||
+    //     companyCode === '' ||
+    //     !contractNumber ||
+    //     contractNumber === '')
+    // ) {
+    //   alert(
+    //     'QR/ Barcode and Company code & Contract number cannot be both empty. Please provide value for either QR/ Barcode or Company Code & Contract Number.',
+    //   );
+    //   return;
+    // }
+    // const { label, documentGroup } = nomenClature[0];
+    // if (!isEncodeDocSaving && document) {
+    //   await encodeDocumentAsync({
+    //     documentId: document.id,
+    //     qrCode: qrBarCode,
+    //     companyCode,
+    //     contractNumber,
+    //     nomenClature: label,
+    //     documentGroup: documentGroup ?? '',
+    //   });
+    //   alert('Encode Saved.');
+    // }
   };
 
   const closeModal = (): void => {
-    resetEncodeDocument();
     onClose();
   };
 
   useEffect(() => {
-    setQrBarCode(qrCode);
-  }, [qrCode]);
+    const documentGroup =
+      nomenclature && !!nomenclature.length
+        ? nomenclature[0].documentGroup
+        : '';
+
+    setValue('documentGroup', documentGroup);
+  }, [nomenclature]);
 
   return (
     <Modal
@@ -175,7 +166,11 @@ export const ViewDocModal = ({
         <Button variant="outline-danger" onClick={closeModal}>
           Close
         </Button>
-        <Button hidden={!isEncode} variant="dark" onClick={encodeSubmit}>
+        <Button
+          hidden={!isEncode}
+          variant="dark"
+          onClick={handleSubmit(handleEncodeSubmit)}
+        >
           Save
         </Button>
       </Modal.Footer>

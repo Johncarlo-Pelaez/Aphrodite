@@ -1,42 +1,36 @@
 import { ReactElement } from 'react';
+import { Control } from 'react-hook-form';
 import fileSize from 'filesize';
 import Card from 'react-bootstrap/Card';
 import Form from 'react-bootstrap/Form';
 import { Document } from 'models';
 import styles from './EncodeForm.module.css';
-import { NomenClatureInput } from './components';
-import { LookupOption } from './components/nomen-clature-input';
+import {
+  NomenclatureField,
+  QRBarcodeField,
+  ContractNumberFiled,
+  CompanyCodeField,
+  DocumentGroupField,
+} from './components';
+import { LookupOption } from './components/nomen-clature-field';
 
 export interface EncodeFormProps {
   document?: Document;
-  qrBarCode: string;
-  setQRBarCode: (value: string) => void;
-  companyCode: string;
-  setCompanyCode: (value: string) => void;
-  contractNumber: string;
-  setContractNumber: (value: string) => void;
-  nomenClature: LookupOption[];
-  setNomenClature: (selected: LookupOption[]) => void;
+  control: Control<IEncodeFormValues>;
 }
 
-export const EncodeForm = (props: EncodeFormProps): ReactElement => {
-  const {
-    document,
-    qrBarCode,
-    setQRBarCode,
-    companyCode,
-    setCompanyCode,
-    contractNumber,
-    setContractNumber,
-    nomenClature,
-    setNomenClature,
-  } = props;
+export interface IEncodeFormValues {
+  qrBarCode: string;
+  companyCode: string;
+  contractNumber: string;
+  nomenclature: LookupOption[];
+  documentGroup: string;
+}
 
-  const documentGroup =
-    !!nomenClature.length && nomenClature.length > 0
-      ? nomenClature[0].documentGroup
-      : '';
-
+export const EncodeForm = ({
+  document,
+  control,
+}: EncodeFormProps): ReactElement => {
   return (
     <Card>
       <Card.Header className={styles.headerTitle}>
@@ -61,52 +55,12 @@ export const EncodeForm = (props: EncodeFormProps): ReactElement => {
         </table>
         <hr />
         <Form>
-          <Form.Group className="mb-3">
-            <Form.Label>
-              <b>Barcode / QR Code</b>
-            </Form.Label>
-            <Form.Control
-              name="qrBarCode"
-              placeholder="Barcode / QR Code"
-              onChange={(event) => setQRBarCode(event.target.value)}
-              value={qrBarCode}
-            />
-          </Form.Group>
+          <QRBarcodeField control={control} />
           <h6 className="text-center">OR</h6>
-          <Form.Group className="mb-3">
-            <Form.Label>
-              <b>Company Code</b>
-            </Form.Label>
-            <Form.Control
-              name="companyCode"
-              placeholder="Company Code"
-              onChange={(event) => setCompanyCode(event.target.value)}
-              value={companyCode}
-            />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>
-              <b>Contract Number</b>
-            </Form.Label>
-            <Form.Control
-              name="contractNumber"
-              placeholder="Contract Number"
-              onChange={(event) => setContractNumber(event.target.value)}
-              value={contractNumber}
-            />
-          </Form.Group>
-          <NomenClatureInput value={nomenClature} onChange={setNomenClature} />
-          <Form.Group className="mb-3">
-            <Form.Label>
-              <b>Document Group</b>
-            </Form.Label>
-            <Form.Control
-              readOnly
-              name="documentGroup"
-              placeholder="Document Group"
-              value={documentGroup || ''}
-            />
-          </Form.Group>
+          <CompanyCodeField control={control} />
+          <ContractNumberFiled control={control} />
+          <NomenclatureField control={control} />
+          <DocumentGroupField control={control} />
         </Form>
       </Card.Body>
     </Card>

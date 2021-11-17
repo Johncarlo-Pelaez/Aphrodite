@@ -17,10 +17,17 @@ export interface TablePaginationConfig {
   onSizeChange: (pageSize: number) => void;
 }
 
-export type SorterResult = {
+export interface SorterResult {
   field: string;
   order: OrderDirection;
-};
+}
+
+export declare type RowSelectionType = 'checkbox' | 'radio';
+export interface RowSelection<T> {
+  type?: RowSelectionType;
+  selectedRowKeys: React.Key[];
+  onChange?: (selectedRowKeys: React.Key[], selectedRows: T[]) => void;
+}
 
 export interface TableProps<T> {
   isServerSide?: boolean;
@@ -29,10 +36,11 @@ export interface TableProps<T> {
   isError?: boolean;
   columns: TableColumnProps<T>[];
   data: T[];
+  rowSelection?: RowSelection<T>;
   pagination?: TablePaginationConfig;
   searchKey?: string;
   selectedRow?: T;
-  onSelectRow?: (row?: T) => void;
+  onSelectRow?: (selectedRow?: T) => void;
   onChange?: (sorter?: SorterResult) => void;
   onSearch?: (seachKey: string) => void;
 }
