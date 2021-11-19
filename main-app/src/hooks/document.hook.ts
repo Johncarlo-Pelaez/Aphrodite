@@ -17,6 +17,10 @@ import {
   getDocumentHistoryApi,
   EncodeDocumentApi,
   encodeDocumentApi,
+  checkerApproveDocApi,
+  checkerDisapproveDocApi,
+  approverApproveDocApi,
+  approverDisapproveDocApi,
 } from 'apis';
 import { QueryKey } from 'utils';
 
@@ -88,9 +92,61 @@ export const useEncodeDocument = (): UseMutationResult<
   EncodeDocumentApi
 > => {
   const queryClient = useQueryClient();
-  return useMutation<void, ApiError, EncodeDocumentApi>(
-    (data) => {
-      return encodeDocumentApi(data);
+  return useMutation<void, ApiError, EncodeDocumentApi>(encodeDocumentApi, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(QueryKey.paginatedDocuments);
+    },
+  });
+};
+
+export interface UseCheckerDocument {
+  documentId: number;
+  approve?: boolean;
+  documentDate: string;
+  remarks: string;
+}
+
+export const useCheckerDocument = (): UseMutationResult<
+  void,
+  ApiError,
+  UseCheckerDocument
+> => {
+  const queryClient = useQueryClient();
+  return useMutation<void, ApiError, UseCheckerDocument>(
+    async ({ approve = true, ...rest }) => {
+      if (approve) {
+        const { remarks, ...approveParams } = rest;
+        await checkerApproveDocApi(approveParams);
+      } else {
+        await checkerDisapproveDocApi(rest);
+      }
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(QueryKey.paginatedDocuments);
+      },
+    },
+  );
+};
+
+export interface UseApproverDocument {
+  documentId: number;
+  approve?: boolean;
+}
+
+export const useApproverDocoment = (): UseMutationResult<
+  void,
+  ApiError,
+  UseApproverDocument
+> => {
+  const queryClient = useQueryClient();
+  return useMutation<void, ApiError, UseApproverDocument>(
+    async ({ documentId, approve = true }) => {
+      if (approve) {
+        await approverApproveDocApi(documentId);
+      } else {
+        await approverDisapproveDocApi(documentId);
+      }
     },
     {
       onSuccess: () => {

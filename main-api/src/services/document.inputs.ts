@@ -15,7 +15,7 @@ export interface EncodeDocument {
 
 export interface CheckerApproveDoc {
   documentId: number;
-  documentDate: Date;
+  documentDate: string;
   checkedBy: number;
 }
 

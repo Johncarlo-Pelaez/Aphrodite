@@ -13,6 +13,7 @@ export interface Document {
   documentType: string;
   contractDetails: string;
   user: User;
+  documentDate: string;
   remarks: string;
 }
 

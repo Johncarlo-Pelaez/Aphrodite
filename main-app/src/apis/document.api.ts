@@ -85,15 +85,12 @@ export const getDocumentHistoryApi = async (
   return res.data;
 };
 
-export interface EncodeForm {
+export interface EncodeDocumentApi {
   qrCode: string;
   companyCode: string;
   contractNumber: string;
   nomenClature: string;
   documentGroup: string;
-}
-
-export interface EncodeDocumentApi extends EncodeForm {
   documentId: number;
 }
 
@@ -101,5 +98,40 @@ export const encodeDocumentApi = async (
   params: EncodeDocumentApi,
 ): Promise<void> => {
   const { documentId, ...rest } = params;
-  await request.put(`/api/documents/${documentId}/encode`, { ...rest });
+  await request.put(`/api/documents/${documentId}/encode`, rest);
+};
+
+export interface CheckerApproveDocApi {
+  documentDate: string;
+  documentId: number;
+}
+
+export const checkerApproveDocApi = async (
+  params: CheckerApproveDocApi,
+): Promise<void> => {
+  const { documentId, ...rest } = params;
+  await request.put(`/api/documents/${documentId}/checker/approve`, rest);
+};
+
+export interface CheckerDisapproveDocApi extends CheckerApproveDocApi {
+  remarks: string;
+}
+
+export const checkerDisapproveDocApi = async (
+  params: CheckerDisapproveDocApi,
+): Promise<void> => {
+  const { documentId, ...rest } = params;
+  await request.put(`/api/documents/${documentId}/checker/disapprove`, rest);
+};
+
+export const approverApproveDocApi = async (
+  documentId: number,
+): Promise<void> => {
+  await request.put(`/api/documents/${documentId}/approver/approve`);
+};
+
+export const approverDisapproveDocApi = async (
+  documentId: number,
+): Promise<void> => {
+  await request.put(`/api/documents/${documentId}/approver/disapprove`);
 };

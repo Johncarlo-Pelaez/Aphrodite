@@ -76,7 +76,7 @@ export interface EncodeAccountDetailsParams {
 
 export interface CheckerApproveDocParam {
   documentId: number;
-  documentDate: Date;
+  documentDate: string;
   checkedAt: Date;
   checkedBy: number;
 }

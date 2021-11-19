@@ -81,7 +81,7 @@ export class Document {
 
   @ApiProperty()
   @Column({ nullable: true })
-  documentDate?: Date;
+  documentDate?: string;
 
   @ApiProperty()
   @Column({ nullable: true })

@@ -4,7 +4,7 @@ import Form from 'react-bootstrap/Form';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { useLookups } from 'hooks';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
-import { IEncodeFormValues } from '../../EncodeForm';
+import { IEncoderFormValues } from '../../EncoderForm';
 
 export interface LookupOption extends Record<string, unknown> {
   id: number;
@@ -13,7 +13,7 @@ export interface LookupOption extends Record<string, unknown> {
 }
 
 export interface NomenclatureFieldProps {
-  control: Control<IEncodeFormValues>;
+  control: Control<IEncoderFormValues>;
 }
 
 export const NomenclatureField = ({
@@ -70,7 +70,7 @@ export const NomenclatureField = ({
         clearButton
       />
       <Form.Control.Feedback type="invalid">
-        {error?.type === 'required' && 'Nomenclature is required.'}
+        {error?.message}
       </Form.Control.Feedback>
     </Form.Group>
   );

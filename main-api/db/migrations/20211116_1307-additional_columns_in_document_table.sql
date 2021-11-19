@@ -10,7 +10,7 @@ COMMIT
 BEGIN TRANSACTION
 GO
 ALTER TABLE dbo.[document] ADD
-	documentDate datetime NULL,
+	documentDate nvarchar(150) NULL,
 	encoder int NULL,
 	encodedAt datetime NULL,
 	checker int NULL,

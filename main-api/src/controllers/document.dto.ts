@@ -66,7 +66,7 @@ export class EncodeDocumentDto {
 export class CheckerApproveDocDto {
   @ApiProperty()
   @IsDateString()
-  documentDate: Date;
+  documentDate: string;
 }
 
 export class CheckerDisApproveDocDto extends CheckerApproveDocDto {

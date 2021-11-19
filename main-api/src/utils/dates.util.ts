@@ -14,4 +14,8 @@ export class DatesUtil {
   formatDate(date: Date, format: string): string {
     return moment(date).format(format);
   }
+
+  formatDateString(date: string, format: string): string {
+    return moment(date).format(format);
+  }
 }

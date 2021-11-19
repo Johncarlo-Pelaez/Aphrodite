@@ -1,21 +1,20 @@
-import { ReactElement, useState, useEffect } from 'react';
-import { useForm, SubmitHandler } from 'react-hook-form';
+import { ReactElement, useState, useRef } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Spinner from 'react-bootstrap/Spinner';
-import Alert from 'react-bootstrap/Alert';
 import Tabs from 'react-bootstrap/Tabs';
 import Tab from 'react-bootstrap/Tab';
-import { useDocument, useEncodeDocument } from 'hooks';
+import { useDocument } from 'hooks';
 import { PdfViewer } from 'core/ui';
 import { DocumentStatus } from 'core/enum';
 import {
   IndexesForm,
   FileProperties,
   DocHistoryTable,
-  EncodeForm,
+  EncoderForm,
+  CheckerForm,
+  AppoverForm,
 } from './components';
-import { IEncodeFormValues } from './components/encode-form';
 import styles from './ViewDocModal.module.scss';
 
 export interface ViewDocModalProps {
@@ -36,118 +35,14 @@ export const ViewDocModal = ({
   onClose,
 }: ViewDocModalProps): ReactElement => {
   const [key, setKey] = useState<TabKey>(TabKey.File);
+  const encoderFormRef = useRef<any>(null);
+  const checkerFormRef = useRef<any>(null);
+  const approverFormRef = useRef<any>(null);
   const { isLoading: isDocsLoading, data: document } = useDocument(
     isVisible ? documentId : undefined,
   );
-  const {
-    isLoading: isEncodeDocSaving,
-    isError: hasEncodeSaveError,
-    mutateAsync: encodeDocumentAsync,
-    reset: resetEncodeDocument,
-  } = useEncodeDocument();
 
-  const {
-    control,
-    watch,
-    reset: resetForm,
-    handleSubmit,
-    setValue,
-  } = useForm<IEncodeFormValues>();
-
-  const isEncode = document?.status === DocumentStatus.FOR_MANUAL_ENCODE;
-  const nomenclature = watch('nomenclature');
-
-  const spinner: ReactElement = (
-    <div className="d-flex justify-content-center align-items-center w-100 h-100">
-      <Spinner animation="border" />
-    </div>
-  );
-
-  const renderForm = (): ReactElement => {
-    switch (document?.status) {
-      case DocumentStatus.FOR_MANUAL_ENCODE:
-        return (
-          <>
-            <Alert variant="danger" show={hasEncodeSaveError}>
-              Failed to encode.
-            </Alert>
-            <EncodeForm control={control} document={document} />
-          </>
-        );
-      default:
-        return <IndexesForm document={document} />;
-    }
-  };
-
-  const handleEncodeSubmit: SubmitHandler<IEncodeFormValues> = async (
-    data,
-  ): Promise<void> => {
-    const {
-      qrBarCode,
-      companyCode,
-      contractNumber,
-      nomenclature,
-      documentGroup,
-    } = data;
-
-    if (!nomenclature.length || nomenclature.length < 1) {
-      alert('Nomenclature is required.');
-      return;
-    }
-
-    if (
-      (!qrBarCode || qrBarCode === '') &&
-      (!companyCode ||
-        companyCode === '' ||
-        !contractNumber ||
-        contractNumber === '')
-    ) {
-      alert(
-        'QR/ Barcode and Company code & Contract number cannot be both empty. Please provide value for either QR/ Barcode or Company Code & Contract Number.',
-      );
-      return;
-    }
-
-    const { label } = nomenclature[0];
-    if (!isEncodeDocSaving && document) {
-      await encodeDocumentAsync({
-        documentId: document.id,
-        qrCode: qrBarCode,
-        companyCode,
-        contractNumber,
-        nomenClature: label,
-        documentGroup,
-      });
-      alert('Encode Saved.');
-    }
-  };
-
-  const closeModal = (): void => {
-    resetForm({
-      qrBarCode: '',
-      companyCode: '',
-      contractNumber: '',
-      nomenclature: [],
-      documentGroup: '',
-    });
-    resetEncodeDocument();
-    onClose();
-  };
-
-  useEffect(() => {
-    const documentGroup =
-      nomenclature && !!nomenclature.length
-        ? nomenclature[0].documentGroup
-        : '';
-
-    setValue('documentGroup', documentGroup);
-  }, [nomenclature, setValue]);
-
-  useEffect(() => {
-    setValue('qrBarCode', document?.qrCode ?? '');
-  }, [document?.qrCode, setValue]);
-
-  return (
+  const renderModal = (): ReactElement => (
     <Modal
       backdrop="static"
       keyboard={false}
@@ -189,20 +84,138 @@ export const ViewDocModal = ({
           </Tab>
         </Tabs>
       </Modal.Body>
-      <Modal.Footer>
-        <Button variant="outline-danger" onClick={closeModal}>
-          Close
-        </Button>
-        <Button
-          hidden={!isEncode}
-          variant="dark"
-          onClick={handleSubmit(handleEncodeSubmit)}
-        >
-          Save
-        </Button>
-      </Modal.Footer>
+      {renderModalFooter()}
     </Modal>
   );
+
+  const spinner: ReactElement = (
+    <div className="d-flex justify-content-center align-items-center w-100 h-100">
+      <Spinner animation="border" />
+    </div>
+  );
+
+  const renderForm = (): ReactElement => {
+    switch (document?.status) {
+      case DocumentStatus.FOR_MANUAL_ENCODE:
+        return (
+          <EncoderForm
+            ref={encoderFormRef}
+            document={document}
+            triggerCloseModal={onClose}
+          />
+        );
+      case DocumentStatus.FOR_CHECKING:
+        return (
+          <CheckerForm
+            ref={checkerFormRef}
+            document={document}
+            triggerCloseModal={onClose}
+          />
+        );
+      case DocumentStatus.FOR_APPROVAL:
+        return (
+          <AppoverForm
+            ref={approverFormRef}
+            document={document}
+            triggerCloseModal={onClose}
+          />
+        );
+      default:
+        return <IndexesForm document={document} />;
+    }
+  };
+
+  const renderModalFooter = (): ReactElement => {
+    let formActionButtons: ReactElement[];
+
+    switch (document?.status) {
+      case DocumentStatus.FOR_MANUAL_ENCODE:
+        formActionButtons = [
+          <Button key="btn-close" variant="outline-danger" onClick={closeModal}>
+            Close
+          </Button>,
+          <Button
+            key="btn-save"
+            variant="dark"
+            onClick={triggerEncoderFormSubmit}
+          >
+            Save
+          </Button>,
+        ];
+        break;
+      case DocumentStatus.FOR_CHECKING:
+        formActionButtons = [
+          <Button
+            key="btn-disapprove"
+            variant="outline-danger"
+            onClick={triggerCheckerFormSubmitDispprove}
+          >
+            Disapprove
+          </Button>,
+          <Button
+            key="btn-approve"
+            variant="dark"
+            onClick={triggerCheckerFormSubmitApprove}
+          >
+            Approve
+          </Button>,
+        ];
+        break;
+      case DocumentStatus.FOR_APPROVAL:
+        formActionButtons = [
+          <Button
+            key="btn-disapprove"
+            variant="outline-danger"
+            onClick={triggerApproverFormSubmitDispprove}
+          >
+            Disapprove
+          </Button>,
+          <Button
+            key="btn-approve"
+            variant="dark"
+            onClick={triggerApproverFormSubmitApprove}
+          >
+            Approve
+          </Button>,
+        ];
+        break;
+      default:
+        formActionButtons = [
+          <Button key="btn-close" variant="outline-danger" onClick={closeModal}>
+            Close
+          </Button>,
+        ];
+        break;
+    }
+
+    return <Modal.Footer>{formActionButtons}</Modal.Footer>;
+  };
+
+  const triggerEncoderFormSubmit = (): void => {
+    encoderFormRef && encoderFormRef?.current?.encodeDocument();
+  };
+
+  const triggerCheckerFormSubmitApprove = (): void => {
+    checkerFormRef && checkerFormRef?.current?.approveDocument();
+  };
+
+  const triggerCheckerFormSubmitDispprove = (): void => {
+    checkerFormRef && checkerFormRef?.current?.disapproveDocument();
+  };
+
+  const triggerApproverFormSubmitApprove = (): void => {
+    approverFormRef && approverFormRef?.current?.approveDocument();
+  };
+
+  const triggerApproverFormSubmitDispprove = (): void => {
+    approverFormRef && approverFormRef?.current?.disapproveDocument();
+  };
+
+  const closeModal = (): void => {
+    onClose();
+  };
+
+  return renderModal();
 };
 
 export default ViewDocModal;

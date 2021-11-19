@@ -138,7 +138,7 @@ export class DocumentConsumer {
         )}`,
         MIMEType: document.mimeType,
         DocumentDate: document.documentDate
-          ? this.datesUtil.formatDate(document.documentDate, 'MMDDYYYY')
+          ? this.datesUtil.formatDateString(document.documentDate, 'MMDDYYYY')
           : empty,
         ExternalSourceUserID: document.user.email.split('@')[0],
         SourceSystem: 'RIS',

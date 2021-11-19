@@ -1,11 +1,10 @@
 import { ReactElement } from 'react';
 import { useController, Control } from 'react-hook-form';
 import Form from 'react-bootstrap/Form';
-import 'react-bootstrap-typeahead/css/Typeahead.css';
-import { IEncodeFormValues } from '../../EncodeForm';
+import { IEncoderFormValues } from '../../EncoderForm';
 
 export interface DocumentGroupFieldProps {
-  control: Control<IEncodeFormValues>;
+  control: Control<IEncoderFormValues>;
 }
 
 export const DocumentGroupField = ({
@@ -35,7 +34,7 @@ export const DocumentGroupField = ({
         isInvalid={!!error}
       />
       <Form.Control.Feedback type="invalid">
-        {error?.type === 'required' && 'Document Group is required.'}
+        {error?.message}
       </Form.Control.Feedback>
     </Form.Group>
   );
