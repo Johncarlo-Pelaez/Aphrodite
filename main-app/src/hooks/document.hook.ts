@@ -21,8 +21,10 @@ import {
   checkerDisapproveDocApi,
   approverApproveDocApi,
   approverDisapproveDocApi,
+  retryDocumentsApi,
 } from 'apis';
 import { QueryKey } from 'utils';
+import { DocumentStatus } from 'core/enum';
 
 export interface UseDocuments {
   search: string;
@@ -150,6 +152,54 @@ export const useApproverDocoment = (): UseMutationResult<
     },
     {
       onSuccess: () => {
+        queryClient.invalidateQueries(QueryKey.paginatedDocuments);
+      },
+    },
+  );
+};
+
+export type UseRetryDocsContext = {
+  prevDocs?: Document[];
+};
+
+export const useRetryDocs = (): UseMutationResult<
+  void,
+  ApiError,
+  number[],
+  UseRetryDocsContext
+> => {
+  const queryClient = useQueryClient();
+  return useMutation<void, ApiError, number[], UseRetryDocsContext>(
+    retryDocumentsApi,
+    {
+      onMutate: async (documentIds) => {
+        await queryClient.cancelQueries(QueryKey.paginatedDocuments);
+        const prevDocs = queryClient.getQueryData<Document[]>(
+          QueryKey.paginatedDocuments,
+        );
+        queryClient.setQueryData<Document[]>(
+          QueryKey.paginatedDocuments,
+          (documents) =>
+            !!documents
+              ? documents.filter((d) => {
+                  if (documentIds.includes(d.id)) {
+                    d.status = DocumentStatus.RETRY;
+                  }
+                  return true;
+                })
+              : [],
+        );
+        return { prevDocs };
+      },
+      onError: (_err, _documentIds, context) => {
+        if (!!context) {
+          queryClient.setQueryData(
+            QueryKey.paginatedDocuments,
+            context.prevDocs,
+          );
+        }
+      },
+      onSettled: () => {
         queryClient.invalidateQueries(QueryKey.paginatedDocuments);
       },
     },

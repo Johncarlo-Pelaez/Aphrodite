@@ -61,6 +61,9 @@ $table-height: 50vh;
 
   & > tr {
     cursor: pointer;
+    & > th.selection-column {
+      width: 2.5rem;
+    }
   }
 }
 
@@ -69,14 +72,14 @@ $table-height: 50vh;
     cursor: pointer;
   }
 
+  & > tr.highlight-row {
+    background-color: $primary-color;
+    color: $white;
+  }
+
   & > tr.highlight-row:hover {
     & > td {
       background-color: #2286e3;
     }
   }
-}
-
-.highlight-row {
-  background-color: $primary-color;
-  color: $white;
 }

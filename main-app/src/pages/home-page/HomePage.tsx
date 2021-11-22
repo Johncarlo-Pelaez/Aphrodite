@@ -1,47 +1,65 @@
-import { useState } from 'react';
-import { Container, Button, Stack } from 'react-bootstrap';
+import { ReactElement, useState } from 'react';
+import Container from 'react-bootstrap/Container';
+import Button from 'react-bootstrap/Button';
+import Stack from 'react-bootstrap/Stack';
 import { Document } from 'models';
-import { UploadFilesModal, DocumentsTable, ViewDocModal } from './components';
+import {
+  UploadFilesModal,
+  DocumentsTable,
+  ViewDocModal,
+  ProcessDetails,
+} from './components';
 
-export const HomePage = () => {
-  const [selectedDocument, setSelectedDocument] = useState<
-    Document | undefined
-  >(undefined);
+export const HomePage = (): ReactElement => {
+  const [selectedDocuments, setSelectedDocuments] = useState<Document[]>([]);
   const [uploadModalShow, setUploadModalShow] = useState<boolean>(false);
   const [viewDocModalShow, setViewDocModalShow] = useState<boolean>(false);
+  const hasSelectedRows = !!selectedDocuments.length;
+  const selected1Doc =
+    selectedDocuments.length === 1 ? selectedDocuments[0] : undefined;
+  const hasSelected1Doc = !!selected1Doc;
 
   return (
     <Container className="my-4">
-      <h4 className="fw-normal py-3">Upload List</h4>
+      <div className="d-flex justify-content-between">
+        <h4 className="fw-normal py-3">Documents</h4>
+        <Stack className="my-2" direction="horizontal" gap={3}>
+          <Button
+            className="px-4"
+            variant="dark"
+            onClick={() => setUploadModalShow(true)}
+          >
+            Upload
+          </Button>
+          <Button className="px-4" variant="outline-dark">
+            Refresh
+          </Button>
+        </Stack>
+      </div>
+      <ProcessDetails />
       <Stack className="my-2" direction="horizontal" gap={3}>
         <Button
           className="px-4"
-          variant="dark"
-          onClick={() => setUploadModalShow(true)}
+          variant="outline-secondary"
+          disabled={!hasSelected1Doc}
+          onClick={() => setViewDocModalShow(true)}
         >
-          Upload
-        </Button>
-        <Button className="px-4" variant="secondary">
-          Filters
+          Open
         </Button>
         <Button
           className="px-4"
-          variant="light"
-          disabled={!selectedDocument}
-          onClick={() => setViewDocModalShow(true)}
+          variant="outline-dark"
+          disabled={!hasSelectedRows}
         >
-          View
-        </Button>
-        <Button className="px-4" variant="outline-dark">
           Retry
         </Button>
-        <Button className="px-4" variant="danger">
+        <Button className="px-4" variant="danger" disabled={!hasSelectedRows}>
           Delete
         </Button>
       </Stack>
       <DocumentsTable
-        selectedDoc={selectedDocument}
-        onSelectDoc={setSelectedDocument}
+        selectedDocuments={selectedDocuments}
+        setSelectedDocuments={setSelectedDocuments}
       />
       <UploadFilesModal
         isVisible={uploadModalShow}
@@ -49,7 +67,7 @@ export const HomePage = () => {
       />
       <ViewDocModal
         isVisible={viewDocModalShow}
-        documentId={selectedDocument?.id}
+        documentId={selected1Doc?.id}
         onClose={() => setViewDocModalShow(false)}
       />
     </Container>

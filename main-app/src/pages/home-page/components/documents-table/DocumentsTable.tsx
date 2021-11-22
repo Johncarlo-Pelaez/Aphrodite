@@ -11,17 +11,19 @@ import {
 } from 'core/ui/table';
 import { Document } from 'models';
 import { sortDateTime, sortText } from 'utils/sort';
-import { DocumentsTableProps } from './DocumentsTable.types';
 
 const DEFAULT_SORT_ORDER: SorterResult = {
   field: 'modifiedDate',
   order: OrderDirection.DESC,
 };
 
-export const DocumentsTable = ({
-  selectedDoc,
-  onSelectDoc,
-}: DocumentsTableProps): ReactElement => {
+export interface DocumentsTableProps {
+  selectedDocuments: Document[];
+  setSelectedDocuments: (document: Document[]) => void;
+}
+
+export const DocumentsTable = (props: DocumentsTableProps): ReactElement => {
+  const { selectedDocuments, setSelectedDocuments } = props;
   const [searchKey, setSearchKey] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(15);
@@ -39,6 +41,9 @@ export const DocumentsTable = ({
     currentPage,
     pageSize,
   });
+
+  const documents = result?.data || [];
+  const total = result?.count || 0;
 
   const renderColumns = (): TableColumnProps<Document>[] => [
     {
@@ -72,8 +77,12 @@ export const DocumentsTable = ({
     setSorter(sorterResult ?? DEFAULT_SORT_ORDER);
   };
 
-  const documents = result?.data || [];
-  const total = result?.count || 0;
+  const changeSelectedRows = (
+    selectedRowKeys: React.Key[],
+    selectedRows: Document[],
+  ) => {
+    setSelectedDocuments(selectedRows);
+  };
 
   return (
     <Table<Document>
@@ -83,6 +92,11 @@ export const DocumentsTable = ({
       isError={hasDocsError}
       columns={renderColumns()}
       data={documents}
+      rowSelection={{
+        type: 'checkbox',
+        selectedRowKeys: selectedDocuments.map((doc) => doc.id),
+        onChange: changeSelectedRows,
+      }}
       pagination={{
         total: total,
         pageSize: pageSize,
@@ -92,8 +106,18 @@ export const DocumentsTable = ({
         onSizeChange: setPageSize,
       }}
       searchKey={searchKey}
-      selectedRow={selectedDoc}
-      onSelectRow={onSelectDoc}
+      onSelectRow={(document) => {
+        let newSelectedDocs: Document[] = [];
+        const isSelected = selectedDocuments.some((d) => d.id === document.id);
+        if (isSelected) {
+          newSelectedDocs = selectedDocuments.filter(
+            (d) => d.id !== document.id,
+          );
+        } else {
+          newSelectedDocs = [...selectedDocuments, document];
+        }
+        setSelectedDocuments(newSelectedDocs);
+      }}
       onSearch={setSearchKey}
       onChange={changeSort}
     />

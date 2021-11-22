@@ -1,4 +1,4 @@
-import { ReactElement, useState, useEffect } from 'react';
+import React, { ReactElement, useState, useEffect } from 'react';
 import BTable from 'react-bootstrap/Table';
 import Alert from 'react-bootstrap/Alert';
 import Spinner from 'react-bootstrap/Spinner';
@@ -22,6 +22,7 @@ export const Table = <T extends Record<string, any> = {}>(
   const [currentColumnSorter, setCurrentColumnSorter] =
     useState<TableColumnProps<T> | null>(null);
   const [dataList, setDataList] = useState<T[]>([]);
+  const [rowSelectionCheck, setRowSelectionCheck] = useState<boolean>(false);
   const {
     isServerSide,
     rowKey,
@@ -51,18 +52,27 @@ export const Table = <T extends Record<string, any> = {}>(
   };
 
   const showRowHighlight = (rowData: T): string => {
-    return getRowKey(rowData) === (selectedRow && getRowKey(selectedRow))
+    return getRowKey(rowData) === (selectedRow && getRowKey(selectedRow)) ||
+      isRowSelected(rowData)
       ? 'highlight-row'
       : '';
   };
 
-  const setSelectedRow = (rowData: T): void => {
+  const triggerOnSelectRow = (rowData: T): void => {
     if (onSelectRow && typeof onSelectRow === 'function') onSelectRow(rowData);
+  };
+
+  const triggerSelectionOnChange = (
+    newSelectedRowKeys: React.Key[],
+    newSelectedRows: T[],
+  ): void => {
+    if (rowSelection && typeof rowSelection.onChange === 'function')
+      rowSelection.onChange(newSelectedRowKeys, newSelectedRows);
   };
 
   const handleRowSelectionChange = (checked: boolean, rowData: T): void => {
     if (rowSelection) {
-      const { onChange: onRowsChange, selectedRowKeys } = rowSelection;
+      const { selectedRowKeys } = rowSelection;
       let newSelectedRowKey: React.Key | undefined = getRowKey(rowData),
         newSelectedRows: T[],
         newSelectedRowKeys: React.Key[];
@@ -85,8 +95,7 @@ export const Table = <T extends Record<string, any> = {}>(
         );
       }
 
-      if (onRowsChange && typeof onRowsChange === 'function')
-        onRowsChange(newSelectedRowKeys, newSelectedRows);
+      triggerSelectionOnChange(newSelectedRowKeys, newSelectedRows);
     }
   };
 
@@ -184,7 +193,17 @@ export const Table = <T extends Record<string, any> = {}>(
         <BTable className="b-table" borderless hover>
           <thead>
             <tr>
-              {rowSelection && <th>{''}</th>}
+              {rowSelection && (
+                <th className="selection-column">
+                  <Form.Check
+                    onChange={(event) =>
+                      setRowSelectionCheck(event.target.checked)
+                    }
+                    type={rowSelection?.type ?? 'checkbox'}
+                    checked={rowSelectionCheck}
+                  />
+                </th>
+              )}
               {renderTableColumns()}
             </tr>
           </thead>
@@ -193,10 +212,10 @@ export const Table = <T extends Record<string, any> = {}>(
               <tr
                 key={`row-${index}`}
                 className={showRowHighlight(data)}
-                onClick={() => setSelectedRow(data)}
+                onClick={() => triggerOnSelectRow(data)}
               >
                 {rowSelection && (
-                  <td key={`selection-column-${index}`}>
+                  <td key={`selection-row-${index}`}>
                     <Form.Check
                       onChange={(event) =>
                         handleRowSelectionChange(event.target.checked, data)
@@ -310,12 +329,30 @@ export const Table = <T extends Record<string, any> = {}>(
     [currentColumnSorter],
   );
 
+  useEffect(
+    function onSelectAllRow() {
+      let newSelectedRows: T[], newSelectedRowKeys: React.Key[];
+
+      if (rowSelectionCheck) {
+        newSelectedRows = dataList;
+        newSelectedRowKeys = dataList.map((doc) => doc.id);
+      } else {
+        newSelectedRows = [];
+        newSelectedRowKeys = [];
+      }
+
+      triggerSelectionOnChange(newSelectedRowKeys, newSelectedRows);
+    },
+    // eslint-disable-next-line
+    [rowSelectionCheck],
+  );
+
   return (
-    <>
+    <React.Fragment>
       {renderSearchField()}
       {renderTable()}
       {renderPagination()}
-    </>
+    </React.Fragment>
   );
 };
 

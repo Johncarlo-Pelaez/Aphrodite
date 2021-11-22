@@ -135,3 +135,11 @@ export const approverDisapproveDocApi = async (
 ): Promise<void> => {
   await request.put(`/api/documents/${documentId}/approver/disapprove`);
 };
+
+export const retryDocumentsApi = async (
+  documentIds: number[],
+): Promise<void> => {
+  await request.put('/api/documents/retry', {
+    documentIds,
+  });
+};

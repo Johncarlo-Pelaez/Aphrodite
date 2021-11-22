@@ -40,7 +40,7 @@ export interface TableProps<T> {
   pagination?: TablePaginationConfig;
   searchKey?: string;
   selectedRow?: T;
-  onSelectRow?: (selectedRow?: T) => void;
+  onSelectRow?: (selectedRow: T) => void;
   onChange?: (sorter?: SorterResult) => void;
   onSearch?: (seachKey: string) => void;
 }

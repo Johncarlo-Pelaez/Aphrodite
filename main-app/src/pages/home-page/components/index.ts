@@ -1,3 +1,4 @@
-export { UploadFilesModal } from './upload-files-modal';
-export { DocumentsTable } from './documents-table';
-export { ViewDocModal } from './view-doc-modal';
+export * from './upload-files-modal';
+export * from './documents-table';
+export * from './view-doc-modal';
+export * from './ProcessDetails';

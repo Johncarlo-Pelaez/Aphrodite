@@ -96,7 +96,7 @@ export const ViewDocModal = ({
 
   const renderForm = (): ReactElement => {
     switch (document?.status) {
-      case DocumentStatus.FOR_MANUAL_ENCODE:
+      case DocumentStatus.MANUAL_ENCODE:
         return (
           <EncoderForm
             ref={encoderFormRef}
@@ -104,7 +104,7 @@ export const ViewDocModal = ({
             triggerCloseModal={onClose}
           />
         );
-      case DocumentStatus.FOR_CHECKING:
+      case DocumentStatus.CHECKING:
         return (
           <CheckerForm
             ref={checkerFormRef}
@@ -112,7 +112,7 @@ export const ViewDocModal = ({
             triggerCloseModal={onClose}
           />
         );
-      case DocumentStatus.FOR_APPROVAL:
+      case DocumentStatus.APPROVAL:
         return (
           <AppoverForm
             ref={approverFormRef}
@@ -129,7 +129,7 @@ export const ViewDocModal = ({
     let formActionButtons: ReactElement[];
 
     switch (document?.status) {
-      case DocumentStatus.FOR_MANUAL_ENCODE:
+      case DocumentStatus.MANUAL_ENCODE:
         formActionButtons = [
           <Button key="btn-close" variant="outline-danger" onClick={closeModal}>
             Close
@@ -143,7 +143,7 @@ export const ViewDocModal = ({
           </Button>,
         ];
         break;
-      case DocumentStatus.FOR_CHECKING:
+      case DocumentStatus.CHECKING:
         formActionButtons = [
           <Button
             key="btn-disapprove"
@@ -161,7 +161,7 @@ export const ViewDocModal = ({
           </Button>,
         ];
         break;
-      case DocumentStatus.FOR_APPROVAL:
+      case DocumentStatus.APPROVAL:
         formActionButtons = [
           <Button
             key="btn-disapprove"

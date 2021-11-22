@@ -292,7 +292,7 @@ export class DocumentRepository {
         Document,
         param.documentId,
       );
-      document.status = DocumentStatus.FOR_CHECKING;
+      document.status = DocumentStatus.CHECKING;
       document.modifiedDate = param.processAt;
       document.description = 'For quality checking.';
       await transaction.save(document);
@@ -308,7 +308,7 @@ export class DocumentRepository {
         Document,
         param.documentId,
       );
-      document.status = DocumentStatus.FOR_MANUAL_ENCODE;
+      document.status = DocumentStatus.MANUAL_ENCODE;
       document.modifiedDate = param.processAt;
       document.description = 'For manual encode.';
       await transaction.save(document);
@@ -387,7 +387,7 @@ export class DocumentRepository {
         Document,
         param.documentId,
       );
-      document.status = DocumentStatus.FOR_APPROVAL;
+      document.status = DocumentStatus.APPROVAL;
       document.description = 'Checker Disapproved.';
       document.documentDate = param.documentDate;
       document.remarks = param.remarks;
@@ -448,10 +448,10 @@ export class DocumentRepository {
         Document,
         param.documentId,
       );
-      document.status = DocumentStatus.FOR_RETRY;
+      document.status = DocumentStatus.RETRY;
       document.modifiedDate = param.processAt;
       document.modifiedBy = param.retryBy;
-      document.description = 'Retry process.';
+      document.description = 'Retrying process.';
       await transaction.save(document);
 
       const history = this.genarateDocumentHistory(document);
