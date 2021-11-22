@@ -18,6 +18,7 @@ export const MngNomenclature = (): ReactElement => {
     undefined,
   );
   const hasSelectNomenclature = !!selectedNomenclature;
+  const isModalOpen = !!modalMode;
 
   const {
     isLoading: isDeleteLoading,
@@ -52,13 +53,17 @@ export const MngNomenclature = (): ReactElement => {
     }
   };
 
-  const openEditModal = (): void => {
+  const handleOpenEditModal = (): void => {
     if (!hasSelectNomenclature) {
       alert('Please select an item.');
       return;
     }
 
     setModalMode(ModalAction.EDIT);
+  };
+
+  const handleOpenAddModal = (): void => {
+    setModalMode(ModalAction.ADD);
   };
 
   const closeModal = (): void => {
@@ -71,17 +76,14 @@ export const MngNomenclature = (): ReactElement => {
       <p className="fw-bold">Manage Nomenclature Whitelist</p>
       <hr />
       <ButtonGroup>
-        <Button
-          variant="outline-secondary"
-          onClick={() => setModalMode(ModalAction.ADD)}
-        >
+        <Button variant="outline-secondary" onClick={handleOpenAddModal}>
           Add
         </Button>
         {hasSelectNomenclature && [
           <Button
             key="btn-edit"
             variant="outline-secondary"
-            onClick={openEditModal}
+            onClick={handleOpenEditModal}
             disabled={!hasSelectNomenclature}
           >
             Edit
@@ -107,7 +109,7 @@ export const MngNomenclature = (): ReactElement => {
         <AddEditNomenclatureModal
           editId={selectedNomenclature?.id}
           description={selectedNomenclature?.description}
-          isVisible={modalMode !== undefined}
+          isVisible={isModalOpen}
           actionMode={modalMode}
           onClose={closeModal}
         />

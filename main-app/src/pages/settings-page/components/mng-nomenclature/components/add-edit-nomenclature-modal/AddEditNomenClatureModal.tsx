@@ -15,8 +15,8 @@ const addEditNomenclatureSchema = yup.object().shape({
 });
 
 export enum ModalAction {
-  ADD,
-  EDIT,
+  ADD = 'add',
+  EDIT = 'edit',
 }
 
 export interface AddEditNomenclatureModalProps {
