@@ -33,7 +33,7 @@ import {
   CheckerDisApproveDocDto,
   RetryDocumentsDto,
 } from './document.dto';
-import { GetDocumentsIntPipe } from './document.pipe';
+import { GetDocumentsIntPipe, RetryDocumentsIntPipe } from './document.pipe';
 
 @Controller('/documents')
 @UseGuards(AzureADGuard)
@@ -50,7 +50,11 @@ export class DocumentController {
   ): Promise<PaginatedResponse<Document>> {
     const response = new PaginatedResponse<Document>();
 
-    response.count = await this.documentRepository.count(dto.search);
+    response.count = await this.documentRepository.count({
+      search: dto.search,
+      documentType: dto.documentType,
+      statuses: dto.statuses,
+    });
     response.data = await this.documentRepository.getDocuments(dto);
 
     return response;
@@ -190,7 +194,7 @@ export class DocumentController {
   @ApiOkResponse()
   @Put('/retry')
   retryDocuments(
-    @Body() dto: RetryDocumentsDto,
+    @Body(RetryDocumentsIntPipe) dto: RetryDocumentsDto,
     @GetUserId() userId: number,
   ): Promise<void> {
     return this.documentsService.retryDocuments({

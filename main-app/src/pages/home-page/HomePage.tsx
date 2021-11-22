@@ -1,4 +1,4 @@
-import { ReactElement, useState } from 'react';
+import { ReactElement, useState, useRef } from 'react';
 import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
 import Stack from 'react-bootstrap/Stack';
@@ -14,10 +14,15 @@ export const HomePage = (): ReactElement => {
   const [selectedDocuments, setSelectedDocuments] = useState<Document[]>([]);
   const [uploadModalShow, setUploadModalShow] = useState<boolean>(false);
   const [viewDocModalShow, setViewDocModalShow] = useState<boolean>(false);
+  const documentsTableRef = useRef<any>(null);
   const hasSelectedRows = !!selectedDocuments.length;
   const selected1Doc =
     selectedDocuments.length === 1 ? selectedDocuments[0] : undefined;
   const hasSelected1Doc = !!selected1Doc;
+
+  const triggerRefreshDocslist = (): void => {
+    documentsTableRef.current?.refresh();
+  };
 
   return (
     <Container className="my-4">
@@ -31,7 +36,11 @@ export const HomePage = (): ReactElement => {
           >
             Upload
           </Button>
-          <Button className="px-4" variant="outline-dark">
+          <Button
+            className="px-4"
+            variant="outline-dark"
+            onClick={triggerRefreshDocslist}
+          >
             Refresh
           </Button>
         </Stack>
@@ -58,6 +67,7 @@ export const HomePage = (): ReactElement => {
         </Button>
       </Stack>
       <DocumentsTable
+        ref={documentsTableRef}
         selectedDocuments={selectedDocuments}
         setSelectedDocuments={setSelectedDocuments}
       />

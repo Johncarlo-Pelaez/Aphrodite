@@ -7,6 +7,7 @@ import {
   IsString,
   IsUUID,
 } from 'class-validator';
+import { DocumentStatus } from 'src/entities';
 
 export class GetDocumentsDto {
   @ApiProperty({ required: false })
@@ -23,6 +24,16 @@ export class GetDocumentsDto {
   @IsOptional()
   @IsNumberString()
   take?: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  documentType?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString({ each: true })
+  statuses?: DocumentStatus[];
 }
 
 export class CreateDocumentDto {
@@ -76,6 +87,7 @@ export class CheckerDisApproveDocDto extends CheckerApproveDocDto {
 }
 
 export class RetryDocumentsDto {
-  @IsNumber({}, { each: true })
+  @ApiProperty({ required: true })
+  @IsNumber({ allowNaN: false }, { each: true })
   documentIds: number[];
 }

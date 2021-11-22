@@ -1,7 +1,14 @@
 import { Document, DocumentStatus, DocumentHistory } from 'src/entities';
-import { EntityManager, EntityRepository, ILike, In } from 'typeorm';
+import {
+  EntityManager,
+  EntityRepository,
+  ILike,
+  In,
+  FindOperator,
+} from 'typeorm';
 import {
   CreateDocumentParam,
+  CountParam,
   GetDocumentsParam,
   BeginDocProcessParam,
   QrDocumentParams,
@@ -23,23 +30,29 @@ export class DocumentRepository {
   constructor(private readonly manager: EntityManager) {}
 
   async getDocuments(param: GetDocumentsParam): Promise<Document[]> {
-    const search = param.search || '';
+    const { search = '', documentType = '', statuses } = param;
 
     return this.manager.find(Document, {
       relations: ['user'],
       where: [
         {
           documentName: ILike(`%${search}%`),
+          documentType: ILike(`%${documentType}%`),
+          status: In(statuses),
         },
         {
           user: {
             firstName: ILike(`%${search}%`),
           },
+          documentType: ILike(`%${documentType}%`),
+          status: In(statuses),
         },
         {
           user: {
             lastName: ILike(`%${search}%`),
           },
+          documentType: ILike(`%${documentType}%`),
+          status: In(statuses),
         },
       ],
       order: { modifiedDate: 'DESC' },
@@ -66,22 +79,30 @@ export class DocumentRepository {
     });
   }
 
-  async count(search?: string): Promise<number> {
+  async count(param: CountParam): Promise<number> {
+    const { search = '', documentType = '', statuses } = param;
+
     return this.manager.count(Document, {
       relations: ['user'],
       where: [
         {
           documentName: ILike(`%${search}%`),
+          documentType: ILike(`%${documentType}%`),
+          status: In(statuses),
         },
         {
           user: {
             firstName: ILike(`%${search}%`),
           },
+          documentType: ILike(`%${documentType}%`),
+          status: In(statuses),
         },
         {
           user: {
             lastName: ILike(`%${search}%`),
           },
+          documentType: ILike(`%${documentType}%`),
+          status: In(statuses),
         },
       ],
     });

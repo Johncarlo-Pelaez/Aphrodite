@@ -192,23 +192,23 @@ export const ViewDocModal = ({
   };
 
   const triggerEncoderFormSubmit = (): void => {
-    encoderFormRef && encoderFormRef?.current?.encodeDocument();
+    encoderFormRef.current?.encodeDocument();
   };
 
   const triggerCheckerFormSubmitApprove = (): void => {
-    checkerFormRef && checkerFormRef?.current?.approveDocument();
+    checkerFormRef.current?.approveDocument();
   };
 
   const triggerCheckerFormSubmitDispprove = (): void => {
-    checkerFormRef && checkerFormRef?.current?.disapproveDocument();
+    checkerFormRef.current?.disapproveDocument();
   };
 
   const triggerApproverFormSubmitApprove = (): void => {
-    approverFormRef && approverFormRef?.current?.approveDocument();
+    approverFormRef.current?.approveDocument();
   };
 
   const triggerApproverFormSubmitDispprove = (): void => {
-    approverFormRef && approverFormRef?.current?.disapproveDocument();
+    approverFormRef.current?.disapproveDocument();
   };
 
   const closeModal = (): void => {

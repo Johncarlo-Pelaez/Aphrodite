@@ -1,5 +1,14 @@
-export interface GetDocumentsParam {
+import { DocumentStatus } from 'src/entities';
+
+export interface DocFilterParam {
   search?: string;
+  documentType?: string;
+  statuses?: DocumentStatus[];
+}
+
+export interface CountParam extends DocFilterParam {}
+
+export interface GetDocumentsParam extends DocFilterParam {
   skip?: number;
   take?: number;
 }
