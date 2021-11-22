@@ -1,29 +1,31 @@
 import { ReactElement, useState } from 'react';
-import { useNomenClatures } from 'hooks';
+import { useNomenclatures } from 'hooks';
 import { Table, TableColumnProps } from 'core/ui/table';
-import { NomenClature } from 'models';
-import { NomenClaturesTableProps } from './NomenClaturesTable.types';
+import { Nomenclature } from 'models';
 
-const columns: TableColumnProps<NomenClature>[] = [
+const columns: TableColumnProps<Nomenclature>[] = [
   {
     title: 'Description',
     dataIndex: 'description',
   },
 ];
 
-export const NomenClaturesTable = ({
-  selectedNomenClature,
-  onSelectNomenClature,
-}: NomenClaturesTableProps): ReactElement => {
+export interface NomenclaturesTableProps {
+  selectedNomenclature?: Nomenclature;
+  onSelectNomenclature: (nomenClature?: Nomenclature) => void;
+}
+
+export const NomenclaturesTable = ({
+  selectedNomenclature,
+  onSelectNomenclature,
+}: NomenclaturesTableProps): ReactElement => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(15);
-
-  const { isLoading, isError, data: nomenClatures = [] } = useNomenClatures();
-
+  const { isLoading, isError, data: nomenClatures = [] } = useNomenclatures();
   const total = nomenClatures.length;
 
   return (
-    <Table<NomenClature>
+    <Table<Nomenclature>
       rowKey={(doc) => doc.id}
       loading={isLoading}
       isError={isError}
@@ -37,10 +39,10 @@ export const NomenClaturesTable = ({
         onChange: setCurrentPage,
         onSizeChange: setPageSize,
       }}
-      selectedRow={selectedNomenClature}
-      onSelectRow={onSelectNomenClature}
+      selectedRow={selectedNomenclature}
+      onSelectRow={onSelectNomenclature}
     />
   );
 };
 
-export default NomenClaturesTable;
+export default NomenclaturesTable;

@@ -12,35 +12,35 @@ import {
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
 import { AzureADGuard, CreatedResponse } from 'src/core';
-import { NomenClature } from 'src/entities';
-import { NomenClatureRepository } from 'src/repositories';
-import { NomenClatureDto } from './nomen-clature.dto';
+import { Nomenclature } from 'src/entities';
+import { NomenclatureRepository } from 'src/repositories';
+import { NomenClatureDto } from './nomenclature.dto';
 
-@Controller('/nomen-clatures')
+@Controller('/nomenclatures')
 @UseGuards(AzureADGuard)
-export class NomenClatureController {
+export class NomenclatureController {
   constructor(
-    private readonly nomenClatureRepository: NomenClatureRepository,
+    private readonly nomenclatureRepository: NomenclatureRepository,
   ) {}
 
   @ApiOkResponse({
-    type: NomenClature,
+    type: Nomenclature,
     isArray: true,
   })
   @Get('/')
-  async getNomenClatures(): Promise<NomenClature[]> {
-    return this.nomenClatureRepository.getNomenClatures();
+  async getNomenclatures(): Promise<Nomenclature[]> {
+    return this.nomenclatureRepository.getNomenclatures();
   }
 
   @ApiCreatedResponse({
     type: CreatedResponse,
   })
   @Post('/')
-  async createNomenClature(
+  async createNomenclature(
     @Body(ValidationPipe) dto: NomenClatureDto,
   ): Promise<CreatedResponse> {
     const response = new CreatedResponse();
-    response.id = await this.nomenClatureRepository.createNomenClature({
+    response.id = await this.nomenclatureRepository.createNomenclature({
       description: dto.description,
     });
     return response;
@@ -48,11 +48,11 @@ export class NomenClatureController {
 
   @ApiOkResponse()
   @Put('/:id')
-  async updateNomenClature(
+  async updateNomenclature(
     @Param('id', ParseIntPipe) id: number,
     @Body(ValidationPipe) dto: NomenClatureDto,
   ): Promise<void> {
-    return await this.nomenClatureRepository.updateNomenClature({
+    return await this.nomenclatureRepository.updateNomenclature({
       id,
       description: dto.description,
     });
@@ -60,9 +60,9 @@ export class NomenClatureController {
 
   @ApiOkResponse()
   @Delete('/:id')
-  async deleteNomenClature(
+  async deleteNomenclature(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<void> {
-    return await this.nomenClatureRepository.deleteNomenClature(id);
+    return await this.nomenclatureRepository.deleteNomenclature(id);
   }
 }

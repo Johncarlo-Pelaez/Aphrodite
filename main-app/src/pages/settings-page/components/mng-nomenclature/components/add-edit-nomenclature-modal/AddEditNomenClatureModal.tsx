@@ -1,4 +1,4 @@
-import { ReactElement } from 'react';
+import { ReactElement, useEffect } from 'react';
 import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Form from 'react-bootstrap/Form';
@@ -6,11 +6,11 @@ import Alert from 'react-bootstrap/Alert';
 import Spinner from 'react-bootstrap/Spinner';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
-import { useCreateNomenClature, useUpdateNomenClature } from 'hooks';
+import { useCreateNomenclature, useUpdateNomenclature } from 'hooks';
 import * as yup from 'yup';
-import { CreateNomenClatureApi } from 'apis';
+import { CreateNomenclatureApi } from 'apis';
 
-const addEditNomenClatureSchema = yup.object().shape({
+const addEditNomenclatureSchema = yup.object().shape({
   description: yup.string().required('Description is required.'),
 });
 
@@ -19,56 +19,59 @@ export enum ModalAction {
   EDIT,
 }
 
-export interface AddEditNomenClatureModalProps {
-  isVisible: boolean;
+export interface AddEditNomenclatureModalProps {
   editId?: number;
+  description?: string;
+  isVisible: boolean;
   actionMode?: ModalAction;
   onClose: () => void;
 }
 
-export const AddEditNomenClatureModal = ({
-  isVisible,
+export const AddEditNomenclatureModal = ({
   editId,
+  description,
+  isVisible,
   actionMode,
   onClose,
-}: AddEditNomenClatureModalProps): ReactElement => {
+}: AddEditNomenclatureModalProps): ReactElement => {
   const {
     isLoading: isCreateLoading,
     isError: hasCreateError,
     mutateAsync: createAsync,
     reset: resetCreate,
-  } = useCreateNomenClature();
+  } = useCreateNomenclature();
 
   const {
     isLoading: isUpdateLoading,
     isError: hasUpdateError,
     mutateAsync: updateAsync,
     reset: resetUpdate,
-  } = useUpdateNomenClature();
+  } = useUpdateNomenclature();
 
   const {
     control,
     handleSubmit,
     reset: resetForm,
     formState: { errors },
-  } = useForm<CreateNomenClatureApi>({
-    resolver: yupResolver(addEditNomenClatureSchema),
+    setValue,
+  } = useForm<CreateNomenclatureApi>({
+    resolver: yupResolver(addEditNomenclatureSchema),
   });
 
   const isLoading = isCreateLoading || isUpdateLoading;
   const isEditMode = actionMode === ModalAction.EDIT;
   const isAddMode = actionMode === ModalAction.ADD;
 
-  const createNomenClature: SubmitHandler<CreateNomenClatureApi> = async (
+  const createNomenclature: SubmitHandler<CreateNomenclatureApi> = async (
     params,
   ): Promise<void> => {
-    if (!isCreateLoading && !editId && isAddMode) {
+    if (!isCreateLoading && isAddMode) {
       await createAsync(params);
       closeModal();
     }
   };
 
-  const updateNomenClature: SubmitHandler<CreateNomenClatureApi> = async (
+  const updateNomenclature: SubmitHandler<CreateNomenclatureApi> = async (
     params,
   ): Promise<void> => {
     if (!isUpdateLoading && editId && isEditMode) {
@@ -78,8 +81,8 @@ export const AddEditNomenClatureModal = ({
   };
 
   const getFormActionMethod = () => {
-    if (isEditMode) return updateNomenClature;
-    else return createNomenClature;
+    if (isEditMode) return updateNomenclature;
+    else return createNomenclature;
   };
 
   const renderErrorAlert = (): ReactElement => {
@@ -87,7 +90,7 @@ export const AddEditNomenClatureModal = ({
     const show = !!errors.description || hasCreateError || hasUpdateError;
 
     if (hasCreateError || hasUpdateError) {
-      errorMessage = 'Failed to save Nomen Clature.';
+      errorMessage = 'Failed to save Nomenclature.';
     } else if (!!errors.description) {
       errorMessage = errors?.description?.message;
     }
@@ -105,6 +108,11 @@ export const AddEditNomenClatureModal = ({
     resetForm({ description: '' });
     onClose();
   };
+
+  useEffect(() => {
+    if (isEditMode) setValue('description', description ?? '');
+    // eslint-disable-next-line
+  }, [description, actionMode]);
 
   return (
     <Modal
@@ -159,4 +167,4 @@ export const AddEditNomenClatureModal = ({
   );
 };
 
-export default AddEditNomenClatureModal;
+export default AddEditNomenclatureModal;

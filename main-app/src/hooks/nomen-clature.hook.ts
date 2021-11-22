@@ -1,10 +1,10 @@
 import {
-  getNomenClaturesApi,
-  createNomenClatureApi,
-  updateNomenClatureApi,
-  deleteNomenClatureApi,
-  CreateNomenClatureApi,
-  UpdateNomenClatureApi,
+  getNomenclaturesApi,
+  createNomenclatureApi,
+  updateNomenclatureApi,
+  deleteNomenclatureApi,
+  CreateNomenclatureApi,
+  UpdateNomenclatureApi,
 } from 'apis';
 import {
   useQuery,
@@ -13,26 +13,26 @@ import {
   UseMutationResult,
   useQueryClient,
 } from 'react-query';
-import { NomenClature } from 'models';
+import { Nomenclature } from 'models';
 import { ApiError } from 'core/types';
 import { QueryKey } from 'utils';
 
-export const useNomenClatures = (): UseQueryResult<
-  NomenClature[],
+export const useNomenclatures = (): UseQueryResult<
+  Nomenclature[],
   ApiError
 > => {
-  return useQuery(QueryKey.nomenClatures, getNomenClaturesApi);
+  return useQuery(QueryKey.nomenClatures, getNomenclaturesApi);
 };
 
-export const useCreateNomenClature = (): UseMutationResult<
+export const useCreateNomenclature = (): UseMutationResult<
   void,
   ApiError,
-  CreateNomenClatureApi
+  CreateNomenclatureApi
 > => {
   const queryClient = useQueryClient();
-  return useMutation<void, ApiError, CreateNomenClatureApi>(
+  return useMutation<void, ApiError, CreateNomenclatureApi>(
     (data) => {
-      return createNomenClatureApi(data);
+      return createNomenclatureApi(data);
     },
     {
       onSuccess: () => {
@@ -42,15 +42,15 @@ export const useCreateNomenClature = (): UseMutationResult<
   );
 };
 
-export const useUpdateNomenClature = (): UseMutationResult<
+export const useUpdateNomenclature = (): UseMutationResult<
   void,
   ApiError,
-  UpdateNomenClatureApi
+  UpdateNomenclatureApi
 > => {
   const queryClient = useQueryClient();
-  return useMutation<void, ApiError, UpdateNomenClatureApi>(
+  return useMutation<void, ApiError, UpdateNomenclatureApi>(
     (data) => {
-      return updateNomenClatureApi(data);
+      return updateNomenclatureApi(data);
     },
     {
       onSuccess: () => {
@@ -60,7 +60,7 @@ export const useUpdateNomenClature = (): UseMutationResult<
   );
 };
 
-export const useDeleteNomenClature = (): UseMutationResult<
+export const useDeleteNomenclature = (): UseMutationResult<
   void,
   ApiError,
   number
@@ -68,7 +68,7 @@ export const useDeleteNomenClature = (): UseMutationResult<
   const queryClient = useQueryClient();
   return useMutation<void, ApiError, number>(
     (data) => {
-      return deleteNomenClatureApi(data);
+      return deleteNomenclatureApi(data);
     },
     {
       onSuccess: () => {

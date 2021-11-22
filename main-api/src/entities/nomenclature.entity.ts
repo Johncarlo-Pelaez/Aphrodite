@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-export class NomenClature {
+export class Nomenclature {
   @ApiProperty()
   @PrimaryGeneratedColumn()
   id: number;

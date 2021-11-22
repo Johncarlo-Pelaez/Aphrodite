@@ -7,7 +7,7 @@ import { DocumentConsumer } from './consumers';
 import {
   DocumentController,
   UserController,
-  NomenClatureController,
+  NomenclatureController,
   LookupController,
 } from './controllers';
 import { UtilsModule } from './utils/utils.module';
@@ -15,7 +15,7 @@ import { DocumentProducer } from './producers';
 import {
   DocumentRepository,
   UserRepository,
-  NomenClatureRepository,
+  NomenclatureRepository,
   LookupRepository,
 } from './repositories';
 import { DocumentService } from './services';
@@ -73,7 +73,7 @@ const logger = new Logger('AppModule');
   controllers: [
     DocumentController,
     UserController,
-    NomenClatureController,
+    NomenclatureController,
     LookupController,
   ],
   providers: [
@@ -87,7 +87,7 @@ const logger = new Logger('AppModule');
     DocumentProducer,
     DocumentConsumer,
     AzureADStrategy,
-    NomenClatureRepository,
+    NomenclatureRepository,
     LookupRepository,
   ],
 })

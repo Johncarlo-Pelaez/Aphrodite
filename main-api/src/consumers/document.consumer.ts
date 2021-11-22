@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { AppConfigService } from 'src/app-config';
 import { DatesUtil } from 'src/utils';
-import { DocumentRepository, NomenClatureRepository } from 'src/repositories';
+import { DocumentRepository, NomenclatureRepository } from 'src/repositories';
 import { QRService } from 'src/qr-service';
 import {
   SalesForceService,
@@ -30,7 +30,7 @@ export class DocumentConsumer {
   constructor(
     private readonly appConfigService: AppConfigService,
     private readonly documentRepository: DocumentRepository,
-    private readonly nomenClatureRepository: NomenClatureRepository,
+    private readonly nomenClatureRepository: NomenclatureRepository,
     private readonly qrService: QRService,
     private readonly salesForceService: SalesForceService,
     private readonly springCMService: SpringCMService,
@@ -102,7 +102,7 @@ export class DocumentConsumer {
     }
 
     const isWhiteListed =
-      await this.nomenClatureRepository.checkNomenClatureIfExist(
+      await this.nomenClatureRepository.checkNomenclatureIfExist(
         documentType.Nomenclature,
       );
 

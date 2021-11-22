@@ -1,32 +1,32 @@
 import { request } from './request';
-import { NomenClature } from 'models';
+import { Nomenclature } from 'models';
 
-export const getNomenClaturesApi = async (): Promise<NomenClature[]> => {
-  const res = await request.get<NomenClature[]>('/api/nomen-clatures');
+export const getNomenclaturesApi = async (): Promise<Nomenclature[]> => {
+  const res = await request.get<Nomenclature[]>('/api/nomenclatures');
   return res.data;
 };
 
-export interface CreateNomenClatureApi {
+export interface CreateNomenclatureApi {
   description: string;
 }
 
-export const createNomenClatureApi = async (
-  params: CreateNomenClatureApi,
+export const createNomenclatureApi = async (
+  params: CreateNomenclatureApi,
 ): Promise<void> => {
-  await request.post('/api/nomen-clatures', params);
+  await request.post('/api/nomenclatures', params);
 };
 
-export interface UpdateNomenClatureApi extends CreateNomenClatureApi {
+export interface UpdateNomenclatureApi extends CreateNomenclatureApi {
   id: number;
 }
 
-export const updateNomenClatureApi = async ({
+export const updateNomenclatureApi = async ({
   id,
   description,
-}: UpdateNomenClatureApi): Promise<void> => {
-  await request.put(`/api/nomen-clatures/${id}`, { description });
+}: UpdateNomenclatureApi): Promise<void> => {
+  await request.put(`/api/nomenclatures/${id}`, { description });
 };
 
-export const deleteNomenClatureApi = async (id: number): Promise<void> => {
-  await request.delete(`/api/nomen-clatures/${id}`);
+export const deleteNomenclatureApi = async (id: number): Promise<void> => {
+  await request.delete(`/api/nomenclatures/${id}`);
 };

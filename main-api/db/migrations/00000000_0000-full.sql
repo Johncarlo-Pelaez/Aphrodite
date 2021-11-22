@@ -1,4 +1,4 @@
-/****** Object:  Table [dbo].[document]    Script Date: 11/16/2021 6:39:42 PM ******/
+/****** Object:  Table [dbo].[document]    Script Date: 11/19/2021 11:33:55 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -23,7 +23,7 @@ CREATE TABLE [dbo].[document](
 	[docTypeReqParams] [nvarchar](max) NULL,
 	[contractDetailsReqParams] [nvarchar](max) NULL,
 	[springReqParams] [nvarchar](max) NULL,
-	[documentDate] [datetime] NULL,
+	[documentDate] [nvarchar](150) NULL,
 	[encoder] [int] NULL,
 	[encodedAt] [datetime] NULL,
 	[checker] [int] NULL,
@@ -35,7 +35,7 @@ CREATE TABLE [dbo].[document](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[document_history]    Script Date: 11/16/2021 6:39:42 PM ******/
+/****** Object:  Table [dbo].[document_history]    Script Date: 11/19/2021 11:33:55 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -53,7 +53,7 @@ CREATE TABLE [dbo].[document_history](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[lookup]    Script Date: 11/16/2021 6:39:42 PM ******/
+/****** Object:  Table [dbo].[lookup]    Script Date: 11/19/2021 11:33:55 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -64,17 +64,17 @@ CREATE TABLE [dbo].[lookup](
 	[documentGroup] [nvarchar](max) NOT NULL
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[nomen_clature]    Script Date: 11/16/2021 6:39:42 PM ******/
+/****** Object:  Table [dbo].[nomenclature]    Script Date: 11/19/2021 11:33:55 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE TABLE [dbo].[nomen_clature](
+CREATE TABLE [dbo].[nomenclature](
 	[id] [int] IDENTITY(1,1) NOT NULL,
 	[description] [nvarchar](255) NOT NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[user]    Script Date: 11/16/2021 6:39:42 PM ******/
+/****** Object:  Table [dbo].[user]    Script Date: 11/19/2021 11:33:55 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON

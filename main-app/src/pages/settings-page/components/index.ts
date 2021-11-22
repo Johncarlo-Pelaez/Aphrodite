@@ -1,1 +1,1 @@
-export { MngNomenClature } from './mng-nomen-clature';
+export * from './mng-nomenclature';

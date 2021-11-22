@@ -9,12 +9,12 @@ SET ANSI_WARNINGS ON
 COMMIT
 BEGIN TRANSACTION
 GO
-CREATE TABLE dbo.nomen_clature
+CREATE TABLE dbo.nomenclature
 	(
 	id int NOT NULL IDENTITY (1, 1),
 	description nvarchar(255) NOT NULL
 	)  ON [PRIMARY]
 GO
-ALTER TABLE dbo.nomen_clature SET (LOCK_ESCALATION = TABLE)
+ALTER TABLE dbo.nomenclature SET (LOCK_ESCALATION = TABLE)
 GO
 COMMIT
