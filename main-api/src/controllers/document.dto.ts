@@ -74,3 +74,8 @@ export class CheckerDisApproveDocDto extends CheckerApproveDocDto {
   @IsString()
   remarks: string;
 }
+
+export class RetryDocumentsDto {
+  @IsNumber({}, { each: true })
+  documentIds: number[];
+}

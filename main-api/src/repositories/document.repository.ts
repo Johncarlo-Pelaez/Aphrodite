@@ -1,5 +1,5 @@
 import { Document, DocumentStatus, DocumentHistory } from 'src/entities';
-import { EntityManager, EntityRepository, ILike } from 'typeorm';
+import { EntityManager, EntityRepository, ILike, In } from 'typeorm';
 import {
   CreateDocumentParam,
   GetDocumentsParam,
@@ -15,6 +15,7 @@ import {
   CheckerApproveDocParam,
   CheckerDispproveDocParam,
   ApproverApproveDisapproveDocParam,
+  UpdateForRetry,
 } from './document.params';
 
 @EntityRepository()
@@ -44,6 +45,17 @@ export class DocumentRepository {
       order: { modifiedDate: 'DESC' },
       skip: param.skip,
       take: param.take,
+    });
+  }
+
+  async findDocumentsByIds(documentIds: number[]): Promise<Document[]> {
+    return this.manager.find(Document, {
+      relations: ['user'],
+      where: [
+        {
+          id: In(documentIds),
+        },
+      ],
     });
   }
 
@@ -125,7 +137,7 @@ export class DocumentRepository {
         param.documentId,
       );
       document.status = DocumentStatus.QR_BEGIN;
-      document.modifiedDate = param.beginAt;
+      document.modifiedDate = param.processAt;
       document.description = 'Begin QR Code.';
       await this.manager.save(document);
 
@@ -144,7 +156,6 @@ export class DocumentRepository {
       document.qrCode = param.qrCode;
       document.qrAt = param.qrAt;
       document.modifiedDate = param.qrAt;
-      document.modifiedBy = param.modifiedBy ?? document.modifiedBy;
       document.description = 'Successfully done QR Code.';
       await transaction.save(document);
 
@@ -176,7 +187,7 @@ export class DocumentRepository {
         param.documentId,
       );
       document.status = DocumentStatus.INDEXING_BEGIN;
-      document.modifiedDate = param.beginAt;
+      document.modifiedDate = param.processAt;
       document.description = 'Begin indexing.';
       await transaction.save(document);
 
@@ -193,9 +204,7 @@ export class DocumentRepository {
       );
       document.status = DocumentStatus.INDEXING_DONE;
       document.documentType = param.documentType;
-      document.contractDetails = param.contractDetails;
       document.docTypeReqParams = param.docTypeReqParams;
-      document.contractDetailsReqParams = param.contractDetailsReqParams;
       document.modifiedDate = param.indexedAt;
       document.description =
         'Successfully retrieved account details from sales force.';
@@ -213,8 +222,6 @@ export class DocumentRepository {
         param.documentId,
       );
       document.status = DocumentStatus.INDEXING_FAILED;
-      document.documentType = param.documentType;
-      document.contractDetails = param.contractDetails;
       document.docTypeReqParams = param.docTypeReqParams;
       document.contractDetailsReqParams = param.contractDetailsReqParams;
       document.modifiedDate = param.failedAt;
@@ -234,7 +241,7 @@ export class DocumentRepository {
         param.documentId,
       );
       document.status = DocumentStatus.MIGRATE_BEGIN;
-      document.modifiedDate = param.beginAt;
+      document.modifiedDate = param.processAt;
       document.description = 'Begin migrate.';
       await transaction.save(document);
 
@@ -286,7 +293,7 @@ export class DocumentRepository {
         param.documentId,
       );
       document.status = DocumentStatus.FOR_CHECKING;
-      document.modifiedDate = param.beginAt;
+      document.modifiedDate = param.processAt;
       document.description = 'For quality checking.';
       await transaction.save(document);
 
@@ -302,7 +309,7 @@ export class DocumentRepository {
         param.documentId,
       );
       document.status = DocumentStatus.FOR_MANUAL_ENCODE;
-      document.modifiedDate = param.beginAt;
+      document.modifiedDate = param.processAt;
       document.description = 'For manual encode.';
       await transaction.save(document);
 
@@ -428,6 +435,23 @@ export class DocumentRepository {
       document.approver = param.approver;
       document.modifiedDate = param.modifiedAt;
       document.modifiedBy = param.approver;
+      await transaction.save(document);
+
+      const history = this.genarateDocumentHistory(document);
+      await transaction.save(history);
+    });
+  }
+
+  async updateForRetry(param: UpdateForRetry): Promise<void> {
+    await this.manager.transaction(async (transaction): Promise<void> => {
+      const document = await this.manager.findOneOrFail(
+        Document,
+        param.documentId,
+      );
+      document.status = DocumentStatus.FOR_RETRY;
+      document.modifiedDate = param.processAt;
+      document.modifiedBy = param.retryBy;
+      document.description = 'Retry process.';
       await transaction.save(document);
 
       const history = this.genarateDocumentHistory(document);

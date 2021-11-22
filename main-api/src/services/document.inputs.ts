@@ -27,3 +27,8 @@ export interface DocumentApprover {
   documentId: number;
   approver: number;
 }
+
+export interface RetryDocuments {
+  documentIds: number[];
+  retryBy: number;
+}

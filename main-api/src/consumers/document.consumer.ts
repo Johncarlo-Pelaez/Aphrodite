@@ -18,13 +18,9 @@ import {
   UploadDocToSpringParams,
 } from 'src/spring-cm-service';
 import { DocumentStatus } from 'src/entities';
-import {
-  JobData,
-  UpdateToIndexingDoneParams,
-  UpdateToIndexingFailedParams,
-} from './document.interfaces';
+import { DOCUMENT_QUEUE, MIGRATE } from './document.constants';
 
-@Processor('document')
+@Processor(DOCUMENT_QUEUE)
 export class DocumentConsumer {
   private readonly logger = new Logger(DocumentConsumer.name);
   constructor(
@@ -37,14 +33,10 @@ export class DocumentConsumer {
     private readonly datesUtil: DatesUtil,
   ) {}
 
-  @Process('migrate')
+  @Process(MIGRATE)
   async migrate(job: Job<number>): Promise<void> {
     const document = await this.documentRepository.getDocument(job.data);
-    const jobData: JobData = {
-      documentId: document.id,
-      sysSrcFileName: document.uuid,
-    };
-    const { documentId, sysSrcFileName } = jobData;
+    const { id: documentId, uuid: sysSrcFileName } = document;
     const {
       documentName,
       qrCode: docQrCode,
@@ -85,7 +77,7 @@ export class DocumentConsumer {
       } else if (filename.length === 18) {
         qrCode = filename.substr(0, 15);
       } else {
-        qrCode = await this.runQr(buffer, jobData);
+        qrCode = await this.runQr(documentId, buffer, sysSrcFileName);
       }
 
       if (qrCode === '') {
@@ -154,18 +146,19 @@ export class DocumentConsumer {
   }
 
   private async runQr(
+    documentId: number,
     buffer: Buffer,
-    { documentId, sysSrcFileName }: JobData,
+    filename: string,
   ): Promise<string> {
     await this.documentRepository.beginQrDocument({
       documentId,
-      beginAt: this.datesUtil.getDateNow(),
+      processAt: this.datesUtil.getDateNow(),
     });
 
     let qrCode;
 
     try {
-      qrCode = await this.qrService.readPdfQrCode(buffer, sysSrcFileName);
+      qrCode = await this.qrService.readPdfQrCode(buffer, filename);
     } catch (error) {
       await this.updateToQrFailed(error, documentId);
       throw error;
@@ -182,7 +175,7 @@ export class DocumentConsumer {
   ): Promise<DocumentType | undefined> {
     await this.documentRepository.beginIndexing({
       documentId,
-      beginAt: this.datesUtil.getDateNow(),
+      processAt: this.datesUtil.getDateNow(),
     });
 
     const getDocTypeReqParams = {
@@ -195,11 +188,11 @@ export class DocumentConsumer {
         getDocTypeReqParams,
       );
     } catch (error) {
-      await this.updateToIndexingFailed({
+      await this.updateToIndexingFailed(
         documentId,
-        docTypeReqParams: JSON.stringify(getDocTypeReqParams),
+        JSON.stringify(getDocTypeReqParams),
         error,
-      });
+      );
       throw error;
     }
 
@@ -207,11 +200,11 @@ export class DocumentConsumer {
       ? getDocTypeResult.response[0]
       : undefined;
 
-    await this.updateToIndexingDone({
+    await this.updateToIndexingDone(
       documentId,
-      documentType: JSON.stringify(getDocTypeResult),
-      docTypeReqParams: JSON.stringify(getDocTypeReqParams),
-    });
+      JSON.stringify(getDocTypeResult),
+      JSON.stringify(getDocTypeReqParams),
+    );
 
     return documentType;
   }
@@ -225,7 +218,7 @@ export class DocumentConsumer {
 
     await this.documentRepository.beginMigrate({
       documentId,
-      beginAt: this.datesUtil.getDateNow(),
+      processAt: this.datesUtil.getDateNow(),
     });
 
     let uploadDocToSpringResult;
@@ -298,32 +291,31 @@ export class DocumentConsumer {
   }
 
   private async updateToIndexingDone(
-    params: UpdateToIndexingDoneParams,
+    documentId: number,
+    documentType: string,
+    docTypeReqParams: string,
   ): Promise<void> {
     const indexedAt = this.datesUtil.getDateNow();
     await this.documentRepository.doneIndexing({
-      documentId: params.documentId,
-      documentType: params.documentType,
-      contractDetails: params.contractDetails,
-      docTypeReqParams: params.docTypeReqParams,
-      contractDetailsReqParams: params.contractDetailsReqParams,
+      documentId,
+      documentType,
+      docTypeReqParams,
       indexedAt,
     });
   }
 
   private async updateToIndexingFailed(
-    params: UpdateToIndexingFailedParams,
+    documentId: number,
+    docTypeReqParams: string,
+    error: string,
   ): Promise<void> {
     const failedAt = this.datesUtil.getDateNow();
     await this.documentRepository.failIndexing({
-      documentId: params.documentId,
-      documentType: params.documentType,
-      contractDetails: params.contractDetails,
-      docTypeReqParams: params.docTypeReqParams,
-      contractDetailsReqParams: params.contractDetailsReqParams,
+      documentId,
+      docTypeReqParams,
       failedAt,
     });
-    this.logger.error(params.error);
+    this.logger.error(error);
   }
 
   private async updateToMigrateDone(
@@ -360,7 +352,7 @@ export class DocumentConsumer {
     const beginAt = this.datesUtil.getDateNow();
     await this.documentRepository.updateForManualEncode({
       documentId,
-      beginAt,
+      processAt: beginAt,
     });
   }
 
@@ -368,7 +360,7 @@ export class DocumentConsumer {
     const beginAt = this.datesUtil.getDateNow();
     await this.documentRepository.updateForChecking({
       documentId,
-      beginAt,
+      processAt: beginAt,
     });
   }
 }

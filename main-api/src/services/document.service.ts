@@ -19,6 +19,7 @@ import {
   CheckerApproveDoc,
   CheckerDisApproveDoc,
   DocumentApprover,
+  RetryDocuments,
 } from './document.inputs';
 const { readFile, writeFile } = fs.promises;
 
@@ -189,5 +190,16 @@ export class DocumentService {
       approver,
       modifiedAt: this.datesUtil.getDateNow(),
     });
+  }
+
+  async retryDocuments(data: RetryDocuments): Promise<void> {
+    for await (const documentId of data.documentIds) {
+      await this.documentRepository.updateForRetry({
+        documentId,
+        processAt: this.datesUtil.getDateNow(),
+        retryBy: data.retryBy,
+      });
+      await this.documentProducer.migrate(documentId);
+    }
   }
 }

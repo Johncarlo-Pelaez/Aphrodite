@@ -15,14 +15,13 @@ export interface CreateDocumentParam {
 
 export interface BeginDocProcessParam {
   documentId: number;
-  beginAt: Date;
+  processAt: Date;
 }
 
 export interface QrDocumentParams {
   documentId: number;
   qrCode: string;
   qrAt: Date;
-  modifiedBy?: number;
 }
 
 export interface FailDocProcessParam {
@@ -33,15 +32,11 @@ export interface FailDocProcessParam {
 export interface DoneIndexingParam {
   documentId: number;
   indexedAt: Date;
-  documentType?: string;
-  contractDetails?: string;
-  docTypeReqParams?: string;
-  contractDetailsReqParams?: string;
+  documentType: string;
+  docTypeReqParams: string;
 }
 
 export interface FailIndexingParam extends FailDocProcessParam {
-  documentType?: string;
-  contractDetails?: string;
   docTypeReqParams?: string;
   contractDetailsReqParams?: string;
 }
@@ -89,4 +84,8 @@ export interface ApproverApproveDisapproveDocParam {
   documentId: number;
   approver: number;
   modifiedAt: Date;
+}
+
+export interface UpdateForRetry extends BeginDocProcessParam {
+  retryBy: number;
 }

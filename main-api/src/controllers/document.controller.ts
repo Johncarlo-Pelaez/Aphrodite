@@ -31,6 +31,7 @@ import {
   EncodeDocumentDto,
   CheckerApproveDocDto,
   CheckerDisApproveDocDto,
+  RetryDocumentsDto,
 } from './document.dto';
 import { GetDocumentsIntPipe } from './document.pipe';
 
@@ -183,6 +184,18 @@ export class DocumentController {
     return await this.documentsService.approverDisapproveDoc({
       documentId,
       approver: userId,
+    });
+  }
+
+  @ApiOkResponse()
+  @Put('/retry')
+  retryDocuments(
+    @Body() dto: RetryDocumentsDto,
+    @GetUserId() userId: number,
+  ): Promise<void> {
+    return this.documentsService.retryDocuments({
+      documentIds: dto.documentIds,
+      retryBy: userId,
     });
   }
 }
