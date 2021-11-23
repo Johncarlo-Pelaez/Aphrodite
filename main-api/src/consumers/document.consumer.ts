@@ -6,10 +6,12 @@ import * as path from 'path';
 import { AppConfigService } from 'src/app-config';
 import { DatesUtil } from 'src/utils';
 import { DocumentRepository, NomenclatureRepository } from 'src/repositories';
+import { EncodeValues } from 'src/repositories/document';
 import { QRService } from 'src/qr-service';
 import {
   SalesForceService,
   GetDocumentTypeResult,
+  GetContractDetailsResult,
   DocumentType,
   ContractDetail,
 } from 'src/sales-force-service';
@@ -40,13 +42,15 @@ export class DocumentConsumer {
 
   async migrate(jobDocId: number): Promise<void> {
     const document = await this.documentRepository.getDocument(jobDocId);
-    const { id: documentId, uuid: sysSrcFileName } = document;
     const {
+      id: documentId,
+      uuid: sysSrcFileName,
       documentName,
       qrCode: docQrCode,
       status,
       documentType: strGetDocTypeReqRes,
       contractDetails: strGetContDetailsReqRes,
+      encodeValues: strEncodeValues,
     } = document;
     const filename = path
       .basename(documentName, path.extname(documentName))
@@ -54,7 +58,9 @@ export class DocumentConsumer {
     let qrCode: string;
     const buffer = await this.readFile(sysSrcFileName);
 
-    let documentType: DocumentType, contractDetail: ContractDetail;
+    let documentType: DocumentType,
+      contractDetail: ContractDetail,
+      encodeValues: EncodeValues;
 
     if (strGetDocTypeReqRes && strGetDocTypeReqRes !== '') {
       const getDocTypeReqResult = JSON.parse(strGetDocTypeReqRes);
@@ -68,6 +74,18 @@ export class DocumentConsumer {
       contractDetail = !!getContDetailsReqRes?.reponse?.items.length
         ? getContDetailsReqRes.reponse.items[0]
         : undefined;
+    }
+
+    if (strEncodeValues && strEncodeValues !== '') {
+      encodeValues = JSON.parse(strEncodeValues);
+    }
+
+    if (
+      !documentType &&
+      encodeValues &&
+      status === DocumentStatus.ENCODING_DONE
+    ) {
+      documentType = await this.runGetContractDetails(documentId, encodeValues);
     }
 
     if (!documentType) {
@@ -86,9 +104,9 @@ export class DocumentConsumer {
       if (qrCode === '') {
         await this.updateForManualEncode(documentId);
         return;
+      } else {
+        documentType = await this.runGetDocumentType(qrCode, documentId);
       }
-
-      documentType = await this.runIndexing(qrCode, documentId);
     }
 
     if (!documentType) {
@@ -101,12 +119,20 @@ export class DocumentConsumer {
         documentType.Nomenclature,
       );
 
-    if (isWhiteListed && status !== DocumentStatus.APPROVED) {
+    if (
+      isWhiteListed &&
+      status !== DocumentStatus.APPROVED &&
+      status !== DocumentStatus.CHECKING_APPROVED
+    ) {
       await this.updateForChecking(documentId);
       return;
     }
 
-    if (!isWhiteListed || status === DocumentStatus.APPROVED) {
+    if (
+      !isWhiteListed ||
+      status === DocumentStatus.APPROVED ||
+      status === DocumentStatus.CHECKING_APPROVED
+    ) {
       const empty = '';
       const uploadParams = {
         Brand: documentType?.Brand ?? empty,
@@ -172,7 +198,7 @@ export class DocumentConsumer {
     return qrCode;
   }
 
-  private async runIndexing(
+  private async runGetDocumentType(
     qrCode: string,
     documentId: number,
   ): Promise<DocumentType | undefined> {
@@ -193,8 +219,9 @@ export class DocumentConsumer {
     } catch (error) {
       await this.updateToIndexingFailed(
         documentId,
-        JSON.stringify(getDocTypeReqParams),
         error,
+        JSON.stringify(getDocTypeReqParams),
+        null,
       );
       throw error;
     }
@@ -207,9 +234,78 @@ export class DocumentConsumer {
       documentId,
       JSON.stringify(getDocTypeResult),
       JSON.stringify(getDocTypeReqParams),
+      null,
+      null,
     );
 
     return documentType;
+  }
+
+  private async runGetContractDetails(
+    documentId: number,
+    { contractNumber, companyCode, nomenclature, documentGroup }: EncodeValues,
+  ): Promise<DocumentType | undefined> {
+    await this.documentRepository.beginIndexing({
+      documentId,
+      processAt: this.datesUtil.getDateNow(),
+    });
+
+    const getContractDetailsReqParams = {
+      ContractNumber: contractNumber,
+      CompanyCode: companyCode,
+    };
+    let getContractDetailsResult: GetContractDetailsResult;
+
+    try {
+      getContractDetailsResult =
+        await this.salesForceService.getContractDetails(
+          getContractDetailsReqParams,
+        );
+    } catch (error) {
+      await this.updateToIndexingFailed(
+        documentId,
+        error,
+        null,
+        JSON.stringify(getContractDetailsReqParams),
+      );
+      throw error;
+    }
+
+    const contractDetail =
+      !!getContractDetailsResult?.response?.length &&
+      !!getContractDetailsResult?.response[0].items?.length
+        ? getContractDetailsResult.response[0].items[0]
+        : undefined;
+
+    const documentType = {
+      Nomenclature: nomenclature,
+      DocumentGroup: documentGroup,
+      ContractNumber: contractDetail?.ContractNumber,
+      CompanyCode: contractDetail?.CompanyCode,
+      Brand: contractDetail?.Brand,
+      ProjectCode: contractDetail?.ProjectCode,
+      TowerPhase: contractDetail?.Tower_Phase,
+      CustomerCode: contractDetail?.CustomerCode,
+      UnitDetails: contractDetail?.UnitDescription,
+      AccountName: contractDetail?.CustomerName,
+      ProjectName: contractDetail?.ProjectName,
+      Transmittal: '',
+      CopyType: '',
+    };
+
+    const getDocTypeReqResult: GetDocumentTypeResult = {
+      response: [documentType],
+    };
+
+    await this.updateToIndexingDone(
+      documentId,
+      contractDetail ? JSON.stringify(getDocTypeReqResult) : null,
+      null,
+      JSON.stringify(getContractDetailsResult),
+      JSON.stringify(getContractDetailsReqParams),
+    );
+
+    return contractDetail ? documentType : undefined;
   }
 
   private async runUploadToSpringCM(
@@ -297,25 +393,31 @@ export class DocumentConsumer {
     documentId: number,
     documentType: string,
     docTypeReqParams: string,
+    contractDetails: string,
+    contractDetailsReqParams: string,
   ): Promise<void> {
     const indexedAt = this.datesUtil.getDateNow();
     await this.documentRepository.doneIndexing({
       documentId,
       documentType,
       docTypeReqParams,
+      contractDetails,
+      contractDetailsReqParams,
       indexedAt,
     });
   }
 
   private async updateToIndexingFailed(
     documentId: number,
-    docTypeReqParams: string,
     error: string,
+    docTypeReqParams: string,
+    contractDetailsReqParams: string,
   ): Promise<void> {
     const failedAt = this.datesUtil.getDateNow();
     await this.documentRepository.failIndexing({
       documentId,
       docTypeReqParams,
+      contractDetailsReqParams,
       failedAt,
     });
     this.logger.error(error);
@@ -352,18 +454,18 @@ export class DocumentConsumer {
   }
 
   private async updateForManualEncode(documentId: number): Promise<void> {
-    const beginAt = this.datesUtil.getDateNow();
+    const processAt = this.datesUtil.getDateNow();
     await this.documentRepository.updateForManualEncode({
       documentId,
-      processAt: beginAt,
+      processAt,
     });
   }
 
   private async updateForChecking(documentId: number): Promise<void> {
-    const beginAt = this.datesUtil.getDateNow();
+    const processAt = this.datesUtil.getDateNow();
     await this.documentRepository.updateForChecking({
       documentId,
-      processAt: beginAt,
+      processAt,
     });
   }
 }

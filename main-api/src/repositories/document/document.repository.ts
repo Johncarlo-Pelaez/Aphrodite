@@ -31,9 +31,16 @@ export class DocumentRepository {
   constructor(private readonly manager: EntityManager) {}
 
   async getDocuments(param: GetDocumentsParam): Promise<Document[]> {
-    const { search = '', documentType = '', statuses } = param;
+    const { search = '', documentType, statuses } = param;
 
+    let whereDocumentType: { documentType: FindOperator<string> };
     let whereStatusIn: { status: FindOperator<DocumentStatus> };
+
+    if (documentType && documentType !== '') {
+      whereDocumentType = {
+        documentType: ILike(`%${documentType}%`),
+      };
+    }
 
     if (statuses && !!statuses.length) {
       whereStatusIn = {
@@ -46,21 +53,21 @@ export class DocumentRepository {
       where: [
         {
           documentName: ILike(`%${search}%`),
-          documentType: ILike(`%${documentType}%`),
+          ...whereDocumentType,
           ...whereStatusIn,
         },
         {
           user: {
             firstName: ILike(`%${search}%`),
           },
-          documentType: ILike(`%${documentType}%`),
+          ...whereDocumentType,
           ...whereStatusIn,
         },
         {
           user: {
             lastName: ILike(`%${search}%`),
           },
-          documentType: ILike(`%${documentType}%`),
+          ...whereDocumentType,
           ...whereStatusIn,
         },
       ],
@@ -89,9 +96,16 @@ export class DocumentRepository {
   }
 
   async count(param: CountParam): Promise<number> {
-    const { search = '', documentType = '', statuses } = param;
+    const { search = '', documentType, statuses } = param;
 
+    let whereDocumentType: { documentType: FindOperator<string> };
     let whereStatusIn: { status: FindOperator<DocumentStatus> };
+
+    if (documentType && documentType !== '') {
+      whereDocumentType = {
+        documentType: ILike(`%${documentType}%`),
+      };
+    }
 
     if (statuses && !!statuses.length) {
       whereStatusIn = {
@@ -104,21 +118,21 @@ export class DocumentRepository {
       where: [
         {
           documentName: ILike(`%${search}%`),
-          documentType: ILike(`%${documentType}%`),
+          ...whereDocumentType,
           ...whereStatusIn,
         },
         {
           user: {
             firstName: ILike(`%${search}%`),
           },
-          documentType: ILike(`%${documentType}%`),
+          ...whereDocumentType,
           ...whereStatusIn,
         },
         {
           user: {
             lastName: ILike(`%${search}%`),
           },
-          documentType: ILike(`%${documentType}%`),
+          ...whereDocumentType,
           ...whereStatusIn,
         },
       ],
@@ -243,6 +257,8 @@ export class DocumentRepository {
       document.status = DocumentStatus.INDEXING_DONE;
       document.documentType = param.documentType;
       document.docTypeReqParams = param.docTypeReqParams;
+      document.contractDetails = param.contractDetails;
+      document.contractDetailsReqParams = param.contractDetailsReqParams;
       document.modifiedDate = param.indexedAt;
       document.description =
         'Successfully retrieved account details from sales force.';
@@ -261,6 +277,7 @@ export class DocumentRepository {
       );
       document.status = DocumentStatus.INDEXING_FAILED;
       document.docTypeReqParams = param.docTypeReqParams;
+      document.contractDetailsReqParams = param.contractDetailsReqParams;
       document.modifiedDate = param.failedAt;
       document.description =
         'Failed to retrieve account details from sales force.';
@@ -345,7 +362,7 @@ export class DocumentRepository {
         Document,
         param.documentId,
       );
-      document.status = DocumentStatus.MANUAL_ENCODE;
+      document.status = DocumentStatus.ENCODING;
       document.modifiedDate = param.processAt;
       document.description = 'For manual encode.';
       await transaction.save(document);
@@ -361,9 +378,8 @@ export class DocumentRepository {
         Document,
         param.documentId,
       );
-      document.status = DocumentStatus.ENCODED;
+      document.status = DocumentStatus.ENCODING_DONE;
       document.qrCode = param.qrBarCode;
-      document.encodeValues = param.encodeValues;
       document.qrAt = param.encodedAt;
       document.encodedAt = param.encodedAt;
       document.encoder = param.encodedBy;
@@ -383,16 +399,13 @@ export class DocumentRepository {
         Document,
         param.documentId,
       );
-      document.status = DocumentStatus.ENCODED;
-      document.documentType = param.documentType;
-      document.contractDetails = param.contractDetails;
-      document.contractDetailsReqParams = param.contractDetailsReqParams;
+      document.status = DocumentStatus.ENCODING_DONE;
       document.encodeValues = param.encodeValues;
       document.encodedAt = param.encodedAt;
       document.encoder = param.encodedBy;
       document.modifiedDate = param.encodedAt;
       document.modifiedBy = param.encodedBy;
-      document.description = 'Account details has successfully encoded.';
+      document.description = 'Successfully encoded.';
       await transaction.save(document);
 
       const history = this.genarateDocumentHistory(document);
@@ -406,7 +419,7 @@ export class DocumentRepository {
         Document,
         param.documentId,
       );
-      document.status = DocumentStatus.ENCODE_FAILED;
+      document.status = DocumentStatus.ENCODING_FAILED;
       document.contractDetailsReqParams = param.contractDetailsReqParams;
       document.encodeValues = param.encodeValues;
       document.modifiedDate = param.failedAt;
@@ -425,7 +438,7 @@ export class DocumentRepository {
         Document,
         param.documentId,
       );
-      document.status = DocumentStatus.APPROVED;
+      document.status = DocumentStatus.CHECKING_APPROVED;
       document.description = 'Checker approved.';
       document.documentDate = param.documentDate;
       document.checkedAt = param.checkedAt;
@@ -445,7 +458,7 @@ export class DocumentRepository {
         Document,
         param.documentId,
       );
-      document.status = DocumentStatus.APPROVAL;
+      document.status = DocumentStatus.CHECKING_DISAPPROVED;
       document.description = 'Checker Disapproved.';
       document.documentDate = param.documentDate;
       document.remarks = param.remarks;
@@ -506,7 +519,7 @@ export class DocumentRepository {
         Document,
         param.documentId,
       );
-      document.status = DocumentStatus.RETRY;
+      document.status = DocumentStatus.RETRYING;
       document.modifiedDate = param.processAt;
       document.modifiedBy = param.retryBy;
       document.description = 'Retrying process.';

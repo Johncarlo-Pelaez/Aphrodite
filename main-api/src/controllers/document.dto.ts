@@ -73,7 +73,7 @@ export class EncodeDocDetailsDto {
 export class EncodeDocQRBarCodeDto {
   @ApiProperty()
   @IsString()
-  qrCode: string;
+  qrBarCode: string;
 }
 
 export class CheckerApproveDocDto {

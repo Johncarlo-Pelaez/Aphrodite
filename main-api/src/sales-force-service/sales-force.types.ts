@@ -20,7 +20,7 @@ export interface ContractDetail {
 }
 
 export interface GetContractDetailsResult {
-  reponse: { items: ContractDetail[] };
+  response: [{ items: ContractDetail[] }];
 }
 
 export interface DocumentType {

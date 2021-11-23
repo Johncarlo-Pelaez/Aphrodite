@@ -126,7 +126,7 @@ export class DocumentController {
   ): Promise<void> {
     await this.documentsService.encodeDocQRBarcode({
       documentId,
-      qrCode: dto.qrCode,
+      qrBarCode: dto.qrBarCode,
       encodedBy: userId,
     });
   }

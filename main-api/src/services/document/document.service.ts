@@ -5,16 +5,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { DatesUtil } from 'src/utils';
 import { AppConfigService } from 'src/app-config';
 import { DocumentRepository } from 'src/repositories';
+import { EncodeValues } from 'src/repositories/document';
 import { DocumentProducer } from 'src/producers';
 import { CreatedResponse } from 'src/core';
 import { Document } from 'src/entities';
-import {
-  SalesForceService,
-  GetContractDetailsResult,
-  GetDocumentTypeResult,
-  DocumentType,
-} from 'src/sales-force-service';
-import { DocumentStatus } from 'src/entities';
 import {
   UploadDocuments,
   EncodeDocDetails,
@@ -33,7 +27,6 @@ export class DocumentService {
     private readonly documentProducer: DocumentProducer,
     private readonly datesUtil: DatesUtil,
     private readonly appConfigService: AppConfigService,
-    private readonly salesForceService: SalesForceService,
   ) {}
 
   async uploadDocument(data: UploadDocuments): Promise<CreatedResponse> {
@@ -71,7 +64,7 @@ export class DocumentService {
     return [document, buffer];
   }
 
-  async encodeDocDetails(data: EncodeDocDetails): Promise<DocumentType> {
+  async encodeDocDetails(data: EncodeDocDetails): Promise<void> {
     const {
       documentId,
       companyCode,
@@ -80,86 +73,31 @@ export class DocumentService {
       documentGroup,
       encodedBy,
     } = data;
-    const document = await this.documentRepository.getDocument(documentId);
-    let dateRightNow = this.datesUtil.getDateNow();
-    const encodeValues = {
+
+    const encodeValues: EncodeValues = {
       companyCode,
       contractNumber,
       nomenclature,
       documentGroup,
     };
 
-    const getContractDetailsReqParams = {
-      ContractNumber: contractNumber,
-      CompanyCode: companyCode,
-    };
-    let getContractDetailsResult: GetContractDetailsResult;
-
-    try {
-      getContractDetailsResult =
-        await this.salesForceService.getContractDetails(
-          getContractDetailsReqParams,
-        );
-    } catch (error) {
-      dateRightNow = this.datesUtil.getDateNow();
-      await this.documentRepository.failEncode({
-        documentId,
-        contractDetailsReqParams: JSON.stringify(getContractDetailsReqParams),
-        failedAt: dateRightNow,
-        encodeValues: JSON.stringify(encodeValues),
-      });
-      throw error;
-    }
-
-    let getDocTypeReqResult: GetDocumentTypeResult = JSON.parse(
-      document.documentType,
-    );
-
-    const contractDetail = !!getContractDetailsResult?.reponse?.items.length
-      ? getContractDetailsResult.reponse.items[0]
-      : undefined;
-
-    const documentType = {
-      Nomenclature: nomenclature,
-      DocumentGroup: documentGroup,
-      ContractNumber: contractDetail?.ContractNumber,
-      CompanyCode: contractDetail?.CompanyCode,
-      Brand: contractDetail?.Brand,
-      ProjectCode: contractDetail?.ProjectCode,
-      TowerPhase: contractDetail?.Tower_Phase,
-      CustomerCode: contractDetail?.CustomerCode,
-      UnitDetails: contractDetail?.UnitDescription,
-      AccountName: contractDetail?.CustomerName,
-      ProjectName: contractDetail?.ProjectName,
-      Transmittal: '',
-      CopyType: '',
-    };
-
-    getDocTypeReqResult.response.push(documentType);
-
-    dateRightNow = this.datesUtil.getDateNow();
+    const dateRightNow = this.datesUtil.getDateNow();
     await this.documentRepository.encodeAccountDetails({
       documentId,
-      documentType: JSON.stringify(getDocTypeReqResult),
-      contractDetails: JSON.stringify(getContractDetailsResult),
-      contractDetailsReqParams: JSON.stringify(getContractDetailsReqParams),
       encodeValues: JSON.stringify(encodeValues),
       encodedAt: dateRightNow,
       encodedBy,
     });
-
     await this.documentProducer.migrate(documentId);
-    return documentType;
   }
 
   async encodeDocQRBarcode(data: EncodeDocQRBarCode): Promise<void> {
-    const { documentId, qrCode, encodedBy } = data;
+    const { documentId, qrBarCode, encodedBy } = data;
     await this.documentRepository.encodeQrBarcode({
       documentId,
-      qrBarCode: qrCode,
+      qrBarCode,
       encodedAt: this.datesUtil.getDateNow(),
       encodedBy,
-      encodeValues: JSON.stringify({ qrBarCode: qrCode }),
     });
     await this.documentProducer.migrate(documentId);
   }
@@ -209,43 +147,13 @@ export class DocumentService {
     const documents = await this.documentRepository.findDocumentsByIds(
       data.documentIds,
     );
-    for await (const {
-      id,
-      status,
-      qrCode,
-      encodeValues: strEncodeValues,
-    } of documents) {
+    for await (const { id: documentId } of documents) {
       await this.documentRepository.updateForRetry({
-        documentId: id,
+        documentId,
         processAt: this.datesUtil.getDateNow(),
         retryBy: data.retryBy,
       });
-
-      switch (status) {
-        case DocumentStatus.ENCODE_FAILED:
-          const encodeValues = strEncodeValues
-            ? JSON.parse(strEncodeValues)
-            : undefined;
-          const qrBarCode = encodeValues?.qrBarCode;
-          if (qrBarCode && qrBarCode !== qrCode) {
-            await this.encodeDocQRBarcode({
-              documentId: id,
-              qrCode: qrBarCode,
-              encodedBy: data.retryBy,
-            });
-          } else {
-            await this.encodeDocDetails({
-              documentId: id,
-              encodedBy: data.retryBy,
-              ...encodeValues,
-            });
-          }
-          break;
-        default:
-          break;
-      }
-
-      await this.documentProducer.migrate(id);
+      await this.documentProducer.migrate(documentId);
     }
   }
 }

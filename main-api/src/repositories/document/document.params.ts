@@ -43,10 +43,13 @@ export interface DoneIndexingParam {
   indexedAt: Date;
   documentType: string;
   docTypeReqParams: string;
+  contractDetails: string;
+  contractDetailsReqParams: string;
 }
 
 export interface FailIndexingParam extends FailDocProcessParam {
   docTypeReqParams: string;
+  contractDetailsReqParams: string;
 }
 
 export interface MigrateDocumentParam {
@@ -69,13 +72,9 @@ interface EncodeProcess {
 
 export interface EncodeQrBarcodeParams extends EncodeProcess {
   qrBarCode: string;
-  encodeValues: string;
 }
 
 export interface EncodeAccountDetailsParams extends EncodeProcess {
-  documentType: string;
-  contractDetails: string;
-  contractDetailsReqParams: string;
   encodeValues: string;
 }
 

@@ -15,7 +15,7 @@ export interface EncodeDocDetails {
 export interface EncodeDocQRBarCode {
   documentId: number;
   encodedBy: number;
-  qrCode: string;
+  qrBarCode: string;
 }
 
 export interface CheckerApproveDoc {
