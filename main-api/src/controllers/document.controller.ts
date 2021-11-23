@@ -143,7 +143,7 @@ export class DocumentController {
       documentId,
       companyCode: dto.companyCode,
       contractNumber: dto.contractNumber,
-      nomenclature: dto.nomenClature,
+      nomenclature: dto.nomenclature,
       documentGroup: dto.documentGroup,
       encodedBy: userId,
     });

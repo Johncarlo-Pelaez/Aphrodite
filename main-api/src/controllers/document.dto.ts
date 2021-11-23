@@ -63,7 +63,7 @@ export class EncodeDocDetailsDto {
 
   @ApiProperty()
   @IsString()
-  nomenClature: string;
+  nomenclature: string;
 
   @ApiProperty()
   @IsString()
