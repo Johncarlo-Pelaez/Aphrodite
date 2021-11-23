@@ -1,4 +1,4 @@
-/****** Object:  Table [dbo].[document]    Script Date: 11/19/2021 11:33:55 AM ******/
+/****** Object:  Table [dbo].[document]    Script Date: 11/23/2021 10:02:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -29,13 +29,14 @@ CREATE TABLE [dbo].[document](
 	[checker] [int] NULL,
 	[checkedAt] [datetime] NULL,
 	[approver] [int] NULL,
+	[encodeValues] [nvarchar](max) NULL,
  CONSTRAINT [PK_document] PRIMARY KEY CLUSTERED 
 (
 	[id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[document_history]    Script Date: 11/19/2021 11:33:55 AM ******/
+/****** Object:  Table [dbo].[document_history]    Script Date: 11/23/2021 10:02:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -53,7 +54,7 @@ CREATE TABLE [dbo].[document_history](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[lookup]    Script Date: 11/19/2021 11:33:55 AM ******/
+/****** Object:  Table [dbo].[lookup]    Script Date: 11/23/2021 10:02:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -64,7 +65,7 @@ CREATE TABLE [dbo].[lookup](
 	[documentGroup] [nvarchar](max) NOT NULL
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[nomenclature]    Script Date: 11/19/2021 11:33:55 AM ******/
+/****** Object:  Table [dbo].[nomenclature]    Script Date: 11/23/2021 10:02:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -74,7 +75,7 @@ CREATE TABLE [dbo].[nomenclature](
 	[description] [nvarchar](255) NOT NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[user]    Script Date: 11/19/2021 11:33:55 AM ******/
+/****** Object:  Table [dbo].[user]    Script Date: 11/23/2021 10:02:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
