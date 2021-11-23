@@ -28,7 +28,6 @@ export const NomenclatureField = ({
   } = useController({
     control,
     name: 'nomenclature',
-    rules: { required: true },
   });
 
   useEffect(

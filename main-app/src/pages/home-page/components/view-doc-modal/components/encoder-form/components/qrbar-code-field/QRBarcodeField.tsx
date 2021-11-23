@@ -1,5 +1,5 @@
-import { ReactElement, useState, useEffect } from 'react';
-import { useController, Control, useWatch } from 'react-hook-form';
+import { ReactElement } from 'react';
+import { useController, Control } from 'react-hook-form';
 import Form from 'react-bootstrap/Form';
 import { IEncoderFormValues } from '../../EncoderForm';
 
@@ -10,31 +10,14 @@ export interface QRBarcodeFieldProps {
 export const QRBarcodeField = ({
   control,
 }: QRBarcodeFieldProps): ReactElement => {
-  const [isRequired, setIsRequired] = useState<boolean>(true);
   const {
     field: { onChange, value, ref },
     fieldState: { error },
   } = useController({
     control,
     name: 'qrBarCode',
-    rules: { required: isRequired },
     defaultValue: '',
   });
-
-  const contractDetails = useWatch({
-    control,
-    name: ['companyCode', 'contractNumber'],
-  });
-
-  useEffect(() => {
-    if (!!contractDetails.length) {
-      let cc = contractDetails[0];
-      let cn = contractDetails[1];
-      cc = cc ? cc.replace(/\s/g, '') : '';
-      cn = cn ? cn.replace(/\s/g, '') : '';
-      setIsRequired(cc === '' && cn === '');
-    }
-  }, [contractDetails]);
 
   return (
     <Form.Group className="mb-3">

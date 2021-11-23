@@ -18,7 +18,7 @@ import {
   UploadDocToSpringParams,
 } from 'src/spring-cm-service';
 import { DocumentStatus } from 'src/entities';
-import { DOCUMENT_QUEUE, MIGRATE } from './document.constants';
+import { DOCUMENT_QUEUE, MIGRATE_JOB } from './document.constants';
 
 @Processor(DOCUMENT_QUEUE)
 export class DocumentConsumer {
@@ -33,9 +33,13 @@ export class DocumentConsumer {
     private readonly datesUtil: DatesUtil,
   ) {}
 
-  @Process(MIGRATE)
-  async migrate(job: Job<number>): Promise<void> {
-    const document = await this.documentRepository.getDocument(job.data);
+  @Process(MIGRATE_JOB)
+  async runMigrateJob(job: Job<number>): Promise<void> {
+    await this.migrate(job.data);
+  }
+
+  async migrate(jobDocId: number): Promise<void> {
+    const document = await this.documentRepository.getDocument(jobDocId);
     const { id: documentId, uuid: sysSrcFileName } = document;
     const {
       documentName,
@@ -50,8 +54,7 @@ export class DocumentConsumer {
     let qrCode: string;
     const buffer = await this.readFile(sysSrcFileName);
 
-    let documentType: DocumentType | undefined = undefined,
-      contractDetail: ContractDetail | undefined = undefined;
+    let documentType: DocumentType, contractDetail: ContractDetail;
 
     if (strGetDocTypeReqRes && strGetDocTypeReqRes !== '') {
       const getDocTypeReqResult = JSON.parse(strGetDocTypeReqRes);

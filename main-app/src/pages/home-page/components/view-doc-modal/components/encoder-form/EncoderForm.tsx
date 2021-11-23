@@ -67,11 +67,24 @@ export const EncoderForm = forwardRef(
         qrBarCode,
         companyCode,
         contractNumber,
-        nomenclature,
+        nomenclature: arrNomenclature,
         documentGroup,
       } = data;
 
-      if (!nomenclature.length || nomenclature.length < 1) {
+      const hasDefaultQrCode = !!document?.qrCode;
+      const isQRBarCodeInputEmpty = !qrBarCode || qrBarCode === '';
+      const isNomenclatureInputEmpty =
+        !arrNomenclature || (arrNomenclature && arrNomenclature.length < 1);
+      const isDocumentGroupInputEmpty = !documentGroup || documentGroup === '';
+      const isCompanyCodeInputEmpty = !companyCode || companyCode === '';
+      const isContractNumberInputEmpty =
+        !contractNumber || contractNumber === '';
+
+      if (
+        !isCompanyCodeInputEmpty &&
+        !isContractNumberInputEmpty &&
+        isNomenclatureInputEmpty
+      ) {
         setError('nomenclature', {
           type: 'required',
           message: 'Nomenclature is required',
@@ -79,7 +92,7 @@ export const EncoderForm = forwardRef(
         return;
       }
 
-      if (!documentGroup || documentGroup === '') {
+      if (!isNomenclatureInputEmpty && isDocumentGroupInputEmpty) {
         setError('documentGroup', {
           type: 'required',
           message: 'Document Group is required',
@@ -88,9 +101,24 @@ export const EncoderForm = forwardRef(
       }
 
       if (
-        (!qrBarCode || qrBarCode === '') &&
-        (!companyCode || companyCode === '') &&
-        (!contractNumber || contractNumber === '')
+        hasDefaultQrCode &&
+        qrBarCode === document?.qrCode &&
+        isCompanyCodeInputEmpty &&
+        isContractNumberInputEmpty
+      ) {
+        setError('companyCode', {
+          type: 'required',
+          message: 'Company Code is required',
+        });
+        setError('contractNumber', {
+          type: 'required',
+          message: 'Contract Number is required',
+        });
+        return;
+      } else if (
+        isQRBarCodeInputEmpty &&
+        isCompanyCodeInputEmpty &&
+        isContractNumberInputEmpty
       ) {
         setError('qrBarCode', {
           type: 'required',
@@ -106,10 +134,9 @@ export const EncoderForm = forwardRef(
         });
         return;
       } else if (
-        (!qrBarCode || qrBarCode === '') &&
-        contractNumber &&
-        contractNumber !== '' &&
-        (!companyCode || companyCode === '')
+        isQRBarCodeInputEmpty &&
+        !isContractNumberInputEmpty &&
+        isCompanyCodeInputEmpty
       ) {
         setError('companyCode', {
           type: 'required',
@@ -117,10 +144,9 @@ export const EncoderForm = forwardRef(
         });
         return;
       } else if (
-        (!qrBarCode || qrBarCode === '') &&
-        companyCode &&
-        companyCode !== '' &&
-        (!contractNumber || contractNumber === '')
+        isQRBarCodeInputEmpty &&
+        !isCompanyCodeInputEmpty &&
+        isContractNumberInputEmpty
       ) {
         setError('contractNumber', {
           type: 'required',
@@ -134,16 +160,30 @@ export const EncoderForm = forwardRef(
         return;
       }
 
-      const { label } = nomenclature[0];
+      const nomenclature =
+        arrNomenclature && !!arrNomenclature.length
+          ? arrNomenclature[0].label
+          : '';
+
       if (!isEncodeDocSaving) {
+        let isQRBarCode;
+
+        if (!isQRBarCodeInputEmpty && qrBarCode !== document.qrCode) {
+          isQRBarCode = true;
+        } else {
+          isQRBarCode = false;
+        }
+
         await encodeDocumentAsync({
           documentId: document?.id as number,
           qrCode: qrBarCode,
           companyCode,
           contractNumber,
-          nomenClature: label,
+          nomenclature,
           documentGroup,
+          isQRBarCode,
         });
+
         alert('Encode Saved.');
         closeModal();
       }
@@ -162,16 +202,17 @@ export const EncoderForm = forwardRef(
       [nomenclature],
     );
 
-    useEffect(function initEncoderForm() {
-      setValue('qrBarCode', document?.qrCode ?? '');
+    useEffect(
+      function initEncoderForm() {
+        setValue('qrBarCode', document?.qrCode ?? '');
+      },
       // eslint-disable-next-line
-    }, []);
+      [document?.qrCode],
+    );
 
     useImperativeHandle(ref, () => ({
       encodeDocument: () => {
-        handleSubmit(encodeDocumentSubmit)().catch((error) => {
-          alert(error);
-        });
+        handleSubmit(encodeDocumentSubmit)();
       },
     }));
 

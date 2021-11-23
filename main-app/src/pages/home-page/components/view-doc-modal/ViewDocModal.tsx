@@ -101,7 +101,7 @@ export const ViewDocModal = ({
           <EncoderForm
             ref={encoderFormRef}
             document={document}
-            triggerCloseModal={onClose}
+            triggerCloseModal={closeModal}
           />
         );
       case DocumentStatus.CHECKING:
@@ -109,7 +109,7 @@ export const ViewDocModal = ({
           <CheckerForm
             ref={checkerFormRef}
             document={document}
-            triggerCloseModal={onClose}
+            triggerCloseModal={closeModal}
           />
         );
       case DocumentStatus.APPROVAL:
@@ -117,7 +117,7 @@ export const ViewDocModal = ({
           <AppoverForm
             ref={approverFormRef}
             document={document}
-            triggerCloseModal={onClose}
+            triggerCloseModal={closeModal}
           />
         );
       default:

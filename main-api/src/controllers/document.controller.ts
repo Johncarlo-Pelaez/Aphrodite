@@ -28,7 +28,8 @@ import { DocumentRepository } from 'src/repositories';
 import { DocumentService } from 'src/services';
 import {
   GetDocumentsDto,
-  EncodeDocumentDto,
+  EncodeDocDetailsDto,
+  EncodeDocQRBarCodeDto,
   CheckerApproveDocDto,
   CheckerDisApproveDocDto,
   RetryDocumentsDto,
@@ -84,11 +85,11 @@ export class DocumentController {
   })
   @Post('/')
   @ApiFile('file', true, { fileFilter: fileMimetypeFilter('pdf') })
-  uploadDocument(
+  async uploadDocument(
     @UploadedFile() file: Express.Multer.File,
     @GetUserId() userId: number,
   ): Promise<CreatedResponse> {
-    return this.documentsService.uploadDocument({
+    return await this.documentsService.uploadDocument({
       file,
       uploadedBy: userId,
     });
@@ -116,19 +117,33 @@ export class DocumentController {
   }
 
   @ApiOkResponse()
-  @Put('/:id/encode')
-  async encodeDocument(
+  @Put('/:id/encode/qrbarcode')
+  async encodeDocQRBarCode(
     @Param('id', ParseIntPipe)
     documentId: number,
-    @Body(ValidationPipe) dto: EncodeDocumentDto,
+    @Body(ValidationPipe) dto: EncodeDocQRBarCodeDto,
     @GetUserId() userId: number,
   ): Promise<void> {
-    return await this.documentsService.encodeDocument({
+    await this.documentsService.encodeDocQRBarcode({
       documentId,
       qrCode: dto.qrCode,
+      encodedBy: userId,
+    });
+  }
+
+  @ApiOkResponse()
+  @Put('/:id/encode/details')
+  async encodeDocDetails(
+    @Param('id', ParseIntPipe)
+    documentId: number,
+    @Body(ValidationPipe) dto: EncodeDocDetailsDto,
+    @GetUserId() userId: number,
+  ): Promise<void> {
+    await this.documentsService.encodeDocDetails({
+      documentId,
       companyCode: dto.companyCode,
       contractNumber: dto.contractNumber,
-      nomenClature: dto.nomenClature,
+      nomenclature: dto.nomenClature,
       documentGroup: dto.documentGroup,
       encodedBy: userId,
     });
@@ -142,7 +157,7 @@ export class DocumentController {
     @Body(ValidationPipe) dto: CheckerApproveDocDto,
     @GetUserId() userId: number,
   ): Promise<void> {
-    return await this.documentsService.checkerApproveDoc({
+    await this.documentsService.checkerApproveDoc({
       documentId,
       documentDate: dto.documentDate,
       checkedBy: userId,
@@ -157,7 +172,7 @@ export class DocumentController {
     @Body(ValidationPipe) dto: CheckerDisApproveDocDto,
     @GetUserId() userId: number,
   ): Promise<void> {
-    return await this.documentsService.checkerDisapproveDoc({
+    await this.documentsService.checkerDisapproveDoc({
       documentId,
       documentDate: dto.documentDate,
       remarks: dto.remarks,
@@ -172,7 +187,7 @@ export class DocumentController {
     documentId: number,
     @GetUserId() userId: number,
   ): Promise<void> {
-    return await this.documentsService.approverApproveDoc({
+    await this.documentsService.approverApproveDoc({
       documentId,
       approver: userId,
     });
@@ -185,7 +200,7 @@ export class DocumentController {
     documentId: number,
     @GetUserId() userId: number,
   ): Promise<void> {
-    return await this.documentsService.approverDisapproveDoc({
+    await this.documentsService.approverDisapproveDoc({
       documentId,
       approver: userId,
     });
@@ -193,11 +208,11 @@ export class DocumentController {
 
   @ApiOkResponse()
   @Put('/retry')
-  retryDocuments(
+  async retryDocuments(
     @Body(RetryDocumentsIntPipe) dto: RetryDocumentsDto,
     @GetUserId() userId: number,
   ): Promise<void> {
-    return this.documentsService.retryDocuments({
+    await this.documentsService.retryDocuments({
       documentIds: dto.documentIds,
       retryBy: userId,
     });

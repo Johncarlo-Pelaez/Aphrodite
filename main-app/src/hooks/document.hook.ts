@@ -15,8 +15,8 @@ import {
   uploadDocumentApiResponse,
   uploadDocumentApi,
   getDocumentHistoryApi,
-  EncodeDocumentApi,
-  encodeDocumentApi,
+  encodeDocDetailsApi,
+  encodeDocQRBarcodeApi,
   checkerApproveDocApi,
   checkerDisapproveDocApi,
   approverApproveDocApi,
@@ -88,17 +88,40 @@ export const useDocumentHistory = (
   );
 };
 
+export interface UseEncodeDocument {
+  documentId: number;
+  qrCode: string;
+  companyCode: string;
+  contractNumber: string;
+  nomenclature: string;
+  documentGroup: string;
+  isQRBarCode?: boolean;
+}
+
 export const useEncodeDocument = (): UseMutationResult<
   void,
   ApiError,
-  EncodeDocumentApi
+  UseEncodeDocument
 > => {
   const queryClient = useQueryClient();
-  return useMutation<void, ApiError, EncodeDocumentApi>(encodeDocumentApi, {
-    onSuccess: () => {
-      queryClient.invalidateQueries(QueryKey.paginatedDocuments);
+  return useMutation<void, ApiError, UseEncodeDocument>(
+    async ({ isQRBarCode = true, ...encodeParams }) => {
+      if (isQRBarCode) {
+        await encodeDocQRBarcodeApi({
+          documentId: encodeParams.documentId,
+          qrCode: encodeParams.qrCode,
+        });
+      } else {
+        const { qrCode, ...EncodeDocDetailsApi } = encodeParams;
+        await encodeDocDetailsApi(EncodeDocDetailsApi);
+      }
     },
-  });
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(QueryKey.paginatedDocuments);
+      },
+    },
+  );
 };
 
 export interface UseCheckerDocument {

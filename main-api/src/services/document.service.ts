@@ -12,10 +12,13 @@ import {
   SalesForceService,
   GetContractDetailsResult,
   GetDocumentTypeResult,
+  DocumentType,
 } from 'src/sales-force-service';
+import { DocumentStatus } from 'src/entities';
 import {
   UploadDocuments,
-  EncodeDocument,
+  EncodeDocDetails,
+  EncodeDocQRBarCode,
   CheckerApproveDoc,
   CheckerDisApproveDoc,
   DocumentApprover,
@@ -27,9 +30,9 @@ const { readFile, writeFile } = fs.promises;
 export class DocumentService {
   constructor(
     private readonly documentRepository: DocumentRepository,
+    private readonly documentProducer: DocumentProducer,
     private readonly datesUtil: DatesUtil,
     private readonly appConfigService: AppConfigService,
-    private readonly documentProducer: DocumentProducer,
     private readonly salesForceService: SalesForceService,
   ) {}
 
@@ -56,6 +59,7 @@ export class DocumentService {
     });
 
     await this.documentProducer.migrate(response.id);
+
     return response;
   }
 
@@ -67,85 +71,96 @@ export class DocumentService {
     return [document, buffer];
   }
 
-  async encodeDocument(data: EncodeDocument): Promise<void> {
+  async encodeDocDetails(data: EncodeDocDetails): Promise<DocumentType> {
     const {
       documentId,
-      qrCode,
       companyCode,
       contractNumber,
-      nomenClature,
+      nomenclature,
       documentGroup,
       encodedBy,
     } = data;
     const document = await this.documentRepository.getDocument(documentId);
     let dateRightNow = this.datesUtil.getDateNow();
+    const encodeValues = {
+      companyCode,
+      contractNumber,
+      nomenclature,
+      documentGroup,
+    };
 
-    if (qrCode && qrCode !== '' && qrCode !== document.qrCode) {
-      await this.documentRepository.encodeQrBarcode({
-        documentId,
-        qrBarCode: qrCode,
-        encodedAt: dateRightNow,
-        encodedBy,
-      });
-    } else {
-      const getContractDetailsReqParams = {
-        ContractNumber: contractNumber,
-        CompanyCode: companyCode,
-      };
-      let getContractDetailsResult: GetContractDetailsResult;
+    const getContractDetailsReqParams = {
+      ContractNumber: contractNumber,
+      CompanyCode: companyCode,
+    };
+    let getContractDetailsResult: GetContractDetailsResult;
 
-      try {
-        getContractDetailsResult =
-          await this.salesForceService.getContractDetails(
-            getContractDetailsReqParams,
-          );
-      } catch (error) {
-        dateRightNow = this.datesUtil.getDateNow();
-        await this.documentRepository.failIndexing({
-          documentId,
-          contractDetailsReqParams: JSON.stringify(getContractDetailsReqParams),
-          failedAt: dateRightNow,
-        });
-        throw error;
-      }
-
-      let getDocTypeReqResult: GetDocumentTypeResult = JSON.parse(
-        document.documentType,
-      );
-
-      const contractDetail = !!getContractDetailsResult?.reponse?.items.length
-        ? getContractDetailsResult.reponse.items[0]
-        : undefined;
-
-      getDocTypeReqResult.response = [
-        {
-          Nomenclature: nomenClature,
-          DocumentGroup: documentGroup,
-          ContractNumber: contractDetail?.ContractNumber,
-          CompanyCode: contractDetail?.CompanyCode,
-          Brand: contractDetail?.Brand,
-          ProjectCode: contractDetail?.ProjectCode,
-          TowerPhase: contractDetail?.Tower_Phase,
-          CustomerCode: contractDetail?.CustomerCode,
-          UnitDetails: contractDetail?.UnitDescription,
-          AccountName: contractDetail?.CustomerName,
-          ProjectName: contractDetail?.ProjectName,
-          Transmittal: '',
-          CopyType: '',
-        },
-      ];
-
+    try {
+      getContractDetailsResult =
+        await this.salesForceService.getContractDetails(
+          getContractDetailsReqParams,
+        );
+    } catch (error) {
       dateRightNow = this.datesUtil.getDateNow();
-      await this.documentRepository.encodeAccountDetails({
+      await this.documentRepository.failEncode({
         documentId,
-        documentType: JSON.stringify(getDocTypeReqResult),
-        contractDetails: JSON.stringify(getContractDetailsResult),
         contractDetailsReqParams: JSON.stringify(getContractDetailsReqParams),
-        encodedAt: dateRightNow,
-        encodedBy,
+        failedAt: dateRightNow,
+        encodeValues: JSON.stringify(encodeValues),
       });
+      throw error;
     }
 
+    let getDocTypeReqResult: GetDocumentTypeResult = JSON.parse(
+      document.documentType,
+    );
+
+    const contractDetail = !!getContractDetailsResult?.reponse?.items.length
+      ? getContractDetailsResult.reponse.items[0]
+      : undefined;
+
+    const documentType = {
+      Nomenclature: nomenclature,
+      DocumentGroup: documentGroup,
+      ContractNumber: contractDetail?.ContractNumber,
+      CompanyCode: contractDetail?.CompanyCode,
+      Brand: contractDetail?.Brand,
+      ProjectCode: contractDetail?.ProjectCode,
+      TowerPhase: contractDetail?.Tower_Phase,
+      CustomerCode: contractDetail?.CustomerCode,
+      UnitDetails: contractDetail?.UnitDescription,
+      AccountName: contractDetail?.CustomerName,
+      ProjectName: contractDetail?.ProjectName,
+      Transmittal: '',
+      CopyType: '',
+    };
+
+    getDocTypeReqResult.response.push(documentType);
+
+    dateRightNow = this.datesUtil.getDateNow();
+    await this.documentRepository.encodeAccountDetails({
+      documentId,
+      documentType: JSON.stringify(getDocTypeReqResult),
+      contractDetails: JSON.stringify(getContractDetailsResult),
+      contractDetailsReqParams: JSON.stringify(getContractDetailsReqParams),
+      encodeValues: JSON.stringify(encodeValues),
+      encodedAt: dateRightNow,
+      encodedBy,
+    });
+
+    await this.documentProducer.migrate(documentId);
+    return documentType;
+  }
+
+  async encodeDocQRBarcode(data: EncodeDocQRBarCode): Promise<void> {
+    const { documentId, qrCode, encodedBy } = data;
+    await this.documentRepository.encodeQrBarcode({
+      documentId,
+      qrBarCode: qrCode,
+      encodedAt: this.datesUtil.getDateNow(),
+      encodedBy,
+      encodeValues: JSON.stringify({ qrBarCode: qrCode }),
+    });
     await this.documentProducer.migrate(documentId);
   }
 
@@ -157,7 +172,6 @@ export class DocumentService {
       checkedBy,
       checkedAt: this.datesUtil.getDateNow(),
     });
-
     await this.documentProducer.migrate(documentId);
   }
 
@@ -179,7 +193,6 @@ export class DocumentService {
       approver,
       modifiedAt: this.datesUtil.getDateNow(),
     });
-
     await this.documentProducer.migrate(documentId);
   }
 
@@ -193,13 +206,46 @@ export class DocumentService {
   }
 
   async retryDocuments(data: RetryDocuments): Promise<void> {
-    for await (const documentId of data.documentIds) {
+    const documents = await this.documentRepository.findDocumentsByIds(
+      data.documentIds,
+    );
+    for await (const {
+      id,
+      status,
+      qrCode,
+      encodeValues: strEncodeValues,
+    } of documents) {
       await this.documentRepository.updateForRetry({
-        documentId,
+        documentId: id,
         processAt: this.datesUtil.getDateNow(),
         retryBy: data.retryBy,
       });
-      await this.documentProducer.migrate(documentId);
+
+      switch (status) {
+        case DocumentStatus.ENCODE_FAILED:
+          const encodeValues = strEncodeValues
+            ? JSON.parse(strEncodeValues)
+            : undefined;
+          const qrBarCode = encodeValues?.qrBarCode;
+          if (qrBarCode && qrBarCode !== qrCode) {
+            await this.encodeDocQRBarcode({
+              documentId: id,
+              qrCode: qrBarCode,
+              encodedBy: data.retryBy,
+            });
+          } else {
+            await this.encodeDocDetails({
+              documentId: id,
+              encodedBy: data.retryBy,
+              ...encodeValues,
+            });
+          }
+          break;
+        default:
+          break;
+      }
+
+      await this.documentProducer.migrate(id);
     }
   }
 }

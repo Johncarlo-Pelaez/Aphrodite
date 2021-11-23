@@ -93,6 +93,10 @@ export class Document {
 
   @ApiProperty()
   @Column({ nullable: true })
+  encodeValues?: string;
+
+  @ApiProperty()
+  @Column({ nullable: true })
   checker?: number;
 
   @ApiProperty()

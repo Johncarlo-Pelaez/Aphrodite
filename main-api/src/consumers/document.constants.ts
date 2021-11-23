@@ -1,2 +1,2 @@
 export const DOCUMENT_QUEUE = 'document';
-export const MIGRATE = 'migrate';
+export const MIGRATE_JOB = 'migrate';

@@ -19,6 +19,7 @@ import {
   FailIndexingParam,
   EncodeQrBarcodeParams,
   EncodeAccountDetailsParams,
+  FailEncodeParam,
   CheckerApproveDocParam,
   CheckerDispproveDocParam,
   ApproverApproveDisapproveDocParam,
@@ -32,27 +33,35 @@ export class DocumentRepository {
   async getDocuments(param: GetDocumentsParam): Promise<Document[]> {
     const { search = '', documentType = '', statuses } = param;
 
+    let whereStatusIn: { status: FindOperator<DocumentStatus> };
+
+    if (statuses && !!statuses.length) {
+      whereStatusIn = {
+        status: In(statuses),
+      };
+    }
+
     return this.manager.find(Document, {
       relations: ['user'],
       where: [
         {
           documentName: ILike(`%${search}%`),
           documentType: ILike(`%${documentType}%`),
-          status: In(statuses),
+          ...whereStatusIn,
         },
         {
           user: {
             firstName: ILike(`%${search}%`),
           },
           documentType: ILike(`%${documentType}%`),
-          status: In(statuses),
+          ...whereStatusIn,
         },
         {
           user: {
             lastName: ILike(`%${search}%`),
           },
           documentType: ILike(`%${documentType}%`),
-          status: In(statuses),
+          ...whereStatusIn,
         },
       ],
       order: { modifiedDate: 'DESC' },
@@ -82,27 +91,35 @@ export class DocumentRepository {
   async count(param: CountParam): Promise<number> {
     const { search = '', documentType = '', statuses } = param;
 
+    let whereStatusIn: { status: FindOperator<DocumentStatus> };
+
+    if (statuses && !!statuses.length) {
+      whereStatusIn = {
+        status: In(statuses),
+      };
+    }
+
     return this.manager.count(Document, {
       relations: ['user'],
       where: [
         {
           documentName: ILike(`%${search}%`),
           documentType: ILike(`%${documentType}%`),
-          status: In(statuses),
+          ...whereStatusIn,
         },
         {
           user: {
             firstName: ILike(`%${search}%`),
           },
           documentType: ILike(`%${documentType}%`),
-          status: In(statuses),
+          ...whereStatusIn,
         },
         {
           user: {
             lastName: ILike(`%${search}%`),
           },
           documentType: ILike(`%${documentType}%`),
-          status: In(statuses),
+          ...whereStatusIn,
         },
       ],
     });
@@ -244,7 +261,6 @@ export class DocumentRepository {
       );
       document.status = DocumentStatus.INDEXING_FAILED;
       document.docTypeReqParams = param.docTypeReqParams;
-      document.contractDetailsReqParams = param.contractDetailsReqParams;
       document.modifiedDate = param.failedAt;
       document.description =
         'Failed to retrieve account details from sales force.';
@@ -347,6 +363,7 @@ export class DocumentRepository {
       );
       document.status = DocumentStatus.ENCODED;
       document.qrCode = param.qrBarCode;
+      document.encodeValues = param.encodeValues;
       document.qrAt = param.encodedAt;
       document.encodedAt = param.encodedAt;
       document.encoder = param.encodedBy;
@@ -370,11 +387,31 @@ export class DocumentRepository {
       document.documentType = param.documentType;
       document.contractDetails = param.contractDetails;
       document.contractDetailsReqParams = param.contractDetailsReqParams;
+      document.encodeValues = param.encodeValues;
       document.encodedAt = param.encodedAt;
       document.encoder = param.encodedBy;
       document.modifiedDate = param.encodedAt;
       document.modifiedBy = param.encodedBy;
       document.description = 'Account details has successfully encoded.';
+      await transaction.save(document);
+
+      const history = this.genarateDocumentHistory(document);
+      await transaction.save(history);
+    });
+  }
+
+  async failEncode(param: FailEncodeParam): Promise<void> {
+    await this.manager.transaction(async (transaction): Promise<void> => {
+      const document = await this.manager.findOneOrFail(
+        Document,
+        param.documentId,
+      );
+      document.status = DocumentStatus.ENCODE_FAILED;
+      document.contractDetailsReqParams = param.contractDetailsReqParams;
+      document.encodeValues = param.encodeValues;
+      document.modifiedDate = param.failedAt;
+      document.description =
+        'Failed to retrieve account details from sales force.';
       await transaction.save(document);
 
       const history = this.genarateDocumentHistory(document);

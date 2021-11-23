@@ -16,7 +16,6 @@ export const DocumentGroupField = ({
   } = useController({
     control,
     name: 'documentGroup',
-    rules: { required: true },
     defaultValue: '',
   });
 

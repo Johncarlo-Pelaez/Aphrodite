@@ -1,5 +1,5 @@
-import { ReactElement, useState, useEffect } from 'react';
-import { useController, Control, useWatch } from 'react-hook-form';
+import { ReactElement } from 'react';
+import { useController, Control } from 'react-hook-form';
 import Form from 'react-bootstrap/Form';
 import { IEncoderFormValues } from '../../EncoderForm';
 
@@ -10,25 +10,14 @@ export interface CompanyCodeFieldProps {
 export const CompanyCodeField = ({
   control,
 }: CompanyCodeFieldProps): ReactElement => {
-  const [isRequired, setIsRequired] = useState<boolean>(true);
   const {
     field: { onChange, value, ref },
     fieldState: { error },
   } = useController({
     control,
     name: 'companyCode',
-    rules: { required: isRequired },
     defaultValue: '',
   });
-
-  const qrBarCode = useWatch({
-    control,
-    name: 'qrBarCode',
-  });
-
-  useEffect(() => {
-    setIsRequired(qrBarCode.trim() === '');
-  }, [qrBarCode]);
 
   return (
     <Form.Group className="mb-3">

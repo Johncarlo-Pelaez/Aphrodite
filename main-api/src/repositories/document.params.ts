@@ -46,8 +46,7 @@ export interface DoneIndexingParam {
 }
 
 export interface FailIndexingParam extends FailDocProcessParam {
-  docTypeReqParams?: string;
-  contractDetailsReqParams?: string;
+  docTypeReqParams: string;
 }
 
 export interface MigrateDocumentParam {
@@ -62,20 +61,27 @@ export interface FailDocMigrateParam extends FailDocProcessParam {
   springResponse?: string;
 }
 
-export interface EncodeQrBarcodeParams {
+interface EncodeProcess {
   documentId: number;
-  qrBarCode: string;
   encodedAt: Date;
   encodedBy: number;
 }
 
-export interface EncodeAccountDetailsParams {
-  documentId: number;
+export interface EncodeQrBarcodeParams extends EncodeProcess {
+  qrBarCode: string;
+  encodeValues: string;
+}
+
+export interface EncodeAccountDetailsParams extends EncodeProcess {
   documentType: string;
   contractDetails: string;
   contractDetailsReqParams: string;
-  encodedAt: Date;
-  encodedBy: number;
+  encodeValues: string;
+}
+
+export interface FailEncodeParam extends FailDocProcessParam {
+  contractDetailsReqParams: string;
+  encodeValues: string;
 }
 
 export interface CheckerApproveDocParam {

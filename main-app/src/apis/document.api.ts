@@ -85,20 +85,31 @@ export const getDocumentHistoryApi = async (
   return res.data;
 };
 
-export interface EncodeDocumentApi {
-  qrCode: string;
-  companyCode: string;
-  contractNumber: string;
-  nomenClature: string;
-  documentGroup: string;
+export interface EncodeDocQRBarcodeApi {
   documentId: number;
+  qrCode: string;
 }
 
-export const encodeDocumentApi = async (
-  params: EncodeDocumentApi,
+export const encodeDocQRBarcodeApi = async (
+  params: EncodeDocQRBarcodeApi,
 ): Promise<void> => {
   const { documentId, ...rest } = params;
-  await request.put(`/api/documents/${documentId}/encode`, rest);
+  await request.put(`/api/documents/${documentId}/encode/qrbarcode`, rest);
+};
+
+export interface EncodeDocDetailsApi {
+  documentId: number;
+  companyCode: string;
+  contractNumber: string;
+  nomenclature: string;
+  documentGroup: string;
+}
+
+export const encodeDocDetailsApi = async (
+  params: EncodeDocDetailsApi,
+): Promise<void> => {
+  const { documentId, ...rest } = params;
+  await request.put(`/api/documents/${documentId}/encode/details`, rest);
 };
 
 export interface CheckerApproveDocApi {

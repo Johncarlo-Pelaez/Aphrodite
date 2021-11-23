@@ -3,14 +3,19 @@ export interface UploadDocuments {
   uploadedBy: number;
 }
 
-export interface EncodeDocument {
+export interface EncodeDocDetails {
   documentId: number;
-  qrCode?: string;
-  companyCode?: string;
-  contractNumber?: string;
-  nomenClature?: string;
-  documentGroup?: string;
   encodedBy: number;
+  companyCode: string;
+  contractNumber: string;
+  nomenclature: string;
+  documentGroup: string;
+}
+
+export interface EncodeDocQRBarCode {
+  documentId: number;
+  encodedBy: number;
+  qrCode: string;
 }
 
 export interface CheckerApproveDoc {

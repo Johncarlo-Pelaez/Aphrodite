@@ -52,11 +52,7 @@ export class CreateDocumentDto {
   documentSize: number;
 }
 
-export class EncodeDocumentDto {
-  @ApiProperty()
-  @IsString()
-  qrCode: string;
-
+export class EncodeDocDetailsDto {
   @ApiProperty()
   @IsString()
   companyCode: string;
@@ -72,6 +68,12 @@ export class EncodeDocumentDto {
   @ApiProperty()
   @IsString()
   documentGroup: string;
+}
+
+export class EncodeDocQRBarCodeDto {
+  @ApiProperty()
+  @IsString()
+  qrCode: string;
 }
 
 export class CheckerApproveDocDto {
