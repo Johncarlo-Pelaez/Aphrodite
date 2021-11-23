@@ -39,6 +39,7 @@ export const Table = <T extends Record<string, any> = {}>(
     onSearch,
   } = props;
   const rowCount = dataList.length;
+  const hasData = rowCount > 0;
   const sortOrderSequence = [
     OrderDirection.ASC,
     OrderDirection.DESC,
@@ -166,30 +167,21 @@ export const Table = <T extends Record<string, any> = {}>(
     );
   };
 
-  const renderTable = (): ReactElement => {
-    if (loading)
-      return (
+  const renderTable = (): ReactElement => (
+    <div className="table-container">
+      <Alert className="text-center" variant="danger" show={isError}>
+        Could not load data, Please try again.
+      </Alert>
+      {loading && (
         <div className="b-table__spinner">
           <Spinner animation="border" />
         </div>
-      );
-
-    if (rowCount <= 0)
-      return (
+      )}
+      {!hasData ? (
         <Alert className="text-center" variant="light">
           No Data.
         </Alert>
-      );
-
-    if (isError)
-      return (
-        <Alert className="text-center" variant="danger">
-          Could not load data, Please try again.
-        </Alert>
-      );
-
-    return (
-      <div className="table-container">
+      ) : (
         <BTable className="b-table" borderless hover>
           <thead>
             <tr>
@@ -237,9 +229,9 @@ export const Table = <T extends Record<string, any> = {}>(
             ))}
           </tbody>
         </BTable>
-      </div>
-    );
-  };
+      )}
+    </div>
+  );
 
   const renderPagination = (): ReactElement | undefined => {
     if (pagination && typeof pagination === 'object')

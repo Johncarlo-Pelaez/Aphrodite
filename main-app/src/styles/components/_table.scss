@@ -1,6 +1,7 @@
 $table-height: 50vh;
 
 .table-container {
+  position: relative;
   display: inline-block;
   max-height: $table-height;
   overflow: auto;
@@ -11,11 +12,14 @@ $table-height: 50vh;
   position: relative;
 
   &__spinner {
+    position: absolute;
     display: flex;
     flex-flow: row;
     justify-content: center;
     align-items: center;
-    height: $table-height;
+    height: 100%;
+    width: 100%;
+    z-index: 1;
   }
 
   &__search__container {
