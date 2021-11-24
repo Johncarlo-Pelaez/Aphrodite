@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 import { v4 as uuidv4 } from 'uuid';
@@ -49,6 +49,9 @@ export class DocumentService {
     } else if (filename.length === 18) {
       qrCode = filename.substr(0, 15);
     }
+
+    if (qrCode && !!(await this.documentRepository.getDocumentByQRCode(qrCode)))
+      throw new ConflictException();
 
     await writeFile(fullPath, buffer);
 

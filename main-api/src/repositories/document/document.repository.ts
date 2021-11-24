@@ -95,6 +95,12 @@ export class DocumentRepository {
     });
   }
 
+  async getDocumentByQRCode(qrCode: string): Promise<Document> {
+    return await this.manager.findOne(Document, {
+      where: { qrCode },
+    });
+  }
+
   async count(param: CountParam): Promise<number> {
     const { search = '', documentType, statuses } = param;
 
