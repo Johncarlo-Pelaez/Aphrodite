@@ -1,4 +1,11 @@
-import { ReactElement, useState, useImperativeHandle, forwardRef } from 'react';
+import {
+  ReactElement,
+  useState,
+  useEffect,
+  useMemo,
+  useImperativeHandle,
+  forwardRef,
+} from 'react';
 import fileSize from 'filesize';
 import moment from 'moment';
 import { DEFAULT_DATE_FORMAT } from 'core/constants';
@@ -34,6 +41,10 @@ export const DocumentsTable = forwardRef(
       DEFAULT_SORT_ORDER,
     );
     const debouncedSearch = useDebounce(searchKey);
+    const selectedDocumentKeys = useMemo(
+      () => selectedDocuments.map((doc) => doc.id),
+      [selectedDocuments],
+    );
 
     const {
       isFetching,
@@ -94,6 +105,14 @@ export const DocumentsTable = forwardRef(
       refresh: refetch,
     }));
 
+    useEffect(() => {
+      const pageDocKeys = documents.map((d): React.Key => d.id);
+      setSelectedDocuments(
+        [...selectedDocuments].filter((d) => pageDocKeys.includes(d.id)),
+      );
+      // eslint-disable-next-line
+    }, [documents, currentPage, pageSize]);
+
     return (
       <Table<Document>
         isServerSide
@@ -104,7 +123,7 @@ export const DocumentsTable = forwardRef(
         data={documents}
         rowSelection={{
           type: 'checkbox',
-          selectedRowKeys: selectedDocuments.map((doc) => doc.id),
+          selectedRowKeys: selectedDocumentKeys,
           onChange: changeSelectedRows,
         }}
         pagination={{
@@ -112,7 +131,10 @@ export const DocumentsTable = forwardRef(
           pageSize: pageSize,
           current: currentPage,
           pageNumber: 5,
-          onChange: setCurrentPage,
+          onChange: (page) => {
+            setCurrentPage(page);
+            setSelectedDocuments([]);
+          },
           onSizeChange: setPageSize,
         }}
         searchKey={searchKey}
