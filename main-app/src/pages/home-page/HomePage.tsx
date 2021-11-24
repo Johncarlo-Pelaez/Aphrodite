@@ -1,8 +1,9 @@
-import { ReactElement, useState, useRef, useMemo } from 'react';
+import { ReactElement, useState, useRef, useMemo, useEffect } from 'react';
 import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
 import Stack from 'react-bootstrap/Stack';
 import { Document } from 'models';
+import { useRetryDocs } from 'hooks';
 import { DocumentStatus } from 'core/enum';
 import {
   UploadFilesModal,
@@ -32,6 +33,24 @@ export const HomePage = (): ReactElement => {
   const allStatus = StatusDropdownOptions.filter((s) => s.value !== 'ALL').map(
     (s) => s.value,
   );
+  const selectedDocumentKeys = useMemo(
+    () => selectedDocuments.map((doc) => doc.id),
+    [selectedDocuments],
+  );
+
+  const {
+    isLoading: isRetryDocSaving,
+    isError: hasRetryDocError,
+    mutateAsync: retryDocumentsAsync,
+    reset: resetRetryDoc,
+  } = useRetryDocs();
+
+  const handleRetryDocs = async (): Promise<void> => {
+    if (!isRetryDocSaving) {
+      await retryDocumentsAsync(selectedDocumentKeys);
+      alert('Success.');
+    }
+  };
 
   const concatDocStatus = (operation: string, status: string): string => {
     const cmbDocStatus = `${operation}_${status}, `;
@@ -122,6 +141,16 @@ export const HomePage = (): ReactElement => {
     [selectedStatus, selectedOperation],
   );
 
+  useEffect(() => {
+    if (hasRetryDocError) alert('Failed to retry documents.');
+  }, [hasRetryDocError]);
+
+  useEffect(() => {
+    return function componentCleanUp() {
+      resetRetryDoc();
+    };
+  }, [resetRetryDoc]);
+
   return (
     <Container className="my-4">
       <div className="d-flex justify-content-between">
@@ -156,6 +185,7 @@ export const HomePage = (): ReactElement => {
         <Button
           className="px-4"
           variant="outline-dark"
+          onClick={handleRetryDocs}
           disabled={!hasSelectedRows}
         >
           Retry

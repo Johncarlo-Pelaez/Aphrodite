@@ -48,7 +48,7 @@ export class DocumentRepository {
       };
     }
 
-    return this.manager.find(Document, {
+    return await this.manager.find(Document, {
       relations: ['user'],
       where: [
         {
@@ -78,7 +78,7 @@ export class DocumentRepository {
   }
 
   async findDocumentsByIds(documentIds: number[]): Promise<Document[]> {
-    return this.manager.find(Document, {
+    return await this.manager.find(Document, {
       relations: ['user'],
       where: [
         {
@@ -89,7 +89,7 @@ export class DocumentRepository {
   }
 
   async getDocument(id: number): Promise<Document> {
-    return this.manager.findOne(Document, {
+    return await this.manager.findOne(Document, {
       relations: ['user'],
       where: { id },
     });
@@ -119,7 +119,7 @@ export class DocumentRepository {
       };
     }
 
-    return this.manager.count(Document, {
+    return await this.manager.count(Document, {
       relations: ['user'],
       where: [
         {
@@ -146,7 +146,7 @@ export class DocumentRepository {
   }
 
   async getHistory(documentId: number): Promise<DocumentHistory[]> {
-    return this.manager.find(DocumentHistory, {
+    return await this.manager.find(DocumentHistory, {
       relations: ['document', 'user'],
       where: { documentId },
       order: { createdDate: 'DESC', id: 'DESC' },
