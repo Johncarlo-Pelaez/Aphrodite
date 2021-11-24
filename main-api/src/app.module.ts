@@ -44,7 +44,7 @@ const logger = new Logger('AppModule');
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: false,
         options: {
-          encrypt: appConfigService.nodeEnv !== Environment.Development,
+          encrypt: false,
         },
       }),
       inject: [AppConfigService],
