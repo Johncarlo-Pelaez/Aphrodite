@@ -33,6 +33,7 @@ import {
   CheckerApproveDocDto,
   CheckerDisApproveDocDto,
   RetryDocumentsDto,
+  GetDocumentsProcessDetailsDto,
 } from './document.dto';
 import { GetDocumentsIntPipe, RetryDocumentsIntPipe } from './document.pipe';
 
@@ -215,6 +216,18 @@ export class DocumentController {
     await this.documentsService.retryDocuments({
       documentIds: dto.documentIds,
       retryBy: userId,
+    });
+  }
+
+  @ApiOkResponse({
+    type: Number,
+  })
+  @Get('/process-details')
+  async getDocumentsProcessDetails(
+    @Query() dto: GetDocumentsProcessDetailsDto,
+  ): Promise<number> {
+    return await this.documentRepository.count({
+      statuses: dto.statuses,
     });
   }
 }

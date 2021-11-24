@@ -93,3 +93,10 @@ export class RetryDocumentsDto {
   @IsNumber({ allowNaN: false }, { each: true })
   documentIds: number[];
 }
+
+export class GetDocumentsProcessDetailsDto {
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString({ each: true })
+  statuses?: DocumentStatus[];
+}

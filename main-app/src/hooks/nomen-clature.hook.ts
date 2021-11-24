@@ -21,7 +21,7 @@ export const useNomenclatures = (): UseQueryResult<
   Nomenclature[],
   ApiError
 > => {
-  return useQuery(QueryKey.nomenClatures, getNomenclaturesApi);
+  return useQuery(QueryKey.nomenclatures, getNomenclaturesApi);
 };
 
 export const useCreateNomenclature = (): UseMutationResult<
@@ -36,7 +36,7 @@ export const useCreateNomenclature = (): UseMutationResult<
     },
     {
       onSuccess: () => {
-        queryClient.invalidateQueries(QueryKey.nomenClatures);
+        queryClient.invalidateQueries(QueryKey.nomenclatures);
       },
     },
   );
@@ -54,7 +54,7 @@ export const useUpdateNomenclature = (): UseMutationResult<
     },
     {
       onSuccess: () => {
-        queryClient.invalidateQueries(QueryKey.nomenClatures);
+        queryClient.invalidateQueries(QueryKey.nomenclatures);
       },
     },
   );
@@ -72,7 +72,7 @@ export const useDeleteNomenclature = (): UseMutationResult<
     },
     {
       onSuccess: () => {
-        queryClient.invalidateQueries(QueryKey.nomenClatures);
+        queryClient.invalidateQueries(QueryKey.nomenclatures);
       },
     },
   );
