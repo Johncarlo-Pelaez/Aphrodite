@@ -57,7 +57,8 @@ export const HomePage = (): ReactElement => {
     let docStatusFilter = '';
     if (operation === 'ENCODING') {
       switch (status) {
-        case 'WAITING' || 'BEGIN':
+        case 'WAITING':
+        case 'BEGIN':
           docStatusFilter += `${operation}, `;
           break;
         default:
@@ -75,7 +76,8 @@ export const HomePage = (): ReactElement => {
       }
     } else if (operation === 'CHECKING') {
       switch (status) {
-        case 'WAITING' || 'BEGIN':
+        case 'WAITING':
+        case 'BEGIN':
           docStatusFilter += `${operation}, `;
           break;
         case 'DONE':
@@ -102,14 +104,10 @@ export const HomePage = (): ReactElement => {
     cmbStatusValue: string,
     cmbOperationValue: string,
   ): DocumentStatus[] => {
-    const cmbDocStatus = `${cmbOperationValue}_${cmbStatusValue}`;
-    const is2CmbValIn = Object.keys(DocumentStatus).indexOf(cmbDocStatus) >= 0;
     let docStatusesFilter: DocumentStatus[] = [];
     let docStatusFilter = '';
 
-    if (is2CmbValIn) {
-      docStatusesFilter.push(cmbDocStatus as DocumentStatus);
-    } else if (cmbOperationValue === 'ALL' && cmbStatusValue === 'ALL') {
+    if (cmbOperationValue === 'ALL' && cmbStatusValue === 'ALL') {
       docStatusesFilter = Object.values(DocumentStatus);
     } else if (cmbOperationValue === 'ALL' && cmbStatusValue !== 'ALL') {
       for (const operation of allOperation) {
