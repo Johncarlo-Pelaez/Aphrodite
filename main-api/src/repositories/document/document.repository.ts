@@ -169,6 +169,8 @@ export class DocumentRepository {
         document.modifiedDate = param.createdDate;
         document.modifiedBy = param.userId;
         document.status = DocumentStatus.UPLOADED;
+        document.qrCode = param.qrCode;
+        document.qrAt = param.createdDate;
         document.userId = param.userId;
         await transaction.save(document);
 

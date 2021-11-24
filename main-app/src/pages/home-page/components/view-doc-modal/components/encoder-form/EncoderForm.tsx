@@ -176,7 +176,7 @@ export const EncoderForm = forwardRef(
 
         await encodeDocumentAsync({
           documentId: document?.id as number,
-          qrCode: qrBarCode,
+          qrBarCode,
           companyCode,
           contractNumber,
           nomenclature,

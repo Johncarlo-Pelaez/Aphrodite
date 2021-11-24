@@ -1,5 +1,6 @@
 import { CancelTokenSource, request } from './request';
 import { Document, DocumentHistory } from 'models';
+import { DocumentStatus } from 'core/enum';
 import {
   createQueryString,
   createTablePaginationQuery,
@@ -11,6 +12,7 @@ export interface GetDocumentsApi {
   currentPage: number;
   pageSize: number;
   search: string;
+  statuses: DocumentStatus[];
 }
 
 export interface GetDocumentsApiResponse {
@@ -24,6 +26,7 @@ const getDocumentsApi = async (
   const paginationQuery = createTablePaginationQuery(params);
   const filterQuery = createQueryString({
     search: params.search,
+    statuses: params.statuses,
   });
 
   const res = await request.get<GetDocumentsApiResponse>(
@@ -87,7 +90,7 @@ export const getDocumentHistoryApi = async (
 
 export interface EncodeDocQRBarcodeApi {
   documentId: number;
-  qrCode: string;
+  qrBarCode: string;
 }
 
 export const encodeDocQRBarcodeApi = async (

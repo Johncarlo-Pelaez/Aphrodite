@@ -1,16 +1,23 @@
-import { ReactElement, useState, useRef } from 'react';
+import { ReactElement, useState, useRef, useMemo } from 'react';
 import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
 import Stack from 'react-bootstrap/Stack';
 import { Document } from 'models';
+import { DocumentStatus } from 'core/enum';
 import {
   UploadFilesModal,
   DocumentsTable,
   ViewDocModal,
   ProcessDetails,
+  StatusDropdown,
+  OperationDropdown,
 } from './components';
+import { OperationDropdownOptions } from './components/OperationDropdown';
+import { StatusDropdownOptions } from './components/StatusDropdown';
 
 export const HomePage = (): ReactElement => {
+  const [selectedStatus, setSelectedStatus] = useState<string>('ALL');
+  const [selectedOperation, setSelectedOperation] = useState<string>('ALL');
   const [selectedDocuments, setSelectedDocuments] = useState<Document[]>([]);
   const [uploadModalShow, setUploadModalShow] = useState<boolean>(false);
   const [viewDocModalShow, setViewDocModalShow] = useState<boolean>(false);
@@ -19,10 +26,101 @@ export const HomePage = (): ReactElement => {
   const selected1Doc =
     selectedDocuments.length === 1 ? selectedDocuments[0] : undefined;
   const hasSelected1Doc = !!selected1Doc;
+  const allOperation = OperationDropdownOptions.filter(
+    (o) => o.value !== 'ALL',
+  ).map((o) => o.value);
+  const allStatus = StatusDropdownOptions.filter((s) => s.value !== 'ALL').map(
+    (s) => s.value,
+  );
+
+  const concatDocStatus = (operation: string, status: string): string => {
+    const cmbDocStatus = `${operation}_${status}, `;
+    let docStatusFilter = '';
+    if (operation === 'ENCODING') {
+      switch (status) {
+        case 'WAITING' || 'BEGIN':
+          docStatusFilter += `${operation}, `;
+          break;
+        default:
+          docStatusFilter += cmbDocStatus;
+          break;
+      }
+    } else if (operation === 'INDEXING') {
+      switch (status) {
+        case 'WAITING':
+          docStatusFilter += 'QR_DONE, ENCODING_DONE, ';
+          break;
+        default:
+          docStatusFilter += cmbDocStatus;
+          break;
+      }
+    } else if (operation === 'CHECKING') {
+      switch (status) {
+        case 'WAITING' || 'BEGIN':
+          docStatusFilter += `${operation}, `;
+          break;
+        case 'DONE':
+          docStatusFilter += 'CHECKING_APPROVED, CHECKING_DISAPPROVED, ';
+          break;
+        default:
+          docStatusFilter += cmbDocStatus;
+          break;
+      }
+    } else if (operation === 'MIGRATE') {
+      switch (status) {
+        case 'WAITING':
+          docStatusFilter += 'INDEXING_DONE, CHECKING_APPROVED, APPROVED, ';
+          break;
+        default:
+          docStatusFilter += cmbDocStatus;
+          break;
+      }
+    }
+    return docStatusFilter;
+  };
+
+  const getDocStatusFilter = (
+    cmbStatusValue: string,
+    cmbOperationValue: string,
+  ): DocumentStatus[] => {
+    const cmbDocStatus = `${cmbOperationValue}_${cmbStatusValue}`;
+    const is2CmbValIn = Object.keys(DocumentStatus).indexOf(cmbDocStatus) >= 0;
+    let docStatusesFilter: DocumentStatus[] = [];
+    let docStatusFilter = '';
+
+    if (is2CmbValIn) {
+      docStatusesFilter.push(cmbDocStatus as DocumentStatus);
+    } else if (cmbOperationValue === 'ALL' && cmbStatusValue === 'ALL') {
+      docStatusesFilter = Object.values(DocumentStatus);
+    } else if (cmbOperationValue === 'ALL' && cmbStatusValue !== 'ALL') {
+      for (const operation of allOperation) {
+        docStatusFilter += concatDocStatus(operation, cmbStatusValue);
+      }
+    } else if (cmbOperationValue !== 'ALL' && cmbStatusValue === 'ALL') {
+      for (const status of allStatus) {
+        docStatusFilter += concatDocStatus(cmbOperationValue, status);
+      }
+    } else {
+      docStatusFilter = concatDocStatus(cmbOperationValue, cmbStatusValue);
+    }
+
+    for (const status of docStatusFilter.split(',')) {
+      if (status !== '')
+        docStatusesFilter.push(status.trim() as DocumentStatus);
+    }
+
+    return docStatusesFilter;
+  };
 
   const triggerRefreshDocslist = (): void => {
     documentsTableRef.current?.refresh();
   };
+
+  const docStatusFilter = useMemo(
+    () => getDocStatusFilter(selectedStatus, selectedOperation),
+    // eslint-disable-next-line
+    [selectedStatus, selectedOperation],
+  );
 
   return (
     <Container className="my-4">
@@ -66,8 +164,19 @@ export const HomePage = (): ReactElement => {
           Delete
         </Button>
       </Stack>
+      <Stack className="my-2" direction="horizontal" gap={3}>
+        <StatusDropdown
+          selected={selectedStatus}
+          onChange={setSelectedStatus}
+        />
+        <OperationDropdown
+          selected={selectedOperation}
+          onChange={setSelectedOperation}
+        />
+      </Stack>
       <DocumentsTable
         ref={documentsTableRef}
+        filterDocStatus={docStatusFilter}
         selectedDocuments={selectedDocuments}
         setSelectedDocuments={setSelectedDocuments}
       />

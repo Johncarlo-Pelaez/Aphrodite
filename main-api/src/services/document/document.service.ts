@@ -31,22 +31,34 @@ export class DocumentService {
 
   async uploadDocument(data: UploadDocuments): Promise<CreatedResponse> {
     const dateRightNow = this.datesUtil.getDateNow();
-    let file = data.file;
+    const { buffer, size, mimetype, originalname } = data.file;
     const uuid = uuidv4();
-    let fileName: string = uuid;
     const fullPath = path.join(
       this.appConfigService.filePath,
-      fileName.toUpperCase(),
+      uuid.toUpperCase(),
     );
+    const filename = path
+      .basename(originalname, path.extname(originalname))
+      .replace(/\.$/, '');
+    let qrCode: string;
 
-    await writeFile(fullPath, file.buffer);
+    if (filename.match(/^ecr/i) || filename.match(/^ecp/i)) {
+      qrCode = filename;
+    } else if (filename.match(/_/g)) {
+      qrCode = filename.replace(/_/g, '|');
+    } else if (filename.length === 18) {
+      qrCode = filename.substr(0, 15);
+    }
+
+    await writeFile(fullPath, buffer);
 
     const response = new CreatedResponse();
     response.id = await this.documentRepository.createDocument({
-      uuid: fileName,
-      documentName: file.originalname,
-      documentSize: file.size,
-      mimeType: file.mimetype,
+      uuid,
+      documentName: originalname,
+      documentSize: size,
+      mimeType: mimetype,
+      qrCode: qrCode,
       createdDate: dateRightNow,
       userId: data.uploadedBy,
     });

@@ -18,6 +18,7 @@ export interface CreateDocumentParam {
   documentName: string;
   documentSize: number;
   mimeType: string;
+  qrCode?: string;
   createdDate: Date;
   userId: number;
 }

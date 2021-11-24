@@ -30,6 +30,7 @@ export interface UseDocuments {
   search: string;
   currentPage: number;
   pageSize: number;
+  statuses: DocumentStatus[];
 }
 
 export const useDocuments = (
@@ -90,7 +91,7 @@ export const useDocumentHistory = (
 
 export interface UseEncodeDocument {
   documentId: number;
-  qrCode: string;
+  qrBarCode: string;
   companyCode: string;
   contractNumber: string;
   nomenclature: string;
@@ -109,10 +110,10 @@ export const useEncodeDocument = (): UseMutationResult<
       if (isQRBarCode) {
         await encodeDocQRBarcodeApi({
           documentId: encodeParams.documentId,
-          qrCode: encodeParams.qrCode,
+          qrBarCode: encodeParams.qrBarCode,
         });
       } else {
-        const { qrCode, ...EncodeDocDetailsApi } = encodeParams;
+        const { qrBarCode: qrCode, ...EncodeDocDetailsApi } = encodeParams;
         await encodeDocDetailsApi(EncodeDocDetailsApi);
       }
     },
@@ -206,7 +207,7 @@ export const useRetryDocs = (): UseMutationResult<
             !!documents
               ? documents.filter((d) => {
                   if (documentIds.includes(d.id)) {
-                    d.status = DocumentStatus.RETRY;
+                    d.status = DocumentStatus.RETRYING;
                   }
                   return true;
                 })

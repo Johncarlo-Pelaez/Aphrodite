@@ -2,6 +2,7 @@ import { ReactElement, useState, useImperativeHandle, forwardRef } from 'react';
 import fileSize from 'filesize';
 import moment from 'moment';
 import { DEFAULT_DATE_FORMAT } from 'core/constants';
+import { DocumentStatus } from 'core/enum';
 import { useDebounce, useDocuments } from 'hooks';
 import {
   Table,
@@ -19,12 +20,13 @@ const DEFAULT_SORT_ORDER: SorterResult = {
 
 export interface DocumentsTableProps {
   selectedDocuments: Document[];
+  filterDocStatus: DocumentStatus[];
   setSelectedDocuments: (document: Document[]) => void;
 }
 
 export const DocumentsTable = forwardRef(
   (props: DocumentsTableProps, ref): ReactElement => {
-    const { selectedDocuments, setSelectedDocuments } = props;
+    const { selectedDocuments, filterDocStatus, setSelectedDocuments } = props;
     const [searchKey, setSearchKey] = useState<string>('');
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [pageSize, setPageSize] = useState<number>(15);
@@ -43,6 +45,7 @@ export const DocumentsTable = forwardRef(
       search: debouncedSearch,
       currentPage,
       pageSize,
+      statuses: filterDocStatus,
     });
 
     const documents = result?.data || [];

@@ -45,16 +45,12 @@ export class DocumentConsumer {
     const {
       id: documentId,
       uuid: sysSrcFileName,
-      documentName,
       qrCode: docQrCode,
       status,
       documentType: strGetDocTypeReqRes,
       contractDetails: strGetContDetailsReqRes,
       encodeValues: strEncodeValues,
     } = document;
-    const filename = path
-      .basename(documentName, path.extname(documentName))
-      .replace(/\.$/, '');
     let qrCode: string;
     const buffer = await this.readFile(sysSrcFileName);
 
@@ -80,38 +76,24 @@ export class DocumentConsumer {
       encodeValues = JSON.parse(strEncodeValues);
     }
 
-    if (
-      !documentType &&
-      encodeValues &&
-      status === DocumentStatus.ENCODING_DONE
-    ) {
-      documentType = await this.runGetContractDetails(documentId, encodeValues);
-    }
-
     if (!documentType) {
-      if (docQrCode && docQrCode !== '') {
-        qrCode = docQrCode;
-      } else if (filename.match(/^ecr/i) || filename.match(/^ecp/i)) {
-        qrCode = filename;
-      } else if (filename.match(/_/g)) {
-        qrCode = filename.replace(/_/g, '|');
-      } else if (filename.length === 18) {
-        qrCode = filename.substr(0, 15);
-      } else {
-        qrCode = await this.runQr(documentId, buffer, sysSrcFileName);
+      if (encodeValues) {
+        documentType = await this.runGetContractDetails(
+          documentId,
+          encodeValues,
+        );
       }
 
-      if (qrCode === '') {
+      if (docQrCode && docQrCode !== '') qrCode = docQrCode;
+      else qrCode = await this.runQr(documentId, buffer, sysSrcFileName);
+
+      if (qrCode && qrCode !== '')
+        documentType = await this.runGetDocumentType(qrCode, documentId);
+
+      if (!documentType) {
         await this.updateForManualEncode(documentId);
         return;
-      } else {
-        documentType = await this.runGetDocumentType(qrCode, documentId);
       }
-    }
-
-    if (!documentType) {
-      await this.updateForManualEncode(documentId);
-      return;
     }
 
     const isWhiteListed =

@@ -169,19 +169,20 @@ export const Table = <T extends Record<string, any> = {}>(
 
   const renderTable = (): ReactElement => (
     <div className="table-container">
-      <Alert className="text-center" variant="danger" show={isError}>
-        Could not load data, Please try again.
-      </Alert>
       {loading && (
         <div className="b-table__spinner">
           <Spinner animation="border" />
         </div>
       )}
-      {!hasData ? (
+      <Alert className="text-center" variant="danger" show={isError}>
+        Could not load data, Please try again.
+      </Alert>
+      {!hasData && (
         <Alert className="text-center" variant="light">
           No Data.
         </Alert>
-      ) : (
+      )}
+      {!isError && hasData && (
         <BTable className="b-table" borderless hover>
           <thead>
             <tr>
