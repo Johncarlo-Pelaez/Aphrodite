@@ -13,14 +13,21 @@ import {
   StatusDropdown,
   OperationDropdown,
 } from './components';
-import { OperationDropdownOptions } from './components/OperationDropdown';
-import { StatusDropdownOptions } from './components/StatusDropdown';
+import { OperationOption } from './components/OperationDropdown';
+import { StatusOption } from './components/StatusDropdown';
 import { concatDocumentStatuses } from './HomePage.utils';
 
 export const HomePage = (): ReactElement => {
-  const [selectedStatus, setSelectedStatus] = useState<string>('ALL');
-  const [selectedOperation, setSelectedOperation] = useState<string>('ALL');
+  const [selectedStatus, setSelectedStatus] = useState<string>(
+    StatusOption.ALL,
+  );
+  const [selectedOperation, setSelectedOperation] = useState<string>(
+    OperationOption.ALL,
+  );
   const [selectedDocuments, setSelectedDocuments] = useState<Document[]>([]);
+  const [selectedDocumentKeys, setSelectedDocumentKeys] = useState<number[]>(
+    [],
+  );
   const [uploadModalShow, setUploadModalShow] = useState<boolean>(false);
   const [viewDocModalShow, setViewDocModalShow] = useState<boolean>(false);
   const documentsTableRef = useRef<any>(null);
@@ -28,15 +35,11 @@ export const HomePage = (): ReactElement => {
   const selected1Doc =
     selectedDocuments.length === 1 ? selectedDocuments[0] : undefined;
   const hasSelected1Doc = !!selected1Doc;
-  const allOperation = OperationDropdownOptions.filter(
-    (o) => o.value !== 'ALL',
-  ).map((o) => o.value);
-  const allStatus = StatusDropdownOptions.filter((s) => s.value !== 'ALL').map(
-    (s) => s.value,
+  const allOperation = Object.values(OperationOption).filter(
+    (o) => o !== OperationOption.ALL,
   );
-  const selectedDocumentKeys = useMemo(
-    () => selectedDocuments.map((doc) => doc.id),
-    [selectedDocuments],
+  const allStatus = Object.values(StatusOption).filter(
+    (s) => s !== StatusOption.ALL,
   );
   const enableRetryButton = useMemo(
     () =>
@@ -196,7 +199,9 @@ export const HomePage = (): ReactElement => {
         ref={documentsTableRef}
         filterDocStatus={docStatusFilter}
         selectedDocuments={selectedDocuments}
+        selectedDocumentKeys={selectedDocumentKeys}
         setSelectedDocuments={setSelectedDocuments}
+        setSelectedDocumentKeys={setSelectedDocumentKeys}
       />
       <UploadFilesModal
         isVisible={uploadModalShow}

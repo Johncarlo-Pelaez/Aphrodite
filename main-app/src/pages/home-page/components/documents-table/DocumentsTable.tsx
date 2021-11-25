@@ -28,13 +28,21 @@ const DEFAULT_SORT_ORDER: SorterResult = {
 
 export interface DocumentsTableProps {
   selectedDocuments: Document[];
+  selectedDocumentKeys: number[];
   filterDocStatus: DocumentStatus[];
-  setSelectedDocuments: (document: Document[]) => void;
+  setSelectedDocuments: React.Dispatch<React.SetStateAction<Document[]>>;
+  setSelectedDocumentKeys: React.Dispatch<React.SetStateAction<number[]>>;
 }
 
 export const DocumentsTable = forwardRef(
   (props: DocumentsTableProps, ref): ReactElement => {
-    const { selectedDocuments, filterDocStatus, setSelectedDocuments } = props;
+    const {
+      selectedDocuments,
+      selectedDocumentKeys,
+      filterDocStatus,
+      setSelectedDocuments,
+      setSelectedDocumentKeys,
+    } = props;
     const [searchKey, setSearchKey] = useState<string>('');
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [pageSize, setPageSize] = useState<number>(15);
@@ -42,10 +50,6 @@ export const DocumentsTable = forwardRef(
       DEFAULT_SORT_ORDER,
     );
     const debouncedSearch = useDebounce(searchKey);
-    const selectedDocumentKeys = useMemo(
-      () => selectedDocuments.map((doc) => doc.id),
-      [selectedDocuments],
-    );
 
     const {
       isFetching,
@@ -60,8 +64,10 @@ export const DocumentsTable = forwardRef(
       statuses: filterDocStatus,
     });
 
-    const documents = result?.data || [];
-    const total = result?.count || 0;
+    const { documents, total } = useMemo(
+      () => ({ documents: result?.data ?? [], total: result?.count ?? 0 }),
+      [result?.data, result?.count],
+    );
 
     const renderColumns = (): TableColumnProps<Document>[] => [
       {
@@ -143,6 +149,7 @@ export const DocumentsTable = forwardRef(
       selectedRows: Document[],
     ) => {
       setSelectedDocuments(selectedRows);
+      setSelectedDocumentKeys(selectedRowKeys as number[]);
     };
 
     useImperativeHandle(ref, () => ({
@@ -151,11 +158,19 @@ export const DocumentsTable = forwardRef(
 
     useEffect(() => {
       const pageDocKeys = documents.map((d): React.Key => d.id);
-      setSelectedDocuments(
-        [...selectedDocuments].filter((d) => pageDocKeys.includes(d.id)),
+      setSelectedDocuments((current) =>
+        current.filter((d) => pageDocKeys.includes(d.id)),
       );
-      // eslint-disable-next-line
-    }, [documents, currentPage, pageSize]);
+      setSelectedDocumentKeys((current) =>
+        current.filter((key) => pageDocKeys.includes(key)),
+      );
+    }, [
+      documents,
+      currentPage,
+      pageSize,
+      setSelectedDocuments,
+      setSelectedDocumentKeys,
+    ]);
 
     return (
       <Table<Document>
@@ -183,18 +198,20 @@ export const DocumentsTable = forwardRef(
         }}
         searchKey={searchKey}
         onSelectRow={(document) => {
-          let newSelectedDocs: Document[] = [];
           const isSelected = selectedDocuments.some(
             (d) => d.id === document.id,
           );
           if (isSelected) {
-            newSelectedDocs = selectedDocuments.filter(
-              (d) => d.id !== document.id,
+            setSelectedDocuments((current) =>
+              current.filter((d) => d.id !== document.id),
+            );
+            setSelectedDocumentKeys((current) =>
+              current.filter((key) => key !== document.id),
             );
           } else {
-            newSelectedDocs = [...selectedDocuments, document];
+            setSelectedDocuments((current) => [...current, document]);
+            setSelectedDocumentKeys((current) => [...current, document.id]);
           }
-          setSelectedDocuments(newSelectedDocs);
         }}
         onSearch={setSearchKey}
         onChange={changeSort}

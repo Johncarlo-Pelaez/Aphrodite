@@ -12,26 +12,34 @@ export interface IOperationDropdownOptions {
   value: string;
 }
 
+export enum OperationOption {
+  ALL = 'ALL',
+  ENCODING = 'ENCODING',
+  INDEXING = 'INDEXING',
+  CHECKING = 'CHECKING',
+  MIGRATE = 'MIGRATE',
+}
+
 export const OperationDropdownOptions: IOperationDropdownOptions[] = [
   {
     label: 'All Operations',
-    value: 'ALL',
+    value: OperationOption.ALL,
   },
   {
     label: 'Manual Encoding',
-    value: 'ENCODING',
+    value: OperationOption.ENCODING,
   },
   {
     label: 'Information Request (Request to SalesForce)',
-    value: 'INDEXING',
+    value: OperationOption.INDEXING,
   },
   {
     label: 'Quality Checking',
-    value: 'CHECKING',
+    value: OperationOption.CHECKING,
   },
   {
     label: 'Document Import (Request to SpringCM)',
-    value: 'MIGRATE',
+    value: OperationOption.MIGRATE,
   },
 ];
 

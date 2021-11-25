@@ -9,29 +9,37 @@ export interface StatusDropdownProps {
 
 export interface IStatusDropdownOptions {
   label: string;
-  value: string;
+  value: StatusOption;
+}
+
+export enum StatusOption {
+  ALL = 'ALL',
+  FAILED = 'FAILED',
+  BEGIN = 'BEGIN',
+  WAITING = 'WAITING',
+  DONE = 'DONE',
 }
 
 export const StatusDropdownOptions: IStatusDropdownOptions[] = [
   {
     label: 'All status',
-    value: 'ALL',
+    value: StatusOption.ALL,
   },
   {
     label: 'Error',
-    value: 'FAILED',
+    value: StatusOption.FAILED,
   },
   {
     label: 'Processing',
-    value: 'BEGIN',
+    value: StatusOption.BEGIN,
   },
   {
     label: 'Waiting',
-    value: 'WAITING',
+    value: StatusOption.WAITING,
   },
   {
     label: 'Success',
-    value: 'DONE',
+    value: StatusOption.DONE,
   },
 ];
 
