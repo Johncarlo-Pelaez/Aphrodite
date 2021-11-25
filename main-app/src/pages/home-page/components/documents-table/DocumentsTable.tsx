@@ -19,6 +19,7 @@ import {
 } from 'core/ui/table';
 import { Document } from 'models';
 import { sortDateTime, sortText } from 'utils/sort';
+import { parseDocumentType } from '../view-doc-modal/components';
 
 const DEFAULT_SORT_ORDER: SorterResult = {
   field: 'modifiedDate',
@@ -73,6 +74,14 @@ export const DocumentsTable = forwardRef(
         title: 'Size',
         dataIndex: 'documentSize',
         render: (document: Document) => fileSize(document.documentSize),
+      },
+      {
+        title: 'Document Type',
+        dataIndex: '',
+        render: (document: Document) => {
+          const documentType = parseDocumentType(document.documentType ?? '');
+          return documentType ? documentType.Nomenclature : '';
+        },
       },
       {
         title: 'Status',

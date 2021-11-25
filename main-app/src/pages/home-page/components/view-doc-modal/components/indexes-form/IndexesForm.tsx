@@ -1,11 +1,11 @@
-import { ReactElement } from 'react';
+import React, { ReactElement } from 'react';
 import fileSize from 'filesize';
 import Card from 'react-bootstrap/Card';
 import Form from 'react-bootstrap/Form';
 import { Document, DocumentType } from 'models';
 import styles from './IndexesForm.module.css';
 
-interface IndexesFormProps {
+export interface IndexesFormProps {
   document?: Document;
 }
 
@@ -28,15 +28,20 @@ export const FileInfo = ({ document }: IndexesFormProps): ReactElement => (
   </table>
 );
 
+export const parseDocumentType = (
+  strDocumentType: string,
+): DocumentType | null => {
+  return strDocumentType && strDocumentType !== ''
+    ? (JSON.parse(strDocumentType).response[0] as DocumentType)
+    : null;
+};
+
 export const ReadOnlyIndexFields = ({
   document,
 }: IndexesFormProps): ReactElement => {
-  const documentType = document?.documentType
-    ? (JSON.parse(document?.documentType ?? '').response[0] as DocumentType)
-    : null;
-
+  const documentType = parseDocumentType(document?.documentType ?? '');
   return (
-    <>
+    <React.Fragment>
       <Form.Group>
         <Form.Label>
           <b>Brand</b>
@@ -103,7 +108,7 @@ export const ReadOnlyIndexFields = ({
           value={documentType?.AccountName ?? ''}
         />
       </Form.Group>
-    </>
+    </React.Fragment>
   );
 };
 
