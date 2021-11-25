@@ -110,7 +110,7 @@ export const DocumentsTable = forwardRef(
               case 'BEGIN':
                 return 'Processing';
               case 'FAILED':
-                return 'Error';
+                return <span style={{ color: 'red' }}>Error</span>;
               case 'DONE':
                 return 'Success';
             }
