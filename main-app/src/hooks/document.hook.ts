@@ -22,6 +22,7 @@ import {
   approverApproveDocApi,
   approverDisapproveDocApi,
   retryDocumentsApi,
+  getDocumentsProcessCountApi,
 } from 'apis';
 import { QueryKey } from 'utils';
 import { DocumentStatus } from 'core/enum';
@@ -227,5 +228,17 @@ export const useRetryDocs = (): UseMutationResult<
         queryClient.invalidateQueries(QueryKey.paginatedDocuments);
       },
     },
+  );
+};
+
+export interface UseDocumentsProcessCount {
+  statuses: DocumentStatus[];
+}
+
+export const useDocumentsProcessCount = (
+  params: UseDocumentsProcessCount,
+): UseQueryResult<number, ApiError> => {
+  return useQuery(QueryKey.buildDocumentProcessCount(params), () =>
+    getDocumentsProcessCountApi({ statuses: params.statuses }),
   );
 };

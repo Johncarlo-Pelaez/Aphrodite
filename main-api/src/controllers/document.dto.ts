@@ -93,3 +93,19 @@ export class RetryDocumentsDto {
   @IsNumber({ allowNaN: false }, { each: true })
   documentIds: number[];
 }
+
+export class GetDocumentsProcessCountDto {
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  search?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  documentType?: string;
+
+  @ApiProperty()
+  @IsString({ each: true })
+  statuses?: DocumentStatus[];
+}

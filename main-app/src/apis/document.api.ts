@@ -6,8 +6,6 @@ import {
   createTablePaginationQuery,
 } from 'utils/query-string';
 
-export { getDocumentsApi, getDocumentApi, uploadDocumentApi };
-
 export interface GetDocumentsApi {
   currentPage: number;
   pageSize: number;
@@ -20,7 +18,7 @@ export interface GetDocumentsApiResponse {
   data: Document[];
 }
 
-const getDocumentsApi = async (
+export const getDocumentsApi = async (
   params: GetDocumentsApi,
 ): Promise<GetDocumentsApiResponse> => {
   const paginationQuery = createTablePaginationQuery(params);
@@ -35,7 +33,7 @@ const getDocumentsApi = async (
   return res.data;
 };
 
-const getDocumentApi = async (id: number): Promise<Document> => {
+export const getDocumentApi = async (id: number): Promise<Document> => {
   const res = await request.get<Document>(`/api/documents/${id}`);
   return res.data;
 };
@@ -50,7 +48,7 @@ export interface uploadDocumentApiResponse {
   id: number;
 }
 
-const uploadDocumentApi = async (
+export const uploadDocumentApi = async (
   params: UploadDocumentApi,
 ): Promise<uploadDocumentApiResponse> => {
   const { file, onUploadProgress, cancelToken } = params;
@@ -156,4 +154,23 @@ export const retryDocumentsApi = async (
   await request.put('/api/documents/retry', {
     documentIds,
   });
+};
+
+export interface GetDocumentsProcessCountApi {
+  search?: string;
+  statuses: DocumentStatus[];
+}
+
+export const getDocumentsProcessCountApi = async (
+  params: GetDocumentsProcessCountApi,
+): Promise<number> => {
+  const filterQuery = createQueryString({
+    search: params.search,
+    statuses: params.statuses,
+  });
+
+  const res = await request.get<number>(
+    `/api/documents/process-count?${filterQuery}`,
+  );
+  return res.data;
 };

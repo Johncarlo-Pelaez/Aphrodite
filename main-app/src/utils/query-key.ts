@@ -1,4 +1,4 @@
-import { UseDocuments } from 'hooks';
+import { UseDocuments, UseDocumentsProcessCount } from 'hooks';
 
 export class QueryKey {
   public static readonly users = 'users';
@@ -18,5 +18,9 @@ export class QueryKey {
 
   public static buildDocumentHistory(id?: number) {
     return [this.documentHistory, id];
+  }
+
+  public static buildDocumentProcessCount(data: UseDocumentsProcessCount) {
+    return [this.documents, data];
   }
 }
