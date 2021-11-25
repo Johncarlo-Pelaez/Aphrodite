@@ -17,6 +17,7 @@ import {
   CheckerDisApproveDoc,
   DocumentApprover,
   RetryDocuments,
+  CancelDocuments,
 } from './document.inputs';
 const { readFile, writeFile } = fs.promises;
 
@@ -166,9 +167,22 @@ export class DocumentService {
       await this.documentRepository.updateForRetry({
         documentId,
         processAt: this.datesUtil.getDateNow(),
-        retryBy: data.retryBy,
+        retryBy: data.retriedBy,
       });
       await this.documentProducer.migrate(documentId);
+    }
+  }
+
+  async cancelDocuments(data: CancelDocuments): Promise<void> {
+    const documents = await this.documentRepository.findDocumentsByIds(
+      data.documentIds,
+    );
+    for await (const { id: documentId } of documents) {
+      await this.documentRepository.updateToCancelled({
+        documentId,
+        processAt: this.datesUtil.getDateNow(),
+        cancelledBy: data.cancelledBy,
+      });
     }
   }
 }

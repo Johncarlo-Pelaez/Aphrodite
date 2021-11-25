@@ -34,8 +34,13 @@ import {
   CheckerDisApproveDocDto,
   RetryDocumentsDto,
   GetDocumentsProcessCountDto,
+  CancelDocumentsDto,
 } from './document.dto';
-import { GetDocumentsIntPipe, RetryDocumentsIntPipe } from './document.pipe';
+import {
+  GetDocumentsIntPipe,
+  RetryDocumentsIntPipe,
+  CancelDocumentsIntPipe,
+} from './document.pipe';
 
 @Controller('/documents')
 @UseGuards(AzureADGuard)
@@ -215,7 +220,19 @@ export class DocumentController {
   ): Promise<void> {
     await this.documentsService.retryDocuments({
       documentIds: dto.documentIds,
-      retryBy: username,
+      retriedBy: username,
+    });
+  }
+
+  @ApiOkResponse()
+  @Put('/cancel')
+  async cancelDocuments(
+    @Body(CancelDocumentsIntPipe) dto: CancelDocumentsDto,
+    @GetAzureUsername() username: string,
+  ): Promise<void> {
+    await this.documentsService.cancelDocuments({
+      documentIds: dto.documentIds,
+      cancelledBy: username,
     });
   }
 

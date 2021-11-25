@@ -36,12 +36,8 @@ export class DocumentConsumer {
   ) {}
 
   @Process(MIGRATE_JOB)
-  async runMigrateJob(job: Job<number>): Promise<void> {
-    await this.migrate(job.data);
-  }
-
-  async migrate(jobDocId: number): Promise<void> {
-    const document = await this.documentRepository.getDocument(jobDocId);
+  async migrate(job: Job<number>): Promise<void> {
+    const document = await this.documentRepository.getDocument(job.data);
     const {
       id: documentId,
       uuid: sysSrcFileName,
@@ -107,6 +103,11 @@ export class DocumentConsumer {
       status !== DocumentStatus.CHECKING_APPROVED
     ) {
       await this.updateForChecking(documentId);
+      return;
+    }
+
+    if (status === DocumentStatus.MIGRATE_CANCELLED) {
+      await job.remove();
       return;
     }
 

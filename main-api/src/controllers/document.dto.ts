@@ -99,3 +99,5 @@ export class GetDocumentsProcessCountDto {
   @IsString({ each: true })
   statuses: DocumentStatus[];
 }
+
+export class CancelDocumentsDto extends RetryDocumentsDto {}

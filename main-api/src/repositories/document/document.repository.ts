@@ -24,6 +24,7 @@ import {
   CheckerDispproveDocParam,
   ApproverApproveDisapproveDocParam,
   UpdateForRetry,
+  UpdateToCanlled,
 } from './document.params';
 
 @EntityRepository()
@@ -531,6 +532,23 @@ export class DocumentRepository {
       document.modifiedDate = param.processAt;
       document.modifiedBy = param.retryBy;
       document.description = 'Retrying process.';
+      await transaction.save(document);
+
+      const history = this.genarateDocumentHistory(document);
+      await transaction.save(history);
+    });
+  }
+
+  async updateToCancelled(param: UpdateToCanlled): Promise<void> {
+    await this.manager.transaction(async (transaction): Promise<void> => {
+      const document = await this.manager.findOneOrFail(
+        Document,
+        param.documentId,
+      );
+      document.status = DocumentStatus.MIGRATE_CANCELLED;
+      document.modifiedDate = param.processAt;
+      document.modifiedBy = param.cancelledBy;
+      document.description = 'Migration cancelled.';
       await transaction.save(document);
 
       const history = this.genarateDocumentHistory(document);

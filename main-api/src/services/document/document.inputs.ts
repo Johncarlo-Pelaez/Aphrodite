@@ -35,5 +35,10 @@ export interface DocumentApprover {
 
 export interface RetryDocuments {
   documentIds: number[];
-  retryBy: string;
+  retriedBy: string;
+}
+
+export interface CancelDocuments {
+  documentIds: number[];
+  cancelledBy: string;
 }

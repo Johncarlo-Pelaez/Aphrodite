@@ -104,3 +104,7 @@ export interface ApproverApproveDisapproveDocParam {
 export interface UpdateForRetry extends BeginDocProcessParam {
   retryBy: string;
 }
+
+export interface UpdateToCanlled extends BeginDocProcessParam {
+  cancelledBy: string;
+}
