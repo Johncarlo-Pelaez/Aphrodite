@@ -10,12 +10,11 @@ interface UseDocsProcessDetailsResult {
 }
 
 const useDocsProcessDetails = (): UseDocsProcessDetailsResult => {
-  const allStatus = Object.values(DocumentStatus);
   const { data: success = 0 } = useDocumentsProcessCount({
     statuses: [DocumentStatus.MIGRATE_DONE],
   });
   const { data: processing_waiting = 0 } = useDocumentsProcessCount({
-    statuses: allStatus.filter(
+    statuses: Object.values(DocumentStatus).filter(
       (s) =>
         s !== DocumentStatus.MIGRATE_DONE &&
         s !== DocumentStatus.MIGRATE_FAILED &&

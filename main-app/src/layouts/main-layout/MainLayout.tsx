@@ -52,8 +52,11 @@ export const MainLayout = (props: MainLayoutProps): ReactElement => {
                     label: 'Settings',
                     path: '/settings',
                   },
-                ].map((l) => (
-                  <NavDropdown.Item onClick={() => redirect(l.path)}>
+                ].map((l, index) => (
+                  <NavDropdown.Item
+                    key={index}
+                    onClick={() => redirect(l.path)}
+                  >
                     {l.label}
                   </NavDropdown.Item>
                 ))}

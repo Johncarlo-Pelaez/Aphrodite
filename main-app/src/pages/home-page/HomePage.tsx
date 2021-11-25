@@ -40,6 +40,7 @@ export const HomePage = (): ReactElement => {
   );
   const enableRetryButton = useMemo(
     () =>
+      !!selectedDocuments.length &&
       selectedDocuments.every(
         (doc) =>
           doc.status === DocumentStatus.QR_FAILED ||
@@ -50,8 +51,16 @@ export const HomePage = (): ReactElement => {
   );
   const enableCancelButton = useMemo(
     () =>
-      selectedDocuments.every(
-        (doc) => doc.status === DocumentStatus.MIGRATE_BEGIN,
+      !!selectedDocuments.length &&
+      selectedDocuments.every(({ status }) =>
+        Object.values(DocumentStatus)
+          .filter((s) => {
+            const arrStattmp = s.split('_');
+            if (arrStattmp.length === 2)
+              return arrStattmp[1] !== 'DONE' && arrStattmp[1] !== 'FAILED';
+            else return true;
+          })
+          .some((s) => s === status),
       ),
     [selectedDocuments],
   );
@@ -161,6 +170,15 @@ export const HomePage = (): ReactElement => {
             disabled={!hasSelectedRows}
           >
             Retry
+          </Button>
+        )}
+        {enableCancelButton && (
+          <Button
+            className="px-4"
+            variant="outline-dark"
+            disabled={!hasSelectedRows}
+          >
+            Cancel
           </Button>
         )}
       </Stack>

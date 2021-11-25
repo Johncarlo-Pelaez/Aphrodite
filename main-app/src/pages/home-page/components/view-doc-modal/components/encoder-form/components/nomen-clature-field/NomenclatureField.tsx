@@ -7,7 +7,6 @@ import 'react-bootstrap-typeahead/css/Typeahead.css';
 import { IEncoderFormValues } from '../../EncoderForm';
 
 export interface LookupOption extends Record<string, unknown> {
-  id: number;
   label: string;
   documentGroup: string;
 }

@@ -3,12 +3,13 @@ import {
   useEffect,
   useImperativeHandle,
   forwardRef,
+  useMemo,
 } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import Card from 'react-bootstrap/Card';
 import Form from 'react-bootstrap/Form';
 import Alert from 'react-bootstrap/Alert';
-import { Document } from 'models';
+import { Document, EncodeValues } from 'models';
 import { useEncodeDocument } from 'hooks';
 import {
   NomenclatureField,
@@ -36,6 +37,11 @@ export interface EncoderFormProps {
 export const EncoderForm = forwardRef(
   (props: EncoderFormProps, ref): ReactElement => {
     const { document, triggerCloseModal } = props;
+    const envodeValues = useMemo(() => {
+      if (document?.encodeValues !== '')
+        return JSON.parse(document?.encodeValues as string) as EncodeValues;
+    }, [document?.encodeValues]);
+
     const {
       isLoading: isEncodeDocSaving,
       isError: hasEncodeDocError,
@@ -44,7 +50,19 @@ export const EncoderForm = forwardRef(
     } = useEncodeDocument();
 
     const { control, watch, reset, handleSubmit, setValue, setError } =
-      useForm<IEncoderFormValues>();
+      useForm<IEncoderFormValues>({
+        defaultValues: {
+          qrBarCode: document?.qrCode,
+          companyCode: envodeValues?.companyCode,
+          contractNumber: envodeValues?.contractNumber,
+          nomenclature: [
+            {
+              label: envodeValues?.nomenclature,
+              documentGroup: envodeValues?.documentGroup,
+            },
+          ],
+        },
+      });
 
     const nomenclature = watch('nomenclature');
 
@@ -200,14 +218,6 @@ export const EncoderForm = forwardRef(
       },
       // eslint-disable-next-line
       [nomenclature],
-    );
-
-    useEffect(
-      function initEncoderForm() {
-        setValue('qrBarCode', document?.qrCode ?? '');
-      },
-      // eslint-disable-next-line
-      [document?.qrCode],
     );
 
     useImperativeHandle(ref, () => ({

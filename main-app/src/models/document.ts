@@ -15,6 +15,7 @@ export interface Document {
   user: User;
   documentDate: string;
   remarks: string;
+  encodeValues: string;
 }
 
 export interface DocumentType {
@@ -31,6 +32,13 @@ export interface DocumentType {
   CodeType: string;
   ProjectCode: string;
   Tower_Phase: string;
+}
+
+export interface EncodeValues {
+  companyCode: string;
+  contractNumber: string;
+  nomenclature: string;
+  documentGroup: string;
 }
 
 export interface DocumentHistory {
