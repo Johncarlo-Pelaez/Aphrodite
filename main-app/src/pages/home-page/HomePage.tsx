@@ -163,15 +163,6 @@ export const HomePage = (): ReactElement => {
             Retry
           </Button>
         )}
-
-        <Button
-          className="px-4"
-          variant="outline-dark"
-          onClick={handleRetryDocs}
-          disabled={!hasSelectedRows || !enableRetryButton}
-        >
-          Cancel
-        </Button>
       </Stack>
       <Stack className="my-2" direction="horizontal" gap={3}>
         <StatusDropdown
