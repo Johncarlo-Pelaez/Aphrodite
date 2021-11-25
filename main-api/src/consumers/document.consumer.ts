@@ -54,7 +54,7 @@ export class DocumentConsumer {
       return;
     }
 
-    let qrCode: string;
+    let qrCode = docQrCode;
     const buffer = await this.readFile(sysSrcFileName);
 
     let documentType: DocumentType,
@@ -75,28 +75,21 @@ export class DocumentConsumer {
         : undefined;
     }
 
-    if (strEncodeValues && strEncodeValues !== '') {
+    if (strEncodeValues && strEncodeValues !== '')
       encodeValues = JSON.parse(strEncodeValues);
-    }
+
+    if (!documentType && encodeValues)
+      documentType = await this.runGetContractDetails(documentId, encodeValues);
+
+    if (!documentType && (!qrCode || qrCode === ''))
+      qrCode = await this.runQr(documentId, buffer, sysSrcFileName);
+
+    if (!documentType && qrCode && qrCode !== '')
+      documentType = await this.runGetDocumentType(qrCode, documentId);
 
     if (!documentType) {
-      if (encodeValues) {
-        documentType = await this.runGetContractDetails(
-          documentId,
-          encodeValues,
-        );
-      }
-
-      if (docQrCode && docQrCode !== '') qrCode = docQrCode;
-      else qrCode = await this.runQr(documentId, buffer, sysSrcFileName);
-
-      if (qrCode && qrCode !== '')
-        documentType = await this.runGetDocumentType(qrCode, documentId);
-
-      if (!documentType) {
-        await this.updateForManualEncode(documentId);
-        return;
-      }
+      await this.updateForManualEncode(documentId);
+      return;
     }
 
     const isWhiteListed =
