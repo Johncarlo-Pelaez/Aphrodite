@@ -1,11 +1,11 @@
 export interface UploadDocuments {
   file: Express.Multer.File;
-  uploadedBy: number;
+  uploadedBy: string;
 }
 
 export interface EncodeDocDetails {
   documentId: number;
-  encodedBy: number;
+  encodedBy: string;
   companyCode: string;
   contractNumber: string;
   nomenclature: string;
@@ -14,14 +14,14 @@ export interface EncodeDocDetails {
 
 export interface EncodeDocQRBarCode {
   documentId: number;
-  encodedBy: number;
+  encodedBy: string;
   qrBarCode: string;
 }
 
 export interface CheckerApproveDoc {
   documentId: number;
   documentDate: string;
-  checkedBy: number;
+  checkedBy: string;
 }
 
 export interface CheckerDisApproveDoc extends CheckerApproveDoc {
@@ -30,10 +30,10 @@ export interface CheckerDisApproveDoc extends CheckerApproveDoc {
 
 export interface DocumentApprover {
   documentId: number;
-  approver: number;
+  approver: string;
 }
 
 export interface RetryDocuments {
   documentIds: number[];
-  retryBy: number;
+  retryBy: string;
 }

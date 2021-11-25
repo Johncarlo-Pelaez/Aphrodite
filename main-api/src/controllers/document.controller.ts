@@ -17,7 +17,7 @@ import { Response } from 'express';
 import {
   ApiPaginatedResponse,
   CreatedResponse,
-  GetUserId,
+  GetAzureUsername,
   PaginatedResponse,
   ApiFile,
   fileMimetypeFilter,
@@ -87,11 +87,11 @@ export class DocumentController {
   @ApiFile('file', true, { fileFilter: fileMimetypeFilter('pdf') })
   async uploadDocument(
     @UploadedFile() file: Express.Multer.File,
-    @GetUserId() userId: number,
+    @GetAzureUsername() username: string,
   ): Promise<CreatedResponse> {
     return await this.documentsService.uploadDocument({
       file,
-      uploadedBy: userId,
+      uploadedBy: username,
     });
   }
 
@@ -122,12 +122,12 @@ export class DocumentController {
     @Param('id', ParseIntPipe)
     documentId: number,
     @Body(ValidationPipe) dto: EncodeDocQRBarCodeDto,
-    @GetUserId() userId: number,
+    @GetAzureUsername() username: string,
   ): Promise<void> {
     await this.documentsService.encodeDocQRBarcode({
       documentId,
       qrBarCode: dto.qrBarCode,
-      encodedBy: userId,
+      encodedBy: username,
     });
   }
 
@@ -137,7 +137,7 @@ export class DocumentController {
     @Param('id', ParseIntPipe)
     documentId: number,
     @Body(ValidationPipe) dto: EncodeDocDetailsDto,
-    @GetUserId() userId: number,
+    @GetAzureUsername() username: string,
   ): Promise<void> {
     await this.documentsService.encodeDocDetails({
       documentId,
@@ -145,7 +145,7 @@ export class DocumentController {
       contractNumber: dto.contractNumber,
       nomenclature: dto.nomenclature,
       documentGroup: dto.documentGroup,
-      encodedBy: userId,
+      encodedBy: username,
     });
   }
 
@@ -155,12 +155,12 @@ export class DocumentController {
     @Param('id', ParseIntPipe)
     documentId: number,
     @Body(ValidationPipe) dto: CheckerApproveDocDto,
-    @GetUserId() userId: number,
+    @GetAzureUsername() username: string,
   ): Promise<void> {
     await this.documentsService.checkerApproveDoc({
       documentId,
       documentDate: dto.documentDate,
-      checkedBy: userId,
+      checkedBy: username,
     });
   }
 
@@ -170,13 +170,13 @@ export class DocumentController {
     @Param('id', ParseIntPipe)
     documentId: number,
     @Body(ValidationPipe) dto: CheckerDisApproveDocDto,
-    @GetUserId() userId: number,
+    @GetAzureUsername() username: string,
   ): Promise<void> {
     await this.documentsService.checkerDisapproveDoc({
       documentId,
       documentDate: dto.documentDate,
       remarks: dto.remarks,
-      checkedBy: userId,
+      checkedBy: username,
     });
   }
 
@@ -185,11 +185,11 @@ export class DocumentController {
   async approverApproveDoc(
     @Param('id', ParseIntPipe)
     documentId: number,
-    @GetUserId() userId: number,
+    @GetAzureUsername() username: string,
   ): Promise<void> {
     await this.documentsService.approverApproveDoc({
       documentId,
-      approver: userId,
+      approver: username,
     });
   }
 
@@ -198,11 +198,11 @@ export class DocumentController {
   async approverDisapproveDoc(
     @Param('id', ParseIntPipe)
     documentId: number,
-    @GetUserId() userId: number,
+    @GetAzureUsername() username: string,
   ): Promise<void> {
     await this.documentsService.approverDisapproveDoc({
       documentId,
-      approver: userId,
+      approver: username,
     });
   }
 
@@ -210,11 +210,11 @@ export class DocumentController {
   @Put('/retry')
   async retryDocuments(
     @Body(RetryDocumentsIntPipe) dto: RetryDocumentsDto,
-    @GetUserId() userId: number,
+    @GetAzureUsername() username: string,
   ): Promise<void> {
     await this.documentsService.retryDocuments({
       documentIds: dto.documentIds,
-      retryBy: userId,
+      retryBy: username,
     });
   }
 }

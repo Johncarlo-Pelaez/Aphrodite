@@ -37,7 +37,7 @@ export class Document {
 
   @ApiProperty()
   @Column()
-  modifiedBy: number;
+  modifiedBy: string;
 
   @ApiProperty()
   @Column()
@@ -85,7 +85,7 @@ export class Document {
 
   @ApiProperty()
   @Column({ nullable: true })
-  encoder?: number;
+  encoder?: string;
 
   @ApiProperty()
   @Column({ nullable: true })
@@ -97,7 +97,7 @@ export class Document {
 
   @ApiProperty()
   @Column({ nullable: true })
-  checker?: number;
+  checker?: string;
 
   @ApiProperty()
   @Column({ nullable: true })
@@ -105,14 +105,14 @@ export class Document {
 
   @ApiProperty()
   @Column({ nullable: true })
-  approver?: number;
+  approver?: string;
 
   @ApiProperty()
-  @Column({ nullable: true })
-  userId: number;
+  @Column()
+  userUsername: string;
 
   @ApiProperty()
-  @ManyToOne(() => User, (e) => e.id)
+  @ManyToOne(() => User, (e) => e.username)
   user: User;
 }
 
@@ -146,9 +146,9 @@ export class DocumentHistory {
 
   @ApiProperty()
   @Column()
-  userId: number;
+  userUsername: string;
 
   @ApiProperty()
-  @ManyToOne(() => User, (e) => e.id)
+  @ManyToOne(() => User, (e) => e.username)
   user: User;
 }

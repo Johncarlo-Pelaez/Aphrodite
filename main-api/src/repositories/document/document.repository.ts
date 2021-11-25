@@ -158,7 +158,7 @@ export class DocumentRepository {
     history.description = document.description;
     history.documentSize = document.documentSize;
     history.createdDate = document.modifiedDate;
-    history.userId = document.userId;
+    history.userUsername = document.userUsername;
     history.documentId = document.id;
     return history;
   }
@@ -173,11 +173,11 @@ export class DocumentRepository {
         document.mimeType = param.mimeType;
         document.description = 'Successfully uploaded.';
         document.modifiedDate = param.createdDate;
-        document.modifiedBy = param.userId;
+        document.modifiedBy = param.username;
         document.status = DocumentStatus.UPLOADED;
         document.qrCode = param.qrCode;
         document.qrAt = param.createdDate;
-        document.userId = param.userId;
+        document.userUsername = param.username;
         await transaction.save(document);
 
         const history = this.genarateDocumentHistory(document);

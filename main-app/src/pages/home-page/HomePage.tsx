@@ -147,7 +147,8 @@ export const HomePage = (): ReactElement => {
     return function componentCleanUp() {
       resetRetryDoc();
     };
-  }, [resetRetryDoc]);
+    // eslint-disable-next-line
+  }, []);
 
   return (
     <Container className="my-4">

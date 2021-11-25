@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 export enum Role {
   ADMIN = 'ADMIN',
@@ -10,14 +10,13 @@ export enum Role {
 @Entity()
 export class User {
   @ApiProperty()
-  @PrimaryGeneratedColumn()
   id: number;
 
   @ApiProperty({
     format: 'email',
   })
-  @Column()
-  email: string;
+  @PrimaryColumn()
+  username: string;
 
   @ApiProperty()
   @Column()

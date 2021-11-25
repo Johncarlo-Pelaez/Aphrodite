@@ -35,19 +35,19 @@ export class UserRepository {
 
   async getAuthUserByEmail(email: string): Promise<User> {
     return await this.manager.findOne(User, {
-      where: { email, isDeleted: false, isActive: true },
+      where: { username: email, isDeleted: false, isActive: true },
     });
   }
 
   async getUserByEmail(email: string): Promise<User> {
     return await this.manager.findOne(User, {
-      where: { email, isDeleted: false },
+      where: { username: email, isDeleted: false },
     });
   }
 
   async createUser(param: CreateUserParam): Promise<number> {
     const user = new User();
-    user.email = param.email;
+    user.username = param.email;
     user.firstName = param.firstName;
     user.lastName = param.lastName;
     user.role = param.role;
@@ -59,7 +59,7 @@ export class UserRepository {
 
   async updateUser(param: UpdateUserParam): Promise<void> {
     const user = await this.manager.findOneOrFail(User, param.id);
-    user.email = param.email;
+    user.username = param.email;
     user.firstName = param.firstName;
     user.lastName = param.lastName;
     user.isActive = param.isActive ?? true;

@@ -63,7 +63,7 @@ export class DocumentService {
       mimeType: mimetype,
       qrCode: qrCode,
       createdDate: dateRightNow,
-      userId: data.uploadedBy,
+      username: data.uploadedBy,
     });
 
     await this.documentProducer.migrate(response.id);

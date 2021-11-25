@@ -20,7 +20,7 @@ export interface CreateDocumentParam {
   mimeType: string;
   qrCode?: string;
   createdDate: Date;
-  userId: number;
+  username: string;
 }
 
 export interface BeginDocProcessParam {
@@ -68,7 +68,7 @@ export interface FailDocMigrateParam extends FailDocProcessParam {
 interface EncodeProcess {
   documentId: number;
   encodedAt: Date;
-  encodedBy: number;
+  encodedBy: string;
 }
 
 export interface EncodeQrBarcodeParams extends EncodeProcess {
@@ -88,7 +88,7 @@ export interface CheckerApproveDocParam {
   documentId: number;
   documentDate: string;
   checkedAt: Date;
-  checkedBy: number;
+  checkedBy: string;
 }
 
 export interface CheckerDispproveDocParam extends CheckerApproveDocParam {
@@ -97,10 +97,10 @@ export interface CheckerDispproveDocParam extends CheckerApproveDocParam {
 
 export interface ApproverApproveDisapproveDocParam {
   documentId: number;
-  approver: number;
+  approver: string;
   modifiedAt: Date;
 }
 
 export interface UpdateForRetry extends BeginDocProcessParam {
-  retryBy: number;
+  retryBy: string;
 }

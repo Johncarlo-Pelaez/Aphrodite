@@ -9,8 +9,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 
-export const GetUserId = createParamDecorator((): number => {
-  return 1;
+export const GetAzureUsername = createParamDecorator((_data, req) => {
+  return req.args[0].user.preferred_username;
 });
 
 export const ApiPaginatedResponse = <TModel extends Type<any>>(

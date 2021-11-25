@@ -40,7 +40,7 @@ export interface DocumentHistory {
   createdDate: Date;
   documentId: number;
   document: Document;
-  userId: number;
+  userUsername: string;
   user: User;
 }
 

@@ -143,7 +143,7 @@ export class DocumentConsumer {
         DocumentDate: document.documentDate
           ? this.datesUtil.formatDateString(document.documentDate, 'MMDDYYYY')
           : empty,
-        ExternalSourceUserID: document.user.email.split('@')[0],
+        ExternalSourceUserID: document.user.username.split('@')[0],
         SourceSystem: 'RIS',
         DataCapDocSource: 'RIS',
         DataCapRemarks: document.remarks ?? empty,
