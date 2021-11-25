@@ -43,7 +43,20 @@ export const MainLayout = (props: MainLayoutProps): ReactElement => {
               ))}
               <span className="nav-link__devider"></span>
               <NavDropdown title={account?.username}>
-                <NavDropdown.Item>Account</NavDropdown.Item>
+                {[
+                  {
+                    label: 'User Management',
+                    path: '/users',
+                  },
+                  {
+                    label: 'Settings',
+                    path: '/settings',
+                  },
+                ].map((l) => (
+                  <NavDropdown.Item onClick={() => redirect(l.path)}>
+                    {l.label}
+                  </NavDropdown.Item>
+                ))}
                 <NavDropdown.Divider />
                 <NavDropdown.Item onClick={signOut}>Log out</NavDropdown.Item>
               </NavDropdown>
