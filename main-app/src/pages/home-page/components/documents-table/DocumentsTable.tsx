@@ -75,6 +75,41 @@ export const DocumentsTable = forwardRef(
         render: (document: Document) => fileSize(document.documentSize),
       },
       {
+        title: 'Status',
+        dataIndex: 'status',
+        render: (document: Document) => {
+          const arrStatus = document.status.split('_');
+          if (arrStatus.length === 2) {
+            const status = arrStatus[1];
+            switch (status) {
+              case 'BEGIN':
+                return 'Processing';
+              case 'FAILED':
+                return 'Error';
+              case 'DONE':
+                return 'Success';
+            }
+          } else return 'Waiting';
+        },
+      },
+      {
+        title: 'Operation',
+        dataIndex: 'status',
+        render: (document: Document) => {
+          const arrStatus = document.status.split('_');
+          const operation = arrStatus[0];
+          switch (operation) {
+            case 'INDEXING':
+              return 'Index';
+            default:
+              return (
+                operation.charAt(0).toUpperCase() +
+                operation.slice(1).toLowerCase()
+              );
+          }
+        },
+      },
+      {
         title: 'User',
         dataIndex: 'user',
         render: (document: Document) =>
