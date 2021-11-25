@@ -3,7 +3,7 @@ import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
 import Stack from 'react-bootstrap/Stack';
 import { Document } from 'models';
-import { useRetryDocs } from 'hooks';
+import { useRetryDocs, useCancelDocs } from 'hooks';
 import { DocumentStatus } from 'core/enum';
 import {
   UploadFilesModal,
@@ -75,9 +75,23 @@ export const HomePage = (): ReactElement => {
     reset: resetRetryDoc,
   } = useRetryDocs();
 
+  const {
+    isLoading: isCancelDocSaving,
+    isError: hasCancelDocError,
+    mutateAsync: cancelDocumentsAsync,
+    reset: resetCancelDoc,
+  } = useCancelDocs();
+
   const handleRetryDocs = async (): Promise<void> => {
     if (!isRetryDocSaving && enableRetryButton) {
       await retryDocumentsAsync(selectedDocumentKeys);
+      alert('Success.');
+    }
+  };
+
+  const handleCancelDocs = async (): Promise<void> => {
+    if (!isCancelDocSaving && enableCancelButton) {
+      await cancelDocumentsAsync(selectedDocumentKeys);
       alert('Success.');
     }
   };
@@ -129,17 +143,19 @@ export const HomePage = (): ReactElement => {
 
   useEffect(() => {
     if (hasRetryDocError) alert('Failed to retry documents.');
-  }, [hasRetryDocError]);
+    if (hasCancelDocError) alert('Failed to cancel documents.');
+  }, [hasRetryDocError, hasCancelDocError]);
 
   useEffect(() => {
     return function componentCleanUp() {
       resetRetryDoc();
+      resetCancelDoc();
     };
     // eslint-disable-next-line
   }, []);
 
   return (
-    <Container className="my-4">
+    <Container className="my-4" fluid>
       <div className="d-flex justify-content-between">
         <h4 className="fw-normal py-3">Documents</h4>
         <Stack className="my-2" direction="horizontal" gap={3}>
@@ -184,6 +200,7 @@ export const HomePage = (): ReactElement => {
             className="px-4"
             variant="outline-dark"
             disabled={!hasSelectedRows}
+            onClick={handleCancelDocs}
           >
             Cancel
           </Button>

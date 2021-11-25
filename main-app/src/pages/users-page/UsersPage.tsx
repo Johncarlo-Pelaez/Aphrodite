@@ -15,7 +15,7 @@ export const UsersPage = (): ReactElement => {
   const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
 
   return (
-    <Container className="my-4">
+    <Container className="my-4" fluid>
       <h4 className="fw-normal py-3">Users List</h4>
       <Stack className="my-2" direction="horizontal" gap={3}>
         <Button
