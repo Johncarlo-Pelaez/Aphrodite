@@ -172,3 +172,11 @@ export const getDocumentsProcessCountApi = async (
   );
   return res.data;
 };
+
+export const cancelDocumentsApi = async (
+  documentIds: number[],
+): Promise<void> => {
+  await request.put('/api/documents/cancel', {
+    documentIds,
+  });
+};

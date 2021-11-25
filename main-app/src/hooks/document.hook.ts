@@ -23,6 +23,7 @@ import {
   approverDisapproveDocApi,
   retryDocumentsApi,
   getDocumentsProcessCountApi,
+  cancelDocumentsApi,
 } from 'apis';
 import { QueryKey } from 'utils';
 import { DocumentStatus } from 'core/enum';
@@ -183,9 +184,9 @@ export const useApproverDocoment = (): UseMutationResult<
   );
 };
 
-export type UseRetryDocsContext = {
+export interface UseRetryDocsContext {
   prevDocs?: Document[];
-};
+}
 
 export const useRetryDocs = (): UseMutationResult<
   void,
@@ -240,5 +241,51 @@ export const useDocumentsProcessCount = (
 ): UseQueryResult<number, ApiError> => {
   return useQuery(QueryKey.buildDocumentProcessCount(params), () =>
     getDocumentsProcessCountApi({ statuses: params.statuses }),
+  );
+};
+
+export interface UseCancelDocsContext extends UseRetryDocsContext {}
+
+export const useCancelDocs = (): UseMutationResult<
+  void,
+  ApiError,
+  number[],
+  UseCancelDocsContext
+> => {
+  const queryClient = useQueryClient();
+  return useMutation<void, ApiError, number[], UseCancelDocsContext>(
+    cancelDocumentsApi,
+    {
+      onMutate: async (documentIds) => {
+        await queryClient.cancelQueries(QueryKey.paginatedDocuments);
+        const prevDocs = queryClient.getQueryData<Document[]>(
+          QueryKey.paginatedDocuments,
+        );
+        queryClient.setQueryData<Document[]>(
+          QueryKey.paginatedDocuments,
+          (documents) =>
+            !!documents
+              ? documents.filter((d) => {
+                  if (documentIds.includes(d.id)) {
+                    d.status = DocumentStatus.MIGRATE_CANCELLED;
+                  }
+                  return true;
+                })
+              : [],
+        );
+        return { prevDocs };
+      },
+      onError: (_err, _documentIds, context) => {
+        if (!!context) {
+          queryClient.setQueryData(
+            QueryKey.paginatedDocuments,
+            context.prevDocs,
+          );
+        }
+      },
+      onSettled: () => {
+        queryClient.invalidateQueries(QueryKey.paginatedDocuments);
+      },
+    },
   );
 };

@@ -48,6 +48,13 @@ export const HomePage = (): ReactElement => {
       ),
     [selectedDocuments],
   );
+  const enableCancelButton = useMemo(
+    () =>
+      selectedDocuments.every(
+        (doc) => doc.status === DocumentStatus.MIGRATE_BEGIN,
+      ),
+    [selectedDocuments],
+  );
 
   const {
     isLoading: isRetryDocSaving,
@@ -146,13 +153,24 @@ export const HomePage = (): ReactElement => {
         >
           Open
         </Button>
+        {enableRetryButton && (
+          <Button
+            className="px-4"
+            variant="outline-dark"
+            onClick={handleRetryDocs}
+            disabled={!hasSelectedRows}
+          >
+            Retry
+          </Button>
+        )}
+
         <Button
           className="px-4"
           variant="outline-dark"
           onClick={handleRetryDocs}
           disabled={!hasSelectedRows || !enableRetryButton}
         >
-          Retry
+          Cancel
         </Button>
       </Stack>
       <Stack className="my-2" direction="horizontal" gap={3}>
