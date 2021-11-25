@@ -15,6 +15,7 @@ import {
 } from './components';
 import { OperationDropdownOptions } from './components/OperationDropdown';
 import { StatusDropdownOptions } from './components/StatusDropdown';
+import { concatDocumentStatuses } from './HomePage.utils';
 
 export const HomePage = (): ReactElement => {
   const [selectedStatus, setSelectedStatus] = useState<string>('ALL');
@@ -62,81 +63,35 @@ export const HomePage = (): ReactElement => {
     }
   };
 
-  const concatDocStatus = (operation: string, status: string): string => {
-    const cmbDocStatus = `${operation}_${status}, `;
-    let docStatusFilter = '';
-    if (operation === 'ENCODING') {
-      switch (status) {
-        case 'WAITING':
-        case 'BEGIN':
-          docStatusFilter += `${operation}, `;
-          break;
-        default:
-          docStatusFilter += cmbDocStatus;
-          break;
-      }
-    } else if (operation === 'INDEXING') {
-      switch (status) {
-        case 'WAITING':
-          docStatusFilter += 'QR_DONE, ENCODING_DONE, ';
-          break;
-        default:
-          docStatusFilter += cmbDocStatus;
-          break;
-      }
-    } else if (operation === 'CHECKING') {
-      switch (status) {
-        case 'WAITING':
-        case 'BEGIN':
-          docStatusFilter += `${operation}, `;
-          break;
-        case 'DONE':
-          docStatusFilter += 'CHECKING_APPROVED, CHECKING_DISAPPROVED, ';
-          break;
-        default:
-          docStatusFilter += cmbDocStatus;
-          break;
-      }
-    } else if (operation === 'MIGRATE') {
-      switch (status) {
-        case 'WAITING':
-          docStatusFilter += 'INDEXING_DONE, CHECKING_APPROVED, APPROVED, ';
-          break;
-        default:
-          docStatusFilter += cmbDocStatus;
-          break;
-      }
-    }
-    return docStatusFilter;
-  };
-
   const getDocStatusFilter = (
     cmbStatusValue: string,
     cmbOperationValue: string,
   ): DocumentStatus[] => {
-    let docStatusesFilter: DocumentStatus[] = [];
-    let docStatusFilter = '';
+    let strStatusesFilter = '';
 
     if (cmbOperationValue === 'ALL' && cmbStatusValue === 'ALL') {
-      docStatusesFilter = Object.values(DocumentStatus);
+      strStatusesFilter = Object.values(DocumentStatus).join(',');
     } else if (cmbOperationValue === 'ALL' && cmbStatusValue !== 'ALL') {
       for (const operation of allOperation) {
-        docStatusFilter += concatDocStatus(operation, cmbStatusValue);
+        strStatusesFilter += concatDocumentStatuses(operation, cmbStatusValue);
       }
     } else if (cmbOperationValue !== 'ALL' && cmbStatusValue === 'ALL') {
       for (const status of allStatus) {
-        docStatusFilter += concatDocStatus(cmbOperationValue, status);
+        strStatusesFilter += concatDocumentStatuses(cmbOperationValue, status);
       }
     } else {
-      docStatusFilter = concatDocStatus(cmbOperationValue, cmbStatusValue);
+      strStatusesFilter = concatDocumentStatuses(
+        cmbOperationValue,
+        cmbStatusValue,
+      );
     }
 
-    for (const status of docStatusFilter.split(',')) {
-      if (status !== '')
-        docStatusesFilter.push(status.trim() as DocumentStatus);
-    }
+    const statusesFilter = strStatusesFilter
+      .split(',')
+      .filter((value, index, self) => self.indexOf(value) === index)
+      .map((status) => status.trim()) as DocumentStatus[];
 
-    return docStatusesFilter;
+    return !!statusesFilter.length ? statusesFilter : [];
   };
 
   const triggerRefreshDocslist = (): void => {
