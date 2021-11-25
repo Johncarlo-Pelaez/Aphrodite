@@ -55,7 +55,7 @@ export const HomePage = (): ReactElement => {
   const enableCancelButton = useMemo(
     () =>
       !!selectedDocuments.length &&
-      selectedDocuments.every(({ status }) =>
+      selectedDocuments.every((doc) =>
         Object.values(DocumentStatus)
           .filter((s) => {
             const arrStattmp = s.split('_');
@@ -63,7 +63,7 @@ export const HomePage = (): ReactElement => {
               return arrStattmp[1] !== 'DONE' && arrStattmp[1] !== 'FAILED';
             else return true;
           })
-          .some((s) => s === status),
+          .some((s) => s === doc.status),
       ),
     [selectedDocuments],
   );
@@ -113,8 +113,12 @@ export const HomePage = (): ReactElement => {
     return !!statusesFilter.length ? statusesFilter : [];
   };
 
-  const triggerRefreshDocslist = (): void => {
+  const refreshDocumentslist = (): void => {
     documentsTableRef.current?.refresh();
+  };
+
+  const selectNextDocument = (): void => {
+    documentsTableRef.current?.next();
   };
 
   const docStatusFilter = useMemo(
@@ -149,7 +153,7 @@ export const HomePage = (): ReactElement => {
           <Button
             className="px-4"
             variant="outline-dark"
-            onClick={triggerRefreshDocslist}
+            onClick={refreshDocumentslist}
           >
             Refresh
           </Button>
@@ -211,6 +215,7 @@ export const HomePage = (): ReactElement => {
         isVisible={viewDocModalShow}
         documentId={selected1Doc?.id}
         onClose={() => setViewDocModalShow(false)}
+        onFormSubmitted={selectNextDocument}
       />
     </Container>
   );

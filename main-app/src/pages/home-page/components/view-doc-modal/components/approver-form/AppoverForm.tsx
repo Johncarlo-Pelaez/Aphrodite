@@ -1,4 +1,9 @@
-import { ReactElement, useImperativeHandle, forwardRef } from 'react';
+import {
+  ReactElement,
+  useImperativeHandle,
+  forwardRef,
+  useEffect,
+} from 'react';
 import Card from 'react-bootstrap/Card';
 import Form from 'react-bootstrap/Form';
 import Alert from 'react-bootstrap/Alert';
@@ -8,23 +13,18 @@ import { FileInfo, ReadOnlyIndexFields } from '../indexes-form';
 
 export interface AppoverFormProps {
   document?: Document;
-  triggerCloseModal: () => void;
+  onSubmitted: () => void;
 }
 
 export const AppoverForm = forwardRef(
   (props: AppoverFormProps, ref): ReactElement => {
-    const { document, triggerCloseModal } = props;
+    const { document, onSubmitted: triggerSubmitted } = props;
     const {
       isLoading: isApproveDocSaving,
       isError: hasApproveDocError,
       mutateAsync: approveDocumentAsync,
       reset,
     } = useApproverDocoment();
-
-    const closeModal = (): void => {
-      reset();
-      triggerCloseModal();
-    };
 
     const approveDocumentSubmit = async (
       approve: boolean = true,
@@ -48,7 +48,7 @@ export const AppoverForm = forwardRef(
           alert('Disapprove Saved.');
         }
 
-        closeModal();
+        triggerSubmitted();
       }
     };
 
@@ -64,6 +64,13 @@ export const AppoverForm = forwardRef(
       approveDocument,
       disapproveDocument,
     }));
+
+    useEffect(() => {
+      return function componentCleanUp() {
+        reset();
+      };
+      // eslint-disable-next-line
+    }, []);
 
     return (
       <>

@@ -21,6 +21,7 @@ export interface ViewDocModalProps {
   documentId?: number;
   isVisible: boolean;
   onClose: () => void;
+  onFormSubmitted: () => void;
 }
 
 enum TabKey {
@@ -29,11 +30,13 @@ enum TabKey {
   History = 'HISTORY',
 }
 
-export const ViewDocModal = ({
-  documentId,
-  isVisible,
-  onClose,
-}: ViewDocModalProps): ReactElement => {
+export const ViewDocModal = (props: ViewDocModalProps): ReactElement => {
+  const {
+    documentId,
+    isVisible,
+    onClose: triggerClose,
+    onFormSubmitted: triggerFormSubmitted,
+  } = props;
   const [key, setKey] = useState<TabKey>(TabKey.File);
   const encoderFormRef = useRef<any>(null);
   const checkerFormRef = useRef<any>(null);
@@ -47,7 +50,7 @@ export const ViewDocModal = ({
       backdrop="static"
       keyboard={false}
       show={isVisible}
-      onHide={closeModal}
+      onHide={triggerClose}
       centered
       dialogClassName={styles.viewModal}
     >
@@ -101,7 +104,7 @@ export const ViewDocModal = ({
           <EncoderForm
             ref={encoderFormRef}
             document={document}
-            triggerCloseModal={closeModal}
+            onSubmitted={triggerFormSubmitted}
           />
         );
       case DocumentStatus.CHECKING:
@@ -109,7 +112,7 @@ export const ViewDocModal = ({
           <CheckerForm
             ref={checkerFormRef}
             document={document}
-            triggerCloseModal={closeModal}
+            onSubmitted={triggerFormSubmitted}
           />
         );
       case DocumentStatus.CHECKING_DISAPPROVED:
@@ -117,7 +120,7 @@ export const ViewDocModal = ({
           <AppoverForm
             ref={approverFormRef}
             document={document}
-            triggerCloseModal={closeModal}
+            onSubmitted={triggerFormSubmitted}
           />
         );
       default:
@@ -131,7 +134,11 @@ export const ViewDocModal = ({
     switch (document?.status) {
       case DocumentStatus.ENCODING:
         formActionButtons = [
-          <Button key="btn-close" variant="outline-danger" onClick={closeModal}>
+          <Button
+            key="btn-close"
+            variant="outline-danger"
+            onClick={triggerClose}
+          >
             Close
           </Button>,
           <Button
@@ -181,7 +188,11 @@ export const ViewDocModal = ({
         break;
       default:
         formActionButtons = [
-          <Button key="btn-close" variant="outline-danger" onClick={closeModal}>
+          <Button
+            key="btn-close"
+            variant="outline-danger"
+            onClick={triggerClose}
+          >
             Close
           </Button>,
         ];
@@ -209,10 +220,6 @@ export const ViewDocModal = ({
 
   const triggerApproverFormSubmitDispprove = (): void => {
     approverFormRef.current?.disapproveDocument();
-  };
-
-  const closeModal = (): void => {
-    onClose();
   };
 
   return renderModal();

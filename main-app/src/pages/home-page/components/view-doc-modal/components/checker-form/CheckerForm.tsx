@@ -1,4 +1,9 @@
-import { ReactElement, useImperativeHandle, forwardRef } from 'react';
+import {
+  ReactElement,
+  useImperativeHandle,
+  forwardRef,
+  useEffect,
+} from 'react';
 import { useForm } from 'react-hook-form';
 import Card from 'react-bootstrap/Card';
 import Form from 'react-bootstrap/Form';
@@ -15,12 +20,12 @@ export interface ICheckerFormValues {
 
 export interface CheckerFormProps {
   document?: Document;
-  triggerCloseModal: () => void;
+  onSubmitted: () => void;
 }
 
 export const CheckerForm = forwardRef(
   (props: CheckerFormProps, ref): ReactElement => {
-    const { document, triggerCloseModal } = props;
+    const { document, onSubmitted: triggerSubmitted } = props;
 
     const {
       isLoading: isCheckDocSaving,
@@ -31,15 +36,6 @@ export const CheckerForm = forwardRef(
 
     const { control, reset, handleSubmit, setError } =
       useForm<ICheckerFormValues>();
-
-    const closeModal = (): void => {
-      reset({
-        documentDate: '',
-        remarks: '',
-      });
-      resetCheckDocument();
-      triggerCloseModal();
-    };
 
     const approveDocumentSubmit = async (
       data: ICheckerFormValues,
@@ -86,7 +82,7 @@ export const CheckerForm = forwardRef(
           alert('Disapprove Saved.');
         }
 
-        closeModal();
+        triggerSubmitted();
       }
     };
 
@@ -108,6 +104,17 @@ export const CheckerForm = forwardRef(
       approveDocument,
       disapproveDocument,
     }));
+
+    useEffect(() => {
+      return function componentCleanUp() {
+        reset({
+          documentDate: '',
+          remarks: '',
+        });
+        resetCheckDocument();
+      };
+      // eslint-disable-next-line
+    }, []);
 
     return (
       <>

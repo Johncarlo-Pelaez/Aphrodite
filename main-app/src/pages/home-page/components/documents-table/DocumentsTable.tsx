@@ -5,6 +5,7 @@ import {
   useMemo,
   useImperativeHandle,
   forwardRef,
+  useCallback,
 } from 'react';
 import fileSize from 'filesize';
 import moment from 'moment';
@@ -68,6 +69,15 @@ export const DocumentsTable = forwardRef(
       () => ({ documents: result?.data ?? [], total: result?.count ?? 0 }),
       [result?.data, result?.count],
     );
+    const selectedIndexes = useMemo(() => {
+      return selectedDocuments.reduce(
+        (indexes: number[], current: Document) => {
+          indexes.push(documents.findIndex((d) => d.id === current.id));
+          return indexes;
+        },
+        [],
+      );
+    }, [documents, selectedDocuments]);
 
     const renderColumns = (): TableColumnProps<Document>[] => [
       {
@@ -152,9 +162,25 @@ export const DocumentsTable = forwardRef(
       setSelectedDocumentKeys(selectedRowKeys as number[]);
     };
 
-    useImperativeHandle(ref, () => ({
-      refresh: refetch,
-    }));
+    const selectNextDocument = useCallback(() => {
+      const nextIndex = (Math.max(...selectedIndexes) + 1) % documents.length;
+      const nextDocument = documents[nextIndex];
+      if (nextDocument) {
+        setSelectedDocuments([nextDocument]);
+        setSelectedDocumentKeys([nextDocument.id]);
+      }
+      // eslint-disable-next-line
+    }, [selectedIndexes, documents]);
+
+    useImperativeHandle(
+      ref,
+      () => ({
+        refresh: refetch,
+        next: selectNextDocument,
+      }),
+      // eslint-disable-next-line
+      [selectNextDocument],
+    );
 
     useEffect(() => {
       const pageDocKeys = documents.map((d): React.Key => d.id);

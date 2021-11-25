@@ -31,12 +31,12 @@ export interface IEncoderFormValues {
 
 export interface EncoderFormProps {
   document?: Document;
-  triggerCloseModal: () => void;
+  onSubmitted: () => void;
 }
 
 export const EncoderForm = forwardRef(
   (props: EncoderFormProps, ref): ReactElement => {
-    const { document, triggerCloseModal } = props;
+    const { document, onSubmitted: triggerSubmitted } = props;
     const envodeValues = useMemo(() => {
       if (document?.encodeValues !== '')
         return JSON.parse(document?.encodeValues as string) as EncodeValues;
@@ -65,18 +65,6 @@ export const EncoderForm = forwardRef(
       });
 
     const nomenclature = watch('nomenclature');
-
-    const closeModal = (): void => {
-      reset({
-        qrBarCode: '',
-        companyCode: '',
-        contractNumber: '',
-        nomenclature: [],
-        documentGroup: '',
-      });
-      resetEncodeDocument();
-      triggerCloseModal();
-    };
 
     const encodeDocumentSubmit: SubmitHandler<IEncoderFormValues> = async (
       data,
@@ -203,18 +191,18 @@ export const EncoderForm = forwardRef(
         });
 
         alert('Encode Saved.');
-        closeModal();
+        triggerSubmitted();
       }
     };
 
     useEffect(
       function onChangeNomenclatureField() {
-        const documentGroup =
+        setValue(
+          'documentGroup',
           nomenclature && !!nomenclature.length
             ? nomenclature[0].documentGroup
-            : '';
-
-        setValue('documentGroup', documentGroup);
+            : '',
+        );
       },
       // eslint-disable-next-line
       [nomenclature],
@@ -225,6 +213,20 @@ export const EncoderForm = forwardRef(
         handleSubmit(encodeDocumentSubmit)();
       },
     }));
+
+    useEffect(() => {
+      return function componentCleanUp() {
+        reset({
+          qrBarCode: '',
+          companyCode: '',
+          contractNumber: '',
+          nomenclature: [],
+          documentGroup: '',
+        });
+        resetEncodeDocument();
+      };
+      // eslint-disable-next-line
+    }, []);
 
     return (
       <>
