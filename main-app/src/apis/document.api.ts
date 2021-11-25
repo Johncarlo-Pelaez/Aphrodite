@@ -157,7 +157,6 @@ export const retryDocumentsApi = async (
 };
 
 export interface GetDocumentsProcessCountApi {
-  search?: string;
   statuses: DocumentStatus[];
 }
 
@@ -165,7 +164,6 @@ export const getDocumentsProcessCountApi = async (
   params: GetDocumentsProcessCountApi,
 ): Promise<number> => {
   const filterQuery = createQueryString({
-    search: params.search,
     statuses: params.statuses,
   });
 

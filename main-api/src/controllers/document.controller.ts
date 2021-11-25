@@ -227,8 +227,6 @@ export class DocumentController {
     @Query() dto: GetDocumentsProcessCountDto,
   ): Promise<number> {
     return await this.documentRepository.count({
-      search: dto.search,
-      documentType: dto.documentType,
       statuses: dto.statuses,
     });
   }

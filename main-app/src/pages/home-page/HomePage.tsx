@@ -154,9 +154,6 @@ export const HomePage = (): ReactElement => {
         >
           Retry
         </Button>
-        <Button className="px-4" variant="danger" disabled={!hasSelectedRows}>
-          Delete
-        </Button>
       </Stack>
       <Stack className="my-2" direction="horizontal" gap={3}>
         <StatusDropdown
