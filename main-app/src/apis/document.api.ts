@@ -168,7 +168,7 @@ export const getDocumentsProcessCountApi = async (
   });
 
   const res = await request.get<number>(
-    `/api/documents/process-count?${filterQuery}`,
+    `/api/documents/process/count?${filterQuery}`,
   );
   return res.data;
 };

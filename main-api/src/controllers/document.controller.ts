@@ -222,7 +222,7 @@ export class DocumentController {
   @ApiOkResponse({
     type: Number,
   })
-  @Get('/process-count')
+  @Get('/process/count')
   async getDocumentsProcessCount(
     @Query() dto: GetDocumentsProcessCountDto,
   ): Promise<number> {
