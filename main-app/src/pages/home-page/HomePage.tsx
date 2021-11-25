@@ -37,6 +37,16 @@ export const HomePage = (): ReactElement => {
     () => selectedDocuments.map((doc) => doc.id),
     [selectedDocuments],
   );
+  const enableRetryButton = useMemo(
+    () =>
+      selectedDocuments.every(
+        (doc) =>
+          doc.status === DocumentStatus.QR_FAILED ||
+          doc.status === DocumentStatus.INDEXING_FAILED ||
+          doc.status === DocumentStatus.MIGRATE_FAILED,
+      ),
+    [selectedDocuments],
+  );
 
   const {
     isLoading: isRetryDocSaving,
@@ -46,7 +56,7 @@ export const HomePage = (): ReactElement => {
   } = useRetryDocs();
 
   const handleRetryDocs = async (): Promise<void> => {
-    if (!isRetryDocSaving) {
+    if (!isRetryDocSaving && enableRetryButton) {
       await retryDocumentsAsync(selectedDocumentKeys);
       alert('Success.');
     }
@@ -185,7 +195,7 @@ export const HomePage = (): ReactElement => {
           className="px-4"
           variant="outline-dark"
           onClick={handleRetryDocs}
-          disabled={!hasSelectedRows}
+          disabled={!hasSelectedRows || !enableRetryButton}
         >
           Retry
         </Button>
