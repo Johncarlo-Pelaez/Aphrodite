@@ -5,7 +5,6 @@ import {
   Get,
   Post,
   Put,
-  Delete,
   ValidationPipe,
   Query,
   Param,
@@ -17,24 +16,23 @@ import {
   ApiCreatedResponse,
   ApiOkResponse,
 } from '@nestjs/swagger';
-import { AzureAdService } from 'src/azure-ad-service';
 import {
   AzureADGuard,
   AzureUser,
   CreatedResponse,
-  GetAccessToken,
   GetAzureUser,
 } from 'src/core';
-import { Role, User } from 'src/entities';
+import { User } from 'src/entities';
 import { UserRepository } from 'src/repositories';
-import { CreateUserAccountDto, UserIsExistDto } from './user.dto';
+import {
+  CreateUserAccountDto,
+  UserIsExistDto,
+  UpdateUserAccountDto,
+} from './user.dto';
 
 @Controller('/users')
 export class UserController {
-  constructor(
-    private readonly userRepository: UserRepository,
-    private readonly azureAdService: AzureAdService,
-  ) {}
+  constructor(private readonly userRepository: UserRepository) {}
 
   @ApiOkResponse({
     type: User,
@@ -67,99 +65,36 @@ export class UserController {
     type: CreatedResponse,
   })
   @ApiConflictResponse({
-    description: 'There is already an admin user.',
-  })
-  @Post('/admin')
-  async createAdminUser(
-    @Body(ValidationPipe) dto: CreateUserAccountDto,
-  ): Promise<CreatedResponse> {
-    const user = await this.userRepository.getAuthUserByEmail(dto.email);
-    const total = await this.userRepository.count([Role.ADMIN]);
-    if (total > 0 || user) {
-      throw new ConflictException();
-    }
-
-    const response = new CreatedResponse();
-    const rightNow = new Date();
-
-    response.id = await this.userRepository.createUser({
-      ...dto,
-      role: Role.ADMIN,
-      createdDate: rightNow,
-    });
-
-    return response;
-  }
-
-  @ApiCreatedResponse({
-    type: CreatedResponse,
-  })
-  @ApiConflictResponse({
     description: 'User already exist.',
   })
   @Post('/create')
   @UseGuards(AzureADGuard)
-  async createEncoderUser(
+  async createUser(
     @Body(ValidationPipe) dto: CreateUserAccountDto,
-    @GetAccessToken() accessToken: string,
   ): Promise<CreatedResponse> {
     const user = await this.userRepository.getUserByEmail(dto.email);
     if (user) throw new ConflictException();
 
-    const data = await this.azureAdService.getUserById(
-      accessToken,
-      dto.objectId,
-    );
     const response = new CreatedResponse();
     const rightNow = new Date();
     response.id = await this.userRepository.createUser({
-      email: data.userPrincipalName,
-      firstName: data.givenName,
-      lastName: data.surname,
-      role: dto.role,
+      ...dto,
       createdDate: rightNow,
-      isActive: dto.isActive,
     });
     return response;
   }
 
   @ApiOkResponse()
-  @ApiConflictResponse({
-    description: 'User already exist.',
-  })
   @Put('/:id')
   @UseGuards(AzureADGuard)
   async updateUser(
     @Param('id', ParseIntPipe) id: number,
-    @Body(ValidationPipe) dto: CreateUserAccountDto,
-    @GetAccessToken() accessToken: string,
+    @Body(ValidationPipe) dto: UpdateUserAccountDto,
   ): Promise<void> {
-    const user = await this.userRepository.getUserByEmail(dto.email);
-    if (user && user.id !== id) throw new ConflictException();
-
-    const data = await this.azureAdService.getUserById(
-      accessToken,
-      dto.objectId,
-    );
     const rightNow = new Date();
     return await this.userRepository.updateUser({
       id,
-      email: data.userPrincipalName,
-      firstName: data.givenName,
-      lastName: data.surname,
-      role: dto.role,
-      modifiedDate: rightNow,
-      isActive: dto.isActive,
-    });
-  }
-
-  @ApiOkResponse()
-  @Delete('/:id')
-  @UseGuards(AzureADGuard)
-  async deleteUser(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    const rightNow = new Date();
-    return await this.userRepository.deleteUser({
-      id,
+      ...dto,
       modifiedDate: rightNow,
     });
   }

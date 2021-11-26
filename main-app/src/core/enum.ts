@@ -21,3 +21,9 @@ export enum DocumentStatus {
   CANCELLED = 'CANCELLED',
   RETRYING = 'RETRYING',
 }
+
+export enum Role {
+  ADMIN = 'ADMIN',
+  ENCODER = 'ENCODER',
+  REVIEWER = 'REVIEWER',
+}

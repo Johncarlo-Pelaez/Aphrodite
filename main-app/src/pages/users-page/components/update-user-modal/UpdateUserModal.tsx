@@ -1,27 +1,50 @@
 import { ReactElement, useEffect } from 'react';
-import { UpdateUserApi, UpdateUserIdentityApi } from 'apis';
-import { Role } from 'models';
+import { UpdateUserApiParams } from 'apis';
+import { Role } from 'core/enum';
 import Form from 'react-bootstrap/Form';
 import Alert from 'react-bootstrap/Alert';
 import Spinner from 'react-bootstrap/Spinner';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 import { useUpdateUser } from 'hooks';
-import { updateUserSchema, initialFormState } from './UpdateUser.schema';
-import { useForm, Controller, SubmitHandler } from 'react-hook-form';
-import { UpdateUserModalProps } from './UpdateUserModal.props';
+import { User } from 'models';
+import { useForm, SubmitHandler, FieldValues } from 'react-hook-form';
+import {
+  RoleField,
+  LastNameField,
+  FirstNameField,
+} from '../add-user-modal/components';
+import { IsActiveField } from './components';
+
+interface UpdateUserForm extends UpdateUserApiParams, FieldValues {}
+
+export const updateUserSchema = yup.object().shape({
+  role: yup
+    .mixed<Role>()
+    .oneOf(Object.values(Role))
+    .required('Role is required.'),
+  firstName: yup.string().required('First name must be filled'),
+  lastName: yup.string().required('Last name must be filled'),
+  isActive: yup.boolean().required('Active is required'),
+});
+
+export interface UpdateUserModalProps {
+  user?: User;
+  isVisible: boolean;
+  onClose: () => void;
+}
 
 export const UpdateUserModal = ({
   user,
   isVisible,
-  onClose,
+  onClose: triggerClose,
 }: UpdateUserModalProps): ReactElement => {
   const hasUserSelected = !!user;
   const {
     isLoading,
     isError,
-    error,
     mutateAsync: updateUserAsync,
     reset: resetUseUpdateUser,
   } = useUpdateUser();
@@ -30,98 +53,52 @@ export const UpdateUserModal = ({
     control,
     handleSubmit,
     reset: resetForm,
-    setValue: set,
-    formState: { errors },
-  } = useForm<UpdateUserApi>({
+    setValue,
+  } = useForm<UpdateUserForm>({
     resolver: yupResolver(updateUserSchema),
-    defaultValues: initialFormState,
   });
 
-  const updateUser: SubmitHandler<UpdateUserIdentityApi> = async (
+  const updateUser: SubmitHandler<UpdateUserForm> = async (
     params,
   ): Promise<void> => {
-    if (hasUserSelected) {
-      const userParam = { ...params, id: user?.id };
-      if (!isLoading) {
-        await updateUserAsync(userParam);
-        closeModal();
-      }
+    if (hasUserSelected && !isLoading) {
+      await updateUserAsync({ ...params, id: user?.id });
+      alert('Update saved.');
+      triggerClose();
     }
   };
 
-  const renderErrorAlert = (): ReactElement => {
-    let errorMessage: string | undefined = '';
-    const show =
-      !!errors.email ||
-      !!errors.objectId ||
-      !!errors.role ||
-      !!errors.firstname ||
-      !!errors.lastname ||
-      isError;
-
-    if (isError && error?.response?.statusText === 'Conflict') {
-      errorMessage = 'Email already exist';
-    } else if (
-      !!errors.email ||
-      !!errors.objectId ||
-      !!errors.role ||
-      !!errors.firstname ||
-      !!errors.lastname
-    ) {
-      errorMessage =
-        errors?.email?.message ||
-        errors?.objectId?.message ||
-        errors?.role?.message ||
-        errors?.firstname?.message ||
-        errors?.lastname?.message;
-    }
-
-    return (
-      <Alert variant="danger" show={show}>
-        {errorMessage}
-      </Alert>
-    );
-  };
-
-  const closeModal = (): void => {
+  const handleClose = (): void => {
     resetForm({
-      email: '',
       role: Role.ENCODER,
-      objectId: '',
-      firstname: '',
-      lastname: '',
+      firstName: '',
+      lastName: '',
+      isActive: true,
     });
-    resetUseUpdateUser();
-    onClose();
+    triggerClose();
   };
 
   useEffect(() => {
-    if (user) {
-      resetForm({
-        email: '',
-        role: Role.ENCODER,
-        objectId: '',
-        firstname: '',
-        lastname: '',
-      });
-      set('email', user?.email ? user.email : '');
-      set('role', user?.role ? user.role : Role.ENCODER);
-      set('objectId', '');
-      set('firstname', user?.firstName ? user.firstName : '');
-      set('lastname', user?.lastName ? user.lastName : '');
-    }
+    setValue('role', user?.role ?? Role.ENCODER);
+    setValue('firstName', user?.firstName ?? '');
+    setValue('lastName', user?.lastName ?? '');
+    setValue('isActive', user?.isActive ?? true);
+    // eslint-disable-next-line
+  }, [user, isVisible]);
 
-    return () => {
+  useEffect(() => {
+    return function componentCleanup() {
       resetUseUpdateUser();
     };
-  }, [user, resetForm, set, resetUseUpdateUser]);
+    // eslint-disable-next-line
+  }, []);
 
   return (
     <Modal
       backdrop="static"
       keyboard={false}
       show={isVisible}
-      onHide={onClose}
+      onHide={handleClose}
       centered
     >
       <Form onSubmit={handleSubmit(updateUser)}>
@@ -131,77 +108,15 @@ export const UpdateUserModal = ({
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {renderErrorAlert()}
-          <Form.Group className="mb-3">
-            <Form.Label>Role</Form.Label>
-            <Controller
-              name="role"
-              control={control}
-              render={({ field }) => (
-                <Form.Select {...field} disabled={isLoading}>
-                  <option value={Role.ENCODER}>Encoder</option>
-                  <option value={Role.REVIEWER}>Reviewer</option>
-                </Form.Select>
-              )}
-            />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Email address</Form.Label>
-            <Controller
-              name="email"
-              control={control}
-              render={({ field }) => (
-                <Form.Control
-                  {...field}
-                  disabled={isLoading}
-                  placeholder="Enter email"
-                />
-              )}
-            />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Object ID</Form.Label>
-            <Controller
-              name="objectId"
-              control={control}
-              defaultValue=""
-              render={({ field }) => (
-                <Form.Control
-                  {...field}
-                  disabled={isLoading}
-                  placeholder="Enter object ID"
-                />
-              )}
-            />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Personal Information</Form.Label>
-            <Controller
-              name="firstname"
-              control={control}
-              defaultValue=""
-              render={({ field }) => (
-                <Form.Control
-                  {...field}
-                  disabled={isLoading}
-                  placeholder="First name"
-                />
-              )}
-            />
-            <br />
-            <Controller
-              name="lastname"
-              control={control}
-              defaultValue=""
-              render={({ field }) => (
-                <Form.Control
-                  {...field}
-                  disabled={isLoading}
-                  placeholder="Last name"
-                />
-              )}
-            />
-          </Form.Group>
+          <Alert variant="danger" show={isError}>
+            {'Failed to update user information.'}
+          </Alert>
+          <fieldset disabled={isLoading}>
+            <RoleField control={control} />
+            <FirstNameField control={control} />
+            <LastNameField control={control} />
+            <IsActiveField control={control} />
+          </fieldset>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="primary" type="submit" disabled={isLoading}>
@@ -215,7 +130,7 @@ export const UpdateUserModal = ({
             />
             {isLoading ? ' Updating...' : 'Update'}
           </Button>
-          <Button variant="outline-danger" onClick={closeModal}>
+          <Button variant="outline-danger" onClick={handleClose}>
             Close
           </Button>
         </Modal.Footer>

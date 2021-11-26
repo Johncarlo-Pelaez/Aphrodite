@@ -1,5 +1,5 @@
-import { ReactElement } from 'react';
-import { useForm, Controller, SubmitHandler } from 'react-hook-form';
+import { ReactElement, useEffect } from 'react';
+import { useForm, SubmitHandler, FieldValues } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Form from 'react-bootstrap/Form';
 import Alert from 'react-bootstrap/Alert';
@@ -9,11 +9,22 @@ import Button from 'react-bootstrap/Button';
 import { useCreateUser } from 'hooks';
 import * as yup from 'yup';
 import { CreateUserApi } from 'apis';
-import { Role } from 'models';
+import { Role } from 'core/enum';
+import {
+  RoleField,
+  EmailField,
+  LastNameField,
+  FirstNameField,
+  ObjectIdField,
+} from './components';
+
+interface CreateUserForm extends CreateUserApi, FieldValues {}
 
 const createUserSchema = yup.object().shape({
   email: yup.string().email().required('Email is required.'),
   objectId: yup.string().required('Object ID is required.'),
+  firstName: yup.string().required('First name is required.'),
+  lastName: yup.string().required('Last name is required.'),
   role: yup
     .mixed<Role>()
     .oneOf(Object.values(Role))
@@ -27,7 +38,7 @@ export interface AddUserModalProps {
 
 export const AddUserModal = ({
   isVisible,
-  onClose,
+  onClose: triggerClose,
 }: AddUserModalProps): ReactElement => {
   const {
     isLoading,
@@ -41,8 +52,7 @@ export const AddUserModal = ({
     control,
     handleSubmit,
     reset: resetForm,
-    formState: { errors },
-  } = useForm<CreateUserApi>({
+  } = useForm<CreateUserForm>({
     resolver: yupResolver(createUserSchema),
   });
 
@@ -51,43 +61,35 @@ export const AddUserModal = ({
   ): Promise<void> => {
     if (!isLoading) {
       await createUserAsync(params);
-      closeModal();
+      alert('New user has successfuly added.');
+      handleClose();
     }
   };
 
-  const renderErrorAlert = (): ReactElement => {
-    let errorMessage: string | undefined = '';
-    const show =
-      !!errors.email || !!errors.objectId || !!errors.role || isError;
-
-    if (isError && error?.response?.statusText === 'Conflict') {
-      errorMessage = 'Email already exist';
-    } else if (!!errors.email || !!errors.objectId || !!errors.role) {
-      errorMessage =
-        errors?.email?.message ||
-        errors?.objectId?.message ||
-        errors?.role?.message;
-    }
-
-    return (
-      <Alert variant="danger" show={show}>
-        {errorMessage}
-      </Alert>
-    );
+  const handleClose = (): void => {
+    resetForm({
+      email: '',
+      role: Role.ENCODER,
+      objectId: '',
+      firstName: '',
+      lastName: '',
+    });
+    triggerClose();
   };
 
-  const closeModal = (): void => {
-    resetForm({ email: '', role: Role.ENCODER, objectId: '' });
-    resetUseAddUser();
-    onClose();
-  };
+  useEffect(() => {
+    return function componentCleanup() {
+      resetUseAddUser();
+    };
+    // eslint-disable-next-line
+  }, []);
 
   return (
     <Modal
       backdrop="static"
       keyboard={false}
       show={isVisible}
-      onHide={onClose}
+      onHide={triggerClose}
       centered
     >
       <Form onSubmit={handleSubmit(addUser)}>
@@ -97,51 +99,18 @@ export const AddUserModal = ({
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {renderErrorAlert()}
-          <Form.Group className="mb-3">
-            <Form.Label>Role</Form.Label>
-            <Controller
-              name="role"
-              control={control}
-              defaultValue={Role.ENCODER}
-              render={({ field }) => (
-                <Form.Select {...field} disabled={isLoading}>
-                  <option value={Role.ENCODER}>Encoder</option>
-                  <option value={Role.REVIEWER}>Reviewer</option>
-                </Form.Select>
-              )}
-            />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Email address</Form.Label>
-            <Controller
-              name="email"
-              control={control}
-              defaultValue=""
-              render={({ field }) => (
-                <Form.Control
-                  {...field}
-                  disabled={isLoading}
-                  placeholder="Enter email"
-                />
-              )}
-            />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Object ID</Form.Label>
-            <Controller
-              name="objectId"
-              control={control}
-              defaultValue=""
-              render={({ field }) => (
-                <Form.Control
-                  {...field}
-                  disabled={isLoading}
-                  placeholder="Enter object ID"
-                />
-              )}
-            />
-          </Form.Group>
+          <Alert variant="danger" show={isError}>
+            {error?.response?.statusText === 'Conflict'
+              ? 'Email already exist'
+              : 'Create user failed.'}
+          </Alert>
+          <fieldset disabled={isLoading}>
+            <RoleField control={control} />
+            <FirstNameField control={control} />
+            <LastNameField control={control} />
+            <EmailField control={control} />
+            <ObjectIdField control={control} />
+          </fieldset>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="primary" type="submit" disabled={isLoading}>
@@ -155,7 +124,7 @@ export const AddUserModal = ({
             />
             {isLoading ? ' Saving...' : 'Save'}
           </Button>
-          <Button variant="outline-danger" onClick={closeModal}>
+          <Button variant="outline-danger" onClick={handleClose}>
             Close
           </Button>
         </Modal.Footer>

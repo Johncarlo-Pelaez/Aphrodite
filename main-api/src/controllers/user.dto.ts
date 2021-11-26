@@ -28,12 +28,28 @@ export class CreateUserAccountDto {
   @ApiProperty()
   @IsOptional()
   @IsString()
-  firstName?: string;
+  firstName: string;
 
   @ApiProperty()
   @IsOptional()
   @IsString()
-  lastName?: string;
+  lastName: string;
+}
+
+export class UpdateUserAccountDto {
+  @ApiProperty()
+  @IsString()
+  role: Role;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsString()
+  firstName: string;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsString()
+  lastName: string;
 
   @ApiProperty()
   @IsOptional()

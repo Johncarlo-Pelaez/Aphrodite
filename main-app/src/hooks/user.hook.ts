@@ -3,7 +3,7 @@ import {
   createUserApi,
   checkEmailExistsApi,
   CreateUserApi,
-  UpdateUserIdentityApi,
+  UpdateUserApi,
   updateUserApi,
 } from 'apis';
 import {
@@ -43,10 +43,10 @@ export const useCreateUser = (): UseMutationResult<
 export const useUpdateUser = (): UseMutationResult<
   void,
   ApiError,
-  UpdateUserIdentityApi
+  UpdateUserApi
 > => {
   const queryClient = useQueryClient();
-  return useMutation<void, ApiError, UpdateUserIdentityApi>(
+  return useMutation<void, ApiError, UpdateUserApi>(
     (data) => {
       return updateUserApi(data);
     },

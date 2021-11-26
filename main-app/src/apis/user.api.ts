@@ -1,5 +1,6 @@
 import { request } from './request';
-import { Role, User } from 'models';
+import { User } from 'models';
+import { Role } from 'core/enum';
 import { createQueryString } from 'utils/query-string';
 
 export const getUsersApi = async (): Promise<User[]> => {
@@ -19,6 +20,8 @@ export const checkEmailExistsApi = async (email: string): Promise<boolean> => {
 
 export interface CreateUserApi {
   email: string;
+  firstName: string;
+  lastName: string;
   objectId: string;
   role: Role;
 }
@@ -27,31 +30,20 @@ export const createUserApi = async (params: CreateUserApi): Promise<void> => {
   await request.post('/api/users/create', params);
 };
 
-export interface UpdateUserApi {
-  email: string;
-  objectId: string;
+export interface UpdateUserApiParams {
   role: Role;
   firstname: string;
   lastname: string;
+  isActive?: boolean;
 }
 
-export interface UpdateUserIdentityApi extends UpdateUserApi {
+export interface UpdateUserApi extends UpdateUserApiParams {
   id: number;
 }
 
 export const updateUserApi = async ({
   id,
-  email,
-  objectId,
-  role,
-  firstname,
-  lastname,
-}: UpdateUserIdentityApi): Promise<void> => {
-  await request.put(`/api/users/${id}`, {
-    email,
-    objectId,
-    role,
-    firstname,
-    lastname,
-  });
+  ...rest
+}: UpdateUserApi): Promise<void> => {
+  await request.put(`/api/users/${id}`, rest);
 };

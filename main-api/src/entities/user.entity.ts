@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, Generated } from 'typeorm';
 
 export enum Role {
   ADMIN = 'ADMIN',
@@ -10,6 +10,7 @@ export enum Role {
 @Entity()
 export class User {
   @ApiProperty()
+  @Generated('increment')
   @Column()
   id: number;
 
@@ -43,9 +44,9 @@ export class User {
 
   @ApiProperty()
   @Column()
-  isDeleted: boolean;
+  modifiedDate: Date;
 
   @ApiProperty()
   @Column()
-  modifiedDate: Date;
+  objectId: string;
 }

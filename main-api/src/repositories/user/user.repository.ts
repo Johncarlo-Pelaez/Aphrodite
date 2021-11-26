@@ -11,37 +11,33 @@ export class UserRepository {
   constructor(private readonly manager: EntityManager) {}
 
   async getUsers(): Promise<User[]> {
-    return await this.manager.find(User, {
-      where: { isDeleted: false },
-    });
+    return await this.manager.find(User);
   }
 
   async getUser(id: number): Promise<User> {
-    return await this.manager.findOne(User, id, {
-      where: { isDeleted: false },
+    return await this.manager.findOne(User, {
+      where: { id },
     });
   }
 
   async count(roles?: Role[]): Promise<number> {
     if (roles) {
       return await this.manager.count(User, {
-        where: { role: In(roles), isDeleted: false },
+        where: { role: In(roles) },
       });
     }
-    return await this.manager.count(User, {
-      where: { isDeleted: false },
-    });
+    return await this.manager.count(User);
   }
 
   async getAuthUserByEmail(email: string): Promise<User> {
     return await this.manager.findOne(User, {
-      where: { username: email, isDeleted: false, isActive: true },
+      where: { username: email, isActive: true },
     });
   }
 
   async getUserByEmail(email: string): Promise<User> {
     return await this.manager.findOne(User, {
-      where: { username: email, isDeleted: false },
+      where: { username: email },
     });
   }
 
@@ -52,26 +48,21 @@ export class UserRepository {
     user.lastName = param.lastName;
     user.role = param.role;
     user.createdDate = param.createdDate;
-    user.isActive = param.isActive ?? true;
+    user.objectId = param.objectId;
+    user.isActive = true;
     await this.manager.save(user);
     return user.id;
   }
 
   async updateUser(param: UpdateUserParam): Promise<void> {
-    const user = await this.manager.findOneOrFail(User, param.id);
-    user.username = param.email;
+    const user = await this.manager.findOneOrFail(User, {
+      where: { id: param.id },
+    });
     user.firstName = param.firstName;
     user.lastName = param.lastName;
     user.isActive = param.isActive ?? true;
     user.role = param.role;
     user.modifiedDate = param.modifiedDate;
-    await this.manager.save(user);
-  }
-
-  async deleteUser({ id, modifiedDate }: DeleteUserParam): Promise<void> {
-    const user = await this.manager.findOneOrFail(User, id);
-    user.isDeleted = true;
-    user.modifiedDate = modifiedDate;
     await this.manager.save(user);
   }
 }

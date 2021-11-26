@@ -26,7 +26,7 @@ export const UserDetailsModal = ({
       <Form>
         <Modal.Header closeButton>
           <Modal.Title as="h6">
-            <b>VIEW USER</b>
+            <b>USER DETAILS</b>
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
