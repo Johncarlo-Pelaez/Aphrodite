@@ -267,7 +267,7 @@ export const useCancelDocs = (): UseMutationResult<
             !!documents
               ? documents.filter((d) => {
                   if (documentIds.includes(d.id)) {
-                    d.status = DocumentStatus.MIGRATE_CANCELLED;
+                    d.status = DocumentStatus.CANCELLED;
                   }
                   return true;
                 })

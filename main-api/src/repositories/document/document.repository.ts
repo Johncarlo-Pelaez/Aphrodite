@@ -545,10 +545,10 @@ export class DocumentRepository {
         Document,
         param.documentId,
       );
-      document.status = DocumentStatus.MIGRATE_CANCELLED;
+      document.status = DocumentStatus.CANCELLED;
       document.modifiedDate = param.processAt;
       document.modifiedBy = param.cancelledBy;
-      document.description = 'Migration cancelled.';
+      document.description = 'Cancelled.';
       await transaction.save(document);
 
       const history = this.genarateDocumentHistory(document);

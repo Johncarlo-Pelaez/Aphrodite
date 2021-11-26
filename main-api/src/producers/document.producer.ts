@@ -17,7 +17,12 @@ export class DocumentProducer {
       backoff: AFTER_30_SECONDS,
       removeOnComplete: true,
       removeOnFail: true,
+      jobId: documentId,
     });
     return job;
+  }
+
+  async cancel(documentId: number): Promise<void> {
+    await (await this.documentQueue.getJob(documentId)).remove();
   }
 }

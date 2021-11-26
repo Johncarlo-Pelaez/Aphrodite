@@ -18,11 +18,11 @@ const useDocsProcessDetails = (): UseDocsProcessDetailsResult => {
       (s) =>
         s !== DocumentStatus.MIGRATE_DONE &&
         s !== DocumentStatus.MIGRATE_FAILED &&
-        s !== DocumentStatus.MIGRATE_CANCELLED,
+        s !== DocumentStatus.CANCELLED,
     ),
   });
   const { data: cancelled_error = 0 } = useDocumentsProcessCount({
-    statuses: [DocumentStatus.MIGRATE_FAILED, DocumentStatus.MIGRATE_CANCELLED],
+    statuses: [DocumentStatus.MIGRATE_FAILED, DocumentStatus.CANCELLED],
   });
 
   return {

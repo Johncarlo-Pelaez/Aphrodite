@@ -1,4 +1,4 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import { Injectable, ConflictException, Logger } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 import { v4 as uuidv4 } from 'uuid';
@@ -23,6 +23,7 @@ const { readFile, writeFile } = fs.promises;
 
 @Injectable()
 export class DocumentService {
+  private readonly logger = new Logger(DocumentService.name);
   constructor(
     private readonly documentRepository: DocumentRepository,
     private readonly documentProducer: DocumentProducer,
@@ -178,11 +179,17 @@ export class DocumentService {
       data.documentIds,
     );
     for await (const { id: documentId } of documents) {
-      await this.documentRepository.updateToCancelled({
-        documentId,
-        processAt: this.datesUtil.getDateNow(),
-        cancelledBy: data.cancelledBy,
-      });
+      try {
+        await this.documentProducer.cancel(documentId);
+        await this.documentRepository.updateToCancelled({
+          documentId,
+          processAt: this.datesUtil.getDateNow(),
+          cancelledBy: data.cancelledBy,
+        });
+      } catch (err) {
+        this.logger.error(err);
+        throw err;
+      }
     }
   }
 }

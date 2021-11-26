@@ -114,7 +114,9 @@ export const DocumentsTable = forwardRef(
               case 'DONE':
                 return 'Success';
             }
-          } else return 'Waiting';
+          } else if (arrStatus[0] === DocumentStatus.CANCELLED)
+            return 'Cancelled';
+          else return 'Waiting';
         },
       },
       {
@@ -126,6 +128,8 @@ export const DocumentsTable = forwardRef(
           switch (operation) {
             case 'INDEXING':
               return 'Index';
+            case DocumentStatus.CANCELLED:
+              return '';
             default:
               return (
                 operation.charAt(0).toUpperCase() +

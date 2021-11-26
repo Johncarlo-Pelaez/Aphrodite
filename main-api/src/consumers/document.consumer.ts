@@ -47,12 +47,6 @@ export class DocumentConsumer {
       contractDetails: strGetContDetailsReqRes,
       encodeValues: strEncodeValues,
     } = document;
-    const isNotCancelled = status !== DocumentStatus.MIGRATE_CANCELLED;
-
-    if (!isNotCancelled) {
-      await job.remove();
-      return;
-    }
 
     let qrCode = docQrCode;
     const buffer = await this.readFile(sysSrcFileName);
@@ -107,10 +101,9 @@ export class DocumentConsumer {
     }
 
     if (
-      isNotCancelled &&
-      (!isWhiteListed ||
-        status === DocumentStatus.APPROVED ||
-        status === DocumentStatus.CHECKING_APPROVED)
+      !isWhiteListed ||
+      status === DocumentStatus.APPROVED ||
+      status === DocumentStatus.CHECKING_APPROVED
     ) {
       const empty = '';
       const uploadParams = {
