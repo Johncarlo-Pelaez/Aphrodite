@@ -1,6 +1,4 @@
 import { ReactElement, useState } from 'react';
-import moment from 'moment';
-import { DEFAULT_DATE_FORMAT } from 'core/constants';
 import { useUsers } from 'hooks';
 import { Table, TableColumnProps } from 'core/ui/table';
 import { User } from 'models';
@@ -20,19 +18,13 @@ const columns: TableColumnProps<User>[] = [
   },
   {
     title: 'Email',
-    dataIndex: 'email',
-  },
-  {
-    title: 'Date Created',
-    dataIndex: 'createdDate',
-    render: (user: User) =>
-      moment(user.createdDate).format(DEFAULT_DATE_FORMAT),
+    dataIndex: 'username',
   },
 ];
 
 export const UsersTable = ({
   selectedUser,
-  onSelectUser,
+  onSelectUser: triggerSelectUser,
 }: UsersTableProps): ReactElement => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(15);
@@ -45,9 +37,13 @@ export const UsersTable = ({
 
   const total = users.length;
 
+  const handleSelectRow = (selected: User): void => {
+    triggerSelectUser(selected.id === selectedUser?.id ? undefined : selected);
+  };
+
   return (
     <Table<User>
-      rowKey={(doc) => doc.id}
+      rowKey={(user) => user.id}
       loading={isDocsLoading}
       isError={hasDocsError}
       columns={columns}
@@ -61,7 +57,7 @@ export const UsersTable = ({
         onSizeChange: setPageSize,
       }}
       selectedRow={selectedUser}
-      onSelectRow={onSelectUser}
+      onSelectRow={handleSelectRow}
     />
   );
 };

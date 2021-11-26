@@ -4,17 +4,17 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import { User } from 'models';
 
-export interface UserDeleteModalProps {
+export interface UserDetailsModalProps {
   user: User | undefined;
   isVisible: boolean;
   onClose: () => void;
 }
 
-export const DeleteUserModal = ({
+export const UserDetailsModal = ({
   user,
   isVisible,
   onClose,
-}: UserDeleteModalProps): ReactElement => {
+}: UserDetailsModalProps): ReactElement => {
   return (
     <Modal
       backdrop="static"
@@ -26,12 +26,12 @@ export const DeleteUserModal = ({
       <Form>
         <Modal.Header closeButton>
           <Modal.Title as="h6">
-            <b>DELETE USER</b>
+            <b>VIEW USER</b>
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form.Group className="mb-3">
-            <Form.Label>User Delete Identifier</Form.Label>
+            <Form.Label>User View Identifier</Form.Label>
           </Form.Group>
         </Modal.Body>
         <Modal.Footer>
@@ -43,4 +43,4 @@ export const DeleteUserModal = ({
     </Modal>
   );
 };
-export default DeleteUserModal;
+export default UserDetailsModal;

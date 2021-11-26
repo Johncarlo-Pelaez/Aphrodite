@@ -10,6 +10,7 @@ export enum Role {
 @Entity()
 export class User {
   @ApiProperty()
+  @Column()
   id: number;
 
   @ApiProperty({
