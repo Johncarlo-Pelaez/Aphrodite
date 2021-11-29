@@ -23,6 +23,7 @@ export const LookupsTable = ({
   selectedLookup,
   onSelectLookup: triggerSelectLookup,
 }: LookupsTableProps): ReactElement => {
+  const [searchKey, setSearchKey] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(15);
   const { isLoading, isError, data: lookups = [] } = useNomenclatureLookups();
@@ -63,6 +64,8 @@ export const LookupsTable = ({
       }}
       selectedRow={selectedLookup}
       onSelectRow={handleSelectRow}
+      searchKey={searchKey}
+      onSearch={setSearchKey}
     />
   );
 };

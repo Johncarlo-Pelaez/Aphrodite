@@ -26,9 +26,9 @@ export const UsersTable = ({
   selectedUser,
   onSelectUser: triggerSelectUser,
 }: UsersTableProps): ReactElement => {
+  const [searchKey, setSearchKey] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(15);
-
   const {
     isLoading: isDocsLoading,
     isError: hasDocsError,
@@ -69,6 +69,8 @@ export const UsersTable = ({
       }}
       selectedRow={selectedUser}
       onSelectRow={handleSelectRow}
+      searchKey={searchKey}
+      onSearch={setSearchKey}
     />
   );
 };

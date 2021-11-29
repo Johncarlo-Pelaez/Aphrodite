@@ -19,6 +19,7 @@ export const WhitelistTable = ({
   selectedWhitelist,
   onSelectWhitelist: triggerSelectWhitelist,
 }: WhitelistTableProps): ReactElement => {
+  const [searchKey, setSearchKey] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(15);
   const {
@@ -63,6 +64,8 @@ export const WhitelistTable = ({
       }}
       selectedRow={selectedWhitelist}
       onSelectRow={handleSelectRow}
+      searchKey={searchKey}
+      onSearch={setSearchKey}
     />
   );
 };
