@@ -1,23 +1,19 @@
 import React, { ReactElement, useState } from 'react';
-import { Nomenclature } from 'models';
+import { NomenclatureWhitelist } from 'models';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Button from 'react-bootstrap/Button';
 import Alert from 'react-bootstrap/Alert';
-import { useDeleteNomenclature } from 'hooks';
-import {
-  NomenclaturesTable,
-  AddEditNomenclatureModal,
-  ModalAction,
-} from './components';
+import { useDeleteNomenclatureWhitelist } from 'hooks';
+import { WhitelistTable, AddEditModal, ModalAction } from './components';
 
 export const NomenclatureWhiteList = (): ReactElement => {
-  const [selectedNomenclature, setSelectedNomenclature] = useState<
-    Nomenclature | undefined
+  const [selectedWhitelist, setSelectedWhitelist] = useState<
+    NomenclatureWhitelist | undefined
   >(undefined);
   const [modalMode, setModalMode] = useState<ModalAction | undefined>(
     undefined,
   );
-  const hasSelectNomenclature = !!selectedNomenclature;
+  const hasSelectNomenclature = !!selectedWhitelist;
   const isModalOpen = !!modalMode;
 
   const {
@@ -26,15 +22,15 @@ export const NomenclatureWhiteList = (): ReactElement => {
     error: deleteError,
     mutateAsync: deleteAsync,
     reset: resetDelete,
-  } = useDeleteNomenclature();
+  } = useDeleteNomenclatureWhitelist();
 
-  const deleteNomenClature = async (): Promise<void> => {
+  const deleteWhitelist = async (): Promise<void> => {
     if (!hasSelectNomenclature) {
       alert('Please select an item.');
       return;
     }
 
-    const { id, description } = selectedNomenclature;
+    const { id, description } = selectedWhitelist;
 
     const inputedDescription = prompt(
       `Please Enter "${description}" to delete.`,
@@ -68,7 +64,7 @@ export const NomenclatureWhiteList = (): ReactElement => {
 
   const closeModal = (): void => {
     setModalMode(undefined);
-    setSelectedNomenclature(undefined);
+    setSelectedWhitelist(undefined);
   };
 
   return (
@@ -89,7 +85,7 @@ export const NomenclatureWhiteList = (): ReactElement => {
           <Button
             key="btn-delete"
             variant="outline-secondary"
-            onClick={deleteNomenClature}
+            onClick={deleteWhitelist}
             disabled={!hasSelectNomenclature}
           >
             Delete
@@ -99,13 +95,13 @@ export const NomenclatureWhiteList = (): ReactElement => {
       <Alert variant="danger" show={hasDeleteError}>
         {deleteError}
       </Alert>
-      <NomenclaturesTable
-        selectedNomenclature={selectedNomenclature}
-        onSelectNomenclature={setSelectedNomenclature}
+      <WhitelistTable
+        selectedWhitelist={selectedWhitelist}
+        onSelectWhitelist={setSelectedWhitelist}
       />
-      <AddEditNomenclatureModal
-        editId={selectedNomenclature?.id}
-        description={selectedNomenclature?.description}
+      <AddEditModal
+        editId={selectedWhitelist?.id}
+        description={selectedWhitelist?.description}
         isVisible={isModalOpen}
         actionMode={modalMode}
         onClose={closeModal}

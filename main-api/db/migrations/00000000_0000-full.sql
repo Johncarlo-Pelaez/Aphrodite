@@ -1,4 +1,4 @@
-/****** Object:  Table [dbo].[document]    Script Date: 11/25/2021 12:38:28 PM ******/
+/****** Object:  Table [dbo].[document]    Script Date: 11/29/2021 3:05:45 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -36,7 +36,7 @@ CREATE TABLE [dbo].[document](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[document_history]    Script Date: 11/25/2021 12:38:28 PM ******/
+/****** Object:  Table [dbo].[document_history]    Script Date: 11/29/2021 3:05:45 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -54,28 +54,28 @@ CREATE TABLE [dbo].[document_history](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[lookup]    Script Date: 11/25/2021 12:38:28 PM ******/
+/****** Object:  Table [dbo].[nomenclature_lookup]    Script Date: 11/29/2021 3:05:45 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE TABLE [dbo].[lookup](
+CREATE TABLE [dbo].[nomenclature_lookup](
 	[id] [int] IDENTITY(1,1) NOT NULL,
-	[nomenClature] [nvarchar](max) NOT NULL,
+	[nomenclature] [nvarchar](max) NOT NULL,
 	[documentGroup] [nvarchar](max) NOT NULL
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[nomenclature]    Script Date: 11/25/2021 12:38:28 PM ******/
+/****** Object:  Table [dbo].[nomenclature_whitelist]    Script Date: 11/29/2021 3:05:45 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE TABLE [dbo].[nomenclature](
+CREATE TABLE [dbo].[nomenclature_whitelist](
 	[id] [int] IDENTITY(1,1) NOT NULL,
 	[description] [nvarchar](255) NOT NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[user]    Script Date: 11/25/2021 12:38:28 PM ******/
+/****** Object:  Table [dbo].[user]    Script Date: 11/29/2021 3:05:45 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -83,22 +83,22 @@ GO
 CREATE TABLE [dbo].[user](
 	[id] [int] IDENTITY(1,1) NOT NULL,
 	[username] [nvarchar](255) NOT NULL,
-	[firstName] [nvarchar](255) NULL,
-	[lastName] [nvarchar](255) NULL,
+	[firstName] [nvarchar](255) NOT NULL,
+	[lastName] [nvarchar](255) NOT NULL,
 	[role] [nvarchar](50) NOT NULL,
 	[createdDate] [datetime] NOT NULL,
-	[IsActive] [bit] NOT NULL,
-	[isDeleted] [bit] NOT NULL,
+	[isActive] [bit] NOT NULL,
 	[modifiedDate] [datetime] NULL,
+	[objectId] [nvarchar](max) NOT NULL,
  CONSTRAINT [PK_cace4a159ff9f2512dd42373760] PRIMARY KEY CLUSTERED 
 (
 	[username] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[user] ADD  CONSTRAINT [DF_user_IsActive]  DEFAULT ((1)) FOR [IsActive]
+ALTER TABLE [dbo].[user] ADD  CONSTRAINT [DF_user_IsActive]  DEFAULT ((1)) FOR [isActive]
 GO
-ALTER TABLE [dbo].[user] ADD  CONSTRAINT [DF_user_isDeleted]  DEFAULT ((0)) FOR [isDeleted]
+ALTER TABLE [dbo].[user] ADD  DEFAULT ('NA') FOR [objectId]
 GO
 ALTER TABLE [dbo].[document]  WITH CHECK ADD  CONSTRAINT [FK_document_user] FOREIGN KEY([userUsername])
 REFERENCES [dbo].[user] ([username])

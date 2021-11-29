@@ -5,8 +5,8 @@ export class QueryKey {
   private static readonly documents = 'documents';
   public static readonly documentHistory = 'documenHistory';
   public static readonly paginatedDocuments = 'paginatedDocuments';
-  public static readonly nomenClatures = 'nomenClatures';
-  public static readonly lookups = 'lookups';
+  public static readonly nomenclaturesWhitelist = 'nomenclaturesWhitelist';
+  public static readonly nomenclaturesLookups = 'nomenclaturesLookups';
 
   public static buildPaginatedDocuments(data: UseDocuments) {
     return [this.paginatedDocuments, data];

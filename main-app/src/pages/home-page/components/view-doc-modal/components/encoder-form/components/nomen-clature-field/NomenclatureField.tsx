@@ -2,7 +2,7 @@ import { ReactElement, useState, useEffect } from 'react';
 import { useController, Control } from 'react-hook-form';
 import Form from 'react-bootstrap/Form';
 import { Typeahead } from 'react-bootstrap-typeahead';
-import { useLookups } from 'hooks';
+import { useNomenclatureLookups } from 'hooks';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import { IEncoderFormValues } from '../../EncoderForm';
 
@@ -19,7 +19,8 @@ export const NomenclatureField = ({
   control,
 }: NomenclatureFieldProps): ReactElement => {
   const [options, setOptions] = useState<LookupOption[]>([]);
-  const { isLoading, data: lookups = [] } = useLookups();
+  const { isLoading, data: nomenclatureLookups = [] } =
+    useNomenclatureLookups();
 
   const {
     field: { onChange, value, ref },
@@ -32,17 +33,17 @@ export const NomenclatureField = ({
   useEffect(
     function populateNomenClatureOptions() {
       setOptions(
-        lookups.map((l) => {
+        nomenclatureLookups.map((l) => {
           return {
             id: l.id,
-            label: l.nomenClature,
+            label: l.nomenclature,
             documentGroup: l.documentGroup,
           };
         }),
       );
     },
     // eslint-disable-next-line
-    [lookups],
+    [nomenclatureLookups],
   );
 
   return (

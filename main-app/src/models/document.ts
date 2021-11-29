@@ -52,7 +52,7 @@ export interface DocumentHistory {
   user: User;
 }
 
-export interface Nomenclature {
+export interface NomenclatureWhitelist {
   id: number;
   description: string;
 }

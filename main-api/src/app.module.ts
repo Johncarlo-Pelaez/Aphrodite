@@ -7,16 +7,16 @@ import { DocumentConsumer } from './consumers';
 import {
   DocumentController,
   UserController,
-  NomenclatureController,
-  LookupController,
+  NomenclatureWhitelistController,
+  NomenclatureLookupController,
 } from './controllers';
 import { UtilsModule } from './utils/utils.module';
 import { DocumentProducer } from './producers';
 import {
   DocumentRepository,
   UserRepository,
-  NomenclatureRepository,
-  LookupRepository,
+  NomenclatureWhitelistRepository,
+  NomenclatureLookupRepository,
 } from './repositories';
 import { DocumentService } from './services';
 import { QRService } from 'src/qr-service';
@@ -73,8 +73,8 @@ const logger = new Logger('AppModule');
   controllers: [
     DocumentController,
     UserController,
-    NomenclatureController,
-    LookupController,
+    NomenclatureWhitelistController,
+    NomenclatureLookupController,
   ],
   providers: [
     QRService,
@@ -87,8 +87,8 @@ const logger = new Logger('AppModule');
     DocumentProducer,
     DocumentConsumer,
     AzureADStrategy,
-    NomenclatureRepository,
-    LookupRepository,
+    NomenclatureWhitelistRepository,
+    NomenclatureLookupRepository,
   ],
 })
 export class AppModule {}

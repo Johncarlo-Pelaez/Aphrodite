@@ -1,4 +1,4 @@
-import { ReactElement, useState } from 'react';
+import { ReactElement, useState, useEffect } from 'react';
 import { useUsers } from 'hooks';
 import { Table, TableColumnProps } from 'core/ui/table';
 import { User } from 'models';
@@ -34,12 +34,23 @@ export const UsersTable = ({
     isError: hasDocsError,
     data: users = [],
   } = useUsers();
-
   const total = users.length;
 
   const handleSelectRow = (selected: User): void => {
     triggerSelectUser(selected.id === selectedUser?.id ? undefined : selected);
   };
+
+  useEffect(
+    function removeOutOfRangeSelectedRow() {
+      const start = (currentPage - 1) * pageSize;
+      const end = currentPage * pageSize;
+      const pageKeys = users.slice(start, end).map((l) => l.id);
+      if (!pageKeys.some((k) => k === selectedUser?.id))
+        triggerSelectUser(undefined);
+    },
+    // eslint-disable-next-line
+    [currentPage, pageSize, users, selectedUser],
+  );
 
   return (
     <Table<User>

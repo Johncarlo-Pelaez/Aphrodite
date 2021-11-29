@@ -1,3 +1,3 @@
 export * from './document';
 export * from './user';
-export * from './lookup';
+export * from './nomenclature-lookup';

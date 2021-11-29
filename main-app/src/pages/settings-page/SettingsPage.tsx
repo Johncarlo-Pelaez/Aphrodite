@@ -4,7 +4,7 @@ import Tab from 'react-bootstrap/Tab';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Nav from 'react-bootstrap/Nav';
-import { NomenclatureWhiteList, Users } from './components';
+import { NomenclatureLookup, NomenclatureWhiteList, Users } from './components';
 
 enum TabKey {
   NOMENCLATURE_LOOKUP = 'NOMENCLATURE_LOOKUP',
@@ -40,7 +40,9 @@ export const SettingsPage = (): ReactElement => {
           </Col>
           <Col sm={9}>
             <Tab.Content>
-              <Tab.Pane eventKey={TabKey.NOMENCLATURE_LOOKUP}></Tab.Pane>
+              <Tab.Pane eventKey={TabKey.NOMENCLATURE_LOOKUP}>
+                <NomenclatureLookup />
+              </Tab.Pane>
               <Tab.Pane eventKey={TabKey.NOMENCLATURE_WHITELIST}>
                 <NomenclatureWhiteList />
               </Tab.Pane>

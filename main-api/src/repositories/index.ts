@@ -1,4 +1,4 @@
 export * from './document';
-export * from './lookup';
-export * from './nomenclature';
+export * from './nomenclature-lookup';
+export * from './nomenclature-whitelist';
 export * from './user';
