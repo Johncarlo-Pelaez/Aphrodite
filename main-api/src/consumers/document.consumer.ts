@@ -320,8 +320,8 @@ export class DocumentConsumer {
     )
       await this.updateToMigrateDone(
         documentId,
-        JSON.stringify(response),
         strUploadParams,
+        JSON.stringify(response),
       );
     else
       await this.updateToMigrateFailed(
