@@ -58,11 +58,6 @@ export class DocumentRepository {
           ...whereStatusIn,
         },
         {
-          documentType: ILike(`%${search}%`),
-          ...whereDocumentType,
-          ...whereStatusIn,
-        },
-        {
           user: {
             firstName: ILike(`%${search}%`),
           },
@@ -130,11 +125,6 @@ export class DocumentRepository {
       where: [
         {
           documentName: ILike(`%${search}%`),
-          ...whereDocumentType,
-          ...whereStatusIn,
-        },
-        {
-          documentType: ILike(`%${search}%`),
           ...whereDocumentType,
           ...whereStatusIn,
         },
