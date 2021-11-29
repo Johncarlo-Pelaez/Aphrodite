@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import { WithChildren } from 'core/types';
 import { useSignOut, useAccount } from 'hooks';
-import { getMainMenuItems } from './main-layout.config';
+import { MainMenuItems } from './main-layout.config';
 
 type MainLayoutProps = WithChildren<{}>;
 
@@ -34,33 +34,16 @@ export const MainLayout = (props: MainLayoutProps): ReactElement => {
             <strong>APP LOGO</strong>
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse id="basic-navbar-nav">
+          <Navbar.Collapse>
             <Nav>
-              {getMainMenuItems().map((mi, index) => (
+              {MainMenuItems.map((mi, index) => (
                 <Nav.Link key={index} onClick={() => redirect(mi.path)}>
                   <strong>{mi.label}</strong>
                 </Nav.Link>
               ))}
-              <span className="nav-link__devider"></span>
+            </Nav>
+            <Nav>
               <NavDropdown title={account?.username}>
-                {[
-                  {
-                    label: 'User Management',
-                    path: '/users',
-                  },
-                  {
-                    label: 'Settings',
-                    path: '/settings',
-                  },
-                ].map((l, index) => (
-                  <NavDropdown.Item
-                    key={index}
-                    onClick={() => redirect(l.path)}
-                  >
-                    {l.label}
-                  </NavDropdown.Item>
-                ))}
-                <NavDropdown.Divider />
                 <NavDropdown.Item onClick={signOut}>Log out</NavDropdown.Item>
               </NavDropdown>
               <span className="nav-link__avatar">

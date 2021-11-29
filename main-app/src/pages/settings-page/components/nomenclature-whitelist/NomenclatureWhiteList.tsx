@@ -1,4 +1,4 @@
-import { ReactElement, useState } from 'react';
+import React, { ReactElement, useState } from 'react';
 import { Nomenclature } from 'models';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Button from 'react-bootstrap/Button';
@@ -10,7 +10,7 @@ import {
   ModalAction,
 } from './components';
 
-export const MngNomenclature = (): ReactElement => {
+export const NomenclatureWhiteList = (): ReactElement => {
   const [selectedNomenclature, setSelectedNomenclature] = useState<
     Nomenclature | undefined
   >(undefined);
@@ -72,9 +72,7 @@ export const MngNomenclature = (): ReactElement => {
   };
 
   return (
-    <div>
-      <p className="fw-bold">Manage Nomenclature Whitelist</p>
-      <hr />
+    <React.Fragment>
       <ButtonGroup>
         <Button variant="outline-secondary" onClick={handleOpenAddModal}>
           Add
@@ -98,24 +96,22 @@ export const MngNomenclature = (): ReactElement => {
           </Button>,
         ]}
       </ButtonGroup>
-      <div className="w-50 my-2">
-        <Alert variant="danger" show={hasDeleteError}>
-          {deleteError}
-        </Alert>
-        <NomenclaturesTable
-          selectedNomenclature={selectedNomenclature}
-          onSelectNomenclature={setSelectedNomenclature}
-        />
-        <AddEditNomenclatureModal
-          editId={selectedNomenclature?.id}
-          description={selectedNomenclature?.description}
-          isVisible={isModalOpen}
-          actionMode={modalMode}
-          onClose={closeModal}
-        />
-      </div>
-    </div>
+      <Alert variant="danger" show={hasDeleteError}>
+        {deleteError}
+      </Alert>
+      <NomenclaturesTable
+        selectedNomenclature={selectedNomenclature}
+        onSelectNomenclature={setSelectedNomenclature}
+      />
+      <AddEditNomenclatureModal
+        editId={selectedNomenclature?.id}
+        description={selectedNomenclature?.description}
+        isVisible={isModalOpen}
+        actionMode={modalMode}
+        onClose={closeModal}
+      />
+    </React.Fragment>
   );
 };
 
-export default MngNomenclature;
+export default NomenclatureWhiteList;

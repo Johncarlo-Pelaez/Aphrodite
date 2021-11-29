@@ -1,1 +1,2 @@
-export * from './mng-nomenclature';
+export * from './nomenclature-whitelist';
+export * from './users';

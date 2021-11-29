@@ -13,7 +13,6 @@ import { ForbiddenAccount } from 'pages';
 
 const HomePage = lazy(() => import('pages/home-page'));
 const LoginPage = lazy(() => import('pages/login-page'));
-const UsersPage = lazy(() => import('pages/users-page'));
 const ReportsPage = lazy(() => import('pages/reports-page'));
 const SettingsPage = lazy(() => import('pages/settings-page'));
 const NotFoundPage = lazy(() => import('pages/not-found-page'));
@@ -59,12 +58,6 @@ const AppContent = () => {
             path="/"
             layout={MainLayout}
             component={HomePage}
-          />
-          <PrivateRoute
-            exact
-            path="/users"
-            layout={MainLayout}
-            component={UsersPage}
           />
           <PrivateRoute
             exact

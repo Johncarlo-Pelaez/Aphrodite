@@ -1,5 +1,4 @@
-import { useState, ReactElement } from 'react';
-import Container from 'react-bootstrap/Container';
+import React, { useState, ReactElement } from 'react';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Button from 'react-bootstrap/Button';
 import { User } from 'models';
@@ -10,7 +9,7 @@ import {
   UserDetailsModal,
 } from './components';
 
-export const UsersPage = (): ReactElement => {
+export const Users = (): ReactElement => {
   const [selectedUser, setSelectedUser] = useState<User | undefined>(undefined);
   const [openAddModal, setOpenModal] = useState<boolean>(false);
   const [openEditModal, setOpenEditModal] = useState<boolean>(false);
@@ -18,8 +17,7 @@ export const UsersPage = (): ReactElement => {
   const hasSelectUser = !!selectedUser;
 
   return (
-    <Container className="my-4" fluid>
-      <h4 className="fw-normal py-3">Users List</h4>
+    <React.Fragment>
       <ButtonGroup>
         <Button variant="outline-secondary" onClick={() => setOpenModal(true)}>
           Add
@@ -58,8 +56,8 @@ export const UsersPage = (): ReactElement => {
         isVisible={openViewModal}
         onClose={() => setOpenViewModal(false)}
       />
-    </Container>
+    </React.Fragment>
   );
 };
 
-export default UsersPage;
+export default Users;

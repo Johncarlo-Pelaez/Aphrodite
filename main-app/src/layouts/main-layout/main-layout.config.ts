@@ -1,12 +1,16 @@
 import { MenuItem } from 'core/types';
 
-export { getMainMenuItems };
-
-const getMainMenuItems = (): MenuItem[] => {
-  return [
-    {
-      label: 'Reports',
-      path: '/reports',
-    },
-  ];
-};
+export const MainMenuItems: MenuItem[] = [
+  {
+    label: 'Home',
+    path: '/',
+  },
+  {
+    label: 'Reports',
+    path: '/reports',
+  },
+  {
+    label: 'Settings',
+    path: '/settings',
+  },
+];

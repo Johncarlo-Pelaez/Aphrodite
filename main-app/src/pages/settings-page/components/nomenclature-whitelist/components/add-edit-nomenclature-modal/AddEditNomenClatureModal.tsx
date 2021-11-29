@@ -11,7 +11,7 @@ import * as yup from 'yup';
 import { CreateNomenclatureApi } from 'apis';
 
 const addEditNomenclatureSchema = yup.object().shape({
-  description: yup.string().required('Description is required.'),
+  description: yup.string().required('Nomenclature is required.'),
 });
 
 export enum ModalAction {
@@ -32,7 +32,7 @@ export const AddEditNomenclatureModal = ({
   description,
   isVisible,
   actionMode,
-  onClose,
+  onClose: triggerClose,
 }: AddEditNomenclatureModalProps): ReactElement => {
   const {
     isLoading: isCreateLoading,
@@ -52,7 +52,6 @@ export const AddEditNomenclatureModal = ({
     control,
     handleSubmit,
     reset: resetForm,
-    formState: { errors },
     setValue,
   } = useForm<CreateNomenclatureApi>({
     resolver: yupResolver(addEditNomenclatureSchema),
@@ -85,28 +84,9 @@ export const AddEditNomenclatureModal = ({
     else return createNomenclature;
   };
 
-  const renderErrorAlert = (): ReactElement => {
-    let errorMessage: string | undefined = '';
-    const show = !!errors.description || hasCreateError || hasUpdateError;
-
-    if (hasCreateError || hasUpdateError) {
-      errorMessage = 'Failed to save Nomenclature.';
-    } else if (!!errors.description) {
-      errorMessage = errors?.description?.message;
-    }
-
-    return (
-      <Alert variant="danger" show={show}>
-        {errorMessage}
-      </Alert>
-    );
-  };
-
   const closeModal = (): void => {
-    resetCreate();
-    resetUpdate();
     resetForm({ description: '' });
-    onClose();
+    triggerClose();
   };
 
   useEffect(() => {
@@ -114,12 +94,20 @@ export const AddEditNomenclatureModal = ({
     // eslint-disable-next-line
   }, [description, actionMode]);
 
+  useEffect(() => {
+    return function componentCleanup() {
+      resetCreate();
+      resetUpdate();
+    };
+    // eslint-disable-next-line
+  }, []);
+
   return (
     <Modal
       backdrop="static"
       keyboard={false}
       show={isVisible}
-      onHide={onClose}
+      onHide={closeModal}
       centered
     >
       <Form onSubmit={handleSubmit(getFormActionMethod())}>
@@ -129,22 +117,29 @@ export const AddEditNomenclatureModal = ({
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {renderErrorAlert()}
-          <Form.Group className="mb-3">
-            <Form.Label>Description</Form.Label>
-            <Controller
-              name="description"
-              control={control}
-              defaultValue=""
-              render={({ field }) => (
+          <Alert variant="danger" show={hasCreateError || hasUpdateError}>
+            {isEditMode ? 'Update' : 'Create'} Nomenclature Failed.
+          </Alert>
+          <Controller
+            name="description"
+            control={control}
+            rules={{ required: true }}
+            defaultValue=""
+            render={({ field, fieldState: { invalid, error } }) => (
+              <Form.Group className="mb-3">
+                <Form.Label>Nomenclature</Form.Label>
                 <Form.Control
                   {...field}
                   disabled={isLoading}
-                  placeholder="Enter description"
+                  placeholder="Enter nomenclature"
+                  isInvalid={invalid}
                 />
-              )}
-            />
-          </Form.Group>
+                <Form.Control.Feedback type="invalid">
+                  {error?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            )}
+          />
         </Modal.Body>
         <Modal.Footer>
           <Button variant="primary" type="submit" disabled={isLoading}>
