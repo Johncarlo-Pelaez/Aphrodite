@@ -3,7 +3,7 @@ import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
 import Stack from 'react-bootstrap/Stack';
 import { Document } from 'models';
-import { useRetryDocs, useCancelDocs } from 'hooks';
+import { useRetryDocuments, useCancelDocuments } from 'hooks';
 import { DocumentStatus } from 'core/enum';
 import { SearchField } from 'core/ui';
 import {
@@ -16,22 +16,11 @@ import {
 } from './components';
 import { OperationOption } from './components/operation-dropdown';
 import { StatusOption } from './components/status-dropdown';
-import { concatDocumentStatuses } from './HomePage.utils';
-
-export const getForRetryDocstatuses = (): DocumentStatus[] =>
-  Object.values(DocumentStatus).filter((s) => {
-    const arrStattmp = s.split('_');
-    if (arrStattmp.length === 2) return arrStattmp[1] === 'FAILED';
-    else return false;
-  });
-
-export const getForCancelDocStatuses = (): DocumentStatus[] =>
-  Object.values(DocumentStatus).filter((s) => {
-    const arrStattmp = s.split('_');
-    if (arrStattmp.length === 2)
-      return arrStattmp[1] !== 'DONE' && arrStattmp[1] !== 'FAILED';
-    else return arrStattmp[0] !== 'CANCELLED';
-  });
+import {
+  concatDocumentStatuses,
+  getForRetryDocstatuses,
+  getForCancelDocStatuses,
+} from './HomePage.utils';
 
 export const HomePage = (): ReactElement => {
   const [searchKey, setSearchKey] = useState<string>('');
@@ -47,6 +36,7 @@ export const HomePage = (): ReactElement => {
   );
   const [uploadModalShow, setUploadModalShow] = useState<boolean>(false);
   const [viewDocModalShow, setViewDocModalShow] = useState<boolean>(false);
+  const processDetailsRef = useRef<any>(null);
   const documentsTableRef = useRef<any>(null);
   const hasSelectedRows = !!selectedDocuments.length;
   const selected1Doc =
@@ -80,14 +70,14 @@ export const HomePage = (): ReactElement => {
     isError: hasRetryDocError,
     mutateAsync: retryDocumentsAsync,
     reset: resetRetryDoc,
-  } = useRetryDocs();
+  } = useRetryDocuments();
 
   const {
     isLoading: isCancelDocSaving,
     isError: hasCancelDocError,
     mutateAsync: cancelDocumentsAsync,
     reset: resetCancelDoc,
-  } = useCancelDocs();
+  } = useCancelDocuments();
 
   const handleRetryDocs = async (): Promise<void> => {
     if (!isRetryDocSaving && enableRetryButton) {
@@ -136,6 +126,7 @@ export const HomePage = (): ReactElement => {
 
   const refreshDocumentslist = (): void => {
     documentsTableRef.current?.refresh();
+    processDetailsRef.current?.refresh();
   };
 
   const selectNextDocument = (): void => {
@@ -175,14 +166,14 @@ export const HomePage = (): ReactElement => {
           </Button>
           <Button
             className="px-4"
-            variant="outline-dark"
+            variant="outline-secondary"
             onClick={refreshDocumentslist}
           >
             Refresh
           </Button>
         </Stack>
       </div>
-      <ProcessDetails />
+      <ProcessDetails ref={processDetailsRef} />
       <Stack className="my-2" direction="horizontal" gap={3}>
         <Button
           className="px-4"

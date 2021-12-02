@@ -225,7 +225,7 @@ export class DocumentController {
   }
 
   @ApiOkResponse()
-  @Get('/retry/error')
+  @Put('/retry/error')
   async retryErrorDocuments(
     @GetAzureUsername() username: string,
   ): Promise<void> {
@@ -245,7 +245,7 @@ export class DocumentController {
   }
 
   @ApiOkResponse()
-  @Get('/cancel/waiting')
+  @Put('/cancel/waiting')
   async cancelWaitingInQueue(
     @GetAzureUsername() username: string,
   ): Promise<void> {

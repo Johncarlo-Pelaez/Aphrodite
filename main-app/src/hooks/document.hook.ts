@@ -24,6 +24,8 @@ import {
   retryDocumentsApi,
   getDocumentsProcessCountApi,
   cancelDocumentsApi,
+  cancelWaitingDocumentsApi,
+  retryErrorDocumentsApi,
 } from 'apis';
 import { QueryKey } from 'utils';
 import { DocumentStatus } from 'core/enum';
@@ -184,18 +186,18 @@ export const useApproverDocoment = (): UseMutationResult<
   );
 };
 
-export interface UseRetryDocsContext {
+export interface UseRetryDocumentsContext {
   prevDocs?: Document[];
 }
 
-export const useRetryDocs = (): UseMutationResult<
+export const useRetryDocuments = (): UseMutationResult<
   void,
   ApiError,
   number[],
-  UseRetryDocsContext
+  UseRetryDocumentsContext
 > => {
   const queryClient = useQueryClient();
-  return useMutation<void, ApiError, number[], UseRetryDocsContext>(
+  return useMutation<void, ApiError, number[], UseRetryDocumentsContext>(
     retryDocumentsApi,
     {
       onMutate: async (documentIds) => {
@@ -244,16 +246,16 @@ export const useDocumentsProcessCount = (
   );
 };
 
-export interface UseCancelDocsContext extends UseRetryDocsContext {}
+export interface UseCancelDocumentsContext extends UseRetryDocumentsContext {}
 
-export const useCancelDocs = (): UseMutationResult<
+export const useCancelDocuments = (): UseMutationResult<
   void,
   ApiError,
   number[],
-  UseCancelDocsContext
+  UseCancelDocumentsContext
 > => {
   const queryClient = useQueryClient();
-  return useMutation<void, ApiError, number[], UseCancelDocsContext>(
+  return useMutation<void, ApiError, number[], UseCancelDocumentsContext>(
     cancelDocumentsApi,
     {
       onMutate: async (documentIds) => {
@@ -288,4 +290,30 @@ export const useCancelDocs = (): UseMutationResult<
       },
     },
   );
+};
+
+export const useRetryErrorDocuments = (): UseMutationResult<
+  void,
+  ApiError,
+  unknown
+> => {
+  const queryClient = useQueryClient();
+  return useMutation<void, ApiError, unknown>(retryErrorDocumentsApi, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(QueryKey.paginatedDocuments);
+    },
+  });
+};
+
+export const useCancelWaitingDocuments = (): UseMutationResult<
+  void,
+  ApiError,
+  unknown
+> => {
+  const queryClient = useQueryClient();
+  return useMutation<void, ApiError, unknown>(cancelWaitingDocumentsApi, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(QueryKey.paginatedDocuments);
+    },
+  });
 };

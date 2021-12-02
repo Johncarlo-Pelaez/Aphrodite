@@ -1,3 +1,5 @@
+import { DocumentStatus } from 'core/enum';
+
 export const concatDocumentStatuses = (
   operation: string,
   status: string,
@@ -48,3 +50,18 @@ export const concatDocumentStatuses = (
   }
   return strDocumentStatuses;
 };
+
+export const getForRetryDocstatuses = (): DocumentStatus[] =>
+  Object.values(DocumentStatus).filter((s) => {
+    const arrStattmp = s.split('_');
+    if (arrStattmp.length === 2) return arrStattmp[1] === 'FAILED';
+    else return false;
+  });
+
+export const getForCancelDocStatuses = (): DocumentStatus[] =>
+  Object.values(DocumentStatus).filter((s) => {
+    const arrStattmp = s.split('_');
+    if (arrStattmp.length === 2)
+      return arrStattmp[1] !== 'DONE' && arrStattmp[1] !== 'FAILED';
+    else return arrStattmp[0] !== 'CANCELLED';
+  });

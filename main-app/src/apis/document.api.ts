@@ -180,3 +180,11 @@ export const cancelDocumentsApi = async (
     documentIds,
   });
 };
+
+export const cancelWaitingDocumentsApi = async (): Promise<void> => {
+  await request.put('/api/documents/cancel/waiting');
+};
+
+export const retryErrorDocumentsApi = async (): Promise<void> => {
+  await request.put('/api/documents/retry/error');
+};
