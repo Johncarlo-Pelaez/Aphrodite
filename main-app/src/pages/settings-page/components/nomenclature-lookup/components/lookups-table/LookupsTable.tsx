@@ -1,6 +1,6 @@
-import { ReactElement, Fragment, useState, useEffect, useMemo } from 'react';
+import { ReactElement, useState, useEffect, useMemo } from 'react';
 import { useNomenclatureLookups } from 'hooks';
-import { Table, TableColumnProps, SearchField } from 'core/ui';
+import { Table, TableColumnProps } from 'core/ui';
 import { nomenclatureLookup } from 'models';
 
 const columns: TableColumnProps<nomenclatureLookup>[] = [
@@ -15,15 +15,17 @@ const columns: TableColumnProps<nomenclatureLookup>[] = [
 ];
 
 export interface LookupsTableProps {
+  searchKey: string;
   selectedLookup?: nomenclatureLookup;
   onSelectLookup: (nomenclature?: nomenclatureLookup) => void;
 }
 
-export const LookupsTable = ({
-  selectedLookup,
-  onSelectLookup: triggerSelectLookup,
-}: LookupsTableProps): ReactElement => {
-  const [searchKey, setSearchKey] = useState<string>('');
+export const LookupsTable = (props: LookupsTableProps): ReactElement => {
+  const {
+    searchKey,
+    selectedLookup,
+    onSelectLookup: triggerSelectLookup,
+  } = props;
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(15);
   const { isLoading, isError, data = [] } = useNomenclatureLookups();
@@ -58,26 +60,23 @@ export const LookupsTable = ({
   );
 
   return (
-    <Fragment>
-      <SearchField searchKey={searchKey} onSearchDocument={setSearchKey} />
-      <Table<nomenclatureLookup>
-        rowKey={(doc) => doc.id}
-        loading={isLoading}
-        isError={isError}
-        columns={columns}
-        data={lookups}
-        pagination={{
-          total: total,
-          pageSize: pageSize,
-          current: currentPage,
-          pageNumber: 5,
-          onChange: setCurrentPage,
-          onSizeChange: setPageSize,
-        }}
-        selectedRow={selectedLookup}
-        onSelectRow={handleSelectRow}
-      />
-    </Fragment>
+    <Table<nomenclatureLookup>
+      rowKey={(doc) => doc.id}
+      loading={isLoading}
+      isError={isError}
+      columns={columns}
+      data={lookups}
+      pagination={{
+        total: total,
+        pageSize: pageSize,
+        current: currentPage,
+        pageNumber: 5,
+        onChange: setCurrentPage,
+        onSizeChange: setPageSize,
+      }}
+      selectedRow={selectedLookup}
+      onSelectRow={handleSelectRow}
+    />
   );
 };
 

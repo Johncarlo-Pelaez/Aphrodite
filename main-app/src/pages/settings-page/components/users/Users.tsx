@@ -1,7 +1,8 @@
-import React, { useState, ReactElement } from 'react';
+import { useState, ReactElement, Fragment } from 'react';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Button from 'react-bootstrap/Button';
 import { User } from 'models';
+import { SearchField } from 'core/ui';
 import {
   UsersTable,
   AddUserModal,
@@ -14,10 +15,11 @@ export const Users = (): ReactElement => {
   const [openAddModal, setOpenModal] = useState<boolean>(false);
   const [openEditModal, setOpenEditModal] = useState<boolean>(false);
   const [openViewModal, setOpenViewModal] = useState<boolean>(false);
+  const [searchKey, setSearchKey] = useState<string>('');
   const hasSelectUser = !!selectedUser;
 
   return (
-    <React.Fragment>
+    <Fragment>
       <ButtonGroup>
         <Button variant="outline-secondary" onClick={() => setOpenModal(true)}>
           Add
@@ -41,7 +43,12 @@ export const Users = (): ReactElement => {
           </Button>,
         ]}
       </ButtonGroup>
-      <UsersTable selectedUser={selectedUser} onSelectUser={setSelectedUser} />
+      <SearchField searchKey={searchKey} onSearchDocument={setSearchKey} />
+      <UsersTable
+        searchKey={searchKey}
+        selectedUser={selectedUser}
+        onSelectUser={setSelectedUser}
+      />
       <AddUserModal
         isVisible={openAddModal}
         onClose={() => setOpenModal(false)}
@@ -56,7 +63,7 @@ export const Users = (): ReactElement => {
         isVisible={openViewModal}
         onClose={() => setOpenViewModal(false)}
       />
-    </React.Fragment>
+    </Fragment>
   );
 };
 

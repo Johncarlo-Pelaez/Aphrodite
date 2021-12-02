@@ -1,6 +1,5 @@
 import {
   ReactElement,
-  Fragment,
   useState,
   useEffect,
   useMemo,
@@ -13,13 +12,7 @@ import moment from 'moment';
 import { DEFAULT_DATE_FORMAT } from 'core/constants';
 import { DocumentStatus } from 'core/enum';
 import { useDebounce, useDocuments } from 'hooks';
-import {
-  Table,
-  TableColumnProps,
-  SorterResult,
-  OrderDirection,
-  SearchField,
-} from 'core/ui';
+import { Table, TableColumnProps, SorterResult, OrderDirection } from 'core/ui';
 import { Document } from 'models';
 import { sortDateTime, sortText } from 'utils/sort';
 import { parseDocumentType } from '../view-doc-modal/components';
@@ -30,6 +23,7 @@ const DEFAULT_SORT_ORDER: SorterResult = {
 };
 
 export interface DocumentsTableProps {
+  searchKey: string;
   selectedDocuments: Document[];
   selectedDocumentKeys: number[];
   filterDocStatus: DocumentStatus[];
@@ -40,13 +34,13 @@ export interface DocumentsTableProps {
 export const DocumentsTable = forwardRef(
   (props: DocumentsTableProps, ref): ReactElement => {
     const {
+      searchKey,
       selectedDocuments,
       selectedDocumentKeys,
       filterDocStatus,
       setSelectedDocuments,
       setSelectedDocumentKeys,
     } = props;
-    const [searchKey, setSearchKey] = useState<string>('');
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [pageSize, setPageSize] = useState<number>(15);
     const [sorter, setSorter] = useState<SorterResult | undefined>(
@@ -205,50 +199,47 @@ export const DocumentsTable = forwardRef(
     ]);
 
     return (
-      <Fragment>
-        <SearchField searchKey={searchKey} onSearchDocument={setSearchKey} />
-        <Table<Document>
-          isServerSide
-          rowKey={(doc) => doc.id}
-          loading={isLoading || isFetching}
-          isError={hasDocsError}
-          columns={renderColumns()}
-          data={documents}
-          rowSelection={{
-            type: 'checkbox',
-            selectedRowKeys: selectedDocumentKeys,
-            onChange: changeSelectedRows,
-          }}
-          pagination={{
-            total: total,
-            pageSize: pageSize,
-            current: currentPage,
-            pageNumber: 5,
-            onChange: (page) => {
-              setCurrentPage(page);
-              setSelectedDocuments([]);
-            },
-            onSizeChange: setPageSize,
-          }}
-          onSelectRow={(document) => {
-            const isSelected = selectedDocuments.some(
-              (d) => d.id === document.id,
+      <Table<Document>
+        isServerSide
+        rowKey={(doc) => doc.id}
+        loading={isLoading || isFetching}
+        isError={hasDocsError}
+        columns={renderColumns()}
+        data={documents}
+        rowSelection={{
+          type: 'checkbox',
+          selectedRowKeys: selectedDocumentKeys,
+          onChange: changeSelectedRows,
+        }}
+        pagination={{
+          total: total,
+          pageSize: pageSize,
+          current: currentPage,
+          pageNumber: 5,
+          onChange: (page) => {
+            setCurrentPage(page);
+            setSelectedDocuments([]);
+          },
+          onSizeChange: setPageSize,
+        }}
+        onSelectRow={(document) => {
+          const isSelected = selectedDocuments.some(
+            (d) => d.id === document.id,
+          );
+          if (isSelected) {
+            setSelectedDocuments((current) =>
+              current.filter((d) => d.id !== document.id),
             );
-            if (isSelected) {
-              setSelectedDocuments((current) =>
-                current.filter((d) => d.id !== document.id),
-              );
-              setSelectedDocumentKeys((current) =>
-                current.filter((key) => key !== document.id),
-              );
-            } else {
-              setSelectedDocuments((current) => [...current, document]);
-              setSelectedDocumentKeys((current) => [...current, document.id]);
-            }
-          }}
-          onChange={changeSort}
-        />
-      </Fragment>
+            setSelectedDocumentKeys((current) =>
+              current.filter((key) => key !== document.id),
+            );
+          } else {
+            setSelectedDocuments((current) => [...current, document]);
+            setSelectedDocumentKeys((current) => [...current, document.id]);
+          }
+        }}
+        onChange={changeSort}
+      />
     );
   },
 );

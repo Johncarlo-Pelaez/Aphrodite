@@ -5,6 +5,7 @@ import Stack from 'react-bootstrap/Stack';
 import { Document } from 'models';
 import { useRetryDocs, useCancelDocs } from 'hooks';
 import { DocumentStatus } from 'core/enum';
+import { SearchField } from 'core/ui';
 import {
   UploadFilesModal,
   DocumentsTable,
@@ -33,6 +34,7 @@ export const getForCancelDocStatuses = (): DocumentStatus[] =>
   });
 
 export const HomePage = (): ReactElement => {
+  const [searchKey, setSearchKey] = useState<string>('');
   const [selectedStatus, setSelectedStatus] = useState<StatusOption>(
     StatusOption.ALL,
   );
@@ -221,7 +223,9 @@ export const HomePage = (): ReactElement => {
           onChange={setSelectedOperation}
         />
       </Stack>
+      <SearchField searchKey={searchKey} onSearchDocument={setSearchKey} />
       <DocumentsTable
+        searchKey={searchKey}
         ref={documentsTableRef}
         filterDocStatus={docStatusFilter}
         selectedDocuments={selectedDocuments}

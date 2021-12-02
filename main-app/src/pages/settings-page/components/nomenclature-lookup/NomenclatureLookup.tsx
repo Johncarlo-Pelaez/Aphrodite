@@ -1,9 +1,10 @@
-import React, { ReactElement, useState } from 'react';
+import { ReactElement, Fragment, useState } from 'react';
 import { nomenclatureLookup } from 'models';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Button from 'react-bootstrap/Button';
 import Alert from 'react-bootstrap/Alert';
 import { useDeleteNomenclatureLookup } from 'hooks';
+import { SearchField } from 'core/ui';
 import { LookupsTable, AddModal, EditModal } from './components';
 
 export const NomenclatureLookup = (): ReactElement => {
@@ -12,6 +13,7 @@ export const NomenclatureLookup = (): ReactElement => {
   >(undefined);
   const [isAddModal, setIsAddModal] = useState<boolean>(false);
   const [isEditModal, setIsEditModal] = useState<boolean>(false);
+  const [searchKey, setSearchKey] = useState<string>('');
   const hasSelectedLookup = !!selectedlookup;
 
   const {
@@ -67,7 +69,7 @@ export const NomenclatureLookup = (): ReactElement => {
   };
 
   return (
-    <React.Fragment>
+    <Fragment>
       <ButtonGroup>
         <Button variant="outline-secondary" onClick={() => setIsAddModal(true)}>
           Add
@@ -94,7 +96,9 @@ export const NomenclatureLookup = (): ReactElement => {
       <Alert variant="danger" show={hasDeleteError}>
         {deleteError}
       </Alert>
+      <SearchField searchKey={searchKey} onSearchDocument={setSearchKey} />
       <LookupsTable
+        searchKey={searchKey}
         selectedLookup={selectedlookup}
         onSelectLookup={setSelectedlookup}
       />
@@ -104,7 +108,7 @@ export const NomenclatureLookup = (): ReactElement => {
         isVisible={isEditModal}
         onClose={handleCloseEditModal}
       />
-    </React.Fragment>
+    </Fragment>
   );
 };
 

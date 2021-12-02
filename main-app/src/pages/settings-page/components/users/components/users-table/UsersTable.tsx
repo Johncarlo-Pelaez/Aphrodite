@@ -1,9 +1,10 @@
-import { ReactElement, Fragment, useState, useEffect, useMemo } from 'react';
+import { ReactElement, useState, useEffect, useMemo } from 'react';
 import { useUsers } from 'hooks';
-import { Table, TableColumnProps, SearchField } from 'core/ui';
+import { Table, TableColumnProps } from 'core/ui';
 import { User } from 'models';
 
 export interface UsersTableProps {
+  searchKey: string;
   selectedUser?: User;
   onSelectUser: (user?: User) => void;
 }
@@ -26,11 +27,8 @@ const columns: TableColumnProps<User>[] = [
   },
 ];
 
-export const UsersTable = ({
-  selectedUser,
-  onSelectUser: triggerSelectUser,
-}: UsersTableProps): ReactElement => {
-  const [searchKey, setSearchKey] = useState<string>('');
+export const UsersTable = (props: UsersTableProps): ReactElement => {
+  const { searchKey, selectedUser, onSelectUser: triggerSelectUser } = props;
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(15);
   const {
@@ -67,26 +65,23 @@ export const UsersTable = ({
   );
 
   return (
-    <Fragment>
-      <SearchField searchKey={searchKey} onSearchDocument={setSearchKey} />
-      <Table<User>
-        rowKey={(user) => user.id}
-        loading={isDocsLoading}
-        isError={hasDocsError}
-        columns={columns}
-        data={users}
-        pagination={{
-          total: total,
-          pageSize: pageSize,
-          current: currentPage,
-          pageNumber: 5,
-          onChange: setCurrentPage,
-          onSizeChange: setPageSize,
-        }}
-        selectedRow={selectedUser}
-        onSelectRow={handleSelectRow}
-      />
-    </Fragment>
+    <Table<User>
+      rowKey={(user) => user.id}
+      loading={isDocsLoading}
+      isError={hasDocsError}
+      columns={columns}
+      data={users}
+      pagination={{
+        total: total,
+        pageSize: pageSize,
+        current: currentPage,
+        pageNumber: 5,
+        onChange: setCurrentPage,
+        onSizeChange: setPageSize,
+      }}
+      selectedRow={selectedUser}
+      onSelectRow={handleSelectRow}
+    />
   );
 };
 

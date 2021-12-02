@@ -1,9 +1,10 @@
-import React, { ReactElement, useState } from 'react';
+import { ReactElement, Fragment, useState } from 'react';
 import { NomenclatureWhitelist } from 'models';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Button from 'react-bootstrap/Button';
 import Alert from 'react-bootstrap/Alert';
 import { useDeleteNomenclatureWhitelist } from 'hooks';
+import { SearchField } from 'core/ui';
 import { WhitelistTable, AddEditModal, ModalAction } from './components';
 
 export const NomenclatureWhiteList = (): ReactElement => {
@@ -13,6 +14,7 @@ export const NomenclatureWhiteList = (): ReactElement => {
   const [modalMode, setModalMode] = useState<ModalAction | undefined>(
     undefined,
   );
+  const [searchKey, setSearchKey] = useState<string>('');
   const hasSelectNomenclature = !!selectedWhitelist;
   const isModalOpen = !!modalMode;
 
@@ -68,7 +70,7 @@ export const NomenclatureWhiteList = (): ReactElement => {
   };
 
   return (
-    <React.Fragment>
+    <Fragment>
       <ButtonGroup>
         <Button variant="outline-secondary" onClick={handleOpenAddModal}>
           Add
@@ -95,7 +97,9 @@ export const NomenclatureWhiteList = (): ReactElement => {
       <Alert variant="danger" show={hasDeleteError}>
         {deleteError}
       </Alert>
+      <SearchField searchKey={searchKey} onSearchDocument={setSearchKey} />
       <WhitelistTable
+        searchKey={searchKey}
         selectedWhitelist={selectedWhitelist}
         onSelectWhitelist={setSelectedWhitelist}
       />
@@ -106,7 +110,7 @@ export const NomenclatureWhiteList = (): ReactElement => {
         actionMode={modalMode}
         onClose={closeModal}
       />
-    </React.Fragment>
+    </Fragment>
   );
 };
 
