@@ -245,7 +245,7 @@ export class DocumentController {
   }
 
   @ApiOkResponse()
-  @Get('/cancel/waiting-inqueue')
+  @Get('/cancel/waiting')
   async cancelWaitingInQueue(
     @GetAzureUsername() username: string,
   ): Promise<void> {
