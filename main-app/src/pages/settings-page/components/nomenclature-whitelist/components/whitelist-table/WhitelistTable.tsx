@@ -1,6 +1,6 @@
-import { ReactElement, useState, useEffect } from 'react';
+import { ReactElement, Fragment, useState, useEffect, useMemo } from 'react';
 import { useNomenclaturesWhitelist } from 'hooks';
-import { Table, TableColumnProps } from 'core/ui/table';
+import { Table, TableColumnProps, SearchField } from 'core/ui';
 import { NomenclatureWhitelist } from 'models';
 
 const columns: TableColumnProps<NomenclatureWhitelist>[] = [
@@ -22,12 +22,18 @@ export const WhitelistTable = ({
   const [searchKey, setSearchKey] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(15);
-  const {
-    isLoading,
-    isError,
-    data: whitelists = [],
-  } = useNomenclaturesWhitelist();
-  const total = whitelists.length;
+  const { isLoading, isError, data = [] } = useNomenclaturesWhitelist();
+  const { whitelists, total } = useMemo(() => {
+    let whitelists = data;
+    if (searchKey)
+      whitelists = whitelists?.filter((data: NomenclatureWhitelist) =>
+        Object.values(data).some((value) =>
+          value?.toString().toLowerCase().includes(searchKey.toLowerCase()),
+        ),
+      );
+    const total = whitelists.length;
+    return { whitelists, total };
+  }, [data, searchKey]);
 
   const handleSelectRow = (selected: NomenclatureWhitelist): void => {
     triggerSelectWhitelist(
@@ -48,25 +54,26 @@ export const WhitelistTable = ({
   );
 
   return (
-    <Table<NomenclatureWhitelist>
-      rowKey={(doc) => doc.id}
-      loading={isLoading}
-      isError={isError}
-      columns={columns}
-      data={whitelists}
-      pagination={{
-        total: total,
-        pageSize: pageSize,
-        current: currentPage,
-        pageNumber: 5,
-        onChange: setCurrentPage,
-        onSizeChange: setPageSize,
-      }}
-      selectedRow={selectedWhitelist}
-      onSelectRow={handleSelectRow}
-      searchKey={searchKey}
-      onSearch={setSearchKey}
-    />
+    <Fragment>
+      <SearchField searchKey={searchKey} onSearchDocument={setSearchKey} />
+      <Table<NomenclatureWhitelist>
+        rowKey={(doc) => doc.id}
+        loading={isLoading}
+        isError={isError}
+        columns={columns}
+        data={whitelists}
+        pagination={{
+          total: total,
+          pageSize: pageSize,
+          current: currentPage,
+          pageNumber: 5,
+          onChange: setCurrentPage,
+          onSizeChange: setPageSize,
+        }}
+        selectedRow={selectedWhitelist}
+        onSelectRow={handleSelectRow}
+      />
+    </Fragment>
   );
 };
 

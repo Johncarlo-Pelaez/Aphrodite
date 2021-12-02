@@ -1,6 +1,6 @@
-import { ReactElement, useState, useEffect } from 'react';
+import { ReactElement, Fragment, useState, useEffect, useMemo } from 'react';
 import { useNomenclatureLookups } from 'hooks';
-import { Table, TableColumnProps } from 'core/ui/table';
+import { Table, TableColumnProps, SearchField } from 'core/ui';
 import { nomenclatureLookup } from 'models';
 
 const columns: TableColumnProps<nomenclatureLookup>[] = [
@@ -26,8 +26,18 @@ export const LookupsTable = ({
   const [searchKey, setSearchKey] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(15);
-  const { isLoading, isError, data: lookups = [] } = useNomenclatureLookups();
-  const total = lookups.length;
+  const { isLoading, isError, data = [] } = useNomenclatureLookups();
+  const { lookups, total } = useMemo(() => {
+    let lookups = data;
+    if (searchKey)
+      lookups = lookups?.filter((data: nomenclatureLookup) =>
+        Object.values(data).some((value) =>
+          value?.toString().toLowerCase().includes(searchKey.toLowerCase()),
+        ),
+      );
+    const total = lookups.length;
+    return { lookups, total };
+  }, [data, searchKey]);
 
   const handleSelectRow = (selected: nomenclatureLookup): void => {
     triggerSelectLookup(
@@ -48,25 +58,26 @@ export const LookupsTable = ({
   );
 
   return (
-    <Table<nomenclatureLookup>
-      rowKey={(doc) => doc.id}
-      loading={isLoading}
-      isError={isError}
-      columns={columns}
-      data={lookups}
-      pagination={{
-        total: total,
-        pageSize: pageSize,
-        current: currentPage,
-        pageNumber: 5,
-        onChange: setCurrentPage,
-        onSizeChange: setPageSize,
-      }}
-      selectedRow={selectedLookup}
-      onSelectRow={handleSelectRow}
-      searchKey={searchKey}
-      onSearch={setSearchKey}
-    />
+    <Fragment>
+      <SearchField searchKey={searchKey} onSearchDocument={setSearchKey} />
+      <Table<nomenclatureLookup>
+        rowKey={(doc) => doc.id}
+        loading={isLoading}
+        isError={isError}
+        columns={columns}
+        data={lookups}
+        pagination={{
+          total: total,
+          pageSize: pageSize,
+          current: currentPage,
+          pageNumber: 5,
+          onChange: setCurrentPage,
+          onSizeChange: setPageSize,
+        }}
+        selectedRow={selectedLookup}
+        onSelectRow={handleSelectRow}
+      />
+    </Fragment>
   );
 };
 

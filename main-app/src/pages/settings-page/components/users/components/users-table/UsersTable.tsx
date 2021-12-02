@@ -1,8 +1,12 @@
-import { ReactElement, useState, useEffect } from 'react';
+import { ReactElement, Fragment, useState, useEffect, useMemo } from 'react';
 import { useUsers } from 'hooks';
-import { Table, TableColumnProps } from 'core/ui/table';
+import { Table, TableColumnProps, SearchField } from 'core/ui';
 import { User } from 'models';
-import { UsersTableProps } from './UsersTable.types';
+
+export interface UsersTableProps {
+  selectedUser?: User;
+  onSelectUser: (user?: User) => void;
+}
 
 const columns: TableColumnProps<User>[] = [
   {
@@ -32,9 +36,19 @@ export const UsersTable = ({
   const {
     isLoading: isDocsLoading,
     isError: hasDocsError,
-    data: users = [],
+    data = [],
   } = useUsers();
-  const total = users.length;
+  const { users, total } = useMemo(() => {
+    let users = data;
+    if (searchKey)
+      users = users?.filter((data: User) =>
+        Object.values(data).some((value) =>
+          value?.toString().toLowerCase().includes(searchKey.toLowerCase()),
+        ),
+      );
+    const total = users.length;
+    return { users, total };
+  }, [data, searchKey]);
 
   const handleSelectRow = (selected: User): void => {
     triggerSelectUser(selected.id === selectedUser?.id ? undefined : selected);
@@ -44,7 +58,7 @@ export const UsersTable = ({
     function removeOutOfRangeSelectedRow() {
       const start = (currentPage - 1) * pageSize;
       const end = currentPage * pageSize;
-      const pageKeys = users.slice(start, end).map((l) => l.id);
+      const pageKeys = users.slice(start, end).map((u) => u.id);
       if (!pageKeys.some((k) => k === selectedUser?.id))
         triggerSelectUser(undefined);
     },
@@ -53,25 +67,26 @@ export const UsersTable = ({
   );
 
   return (
-    <Table<User>
-      rowKey={(user) => user.id}
-      loading={isDocsLoading}
-      isError={hasDocsError}
-      columns={columns}
-      data={users}
-      pagination={{
-        total: total,
-        pageSize: pageSize,
-        current: currentPage,
-        pageNumber: 5,
-        onChange: setCurrentPage,
-        onSizeChange: setPageSize,
-      }}
-      selectedRow={selectedUser}
-      onSelectRow={handleSelectRow}
-      searchKey={searchKey}
-      onSearch={setSearchKey}
-    />
+    <Fragment>
+      <SearchField searchKey={searchKey} onSearchDocument={setSearchKey} />
+      <Table<User>
+        rowKey={(user) => user.id}
+        loading={isDocsLoading}
+        isError={hasDocsError}
+        columns={columns}
+        data={users}
+        pagination={{
+          total: total,
+          pageSize: pageSize,
+          current: currentPage,
+          pageNumber: 5,
+          onChange: setCurrentPage,
+          onSizeChange: setPageSize,
+        }}
+        selectedRow={selectedUser}
+        onSelectRow={handleSelectRow}
+      />
+    </Fragment>
   );
 };
 

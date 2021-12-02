@@ -11,7 +11,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { TableProps, SorterResult, TableColumnProps } from './Table.types';
 import { OrderDirection } from './Table.enum';
-import { Pagination, SearchField } from './components';
+import { Pagination } from './components';
 
 export const Table = <T extends Record<string, any> = {}>(
   props: TableProps<T>,
@@ -32,11 +32,9 @@ export const Table = <T extends Record<string, any> = {}>(
     data,
     rowSelection,
     pagination,
-    searchKey,
     selectedRow,
     onSelectRow,
     onChange,
-    onSearch,
   } = props;
   const rowCount = dataList.length;
   const hasData = rowCount > 0;
@@ -102,11 +100,6 @@ export const Table = <T extends Record<string, any> = {}>(
 
   const triggerOnChange = (sorter?: SorterResult): void => {
     if (onChange && typeof onChange === 'function') onChange(sorter);
-  };
-
-  const renderSearchField = (): ReactElement | undefined => {
-    if (searchKey !== undefined && onSearch && typeof onSearch === 'function')
-      return <SearchField searchKey={searchKey} onSearchDocument={onSearch} />;
   };
 
   const renderTableColumns = (): ReactElement[] => {
@@ -274,14 +267,7 @@ export const Table = <T extends Record<string, any> = {}>(
       else {
         const start = (pagination?.current - 1) * pagination?.pageSize;
         const end = pagination?.current * pagination?.pageSize;
-        let newPageDataList = data;
-        if (searchKey)
-          newPageDataList = newPageDataList?.filter((data: T) =>
-            Object.values(data).some((value) =>
-              value?.toString().toLowerCase().includes(searchKey.toLowerCase()),
-            ),
-          );
-        setDataList(newPageDataList.slice(start, end));
+        setDataList(data.slice(start, end));
       }
     },
     // eslint-disable-next-line
@@ -342,7 +328,6 @@ export const Table = <T extends Record<string, any> = {}>(
 
   return (
     <React.Fragment>
-      {renderSearchField()}
       {renderTable()}
       {renderPagination()}
     </React.Fragment>

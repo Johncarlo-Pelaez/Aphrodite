@@ -38,9 +38,7 @@ export interface TableProps<T> {
   data: T[];
   rowSelection?: RowSelection<T>;
   pagination?: TablePaginationConfig;
-  searchKey?: string;
   selectedRow?: T;
   onSelectRow?: (selectedRow: T) => void;
   onChange?: (sorter?: SorterResult) => void;
-  onSearch?: (seachKey: string) => void;
 }

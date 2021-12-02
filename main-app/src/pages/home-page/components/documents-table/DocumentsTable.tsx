@@ -1,5 +1,6 @@
 import {
   ReactElement,
+  Fragment,
   useState,
   useEffect,
   useMemo,
@@ -17,7 +18,8 @@ import {
   TableColumnProps,
   SorterResult,
   OrderDirection,
-} from 'core/ui/table';
+  SearchField,
+} from 'core/ui';
 import { Document } from 'models';
 import { sortDateTime, sortText } from 'utils/sort';
 import { parseDocumentType } from '../view-doc-modal/components';
@@ -203,49 +205,50 @@ export const DocumentsTable = forwardRef(
     ]);
 
     return (
-      <Table<Document>
-        isServerSide
-        rowKey={(doc) => doc.id}
-        loading={isLoading || isFetching}
-        isError={hasDocsError}
-        columns={renderColumns()}
-        data={documents}
-        rowSelection={{
-          type: 'checkbox',
-          selectedRowKeys: selectedDocumentKeys,
-          onChange: changeSelectedRows,
-        }}
-        pagination={{
-          total: total,
-          pageSize: pageSize,
-          current: currentPage,
-          pageNumber: 5,
-          onChange: (page) => {
-            setCurrentPage(page);
-            setSelectedDocuments([]);
-          },
-          onSizeChange: setPageSize,
-        }}
-        searchKey={searchKey}
-        onSelectRow={(document) => {
-          const isSelected = selectedDocuments.some(
-            (d) => d.id === document.id,
-          );
-          if (isSelected) {
-            setSelectedDocuments((current) =>
-              current.filter((d) => d.id !== document.id),
+      <Fragment>
+        <SearchField searchKey={searchKey} onSearchDocument={setSearchKey} />
+        <Table<Document>
+          isServerSide
+          rowKey={(doc) => doc.id}
+          loading={isLoading || isFetching}
+          isError={hasDocsError}
+          columns={renderColumns()}
+          data={documents}
+          rowSelection={{
+            type: 'checkbox',
+            selectedRowKeys: selectedDocumentKeys,
+            onChange: changeSelectedRows,
+          }}
+          pagination={{
+            total: total,
+            pageSize: pageSize,
+            current: currentPage,
+            pageNumber: 5,
+            onChange: (page) => {
+              setCurrentPage(page);
+              setSelectedDocuments([]);
+            },
+            onSizeChange: setPageSize,
+          }}
+          onSelectRow={(document) => {
+            const isSelected = selectedDocuments.some(
+              (d) => d.id === document.id,
             );
-            setSelectedDocumentKeys((current) =>
-              current.filter((key) => key !== document.id),
-            );
-          } else {
-            setSelectedDocuments((current) => [...current, document]);
-            setSelectedDocumentKeys((current) => [...current, document.id]);
-          }
-        }}
-        onSearch={setSearchKey}
-        onChange={changeSort}
-      />
+            if (isSelected) {
+              setSelectedDocuments((current) =>
+                current.filter((d) => d.id !== document.id),
+              );
+              setSelectedDocumentKeys((current) =>
+                current.filter((key) => key !== document.id),
+              );
+            } else {
+              setSelectedDocuments((current) => [...current, document]);
+              setSelectedDocumentKeys((current) => [...current, document.id]);
+            }
+          }}
+          onChange={changeSort}
+        />
+      </Fragment>
     );
   },
 );
