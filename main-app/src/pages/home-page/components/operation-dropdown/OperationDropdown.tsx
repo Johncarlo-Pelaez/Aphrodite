@@ -3,8 +3,8 @@ import Form from 'react-bootstrap/Form';
 import styles from './OperationDropdown.module.css';
 
 export interface OperationDropdownProps {
-  onChange: (selected: string) => void;
-  selected: string;
+  onChange: (selected: OperationOption) => void;
+  selected: OperationOption;
 }
 
 export interface IOperationDropdownOptions {
@@ -48,7 +48,7 @@ export const OperationDropdown = ({
   onChange,
 }: OperationDropdownProps): ReactElement => {
   const handleOnChange = (event: React.FormEvent<HTMLSelectElement>): void => {
-    onChange(event.currentTarget.value);
+    onChange(event.currentTarget.value as OperationOption);
   };
 
   return (

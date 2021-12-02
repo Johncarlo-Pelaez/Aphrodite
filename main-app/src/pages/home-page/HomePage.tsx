@@ -13,15 +13,15 @@ import {
   StatusDropdown,
   OperationDropdown,
 } from './components';
-import { OperationOption } from './components/OperationDropdown';
-import { StatusOption } from './components/StatusDropdown';
+import { OperationOption } from './components/operation-dropdown';
+import { StatusOption } from './components/status-dropdown';
 import { concatDocumentStatuses } from './HomePage.utils';
 
 export const HomePage = (): ReactElement => {
-  const [selectedStatus, setSelectedStatus] = useState<string>(
+  const [selectedStatus, setSelectedStatus] = useState<StatusOption>(
     StatusOption.ALL,
   );
-  const [selectedOperation, setSelectedOperation] = useState<string>(
+  const [selectedOperation, setSelectedOperation] = useState<OperationOption>(
     OperationOption.ALL,
   );
   const [selectedDocuments, setSelectedDocuments] = useState<Document[]>([]);
@@ -44,11 +44,8 @@ export const HomePage = (): ReactElement => {
   const enableRetryButton = useMemo(
     () =>
       !!selectedDocuments.length &&
-      selectedDocuments.every(
-        (doc) =>
-          doc.status === DocumentStatus.QR_FAILED ||
-          doc.status === DocumentStatus.INDEXING_FAILED ||
-          doc.status === DocumentStatus.MIGRATE_FAILED,
+      selectedDocuments.every((doc) =>
+        getForRetryDocstatus().some((s) => s === doc.status),
       ),
     [selectedDocuments],
   );
@@ -56,14 +53,7 @@ export const HomePage = (): ReactElement => {
     () =>
       !!selectedDocuments.length &&
       selectedDocuments.every((doc) =>
-        Object.values(DocumentStatus)
-          .filter((s) => {
-            const arrStattmp = s.split('_');
-            if (arrStattmp.length === 2)
-              return arrStattmp[1] !== 'DONE' && arrStattmp[1] !== 'FAILED';
-            else return true;
-          })
-          .some((s) => s === doc.status),
+        getForCancelDocStatus().some((s) => s === doc.status),
       ),
     [selectedDocuments],
   );
@@ -81,6 +71,23 @@ export const HomePage = (): ReactElement => {
     mutateAsync: cancelDocumentsAsync,
     reset: resetCancelDoc,
   } = useCancelDocs();
+
+  const getForRetryDocstatus = (): DocumentStatus[] => {
+    return Object.values(DocumentStatus).filter((s) => {
+      const arrStattmp = s.split('_');
+      if (arrStattmp.length === 2) return arrStattmp[1] === 'FAILED';
+      else return false;
+    });
+  };
+
+  const getForCancelDocStatus = (): DocumentStatus[] => {
+    return Object.values(DocumentStatus).filter((s) => {
+      const arrStattmp = s.split('_');
+      if (arrStattmp.length === 2)
+        return arrStattmp[1] !== 'DONE' && arrStattmp[1] !== 'FAILED';
+      else return arrStattmp[0] !== 'CANCELLED';
+    });
+  };
 
   const handleRetryDocs = async (): Promise<void> => {
     if (!isRetryDocSaving && enableRetryButton) {

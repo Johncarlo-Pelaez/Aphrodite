@@ -3,8 +3,8 @@ import Form from 'react-bootstrap/Form';
 import styles from './StatusDropdown.module.css';
 
 export interface StatusDropdownProps {
-  onChange: (selected: string) => void;
-  selected: string;
+  onChange: (selected: StatusOption) => void;
+  selected: StatusOption;
 }
 
 export interface IStatusDropdownOptions {
@@ -48,7 +48,7 @@ export const StatusDropdown = ({
   onChange,
 }: StatusDropdownProps): ReactElement => {
   const handleOnChange = (event: React.FormEvent<HTMLSelectElement>): void => {
-    onChange(event.currentTarget.value);
+    onChange(event.currentTarget.value as StatusOption);
   };
 
   return (

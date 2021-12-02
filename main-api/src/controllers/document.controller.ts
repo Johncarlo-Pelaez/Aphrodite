@@ -225,6 +225,14 @@ export class DocumentController {
   }
 
   @ApiOkResponse()
+  @Get('/retry/error')
+  async retryErrorDocuments(
+    @GetAzureUsername() username: string,
+  ): Promise<void> {
+    await this.documentsService.retryErrorDocuments(username);
+  }
+
+  @ApiOkResponse()
   @Put('/cancel')
   async cancelDocuments(
     @Body(CancelDocumentsIntPipe) dto: CancelDocumentsDto,
@@ -234,6 +242,14 @@ export class DocumentController {
       documentIds: dto.documentIds,
       cancelledBy: username,
     });
+  }
+
+  @ApiOkResponse()
+  @Get('/cancel/waiting-inqueue')
+  async cancelWaitingInQueue(
+    @GetAzureUsername() username: string,
+  ): Promise<void> {
+    await this.documentsService.cancelWaitingDocumentsInQueue(username);
   }
 
   @ApiOkResponse({
