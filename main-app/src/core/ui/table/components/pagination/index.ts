@@ -1,2 +1,1 @@
-export { default, Pagination } from './Pagination';
-export * from './Pagination.types';
+export * from './Pagination';

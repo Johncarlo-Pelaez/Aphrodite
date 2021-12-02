@@ -3,7 +3,17 @@ import BPagination from 'react-bootstrap/Pagination';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import { PaginationProps } from './Pagination.types';
+
+export interface PaginationProps {
+  isLoading?: boolean;
+  total: number;
+  rowCount: number;
+  pageSize: number;
+  currentPage: number;
+  paginationNumber: number;
+  onPageChanged: (page: number) => void;
+  onSizeChange: (pageSize: number) => void;
+}
 
 export const Pagination = (props: PaginationProps): ReactElement => {
   const [paginations, setPaginations] = useState<number[]>([]);
@@ -27,32 +37,38 @@ export const Pagination = (props: PaginationProps): ReactElement => {
   const isNextPageHidden = currentPage === totalPage;
   const isGotoLastPageHidden = !!paginations.find((p) => p === totalPage);
 
-  const getPaginationNumbers = (): number[] => {
-    let pageNumbers: number[] = [currentPage];
-    let paginationRadius = Math.trunc(paginationNumber / 2);
-    let addPrevPage = 0;
-    let prevPageNumber = currentPage;
-    for (let i = 0; i < paginationRadius; i++) {
-      prevPageNumber--;
-      if (prevPageNumber <= 0) addPrevPage++;
-      else pageNumbers.push(prevPageNumber);
-    }
-    let nextPageNumber = currentPage;
-    for (let i = 0; i < paginationRadius + addPrevPage; i++) {
-      nextPageNumber++;
-      if (nextPageNumber > totalPage)
-        pageNumbers.push(Math.min(...pageNumbers) - 1);
-      else pageNumbers.push(nextPageNumber);
-    }
-    return pageNumbers.filter((pn) => pn >= 1).sort((a, b) => a - b);
-  };
+  useEffect(
+    function buildPaginationNumbers() {
+      let pageNumbers: number[] = [currentPage];
+      let paginationRadius = Math.trunc(paginationNumber / 2);
+      let addPrevPage = 0;
+      let prevPageNumber = currentPage;
 
-  useEffect(() => {
-    setPaginations(getPaginationNumbers());
-    if (currentPage > totalPage && totalPage > 0) onPageChanged(totalPage);
-    if (currentPage === 0 && totalPage > 0) onPageChanged(1);
+      for (let i = 0; i < paginationRadius; i++) {
+        prevPageNumber--;
+        if (prevPageNumber <= 0) addPrevPage++;
+        else pageNumbers.push(prevPageNumber);
+      }
+
+      let nextPageNumber = currentPage;
+
+      for (let i = 0; i < paginationRadius + addPrevPage; i++) {
+        nextPageNumber++;
+        if (nextPageNumber > totalPage)
+          pageNumbers.push(Math.min(...pageNumbers) - 1);
+        else pageNumbers.push(nextPageNumber);
+      }
+
+      pageNumbers = pageNumbers.filter((pn) => pn >= 1).sort((a, b) => a - b);
+
+      setPaginations(pageNumbers);
+
+      if (currentPage > totalPage && totalPage > 0) onPageChanged(totalPage);
+      if (currentPage === 0 && totalPage > 0) onPageChanged(1);
+    },
     // eslint-disable-next-line
-  }, [currentPage, paginationNumber, totalPage]);
+    [currentPage, paginationNumber, totalPage],
+  );
 
   return (
     <div className="b-table__pagination">
