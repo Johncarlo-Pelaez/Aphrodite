@@ -1,4 +1,4 @@
-import React, { ReactElement, useState, useEffect } from 'react';
+import { ReactElement, Fragment, useState, useEffect, useMemo } from 'react';
 import BTable from 'react-bootstrap/Table';
 import Alert from 'react-bootstrap/Alert';
 import Spinner from 'react-bootstrap/Spinner';
@@ -9,20 +9,13 @@ import {
   faSortAlphaDown,
   faSortAlphaUp,
 } from '@fortawesome/free-solid-svg-icons';
-import { TableProps, SorterResult, TableColumnProps } from './Table.types';
+import { TableProps, SorterResult } from './Table.types';
 import { SortOrder } from './Table.enum';
 import { Pagination } from './components';
 
 export const Table = <T extends Record<string, any> = {}>(
   props: TableProps<T>,
 ): ReactElement => {
-  const [defaultSorter, setDefaultSorter] = useState<SorterResult | undefined>(
-    undefined,
-  );
-  const [currentColumnSorter, setCurrentColumnSorter] =
-    useState<TableColumnProps<T> | null>(null);
-  const [dataList, setDataList] = useState<T[]>([]);
-  const [rowSelectionCheck, setRowSelectionCheck] = useState<boolean>(false);
   const {
     isServerSide,
     rowKey,
@@ -36,18 +29,60 @@ export const Table = <T extends Record<string, any> = {}>(
     onSelectRow,
     onChange,
   } = props;
-  const rowCount = dataList.length;
+
+  const [defaultSorter, setDefaultSorter] = useState<SorterResult | undefined>(
+    undefined,
+  );
+  const [rowSelectionCheck, setRowSelectionCheck] = useState<boolean>(false);
+  const currentColumnSorter = useMemo(
+    function getCurrentColumnSorter() {
+      return (
+        columns.find(
+          (column) =>
+            !!column.sorter &&
+            typeof column.sorter === 'function' &&
+            column.sortOrder,
+        ) ?? null
+      );
+    },
+    [columns],
+  );
+  const { dataList, total: rowCount } = useMemo(
+    function getPageItemsList() {
+      let dataList: T[];
+      if (isServerSide || !pagination) {
+        dataList = data;
+      } else {
+        const start = (pagination?.current - 1) * pagination?.pageSize;
+        const end = pagination?.current * pagination?.pageSize;
+        dataList = data.slice(start, end);
+      }
+      if (
+        currentColumnSorter?.sorter &&
+        typeof currentColumnSorter?.sorter === 'function' &&
+        currentColumnSorter?.sortOrder
+      ) {
+        const { sorter, sortOrder } = currentColumnSorter;
+        dataList = dataList.sort((a: T, b: T) => {
+          if (sortOrder === SortOrder.ASC) return sorter(a, b);
+          else return sorter(b, a);
+        });
+      }
+      return { dataList, total: dataList.length };
+    },
+    [isServerSide, data, pagination, currentColumnSorter],
+  );
   const hasData = rowCount > 0;
   const sortOrderSequence = [SortOrder.ASC, SortOrder.DESC, undefined];
 
-  const getRowKey = (rowData: T): React.Key | undefined => {
+  const getItemKey = (rowData: T): React.Key | undefined => {
     if (typeof rowKey === 'function') return rowKey(rowData);
     else if (typeof rowKey === 'string') return rowData[rowKey];
     else return undefined;
   };
 
   const showRowHighlight = (rowData: T): string => {
-    return getRowKey(rowData) === (selectedRow && getRowKey(selectedRow)) ||
+    return getItemKey(rowData) === (selectedRow && getItemKey(selectedRow)) ||
       isRowSelected(rowData)
       ? 'highlight-row'
       : '';
@@ -68,14 +103,14 @@ export const Table = <T extends Record<string, any> = {}>(
   const handleRowSelectionChange = (checked: boolean, rowData: T): void => {
     if (rowSelection) {
       const { selectedRowKeys } = rowSelection;
-      let newSelectedRowKey: React.Key | undefined = getRowKey(rowData),
+      let newSelectedRowKey: React.Key | undefined = getItemKey(rowData),
         newSelectedRows: T[],
         newSelectedRowKeys: React.Key[];
 
       if (!newSelectedRowKey) return;
 
       const currentSelectedRows = dataList.filter((row) =>
-        selectedRowKeys.some((key) => key === getRowKey(row)),
+        selectedRowKeys.some((key) => key === getItemKey(row)),
       );
 
       if (checked) {
@@ -86,7 +121,7 @@ export const Table = <T extends Record<string, any> = {}>(
           (key) => key !== newSelectedRowKey,
         );
         newSelectedRows = currentSelectedRows.filter(
-          (row) => getRowKey(row) !== newSelectedRowKey,
+          (row) => getItemKey(row) !== newSelectedRowKey,
         );
       }
 
@@ -151,8 +186,9 @@ export const Table = <T extends Record<string, any> = {}>(
 
   const isRowSelected = (rowData: T): boolean => {
     return (
-      rowSelection?.selectedRowKeys.some((key) => key === getRowKey(rowData)) ??
-      false
+      rowSelection?.selectedRowKeys.some(
+        (key) => key === getItemKey(rowData),
+      ) ?? false
     );
   };
 
@@ -166,12 +202,14 @@ export const Table = <T extends Record<string, any> = {}>(
       <Alert className="text-center" variant="danger" show={isError}>
         Could not load data, Please try again.
       </Alert>
-      {!hasData && (
-        <Alert className="text-center" variant="light">
-          No Data.
-        </Alert>
-      )}
-      {!isError && hasData && (
+      <Alert
+        className="text-center"
+        variant="light"
+        show={!hasData && !isError}
+      >
+        No Data.
+      </Alert>
+      {hasData && !isError && (
         <BTable className="b-table" borderless hover>
           <thead>
             <tr>
@@ -258,75 +296,56 @@ export const Table = <T extends Record<string, any> = {}>(
   }, []);
 
   useEffect(
-    function getPageDataList() {
-      if (isServerSide || !pagination) setDataList(data);
-      else {
-        const start = (pagination?.current - 1) * pagination?.pageSize;
-        const end = pagination?.current * pagination?.pageSize;
-        setDataList(data.slice(start, end));
-      }
-    },
-    // eslint-disable-next-line
-    [data, pagination],
-  );
-
-  useEffect(
-    () =>
-      setCurrentColumnSorter(
-        columns.find(
-          (column) =>
-            !!column.sorter &&
-            typeof column.sorter === 'function' &&
-            column.sortOrder,
-        ) ?? null,
-      ),
-    // eslint-disable-next-line
-    [columns],
-  );
-
-  useEffect(
-    function sortDataList() {
-      if (
-        currentColumnSorter?.sorter &&
-        typeof currentColumnSorter?.sorter === 'function' &&
-        currentColumnSorter?.sortOrder
-      ) {
-        const { sorter, sortOrder } = currentColumnSorter;
-        setDataList((currentDataList) =>
-          [...currentDataList].sort((a: T, b: T) => {
-            if (sortOrder === SortOrder.ASC) return sorter(a, b);
-            else return sorter(b, a);
-          }),
-        );
-      }
-    },
-    // eslint-disable-next-line
-    [currentColumnSorter],
-  );
-
-  useEffect(
     function onSelectAllRow() {
       let newSelectedRows: T[], newSelectedRowKeys: React.Key[];
-
       if (rowSelectionCheck) {
         newSelectedRows = dataList;
-        newSelectedRowKeys = dataList.map((doc) => doc.id);
+        newSelectedRowKeys = dataList.reduce(
+          (itemsKey: React.Key[], currentItem: T) => {
+            const itemKey = getItemKey(currentItem);
+            if (itemKey) itemsKey.push(itemKey);
+            return itemsKey;
+          },
+          [],
+        );
       } else {
         newSelectedRows = [];
         newSelectedRowKeys = [];
       }
-
       triggerSelectionOnChange(newSelectedRowKeys, newSelectedRows);
     },
     // eslint-disable-next-line
     [rowSelectionCheck],
   );
 
+  useEffect(
+    function onSelectAllItems() {
+      const allPageItemsKey = dataList.map((item) => getItemKey(item));
+      const selectedRowKey = selectedRow ? getItemKey(selectedRow) : undefined;
+      const rowSelectionKeys = rowSelection?.selectedRowKeys ?? [];
+      const allSelectedItemsKey = selectedRowKey
+        ? [...rowSelectionKeys, selectedRowKey]
+        : rowSelectionKeys;
+
+      if (
+        !!allSelectedItemsKey.length &&
+        allPageItemsKey.every((pik) =>
+          allSelectedItemsKey.some((ask) => ask === pik),
+        )
+      )
+        setRowSelectionCheck(true);
+
+      if (!allSelectedItemsKey.length) setRowSelectionCheck(false);
+    },
+    // eslint-disable-next-line
+    [rowSelection, selectedRow],
+  );
+
   return (
-    <React.Fragment>
+    <Fragment>
       {renderTable()}
       {renderPagination()}
-    </React.Fragment>
+    </Fragment>
   );
 };
 
