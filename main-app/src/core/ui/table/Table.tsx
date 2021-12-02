@@ -10,7 +10,7 @@ import {
   faSortAlphaUp,
 } from '@fortawesome/free-solid-svg-icons';
 import { TableProps, SorterResult, TableColumnProps } from './Table.types';
-import { OrderDirection } from './Table.enum';
+import { SortOrder } from './Table.enum';
 import { Pagination } from './components';
 
 export const Table = <T extends Record<string, any> = {}>(
@@ -38,11 +38,7 @@ export const Table = <T extends Record<string, any> = {}>(
   } = props;
   const rowCount = dataList.length;
   const hasData = rowCount > 0;
-  const sortOrderSequence = [
-    OrderDirection.ASC,
-    OrderDirection.DESC,
-    undefined,
-  ];
+  const sortOrderSequence = [SortOrder.ASC, SortOrder.DESC, undefined];
 
   const getRowKey = (rowData: T): React.Key | undefined => {
     if (typeof rowKey === 'function') return rowKey(rowData);
@@ -108,7 +104,7 @@ export const Table = <T extends Record<string, any> = {}>(
         dataIndex && typeof sorter === 'function' && sortOrder;
       const isDefaultSorter = dataIndex === defaultSorter?.field;
       const isSelfCurrentSorter = currentColumnSorter?.dataIndex === dataIndex;
-      const isAsc = sortOrder === OrderDirection.ASC;
+      const isAsc = sortOrder === SortOrder.ASC;
       return (
         <th
           key={index}
@@ -121,7 +117,7 @@ export const Table = <T extends Record<string, any> = {}>(
                 defaultSorter?.order &&
                 sortOrder
               )
-                newSortOrder = isAsc ? OrderDirection.DESC : OrderDirection.ASC;
+                newSortOrder = isAsc ? SortOrder.DESC : SortOrder.ASC;
               else if (!sortOrder) newSortOrder = defaultSorter?.order;
               else newSortOrder = undefined;
             } else {
@@ -298,7 +294,7 @@ export const Table = <T extends Record<string, any> = {}>(
         const { sorter, sortOrder } = currentColumnSorter;
         setDataList((currentDataList) =>
           [...currentDataList].sort((a: T, b: T) => {
-            if (sortOrder === OrderDirection.ASC) return sorter(a, b);
+            if (sortOrder === SortOrder.ASC) return sorter(a, b);
             else return sorter(b, a);
           }),
         );

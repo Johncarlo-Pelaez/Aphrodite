@@ -1,11 +1,11 @@
-import { OrderDirection } from './Table.enum';
+import { SortOrder } from './Table.enum';
 
 export interface TableColumnProps<T> {
   title: string;
   dataIndex?: string;
   render?: (obj: T) => any;
   sorter?: (a: T, b: T) => number;
-  sortOrder?: OrderDirection;
+  sortOrder?: SortOrder;
 }
 
 export interface TablePaginationConfig {
@@ -19,7 +19,7 @@ export interface TablePaginationConfig {
 
 export interface SorterResult {
   field: string;
-  order: OrderDirection;
+  order: SortOrder;
 }
 
 export declare type RowSelectionType = 'checkbox' | 'radio';

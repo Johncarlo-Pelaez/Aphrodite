@@ -12,14 +12,14 @@ import moment from 'moment';
 import { DEFAULT_DATE_FORMAT } from 'core/constants';
 import { DocumentStatus } from 'core/enum';
 import { useDebounce, useDocuments } from 'hooks';
-import { Table, TableColumnProps, SorterResult, OrderDirection } from 'core/ui';
+import { Table, TableColumnProps, SorterResult, SortOrder } from 'core/ui';
 import { Document } from 'models';
 import { sortDateTime, sortText } from 'utils/sort';
 import { parseDocumentType } from '../view-doc-modal/components';
 
 const DEFAULT_SORT_ORDER: SorterResult = {
   field: 'modifiedDate',
-  order: OrderDirection.DESC,
+  order: SortOrder.DESC,
 };
 
 export interface DocumentsTableProps {

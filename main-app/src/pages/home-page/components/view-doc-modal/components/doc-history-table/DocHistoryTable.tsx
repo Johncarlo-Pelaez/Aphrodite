@@ -6,7 +6,7 @@ import {
   Table,
   TableColumnProps,
   SorterResult,
-  OrderDirection,
+  SortOrder,
 } from 'core/ui/table';
 import { sortDateTime } from 'utils/sort';
 import { DocumentHistory } from 'models';
@@ -17,7 +17,7 @@ export interface DocHistoryTableProps {
 
 const DEFAULT_SORT_ORDER: SorterResult = {
   field: 'createdDate',
-  order: OrderDirection.DESC,
+  order: SortOrder.DESC,
 };
 
 export const DocHistoryTable = ({
