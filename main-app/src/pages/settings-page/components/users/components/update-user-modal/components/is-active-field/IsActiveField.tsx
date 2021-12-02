@@ -12,14 +12,20 @@ export const IsActiveField = ({
   <Controller
     name="isActive"
     control={control}
-    defaultValue={'false'}
-    render={({ field, fieldState: { invalid, error } }) => (
+    defaultValue={false}
+    render={({
+      field: { onChange, value, ref },
+      fieldState: { invalid, error },
+    }) => (
       <Form.Group className="mb-3">
-        <Form.Label>Status</Form.Label>
-        <Form.Select {...field} isInvalid={invalid}>
-          <option value={'true'}>Active</option>
-          <option value={'false'}>Deactivate</option>
-        </Form.Select>
+        <Form.Check
+          ref={ref}
+          type="checkbox"
+          label="Active"
+          onChange={onChange}
+          checked={value}
+          isInvalid={invalid}
+        />
         <Form.Control.Feedback type="invalid">
           {error?.message}
         </Form.Control.Feedback>

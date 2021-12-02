@@ -11,8 +11,8 @@ export const NomenclatureLookup = (): ReactElement => {
   const [selectedlookup, setSelectedlookup] = useState<
     nomenclatureLookup | undefined
   >(undefined);
-  const [isAddModal, setIsAddModal] = useState<boolean>(false);
-  const [isEditModal, setIsEditModal] = useState<boolean>(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [searchKey, setSearchKey] = useState<string>('');
   const hasSelectedLookup = !!selectedlookup;
 
@@ -55,23 +55,26 @@ export const NomenclatureLookup = (): ReactElement => {
       return;
     }
 
-    setIsEditModal(true);
+    setIsEditModalOpen(true);
   };
 
   const handleCloseAddModal = (): void => {
-    setIsAddModal(false);
+    setIsAddModalOpen(false);
     setSelectedlookup(undefined);
   };
 
   const handleCloseEditModal = (): void => {
-    setIsEditModal(false);
+    setIsEditModalOpen(false);
     setSelectedlookup(undefined);
   };
 
   return (
     <Fragment>
       <ButtonGroup>
-        <Button variant="outline-secondary" onClick={() => setIsAddModal(true)}>
+        <Button
+          variant="outline-secondary"
+          onClick={() => setIsAddModalOpen(true)}
+        >
           Add
         </Button>
         {hasSelectedLookup && [
@@ -102,10 +105,10 @@ export const NomenclatureLookup = (): ReactElement => {
         selectedLookup={selectedlookup}
         onSelectLookup={setSelectedlookup}
       />
-      <AddModal isVisible={isAddModal} onClose={handleCloseAddModal} />
+      <AddModal isVisible={isAddModalOpen} onClose={handleCloseAddModal} />
       <EditModal
         lookup={selectedlookup}
-        isVisible={isEditModal}
+        isVisible={isEditModalOpen}
         onClose={handleCloseEditModal}
       />
     </Fragment>

@@ -12,23 +12,54 @@ import {
 
 export const Users = (): ReactElement => {
   const [selectedUser, setSelectedUser] = useState<User | undefined>(undefined);
-  const [openAddModal, setOpenModal] = useState<boolean>(false);
-  const [openEditModal, setOpenEditModal] = useState<boolean>(false);
-  const [openViewModal, setOpenViewModal] = useState<boolean>(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState<boolean>(false);
   const [searchKey, setSearchKey] = useState<string>('');
   const hasSelectUser = !!selectedUser;
+
+  const handleOpenEditModal = (): void => {
+    if (!hasSelectUser) {
+      alert('Please select a user.');
+      return;
+    }
+
+    setIsEditModalOpen(true);
+  };
+
+  const handleOpenViewModal = (): void => {
+    if (!hasSelectUser) {
+      alert('Please select a user.');
+      return;
+    }
+
+    setIsViewModalOpen(true);
+  };
+
+  const handleCloseAddModal = (): void => {
+    setIsAddModalOpen(false);
+    setSelectedUser(undefined);
+  };
+
+  const handleCloseEditModal = (): void => {
+    setIsEditModalOpen(false);
+    setSelectedUser(undefined);
+  };
 
   return (
     <Fragment>
       <ButtonGroup>
-        <Button variant="outline-secondary" onClick={() => setOpenModal(true)}>
+        <Button
+          variant="outline-secondary"
+          onClick={() => setIsAddModalOpen(true)}
+        >
           Add
         </Button>
         {hasSelectUser && [
           <Button
             key="btn-edit"
             variant="outline-secondary"
-            onClick={() => setOpenEditModal(true)}
+            onClick={handleOpenEditModal}
             disabled={!hasSelectUser}
           >
             Edit
@@ -36,7 +67,7 @@ export const Users = (): ReactElement => {
           <Button
             key="btn-view"
             variant="outline-secondary"
-            onClick={() => setOpenViewModal(true)}
+            onClick={handleOpenViewModal}
             disabled={!hasSelectUser}
           >
             View
@@ -49,19 +80,16 @@ export const Users = (): ReactElement => {
         selectedUser={selectedUser}
         onSelectUser={setSelectedUser}
       />
-      <AddUserModal
-        isVisible={openAddModal}
-        onClose={() => setOpenModal(false)}
-      />
+      <AddUserModal isVisible={isAddModalOpen} onClose={handleCloseAddModal} />
       <UpdateUserModal
         user={selectedUser}
-        isVisible={openEditModal}
-        onClose={() => setOpenEditModal(false)}
+        isVisible={isEditModalOpen}
+        onClose={handleCloseEditModal}
       />
       <UserDetailsModal
         user={selectedUser}
-        isVisible={openViewModal}
-        onClose={() => setOpenViewModal(false)}
+        isVisible={isViewModalOpen}
+        onClose={() => setIsViewModalOpen(false)}
       />
     </Fragment>
   );
