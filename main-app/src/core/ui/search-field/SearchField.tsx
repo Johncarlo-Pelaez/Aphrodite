@@ -1,4 +1,4 @@
-import { ReactElement, useRef } from 'react';
+import { ReactElement } from 'react';
 import FormControl from 'react-bootstrap/FormControl';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
@@ -9,19 +9,17 @@ interface SearchFieldProps {
 }
 
 export const SearchField = (props: SearchFieldProps): ReactElement => {
-  const searchInputRef = useRef<HTMLInputElement>(null);
   const { searchKey, onSearchDocument } = props;
 
-  const searchDocs = (): void => {
-    onSearchDocument(searchInputRef?.current?.value ?? '');
+  const searchDocs = (event: React.ChangeEvent<any>): void => {
+    onSearchDocument(event.target.value);
   };
 
   return (
-    <div className="b-table__search__container">
-      <div className="b-table__search">
+    <div className="search-field__container">
+      <div className="search-field__wrapper">
         <FontAwesomeIcon icon={faSearch} />
         <FormControl
-          ref={searchInputRef}
           placeholder="Search"
           aria-label="Search"
           aria-describedby="Search documents"
@@ -29,10 +27,10 @@ export const SearchField = (props: SearchFieldProps): ReactElement => {
           value={searchKey}
           onKeyUp={(e) => {
             if (e.key === 'Enter' || e.keyCode === 13) {
-              searchDocs();
+              searchDocs(e);
             }
           }}
-          onChange={(e) => onSearchDocument(e.target.value ?? '')}
+          onChange={searchDocs}
         />
       </div>
     </div>
