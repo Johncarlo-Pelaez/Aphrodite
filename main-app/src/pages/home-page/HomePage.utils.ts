@@ -55,7 +55,7 @@ export const getForRetryDocstatuses = (): DocumentStatus[] =>
   Object.values(DocumentStatus).filter((s) => {
     const arrStattmp = s.split('_');
     if (arrStattmp.length === 2) return arrStattmp[1] === 'FAILED';
-    else return false;
+    else return arrStattmp[0] === 'CANCELLED';
   });
 
 export const getForCancelDocStatuses = (): DocumentStatus[] =>

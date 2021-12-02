@@ -161,10 +161,7 @@ export class DocumentService {
   }
 
   async retryDocuments(data: RetryDocuments): Promise<void> {
-    const documents = await this.documentRepository.findDocumentsByIds(
-      data.documentIds,
-    );
-    for await (const { id: documentId } of documents) {
+    for await (const documentId of data.documentIds) {
       await this.documentRepository.updateForRetry({
         documentId,
         processAt: this.datesUtil.getDateNow(),
@@ -175,18 +172,7 @@ export class DocumentService {
   }
 
   async cancelDocuments(data: CancelDocuments): Promise<void> {
-    const forCancelStatus = Object.values(DocumentStatus).filter((s) => {
-      const arrStattmp = s.split('_');
-      if (arrStattmp.length === 2)
-        return arrStattmp[1] !== 'DONE' && arrStattmp[1] !== 'FAILED';
-      else return true;
-    });
-
-    const documents = await this.documentRepository.getDocuments({
-      statuses: forCancelStatus,
-    });
-
-    for await (const { id: documentId } of documents) {
+    for await (const documentId of data.documentIds) {
       try {
         await this.documentProducer.cancel(documentId);
         await this.documentRepository.updateToCancelled({
@@ -201,40 +187,30 @@ export class DocumentService {
     }
   }
 
-  getForRetryDocstatuses(): DocumentStatus[] {
-    return Object.values(DocumentStatus).filter((s) => {
-      const arrStattmp = s.split('_');
-      if (arrStattmp.length === 2) return arrStattmp[1] === 'FAILED';
-      else return false;
-    });
-  }
-
   async retryErrorDocuments(retriedBy: string): Promise<void> {
     const documentIds = (
       await this.documentRepository.getDocuments({
-        statuses: this.getForRetryDocstatuses(),
+        statuses: Object.values(DocumentStatus).filter((s) => {
+          const arrStattmp = s.split('_');
+          if (arrStattmp.length === 2) return arrStattmp[1] === 'FAILED';
+          else return arrStattmp[0] === 'CANCELLED';
+        }),
       })
     ).map((doc) => doc.id);
-
     await this.retryDocuments({ documentIds, retriedBy });
-  }
-
-  getForCancelDocStatuses(): DocumentStatus[] {
-    return Object.values(DocumentStatus).filter((s) => {
-      const arrStattmp = s.split('_');
-      if (arrStattmp.length === 2)
-        return arrStattmp[1] !== 'DONE' && arrStattmp[1] !== 'FAILED';
-      else return arrStattmp[0] !== 'CANCELLED';
-    });
   }
 
   async cancelWaitingDocumentsInQueue(cancelledBy: string): Promise<void> {
     const documentIds = (
       await this.documentRepository.getDocuments({
-        statuses: this.getForCancelDocStatuses(),
+        statuses: [
+          DocumentStatus.UPLOADED,
+          DocumentStatus.RETRYING,
+          DocumentStatus.APPROVED,
+          DocumentStatus.CHECKING_APPROVED,
+        ],
       })
     ).map((doc) => doc.id);
-
     await this.cancelDocuments({ documentIds, cancelledBy });
   }
 }
