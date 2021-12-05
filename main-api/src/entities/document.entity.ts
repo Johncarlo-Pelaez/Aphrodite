@@ -150,6 +150,12 @@ export class DocumentHistory {
   @Column()
   userUsername: string;
 
+  @ApiProperty({
+    enum: DocumentStatus,
+  })
+  @Column({ enum: DocumentStatus, nullable: true })
+  documentStatus?: DocumentStatus;
+
   @ApiProperty()
   @ManyToOne(() => User, (e) => e.username)
   user: User;

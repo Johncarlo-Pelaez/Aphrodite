@@ -160,6 +160,7 @@ export class DocumentRepository {
     history.documentSize = document.documentSize;
     history.createdDate = document.modifiedDate;
     history.userUsername = document.userUsername;
+    history.documentStatus = document.status;
     history.documentId = document.id;
     return history;
   }

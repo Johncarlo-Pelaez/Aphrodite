@@ -55,12 +55,15 @@ export const EncoderForm = forwardRef(
           qrBarCode: document?.qrCode,
           companyCode: envodeValues?.companyCode,
           contractNumber: envodeValues?.contractNumber,
-          nomenclature: [
-            {
-              label: envodeValues?.nomenclature,
-              documentGroup: envodeValues?.documentGroup,
-            },
-          ],
+          nomenclature:
+            envodeValues?.nomenclature && envodeValues?.documentGroup
+              ? [
+                  {
+                    label: envodeValues?.nomenclature,
+                    documentGroup: envodeValues?.documentGroup,
+                  },
+                ]
+              : [],
         },
       });
 

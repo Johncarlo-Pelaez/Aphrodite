@@ -11,7 +11,7 @@ export const ContractNumberField = ({
   control,
 }: ContractNumberFieldProps): ReactElement => {
   const {
-    field: { onChange, value, ref },
+    field,
     fieldState: { error },
   } = useController({
     control,
@@ -25,10 +25,8 @@ export const ContractNumberField = ({
         <b>Contract Number</b>
       </Form.Label>
       <Form.Control
-        ref={ref}
+        {...field}
         placeholder="Contract Number"
-        onChange={onChange}
-        value={value}
         isInvalid={!!error}
       />
       <Form.Control.Feedback type="invalid">

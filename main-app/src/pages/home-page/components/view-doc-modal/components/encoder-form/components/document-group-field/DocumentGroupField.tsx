@@ -11,7 +11,7 @@ export const DocumentGroupField = ({
   control,
 }: DocumentGroupFieldProps): ReactElement => {
   const {
-    field: { onChange, value, ref },
+    field,
     fieldState: { error },
   } = useController({
     control,
@@ -25,11 +25,9 @@ export const DocumentGroupField = ({
         <b>Document Group</b>
       </Form.Label>
       <Form.Control
+        {...field}
         readOnly
-        ref={ref}
         placeholder="Document Group"
-        onChange={onChange}
-        value={value}
         isInvalid={!!error}
       />
       <Form.Control.Feedback type="invalid">

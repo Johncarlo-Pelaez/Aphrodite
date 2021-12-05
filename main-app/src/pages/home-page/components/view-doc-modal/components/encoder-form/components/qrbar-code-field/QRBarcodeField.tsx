@@ -11,7 +11,7 @@ export const QRBarcodeField = ({
   control,
 }: QRBarcodeFieldProps): ReactElement => {
   const {
-    field: { onChange, value, ref },
+    field,
     fieldState: { error },
   } = useController({
     control,
@@ -25,10 +25,8 @@ export const QRBarcodeField = ({
         <b>Barcode / QR Code</b>
       </Form.Label>
       <Form.Control
-        ref={ref}
+        {...field}
         placeholder="Barcode / QR Code"
-        onChange={onChange}
-        value={value}
         isInvalid={!!error}
       />
       <Form.Control.Feedback type="invalid">

@@ -11,7 +11,7 @@ export const CompanyCodeField = ({
   control,
 }: CompanyCodeFieldProps): ReactElement => {
   const {
-    field: { onChange, value, ref },
+    field,
     fieldState: { error },
   } = useController({
     control,
@@ -24,13 +24,7 @@ export const CompanyCodeField = ({
       <Form.Label>
         <b>Company Code</b>
       </Form.Label>
-      <Form.Control
-        ref={ref}
-        placeholder="Company Code"
-        onChange={onChange}
-        value={value}
-        isInvalid={!!error}
-      />
+      <Form.Control {...field} placeholder="Company Code" isInvalid={!!error} />
       <Form.Control.Feedback type="invalid">
         {error?.message}
       </Form.Control.Feedback>
