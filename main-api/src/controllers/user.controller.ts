@@ -23,7 +23,7 @@ import {
   GetAzureUser,
 } from 'src/core';
 import { User } from 'src/entities';
-import { UserRepository } from 'src/repositories';
+import { UserRepository, ActivityLogRepository } from 'src/repositories';
 import {
   CreateUserAccountDto,
   UserIsExistDto,
@@ -32,7 +32,10 @@ import {
 
 @Controller('/users')
 export class UserController {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly activityLogRepository: ActivityLogRepository,
+  ) {}
 
   @ApiOkResponse({
     type: User,
@@ -70,6 +73,7 @@ export class UserController {
   @Post('/create')
   @UseGuards(AzureADGuard)
   async createUser(
+    @GetAzureUser() azureUser: AzureUser,
     @Body(ValidationPipe) dto: CreateUserAccountDto,
   ): Promise<CreatedResponse> {
     const user = await this.userRepository.getUserByEmail(dto.email);
@@ -81,6 +85,11 @@ export class UserController {
       ...dto,
       createdDate: rightNow,
     });
+    await this.activityLogRepository.insertCreateUserLog({
+      username: dto.email,
+      createdBy: azureUser.preferred_username,
+      createdAt: rightNow,
+    });
     return response;
   }
 
@@ -88,14 +97,22 @@ export class UserController {
   @Put('/:id')
   @UseGuards(AzureADGuard)
   async updateUser(
+    @GetAzureUser() azureUser: AzureUser,
     @Param('id', ParseIntPipe) id: number,
     @Body(ValidationPipe) dto: UpdateUserAccountDto,
   ): Promise<void> {
     const rightNow = new Date();
-    return await this.userRepository.updateUser({
+    await this.userRepository.updateUser({
       id,
       ...dto,
       modifiedDate: rightNow,
+    });
+    const user = await this.userRepository.getUser(id);
+    await this.activityLogRepository.insertUpdateUserLog({
+      newUser: Object.values(dto).join(', '),
+      oldUser: `${user.role}, ${user.firstName}, ${user.lastName}, ${user.isActive}`,
+      updatedBy: azureUser.preferred_username,
+      updatedAt: rightNow,
     });
   }
 }

@@ -94,18 +94,27 @@ export const HomePage = (): ReactElement => {
   };
 
   const getDocStatusFilter = (
-    cmbStatusValue: string,
-    cmbOperationValue: string,
+    cmbStatusValue: StatusOption,
+    cmbOperationValue: OperationOption,
   ): DocumentStatus[] => {
     let strStatusesFilter = '';
 
-    if (cmbOperationValue === 'ALL' && cmbStatusValue === 'ALL') {
+    if (
+      cmbOperationValue === OperationOption.ALL &&
+      cmbStatusValue === StatusOption.ALL
+    ) {
       strStatusesFilter = Object.values(DocumentStatus).join(',');
-    } else if (cmbOperationValue === 'ALL' && cmbStatusValue !== 'ALL') {
+    } else if (
+      cmbOperationValue === OperationOption.ALL &&
+      cmbStatusValue !== StatusOption.ALL
+    ) {
       for (const operation of allOperation) {
         strStatusesFilter += concatDocumentStatuses(operation, cmbStatusValue);
       }
-    } else if (cmbOperationValue !== 'ALL' && cmbStatusValue === 'ALL') {
+    } else if (
+      cmbOperationValue !== OperationOption.ALL &&
+      cmbStatusValue === StatusOption.ALL
+    ) {
       for (const status of allStatus) {
         strStatusesFilter += concatDocumentStatuses(cmbOperationValue, status);
       }

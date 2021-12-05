@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty } from 'class-validator';
 
-export class CreateNomenclatureDto {
+export class CreateNomenclatureLookupDto {
   @ApiProperty()
   @IsNotEmpty({ message: 'Nomenclature is required.' })
   @IsString()
@@ -13,4 +13,4 @@ export class CreateNomenclatureDto {
   documentGroup: string;
 }
 
-export class UpdateNomenclatureDto extends CreateNomenclatureDto {}
+export class UpdateNomenclatureLookupDto extends CreateNomenclatureLookupDto {}

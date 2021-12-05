@@ -11,20 +11,20 @@ import {
   CountParam,
   GetDocumentsParam,
   BeginDocProcessParam,
-  QrDocumentParams,
+  QrDocumentParam,
   FailDocProcessParam,
   DoneIndexingParam,
   MigrateDocumentParam,
   FailDocMigrateParam,
   FailIndexingParam,
-  EncodeQrBarcodeParams,
-  EncodeAccountDetailsParams,
+  EncodeQrBarcodeParam,
+  EncodeAccountDetailsParam,
   FailEncodeParam,
   CheckerApproveDocParam,
   CheckerDispproveDocParam,
   ApproverApproveDisapproveDocParam,
-  UpdateForRetry,
-  UpdateToCancelled,
+  UpdateForRetryParam,
+  UpdateToCancelledParam,
 } from './document.params';
 
 @EntityRepository()
@@ -207,7 +207,7 @@ export class DocumentRepository {
     });
   }
 
-  async qrDocument(param: QrDocumentParams): Promise<void> {
+  async qrDocument(param: QrDocumentParam): Promise<void> {
     await this.manager.transaction(async (transaction): Promise<void> => {
       const document = await transaction.findOneOrFail(
         Document,
@@ -381,7 +381,7 @@ export class DocumentRepository {
     });
   }
 
-  async encodeQrBarcode(param: EncodeQrBarcodeParams): Promise<void> {
+  async encodeQrBarcode(param: EncodeQrBarcodeParam): Promise<void> {
     await this.manager.transaction(async (transaction): Promise<void> => {
       const document = await transaction.findOneOrFail(
         Document,
@@ -402,7 +402,7 @@ export class DocumentRepository {
     });
   }
 
-  async encodeAccountDetails(param: EncodeAccountDetailsParams): Promise<void> {
+  async encodeAccountDetails(param: EncodeAccountDetailsParam): Promise<void> {
     await this.manager.transaction(async (transaction): Promise<void> => {
       const document = await this.manager.findOneOrFail(
         Document,
@@ -522,7 +522,7 @@ export class DocumentRepository {
     });
   }
 
-  async updateForRetry(param: UpdateForRetry): Promise<void> {
+  async updateForRetry(param: UpdateForRetryParam): Promise<void> {
     await this.manager.transaction(async (transaction): Promise<void> => {
       const document = await this.manager.findOneOrFail(
         Document,
@@ -539,7 +539,7 @@ export class DocumentRepository {
     });
   }
 
-  async updateToCancelled(param: UpdateToCancelled): Promise<void> {
+  async updateToCancelled(param: UpdateToCancelledParam): Promise<void> {
     await this.manager.transaction(async (transaction): Promise<void> => {
       const document = await this.manager.findOneOrFail(
         Document,

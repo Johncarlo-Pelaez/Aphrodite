@@ -1,47 +1,49 @@
 import { DocumentStatus } from 'core/enum';
+import { OperationOption } from './components/operation-dropdown';
+import { StatusOption } from './components/status-dropdown';
 
 export const concatDocumentStatuses = (
-  operation: string,
-  status: string,
+  operation: OperationOption,
+  status: StatusOption,
 ): string => {
   const documentStatus = `${operation}_${status}, `;
   let strDocumentStatuses = '';
-  if (operation === 'ENCODING') {
+  if (operation === OperationOption.ENCODING) {
     switch (status) {
-      case 'WAITING':
-      case 'BEGIN':
-        strDocumentStatuses += `${operation}, `;
+      case StatusOption.WAITING:
+      case StatusOption.BEGIN:
+        strDocumentStatuses += `${DocumentStatus.ENCODING}, `;
         break;
       default:
         strDocumentStatuses += documentStatus;
         break;
     }
-  } else if (operation === 'INDEXING') {
+  } else if (operation === OperationOption.INDEXING) {
     switch (status) {
-      case 'WAITING':
-        strDocumentStatuses += 'QR_DONE, ENCODING_DONE, ';
+      case StatusOption.WAITING:
+        strDocumentStatuses += `${DocumentStatus.QR_DONE}, ${DocumentStatus.ENCODING_DONE}, `;
         break;
       default:
         strDocumentStatuses += documentStatus;
         break;
     }
-  } else if (operation === 'CHECKING') {
+  } else if (operation === OperationOption.CHECKING) {
     switch (status) {
-      case 'WAITING':
-      case 'BEGIN':
-        strDocumentStatuses += `${operation}, `;
+      case StatusOption.WAITING:
+      case StatusOption.BEGIN:
+        strDocumentStatuses += `${DocumentStatus.CHECKING}, `;
         break;
-      case 'DONE':
-        strDocumentStatuses += 'CHECKING_APPROVED, CHECKING_DISAPPROVED, ';
+      case StatusOption.DONE:
+        strDocumentStatuses += `${DocumentStatus.CHECKING_APPROVED}, ${DocumentStatus.CHECKING_DISAPPROVED}, `;
         break;
       default:
         strDocumentStatuses += documentStatus;
         break;
     }
-  } else if (operation === 'MIGRATE') {
+  } else if (operation === OperationOption.MIGRATE) {
     switch (status) {
-      case 'WAITING':
-        strDocumentStatuses += 'INDEXING_DONE, CHECKING_APPROVED, APPROVED, ';
+      case StatusOption.WAITING:
+        strDocumentStatuses += `${DocumentStatus.INDEXING_DONE}, ${DocumentStatus.CHECKING_APPROVED}, ${DocumentStatus.APPROVED}, `;
         break;
       default:
         strDocumentStatuses += documentStatus;
@@ -55,7 +57,7 @@ export const getForRetryDocstatuses = (): DocumentStatus[] =>
   Object.values(DocumentStatus).filter((s) => {
     const arrStattmp = s.split('_');
     if (arrStattmp.length === 2) return arrStattmp[1] === 'FAILED';
-    else return arrStattmp[0] === 'CANCELLED';
+    else return arrStattmp[0] === DocumentStatus.CANCELLED;
   });
 
 export const getForCancelDocStatuses = (): DocumentStatus[] =>
@@ -63,5 +65,5 @@ export const getForCancelDocStatuses = (): DocumentStatus[] =>
     const arrStattmp = s.split('_');
     if (arrStattmp.length === 2)
       return arrStattmp[1] !== 'DONE' && arrStattmp[1] !== 'FAILED';
-    else return arrStattmp[0] !== 'CANCELLED';
+    else return arrStattmp[0] !== DocumentStatus.CANCELLED;
   });

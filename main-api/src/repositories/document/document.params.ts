@@ -28,7 +28,7 @@ export interface BeginDocProcessParam {
   processAt: Date;
 }
 
-export interface QrDocumentParams {
+export interface QrDocumentParam {
   documentId: number;
   qrCode: string;
   qrAt: Date;
@@ -71,11 +71,11 @@ interface EncodeProcess {
   encodedBy: string;
 }
 
-export interface EncodeQrBarcodeParams extends EncodeProcess {
+export interface EncodeQrBarcodeParam extends EncodeProcess {
   qrBarCode: string;
 }
 
-export interface EncodeAccountDetailsParams extends EncodeProcess {
+export interface EncodeAccountDetailsParam extends EncodeProcess {
   encodeValues: string;
 }
 
@@ -101,10 +101,10 @@ export interface ApproverApproveDisapproveDocParam {
   modifiedAt: Date;
 }
 
-export interface UpdateForRetry extends BeginDocProcessParam {
+export interface UpdateForRetryParam extends BeginDocProcessParam {
   retriedBy: string;
 }
 
-export interface UpdateToCancelled extends BeginDocProcessParam {
+export interface UpdateToCancelledParam extends BeginDocProcessParam {
   cancelledBy: string;
 }

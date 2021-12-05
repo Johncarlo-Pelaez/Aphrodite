@@ -193,7 +193,7 @@ export class DocumentService {
         statuses: Object.values(DocumentStatus).filter((s) => {
           const arrStattmp = s.split('_');
           if (arrStattmp.length === 2) return arrStattmp[1] === 'FAILED';
-          else return arrStattmp[0] === 'CANCELLED';
+          else return arrStattmp[0] === DocumentStatus.CANCELLED;
         }),
       })
     ).map((doc) => doc.id);

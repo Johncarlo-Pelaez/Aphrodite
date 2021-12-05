@@ -30,22 +30,22 @@ export class NomenclatureWhitelistRepository {
   async createNomenclatureWhitelist({
     description,
   }: CreateNomenclatureWhitelistParam): Promise<number> {
-    const nomenClature = new NomenclatureWhitelist();
-    nomenClature.description = description;
-    await this.manager.save(nomenClature);
-    return nomenClature.id;
+    const nomenclatureWhitelist = new NomenclatureWhitelist();
+    nomenclatureWhitelist.description = description;
+    await this.manager.save(nomenclatureWhitelist);
+    return nomenclatureWhitelist.id;
   }
 
   async updateNomenclatureWhitelist({
     id,
     description,
   }: UpdateNomenclatureWhitelistParam): Promise<void> {
-    const nomenClature = await this.manager.findOneOrFail(
+    const nomenclatureWhitelist = await this.manager.findOneOrFail(
       NomenclatureWhitelist,
       id,
     );
-    nomenClature.description = description;
-    await this.manager.save(nomenClature);
+    nomenclatureWhitelist.description = description;
+    await this.manager.save(nomenclatureWhitelist);
   }
 
   async deleteNomenclatureWhitelist(id: number): Promise<void> {

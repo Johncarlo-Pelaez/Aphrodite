@@ -2,13 +2,14 @@ import { BullModule } from '@nestjs/bull';
 import { Logger, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { createConnection } from 'typeorm';
-import { AppConfigModule, AppConfigService, Environment } from './app-config';
+import { AppConfigModule, AppConfigService } from './app-config';
 import { DocumentConsumer } from './consumers';
 import {
   DocumentController,
   UserController,
   NomenclatureWhitelistController,
   NomenclatureLookupController,
+  ActivityLogController,
 } from './controllers';
 import { UtilsModule } from './utils/utils.module';
 import { DocumentProducer } from './producers';
@@ -17,8 +18,9 @@ import {
   UserRepository,
   NomenclatureWhitelistRepository,
   NomenclatureLookupRepository,
+  ActivityLogRepository,
 } from './repositories';
-import { DocumentService } from './services';
+import { DocumentService } from './document-service';
 import { QRService } from 'src/qr-service';
 import { SalesForceService } from './sales-force-service';
 import { SpringCMService } from './spring-cm-service';
@@ -75,6 +77,7 @@ const logger = new Logger('AppModule');
     UserController,
     NomenclatureWhitelistController,
     NomenclatureLookupController,
+    ActivityLogController,
   ],
   providers: [
     QRService,
@@ -89,6 +92,7 @@ const logger = new Logger('AppModule');
     AzureADStrategy,
     NomenclatureWhitelistRepository,
     NomenclatureLookupRepository,
+    ActivityLogRepository,
   ],
 })
 export class AppModule {}

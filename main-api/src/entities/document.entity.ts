@@ -39,8 +39,10 @@ export class Document {
   @Column()
   modifiedBy: string;
 
-  @ApiProperty()
-  @Column()
+  @ApiProperty({
+    enum: DocumentStatus,
+  })
+  @Column({ enum: DocumentStatus })
   status: DocumentStatus;
 
   @ApiProperty()

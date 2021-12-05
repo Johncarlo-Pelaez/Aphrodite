@@ -15,6 +15,10 @@ export class NomenclatureLookupRepository {
     });
   }
 
+  async getNomenclatureLookup(id: number): Promise<NomenclatureLookup> {
+    return await this.manager.findOne(NomenclatureLookup, id);
+  }
+
   async createNomenclatureLookup(
     params: CreateNomenclatureLookupParam,
   ): Promise<number> {

@@ -25,7 +25,7 @@ import {
 } from 'src/core';
 import { Document, DocumentHistory } from 'src/entities';
 import { DocumentRepository } from 'src/repositories';
-import { DocumentService } from 'src/services';
+import { DocumentService } from 'src/document-service';
 import {
   GetDocumentsDto,
   EncodeDocDetailsDto,
