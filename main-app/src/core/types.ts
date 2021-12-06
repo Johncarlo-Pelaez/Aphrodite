@@ -8,4 +8,5 @@ export type MenuItem = {
   label: string;
   icon?: ReactNode;
   subItems?: MenuItem[];
+  hidden?: boolean;
 };

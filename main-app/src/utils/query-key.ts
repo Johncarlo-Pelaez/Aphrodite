@@ -1,6 +1,7 @@
 import { UseDocuments, UseDocumentsProcessCount } from 'hooks';
 
 export class QueryKey {
+  public static readonly currentUser = 'currentUser';
   public static readonly users = 'users';
   private static readonly documents = 'documents';
   public static readonly documentHistory = 'documenHistory';

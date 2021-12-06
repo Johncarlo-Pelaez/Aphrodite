@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { MainLayout, PublicLayout } from 'layouts';
 import { AnonymousRoute, PrivateRoute } from 'routes';
 import { FullHeightSpinner } from 'core/ui';
+import { Role } from 'core/enum';
 import { useLoadAccountToken } from 'hooks';
 import { RecoilRoot } from 'recoil';
 import { ForbiddenAccount } from 'pages';
@@ -70,6 +71,7 @@ const AppContent = () => {
             path="/settings"
             layout={MainLayout}
             component={SettingsPage}
+            allowedUserRoles={[Role.ADMIN]}
           />
           <Route path="/forbidden-account" component={ForbiddenAccount} />
           <Route path="/forbidden" component={Forbidden} />

@@ -4,9 +4,9 @@ import Button from 'react-bootstrap/Button';
 import Spinner from 'react-bootstrap/Spinner';
 import Tabs from 'react-bootstrap/Tabs';
 import Tab from 'react-bootstrap/Tab';
-import { useDocument } from 'hooks';
+import { useDocument, useGetCurrentUserRole } from 'hooks';
 import { PdfViewer } from 'core/ui';
-import { DocumentStatus } from 'core/enum';
+import { DocumentStatus, Role } from 'core/enum';
 import {
   IndexesForm,
   FileProperties,
@@ -44,6 +44,7 @@ export const ViewDocModal = (props: ViewDocModalProps): ReactElement => {
   const { isLoading: isDocsLoading, data: document } = useDocument(
     isVisible ? documentId : undefined,
   );
+  const currentUserRole = useGetCurrentUserRole();
 
   const renderModal = (): ReactElement => (
     <Modal
@@ -98,33 +99,42 @@ export const ViewDocModal = (props: ViewDocModalProps): ReactElement => {
   );
 
   const renderForm = (): ReactElement => {
-    switch (document?.status) {
-      case DocumentStatus.ENCODING:
-        return (
-          <EncoderForm
-            ref={encoderFormRef}
-            document={document}
-            onSubmitted={triggerFormSubmitted}
-          />
-        );
-      case DocumentStatus.CHECKING:
-        return (
-          <CheckerForm
-            ref={checkerFormRef}
-            document={document}
-            onSubmitted={triggerFormSubmitted}
-          />
-        );
-      case DocumentStatus.CHECKING_DISAPPROVED:
-        return (
-          <AppoverForm
-            ref={approverFormRef}
-            document={document}
-            onSubmitted={triggerFormSubmitted}
-          />
-        );
-      default:
-        return <IndexesForm document={document} />;
+    const documentStatus = document?.status;
+    if (
+      documentStatus === DocumentStatus.ENCODING &&
+      (currentUserRole === Role.ENCODER || currentUserRole === Role.ADMIN)
+    ) {
+      return (
+        <EncoderForm
+          ref={encoderFormRef}
+          document={document}
+          onSubmitted={triggerFormSubmitted}
+        />
+      );
+    } else if (
+      documentStatus === DocumentStatus.CHECKING &&
+      (currentUserRole === Role.REVIEWER || currentUserRole === Role.ADMIN)
+    ) {
+      return (
+        <CheckerForm
+          ref={checkerFormRef}
+          document={document}
+          onSubmitted={triggerFormSubmitted}
+        />
+      );
+    } else if (
+      documentStatus === DocumentStatus.CHECKING_DISAPPROVED &&
+      (currentUserRole === Role.REVIEWER || currentUserRole === Role.ADMIN)
+    ) {
+      return (
+        <AppoverForm
+          ref={approverFormRef}
+          document={document}
+          onSubmitted={triggerFormSubmitted}
+        />
+      );
+    } else {
+      return <IndexesForm document={document} />;
     }
   };
 

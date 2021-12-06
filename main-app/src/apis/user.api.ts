@@ -3,6 +3,11 @@ import { User } from 'models';
 import { Role } from 'core/enum';
 import { createQueryString } from 'utils/query-string';
 
+export const getCurrentUser = async (): Promise<User> => {
+  const res = await request.get<User>('/api/users/current');
+  return res.data;
+};
+
 export const getUsersApi = async (): Promise<User[]> => {
   const res = await request.get<User[]>('/api/users');
   return res.data;

@@ -5,6 +5,7 @@ import {
   CreateUserApi,
   UpdateUserApi,
   updateUserApi,
+  getCurrentUser,
 } from 'apis';
 import {
   useQuery,
@@ -14,7 +15,9 @@ import {
   useQueryClient,
 } from 'react-query';
 import { User } from 'models';
+import { useEmailAllowed, useLoadAccountToken } from 'hooks/account.hook';
 import { ApiError } from 'core/types';
+import { Role } from 'core/enum';
 import { useState } from 'react';
 import { QueryKey } from 'utils';
 
@@ -78,4 +81,18 @@ export const useEmailExists = (): UseEmailExistsResult => {
   };
 
   return { isLoading, checkEmailExists };
+};
+
+export const useGetCurrentUserRole = (): Role | undefined => {
+  const { isAllowed } = useEmailAllowed();
+  const { isLoaded } = useLoadAccountToken();
+  const { data: user } = useQuery<User, ApiError>(
+    QueryKey.currentUser,
+    getCurrentUser,
+    {
+      refetchInterval: 1000 * 30,
+      enabled: isAllowed && isLoaded,
+    },
+  );
+  return user?.role;
 };
