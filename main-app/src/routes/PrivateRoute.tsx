@@ -22,7 +22,7 @@ export const PrivateRoute = (props: PrivateRouteProps) => {
   const { isLoaded } = useLoadAccountToken();
   const currentUserRole = useGetCurrentUserRole();
   const hasAccess = useMemo((): boolean => {
-    if (!!allowedUserRoles?.length)
+    if (!!allowedUserRoles?.length && currentUserRole)
       return allowedUserRoles.some((ar) => ar === currentUserRole);
     return true;
   }, [allowedUserRoles, currentUserRole]);
