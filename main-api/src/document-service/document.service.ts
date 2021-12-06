@@ -1,8 +1,7 @@
 import { Injectable, ConflictException, Logger } from '@nestjs/common';
 import * as fs from 'fs';
-import * as path from 'path';
 import { v4 as uuidv4 } from 'uuid';
-import { DatesUtil } from 'src/utils';
+import { DatesUtil, FilenameUtil } from 'src/utils';
 import { AppConfigService } from 'src/app-config';
 import { DocumentRepository } from 'src/repositories';
 import { EncodeValues } from 'src/repositories/document';
@@ -28,6 +27,7 @@ export class DocumentService {
     private readonly documentRepository: DocumentRepository,
     private readonly documentProducer: DocumentProducer,
     private readonly datesUtil: DatesUtil,
+    private readonly filenameUtil: FilenameUtil,
     private readonly appConfigService: AppConfigService,
   ) {}
 
@@ -35,12 +35,12 @@ export class DocumentService {
     const dateRightNow = this.datesUtil.getDateNow();
     const { buffer, size, mimetype, originalname } = data.file;
     const uuid = uuidv4();
-    const fullPath = path.join(
+    const fileFullPath = this.filenameUtil.buildFullPath(
       this.appConfigService.filePath,
       uuid.toUpperCase(),
     );
-    const filename = path
-      .basename(originalname, path.extname(originalname))
+    const filename = this.filenameUtil
+      .getFilenameWithoutExtension(originalname)
       .replace(/\.$/, '');
     let qrCode: string;
 
@@ -55,7 +55,7 @@ export class DocumentService {
     if (qrCode && !!(await this.documentRepository.getDocumentByQRCode(qrCode)))
       throw new ConflictException();
 
-    await writeFile(fullPath, buffer);
+    await writeFile(fileFullPath, buffer);
 
     const response = new CreatedResponse();
     response.id = await this.documentRepository.createDocument({
@@ -75,9 +75,11 @@ export class DocumentService {
 
   async getDocumentFile(documentId: number): Promise<[Document, Buffer]> {
     const document = await this.documentRepository.getDocument(documentId);
-    const buffer = await readFile(
-      path.join(this.appConfigService.filePath, document.uuid),
+    const fileFullPath = this.filenameUtil.buildFullPath(
+      this.appConfigService.filePath,
+      document.uuid,
     );
+    const buffer = await readFile(fileFullPath);
     return [document, buffer];
   }
 

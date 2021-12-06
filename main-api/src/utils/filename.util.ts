@@ -16,6 +16,10 @@ export class FilenameUtil {
     return crypto.randomBytes(16).toString('hex');
   }
 
+  getFilenameWithoutExtension(filePath: string): string {
+    return path.parse(filePath).name;
+  }
+
   buildFullPath(filePath: string, fileName: string): string {
     return path.join(filePath, fileName);
   }

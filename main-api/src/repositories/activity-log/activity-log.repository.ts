@@ -25,18 +25,18 @@ export class ActivityLogRepository {
   async getActivityLogs(param: GetActivityLogsParam): Promise<ActivityLog[]> {
     const { activityType, loggedBy, from, to, skip, take } = param;
 
-    let whereConditions: FindConditions<ActivityLog>;
+    let whereConditions: FindConditions<ActivityLog> = {};
 
     if (activityType) {
-      whereConditions.type = activityType;
+      whereConditions['type'] = activityType;
     }
 
     if (loggedBy) {
-      whereConditions.loggedBy = loggedBy;
+      whereConditions['loggedBy'] = loggedBy;
     }
 
     if (from && to) {
-      whereConditions.loggedAt = Between(from, to);
+      whereConditions['loggedAt'] = Between(from, to);
     }
 
     return await this.manager.find(ActivityLog, {
@@ -52,18 +52,18 @@ export class ActivityLogRepository {
   ): Promise<number> {
     const { activityType, loggedBy, from, to } = param;
 
-    let whereConditions: FindConditions<ActivityLog>;
+    let whereConditions: FindConditions<ActivityLog> = {};
 
     if (activityType) {
-      whereConditions.type = activityType;
+      whereConditions['type'] = activityType;
     }
 
     if (loggedBy) {
-      whereConditions.loggedBy = loggedBy;
+      whereConditions['loggedBy'] = loggedBy;
     }
 
     if (from && to) {
-      whereConditions.loggedAt = Between(from, to);
+      whereConditions['loggedAt'] = Between(from, to);
     }
 
     return await this.manager.count(ActivityLog, {

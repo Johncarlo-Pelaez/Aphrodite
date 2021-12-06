@@ -27,6 +27,7 @@ import { SpringCMService } from './spring-cm-service';
 import { PassportModule } from '@nestjs/passport';
 import { AzureADStrategy } from './core';
 import { AzureAdService } from './azure-ad-service';
+import { ExcelService } from './excel-service';
 
 const logger = new Logger('AppModule');
 
@@ -93,6 +94,7 @@ const logger = new Logger('AppModule');
     NomenclatureWhitelistRepository,
     NomenclatureLookupRepository,
     ActivityLogRepository,
+    ExcelService,
   ],
 })
 export class AppModule {}

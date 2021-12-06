@@ -34,6 +34,7 @@
     "bull": "^3.29.2",
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
+    "exceljs": "^4.3.0",
     "filenamify": "^4.3.0",
     "gm": "^1.23.1",
     "mssql": "^7.2.1",

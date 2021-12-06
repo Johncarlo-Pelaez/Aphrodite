@@ -39,3 +39,25 @@ export class GetActivityLogsDto {
   @IsNumberString()
   take?: number;
 }
+
+export class DownloadActivityLogsDto {
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  activityType?: ActivityLogType;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsEmail()
+  loggedBy?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsDateString()
+  from?: Date;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsDateString()
+  to?: Date;
+}
