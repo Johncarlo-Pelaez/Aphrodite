@@ -4,7 +4,7 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Button from 'react-bootstrap/Button';
 import Alert from 'react-bootstrap/Alert';
 import { useDeleteNomenclatureWhitelist } from 'hooks';
-import { SearchField } from 'core/ui';
+import { SearchField, DeleteModal } from 'core/ui';
 import { WhitelistTable, AddEditModal, ModalAction } from './components';
 
 export const NomenclatureWhiteList = (): ReactElement => {
@@ -14,9 +14,10 @@ export const NomenclatureWhiteList = (): ReactElement => {
   const [modalMode, setModalMode] = useState<ModalAction | undefined>(
     undefined,
   );
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [searchKey, setSearchKey] = useState<string>('');
   const hasSelectNomenclature = !!selectedWhitelist;
-  const isModalOpen = !!modalMode;
+  const isAddEditModalOpen = !!modalMode;
 
   const {
     isLoading: isDeleteLoading,
@@ -32,21 +33,8 @@ export const NomenclatureWhiteList = (): ReactElement => {
       return;
     }
 
-    const { id, description } = selectedWhitelist;
-
-    const inputedDescription = prompt(
-      `Please Enter "${description}" to delete.`,
-    );
-
-    if (inputedDescription === null) return;
-
-    if (inputedDescription !== description) {
-      alert('Not match!');
-      return;
-    }
-
     if (!isDeleteLoading) {
-      await deleteAsync(id);
+      await deleteAsync(selectedWhitelist.id);
       resetDelete();
     }
   };
@@ -66,6 +54,20 @@ export const NomenclatureWhiteList = (): ReactElement => {
 
   const closeModal = (): void => {
     setModalMode(undefined);
+    setSelectedWhitelist(undefined);
+  };
+
+  const handleOpenDeleteModal = (): void => {
+    if (!hasSelectNomenclature) {
+      alert('Please select an item.');
+      return;
+    }
+
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleCloseDeleteModal = (): void => {
+    setIsDeleteModalOpen(false);
     setSelectedWhitelist(undefined);
   };
 
@@ -91,7 +93,7 @@ export const NomenclatureWhiteList = (): ReactElement => {
             <Button
               key="btn-delete"
               variant="outline-secondary"
-              onClick={deleteWhitelist}
+              onClick={handleOpenDeleteModal}
               disabled={!hasSelectNomenclature}
             >
               Delete
@@ -108,10 +110,18 @@ export const NomenclatureWhiteList = (): ReactElement => {
       <AddEditModal
         editId={selectedWhitelist?.id}
         description={selectedWhitelist?.description}
-        isVisible={isModalOpen}
+        isVisible={isAddEditModalOpen}
         actionMode={modalMode}
         onClose={closeModal}
       />
+      {hasSelectNomenclature && (
+        <DeleteModal
+          isVisible={isDeleteModalOpen}
+          title={selectedWhitelist?.description}
+          onDelete={deleteWhitelist}
+          onClose={handleCloseDeleteModal}
+        />
+      )}
     </Fragment>
   );
 };
