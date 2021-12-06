@@ -1,4 +1,17 @@
-/****** Object:  Table [dbo].[document]    Script Date: 11/29/2021 3:05:45 PM ******/
+/****** Object:  Table [dbo].[activity_log]    Script Date: 12/6/2021 10:01:25 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[activity_log](
+	[id] [int] IDENTITY(1,1) NOT NULL,
+	[type] [nvarchar](100) NOT NULL,
+	[description] [nvarchar](max) NOT NULL,
+	[loggedAt] [datetime] NOT NULL,
+	[loggedBy] [nvarchar](255) NULL
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[document]    Script Date: 12/6/2021 10:01:25 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -36,7 +49,7 @@ CREATE TABLE [dbo].[document](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[document_history]    Script Date: 11/29/2021 3:05:45 PM ******/
+/****** Object:  Table [dbo].[document_history]    Script Date: 12/6/2021 10:01:25 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -48,13 +61,14 @@ CREATE TABLE [dbo].[document_history](
 	[createdDate] [datetime] NOT NULL,
 	[documentId] [int] NOT NULL,
 	[userUsername] [nvarchar](255) NOT NULL,
+	[documentStatus] [nvarchar](100) NULL,
  CONSTRAINT [PK_0783dd4cd636039459ee63c9a8b] PRIMARY KEY CLUSTERED 
 (
 	[id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[nomenclature_lookup]    Script Date: 11/29/2021 3:05:45 PM ******/
+/****** Object:  Table [dbo].[nomenclature_lookup]    Script Date: 12/6/2021 10:01:25 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -65,7 +79,7 @@ CREATE TABLE [dbo].[nomenclature_lookup](
 	[documentGroup] [nvarchar](max) NOT NULL
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[nomenclature_whitelist]    Script Date: 11/29/2021 3:05:45 PM ******/
+/****** Object:  Table [dbo].[nomenclature_whitelist]    Script Date: 12/6/2021 10:01:25 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -75,7 +89,7 @@ CREATE TABLE [dbo].[nomenclature_whitelist](
 	[description] [nvarchar](255) NOT NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[user]    Script Date: 11/29/2021 3:05:45 PM ******/
+/****** Object:  Table [dbo].[user]    Script Date: 12/6/2021 10:01:25 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
