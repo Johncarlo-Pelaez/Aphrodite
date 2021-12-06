@@ -140,6 +140,7 @@ export const HomePage = (): ReactElement => {
 
   const selectNextDocument = (): void => {
     documentsTableRef.current?.next();
+    refreshDocumentslist();
   };
 
   const docStatusFilter = useMemo(
