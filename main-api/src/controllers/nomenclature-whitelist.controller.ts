@@ -31,7 +31,7 @@ import {
 @UseGuards(AzureADGuard)
 export class NomenclatureWhitelistController {
   constructor(
-    private readonly nomenclatureWhitelistRepository: NomenclatureWhitelistRepository,
+    private readonly whitelistRepository: NomenclatureWhitelistRepository,
     private readonly activityLogRepository: ActivityLogRepository,
   ) {}
 
@@ -41,7 +41,7 @@ export class NomenclatureWhitelistController {
   })
   @Get('/')
   async getWhitelistNomenclatures(): Promise<NomenclatureWhitelist[]> {
-    return this.nomenclatureWhitelistRepository.getWhitelistNomenclatures();
+    return this.whitelistRepository.getWhitelistNomenclatures();
   }
 
   @ApiCreatedResponse({
@@ -53,10 +53,9 @@ export class NomenclatureWhitelistController {
     @Body(ValidationPipe) dto: CreateNomenclatureWhitelistDto,
   ): Promise<CreatedResponse> {
     const response = new CreatedResponse();
-    response.id =
-      await this.nomenclatureWhitelistRepository.createNomenclatureWhitelist({
-        description: dto.description,
-      });
+    response.id = await this.whitelistRepository.createNomenclatureWhitelist({
+      description: dto.description,
+    });
     await this.activityLogRepository.insertCreateWhitelistLog({
       nomenclature: dto.description,
       createdBy: azureUser.preferred_username,
@@ -72,12 +71,13 @@ export class NomenclatureWhitelistController {
     @Param('id', ParseIntPipe) id: number,
     @Body(ValidationPipe) dto: UpdateNomenclatureWhitelistDto,
   ): Promise<void> {
-    await this.nomenclatureWhitelistRepository.updateNomenclatureWhitelist({
+    await this.whitelistRepository.updateNomenclatureWhitelist({
       id,
       description: dto.description,
     });
-    const whitelist =
-      await this.nomenclatureWhitelistRepository.getNomenclatureWhitelist(id);
+    const whitelist = await this.whitelistRepository.getNomenclatureWhitelist(
+      id,
+    );
     await this.activityLogRepository.insertUpdateWhitelistLog({
       newNomenclature: dto.description,
       oldNomenclature: whitelist.description,
@@ -92,9 +92,10 @@ export class NomenclatureWhitelistController {
     @GetAzureUser() azureUser: AzureUser,
     @Param('id', ParseIntPipe) id: number,
   ): Promise<void> {
-    await this.nomenclatureWhitelistRepository.deleteNomenclatureWhitelist(id);
-    const whitelist =
-      await this.nomenclatureWhitelistRepository.getNomenclatureWhitelist(id);
+    const whitelist = await this.whitelistRepository.getNomenclatureWhitelist(
+      id,
+    );
+    await this.whitelistRepository.deleteNomenclatureWhitelist(whitelist.id);
     await this.activityLogRepository.insertDeleteWhitelistLog({
       nomenclature: whitelist.description,
       deletedBy: azureUser.preferred_username,

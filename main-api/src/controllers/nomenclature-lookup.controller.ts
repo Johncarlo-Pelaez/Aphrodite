@@ -31,7 +31,7 @@ import {
 @UseGuards(AzureADGuard)
 export class NomenclatureLookupController {
   constructor(
-    private readonly nomenclatureLookupRepository: NomenclatureLookupRepository,
+    private readonly lookupRepository: NomenclatureLookupRepository,
     private readonly activityLogRepository: ActivityLogRepository,
   ) {}
 
@@ -41,7 +41,7 @@ export class NomenclatureLookupController {
   })
   @Get('/')
   async getNomenclaturelookups(): Promise<NomenclatureLookup[]> {
-    return this.nomenclatureLookupRepository.getNomenclatureLookups();
+    return this.lookupRepository.getNomenclatureLookups();
   }
 
   @ApiCreatedResponse({
@@ -53,10 +53,9 @@ export class NomenclatureLookupController {
     @Body(ValidationPipe) dto: CreateNomenclatureLookupDto,
   ): Promise<CreatedResponse> {
     const response = new CreatedResponse();
-    response.id =
-      await this.nomenclatureLookupRepository.createNomenclatureLookup({
-        ...dto,
-      });
+    response.id = await this.lookupRepository.createNomenclatureLookup({
+      ...dto,
+    });
     await this.activityLogRepository.insertCreateLookupLog({
       nomenclature: Object.values(dto).join(', '),
       createdBy: azureUser.preferred_username,
@@ -72,12 +71,11 @@ export class NomenclatureLookupController {
     @Param('id', ParseIntPipe) id: number,
     @Body(ValidationPipe) dto: UpdateNomenclatureLookupDto,
   ): Promise<void> {
-    await this.nomenclatureLookupRepository.updateNomenclatureLookup({
+    await this.lookupRepository.updateNomenclatureLookup({
       id,
       ...dto,
     });
-    const lookup =
-      await this.nomenclatureLookupRepository.getNomenclatureLookup(id);
+    const lookup = await this.lookupRepository.getNomenclatureLookup(id);
     await this.activityLogRepository.insertUpdateLookupLog({
       newNomenclature: Object.values(dto).join(', '),
       oldNomenclature: `${lookup.nomenclature}, ${lookup.documentGroup}`,
@@ -92,9 +90,8 @@ export class NomenclatureLookupController {
     @GetAzureUser() azureUser: AzureUser,
     @Param('id', ParseIntPipe) id: number,
   ): Promise<void> {
-    await this.nomenclatureLookupRepository.deleteNomenclatureLookup(id);
-    const lookup =
-      await this.nomenclatureLookupRepository.getNomenclatureLookup(id);
+    const lookup = await this.lookupRepository.getNomenclatureLookup(id);
+    await this.lookupRepository.deleteNomenclatureLookup(lookup.id);
     await this.activityLogRepository.insertDeleteLookupLog({
       nomenclature: lookup.nomenclature,
       deletedBy: azureUser.preferred_username,

@@ -16,7 +16,7 @@ export class NomenclatureLookupRepository {
   }
 
   async getNomenclatureLookup(id: number): Promise<NomenclatureLookup> {
-    return await this.manager.findOne(NomenclatureLookup, id);
+    return await this.manager.findOneOrFail(NomenclatureLookup, id);
   }
 
   async createNomenclatureLookup(
