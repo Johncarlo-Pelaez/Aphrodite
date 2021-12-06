@@ -20,6 +20,7 @@ export const NomenclatureField = ({
         <Form.Control
           {...field}
           placeholder="Enter nomenclature"
+          onFocus={(event) => event.target.select()}
           isInvalid={invalid}
         />
         <Form.Control.Feedback type="invalid">

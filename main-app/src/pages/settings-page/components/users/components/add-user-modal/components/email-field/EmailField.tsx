@@ -19,6 +19,7 @@ export const EmailField = ({ control }: EmailFieldProps): ReactElement => (
           {...field}
           type="email"
           placeholder="Enter email address"
+          onFocus={(event) => event.target.select()}
           isInvalid={invalid}
         />
         <Form.Control.Feedback type="invalid">

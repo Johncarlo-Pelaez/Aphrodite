@@ -1,5 +1,6 @@
 import {
   ReactElement,
+  Fragment,
   useEffect,
   useImperativeHandle,
   forwardRef,
@@ -49,23 +50,30 @@ export const EncoderForm = forwardRef(
       reset: resetEncodeDocument,
     } = useEncodeDocument();
 
-    const { control, watch, reset, handleSubmit, setValue, setError } =
-      useForm<IEncoderFormValues>({
-        defaultValues: {
-          qrBarCode: document?.qrCode,
-          companyCode: envodeValues?.companyCode,
-          contractNumber: envodeValues?.contractNumber,
-          nomenclature:
-            envodeValues?.nomenclature && envodeValues?.documentGroup
-              ? [
-                  {
-                    label: envodeValues?.nomenclature,
-                    documentGroup: envodeValues?.documentGroup,
-                  },
-                ]
-              : [],
-        },
-      });
+    const {
+      control,
+      watch,
+      reset,
+      handleSubmit,
+      setValue,
+      setError,
+      setFocus,
+    } = useForm<IEncoderFormValues>({
+      defaultValues: {
+        qrBarCode: document?.qrCode,
+        companyCode: envodeValues?.companyCode,
+        contractNumber: envodeValues?.contractNumber,
+        nomenclature:
+          envodeValues?.nomenclature && envodeValues?.documentGroup
+            ? [
+                {
+                  label: envodeValues?.nomenclature,
+                  documentGroup: envodeValues?.documentGroup,
+                },
+              ]
+            : [],
+      },
+    });
 
     const nomenclature = watch('nomenclature');
 
@@ -195,6 +203,7 @@ export const EncoderForm = forwardRef(
 
         alert('Encode Saved.');
         triggerSubmitted();
+        setFocus('qrBarCode');
       }
     };
 
@@ -232,7 +241,7 @@ export const EncoderForm = forwardRef(
     }, []);
 
     return (
-      <>
+      <Fragment>
         <Alert variant="danger" show={hasEncodeDocError}>
           Failed to encode.
         </Alert>
@@ -253,7 +262,7 @@ export const EncoderForm = forwardRef(
             </Form>
           </Card.Body>
         </Card>
-      </>
+      </Fragment>
     );
   },
 );

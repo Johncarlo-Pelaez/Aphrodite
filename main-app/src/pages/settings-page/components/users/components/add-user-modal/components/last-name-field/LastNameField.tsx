@@ -20,6 +20,7 @@ export const LastNameField = ({
         <Form.Control
           {...field}
           placeholder="Enter Last Name"
+          onFocus={(event) => event.target.select()}
           isInvalid={invalid}
         />
         <Form.Control.Feedback type="invalid">

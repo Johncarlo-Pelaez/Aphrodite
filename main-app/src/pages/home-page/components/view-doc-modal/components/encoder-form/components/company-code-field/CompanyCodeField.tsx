@@ -24,7 +24,12 @@ export const CompanyCodeField = ({
       <Form.Label>
         <b>Company Code</b>
       </Form.Label>
-      <Form.Control {...field} placeholder="Company Code" isInvalid={!!error} />
+      <Form.Control
+        {...field}
+        placeholder="Company Code"
+        onFocus={(event) => event.target.select()}
+        isInvalid={!!error}
+      />
       <Form.Control.Feedback type="invalid">
         {error?.message}
       </Form.Control.Feedback>

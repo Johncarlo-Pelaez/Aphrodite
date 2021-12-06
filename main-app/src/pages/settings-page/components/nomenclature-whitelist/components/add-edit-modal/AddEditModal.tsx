@@ -135,6 +135,7 @@ export const AddEditModal = ({
                   {...field}
                   disabled={isLoading}
                   placeholder="Enter nomenclature"
+                  onFocus={(event) => event.target.select()}
                   isInvalid={invalid}
                 />
                 <Form.Control.Feedback type="invalid">

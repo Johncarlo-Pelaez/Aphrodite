@@ -11,7 +11,7 @@ export const DocumentDateField = ({
   control,
 }: DocumentDateFieldProps): ReactElement => {
   const {
-    field: { onChange, value, ref },
+    field,
     fieldState: { error },
   } = useController({
     control,
@@ -26,10 +26,9 @@ export const DocumentDateField = ({
         <b>Document Date</b>
       </Form.Label>
       <Form.Control
-        ref={ref}
+        {...field}
         type="date"
-        onChange={onChange}
-        value={value}
+        onFocus={(event) => event.target.select()}
         isInvalid={!!error}
       />
       <Form.Control.Feedback type="invalid">

@@ -20,6 +20,7 @@ export const ObjectIdField = ({
         <Form.Control
           {...field}
           placeholder="Enter object ID"
+          onFocus={(event) => event.target.select()}
           isInvalid={invalid}
         />
         <Form.Control.Feedback type="invalid">

@@ -1,5 +1,6 @@
 import {
   ReactElement,
+  Fragment,
   useImperativeHandle,
   forwardRef,
   useEffect,
@@ -34,7 +35,7 @@ export const CheckerForm = forwardRef(
       reset: resetCheckDocument,
     } = useCheckerDocument();
 
-    const { control, reset, handleSubmit, setError } =
+    const { control, reset, handleSubmit, setError, setFocus } =
       useForm<ICheckerFormValues>();
 
     const approveDocumentSubmit = async (
@@ -83,6 +84,7 @@ export const CheckerForm = forwardRef(
         }
 
         triggerSubmitted();
+        setFocus('documentDate');
       }
     };
 
@@ -117,7 +119,7 @@ export const CheckerForm = forwardRef(
     }, []);
 
     return (
-      <>
+      <Fragment>
         <Alert variant="danger" show={hasCheckDocError}>
           Failed to check.
         </Alert>
@@ -135,7 +137,7 @@ export const CheckerForm = forwardRef(
             </Form>
           </Card.Body>
         </Card>
-      </>
+      </Fragment>
     );
   },
 );

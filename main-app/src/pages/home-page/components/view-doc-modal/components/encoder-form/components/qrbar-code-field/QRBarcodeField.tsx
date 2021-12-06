@@ -27,6 +27,7 @@ export const QRBarcodeField = ({
       <Form.Control
         {...field}
         placeholder="Barcode / QR Code"
+        onFocus={(event) => event.target.select()}
         isInvalid={!!error}
       />
       <Form.Control.Feedback type="invalid">

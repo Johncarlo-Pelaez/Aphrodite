@@ -9,7 +9,7 @@ export interface RemarksFieldProps {
 
 export const RemarksField = ({ control }: RemarksFieldProps): ReactElement => {
   const {
-    field: { onChange, value, ref },
+    field,
     fieldState: { error },
   } = useController({
     control,
@@ -23,10 +23,9 @@ export const RemarksField = ({ control }: RemarksFieldProps): ReactElement => {
         <b>Remarks</b>
       </Form.Label>
       <Form.Control
-        ref={ref}
+        {...field}
         placeholder="Remarks"
-        onChange={onChange}
-        value={value}
+        onFocus={(event) => event.target.select()}
         isInvalid={!!error}
       />
       <Form.Control.Feedback type="invalid">

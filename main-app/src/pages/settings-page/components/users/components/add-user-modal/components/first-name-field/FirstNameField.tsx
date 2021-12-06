@@ -18,6 +18,7 @@ export const FirstNameField = ({ control }: FirstFieldProps): ReactElement => (
         <Form.Control
           {...field}
           placeholder="Enter First Name"
+          onFocus={(event) => event.target.select()}
           isInvalid={invalid}
         />
         <Form.Control.Feedback type="invalid">

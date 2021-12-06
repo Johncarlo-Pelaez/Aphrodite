@@ -20,6 +20,7 @@ export const DocumentGroupField = ({
         <Form.Control
           {...field}
           placeholder="Enter document group"
+          onFocus={(event) => event.target.select()}
           isInvalid={invalid}
         />
         <Form.Control.Feedback type="invalid">
