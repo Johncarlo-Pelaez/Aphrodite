@@ -23,6 +23,7 @@ export class DocumentProducer {
   }
 
   async cancel(documentId: number): Promise<void> {
-    await (await this.documentQueue.getJob(documentId)).remove();
+    const job = await this.documentQueue.getJob(documentId);
+    if (job) job.remove();
   }
 }
