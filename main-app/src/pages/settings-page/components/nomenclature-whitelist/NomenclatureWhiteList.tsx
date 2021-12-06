@@ -71,33 +71,35 @@ export const NomenclatureWhiteList = (): ReactElement => {
 
   return (
     <Fragment>
-      <ButtonGroup>
-        <Button variant="outline-secondary" onClick={handleOpenAddModal}>
-          Add
-        </Button>
-        {hasSelectNomenclature && [
-          <Button
-            key="btn-edit"
-            variant="outline-secondary"
-            onClick={handleOpenEditModal}
-            disabled={!hasSelectNomenclature}
-          >
-            Edit
-          </Button>,
-          <Button
-            key="btn-delete"
-            variant="outline-secondary"
-            onClick={deleteWhitelist}
-            disabled={!hasSelectNomenclature}
-          >
-            Delete
-          </Button>,
-        ]}
-      </ButtonGroup>
       <Alert variant="danger" show={hasDeleteError}>
         {deleteError}
       </Alert>
-      <SearchField searchKey={searchKey} onSearchDocument={setSearchKey} />
+      <div className="d-flex justify-content-between align-items-center flex-wrap my-2">
+        <ButtonGroup>
+          <Button variant="outline-secondary" onClick={handleOpenAddModal}>
+            Add
+          </Button>
+          {hasSelectNomenclature && [
+            <Button
+              key="btn-edit"
+              variant="outline-secondary"
+              onClick={handleOpenEditModal}
+              disabled={!hasSelectNomenclature}
+            >
+              Edit
+            </Button>,
+            <Button
+              key="btn-delete"
+              variant="outline-secondary"
+              onClick={deleteWhitelist}
+              disabled={!hasSelectNomenclature}
+            >
+              Delete
+            </Button>,
+          ]}
+        </ButtonGroup>
+        <SearchField searchKey={searchKey} onSearchDocument={setSearchKey} />
+      </div>
       <WhitelistTable
         searchKey={searchKey}
         selectedWhitelist={selectedWhitelist}

@@ -213,8 +213,8 @@ export const HomePage = (): ReactElement => {
           </Button>
         )}
       </Stack>
-      <div className="d-flex justify-content-between align-items-center flex-wrap">
-        <Stack className="my-2" direction="horizontal" gap={3}>
+      <div className="d-flex justify-content-between align-items-center flex-wrap my-2">
+        <Stack direction="horizontal" gap={3}>
           <StatusDropdown
             selected={selectedStatus}
             onChange={setSelectedStatus}

@@ -4,7 +4,7 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Button from 'react-bootstrap/Button';
 import Alert from 'react-bootstrap/Alert';
 import { useDeleteNomenclatureLookup } from 'hooks';
-import { SearchField } from 'core/ui';
+import { SearchField, DeleteModal } from 'core/ui';
 import { LookupsTable, AddModal, EditModal } from './components';
 
 export const NomenclatureLookup = (): ReactElement => {
@@ -13,6 +13,7 @@ export const NomenclatureLookup = (): ReactElement => {
   >(undefined);
   const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [searchKey, setSearchKey] = useState<string>('');
   const hasSelectedLookup = !!selectedlookup;
 
@@ -30,21 +31,8 @@ export const NomenclatureLookup = (): ReactElement => {
       return;
     }
 
-    const { id, nomenclature } = selectedlookup;
-
-    const inputedNomenclature = prompt(
-      `Please Enter "${nomenclature}" to delete.`,
-    );
-
-    if (inputedNomenclature === null) return;
-
-    if (inputedNomenclature !== nomenclature) {
-      alert('Not match!');
-      return;
-    }
-
     if (!isDeleteLoading) {
-      await deleteAsync(id);
+      await deleteAsync(selectedlookup?.id);
       resetDelete();
     }
   };
@@ -58,6 +46,15 @@ export const NomenclatureLookup = (): ReactElement => {
     setIsEditModalOpen(true);
   };
 
+  const handleOpenDeleteModal = (): void => {
+    if (!hasSelectedLookup) {
+      alert('Please select an item.');
+      return;
+    }
+
+    setIsDeleteModalOpen(true);
+  };
+
   const handleCloseAddModal = (): void => {
     setIsAddModalOpen(false);
     setSelectedlookup(undefined);
@@ -68,38 +65,45 @@ export const NomenclatureLookup = (): ReactElement => {
     setSelectedlookup(undefined);
   };
 
+  const handleCloseDeleteModal = (): void => {
+    setIsDeleteModalOpen(false);
+    setSelectedlookup(undefined);
+  };
+
   return (
     <Fragment>
-      <ButtonGroup>
-        <Button
-          variant="outline-secondary"
-          onClick={() => setIsAddModalOpen(true)}
-        >
-          Add
-        </Button>
-        {hasSelectedLookup && [
-          <Button
-            key="btn-edit"
-            variant="outline-secondary"
-            onClick={handleOpenEditModal}
-            disabled={!hasSelectedLookup}
-          >
-            Edit
-          </Button>,
-          <Button
-            key="btn-delete"
-            variant="outline-secondary"
-            onClick={deleteLookup}
-            disabled={!hasSelectedLookup}
-          >
-            Delete
-          </Button>,
-        ]}
-      </ButtonGroup>
       <Alert variant="danger" show={hasDeleteError}>
         {deleteError}
       </Alert>
-      <SearchField searchKey={searchKey} onSearchDocument={setSearchKey} />
+      <div className="d-flex justify-content-between align-items-center flex-wrap my-2">
+        <ButtonGroup>
+          <Button
+            variant="outline-secondary"
+            onClick={() => setIsAddModalOpen(true)}
+          >
+            Add
+          </Button>
+          {hasSelectedLookup && [
+            <Button
+              key="btn-edit"
+              variant="outline-secondary"
+              onClick={handleOpenEditModal}
+              disabled={!hasSelectedLookup}
+            >
+              Edit
+            </Button>,
+            <Button
+              key="btn-delete"
+              variant="outline-secondary"
+              onClick={handleOpenDeleteModal}
+              disabled={!hasSelectedLookup}
+            >
+              Delete
+            </Button>,
+          ]}
+        </ButtonGroup>
+        <SearchField searchKey={searchKey} onSearchDocument={setSearchKey} />
+      </div>
       <LookupsTable
         searchKey={searchKey}
         selectedLookup={selectedlookup}
@@ -111,6 +115,14 @@ export const NomenclatureLookup = (): ReactElement => {
         isVisible={isEditModalOpen}
         onClose={handleCloseEditModal}
       />
+      {hasSelectedLookup && (
+        <DeleteModal
+          isVisible={isDeleteModalOpen}
+          title={selectedlookup?.nomenclature}
+          onDelete={deleteLookup}
+          onClose={handleCloseDeleteModal}
+        />
+      )}
     </Fragment>
   );
 };

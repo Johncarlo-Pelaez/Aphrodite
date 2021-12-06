@@ -48,33 +48,35 @@ export const Users = (): ReactElement => {
 
   return (
     <Fragment>
-      <ButtonGroup>
-        <Button
-          variant="outline-secondary"
-          onClick={() => setIsAddModalOpen(true)}
-        >
-          Add
-        </Button>
-        {hasSelectUser && [
+      <div className="d-flex justify-content-between align-items-center flex-wrap my-2">
+        <ButtonGroup>
           <Button
-            key="btn-edit"
             variant="outline-secondary"
-            onClick={handleOpenEditModal}
-            disabled={!hasSelectUser}
+            onClick={() => setIsAddModalOpen(true)}
           >
-            Edit
-          </Button>,
-          <Button
-            key="btn-view"
-            variant="outline-secondary"
-            onClick={handleOpenViewModal}
-            disabled={!hasSelectUser}
-          >
-            View
-          </Button>,
-        ]}
-      </ButtonGroup>
-      <SearchField searchKey={searchKey} onSearchDocument={setSearchKey} />
+            Add
+          </Button>
+          {hasSelectUser && [
+            <Button
+              key="btn-edit"
+              variant="outline-secondary"
+              onClick={handleOpenEditModal}
+              disabled={!hasSelectUser}
+            >
+              Edit
+            </Button>,
+            <Button
+              key="btn-view"
+              variant="outline-secondary"
+              onClick={handleOpenViewModal}
+              disabled={!hasSelectUser}
+            >
+              View
+            </Button>,
+          ]}
+        </ButtonGroup>
+        <SearchField searchKey={searchKey} onSearchDocument={setSearchKey} />
+      </div>
       <UsersTable
         searchKey={searchKey}
         selectedUser={selectedUser}
