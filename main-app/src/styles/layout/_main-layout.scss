@@ -32,3 +32,11 @@
     }
   }
 }
+
+main {
+  padding: 0 0;
+
+  @include breakpoint-up(lg) {
+    padding: 0 2rem;
+  }
+}

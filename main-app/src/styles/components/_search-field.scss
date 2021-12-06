@@ -1,12 +1,7 @@
-.search-field__container {
-  display: flex;
-  justify-content: flex-end;
-}
-
 .search-field__wrapper {
   position: relative;
-  margin-bottom: 1rem;
   width: 20rem;
+  height: fit-content;
 
   & > svg {
     position: absolute;

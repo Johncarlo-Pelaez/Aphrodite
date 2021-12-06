@@ -163,7 +163,7 @@ export const HomePage = (): ReactElement => {
 
   return (
     <Container className="my-4" fluid>
-      <div className="d-flex justify-content-between">
+      <div className="d-flex justify-content-between flex-wrap">
         <h4 className="fw-normal py-3">Documents</h4>
         <Stack className="my-2" direction="horizontal" gap={3}>
           <Button
@@ -213,17 +213,19 @@ export const HomePage = (): ReactElement => {
           </Button>
         )}
       </Stack>
-      <Stack className="my-2" direction="horizontal" gap={3}>
-        <StatusDropdown
-          selected={selectedStatus}
-          onChange={setSelectedStatus}
-        />
-        <OperationDropdown
-          selected={selectedOperation}
-          onChange={setSelectedOperation}
-        />
-      </Stack>
-      <SearchField searchKey={searchKey} onSearchDocument={setSearchKey} />
+      <div className="d-flex justify-content-between align-items-center flex-wrap">
+        <Stack className="my-2" direction="horizontal" gap={3}>
+          <StatusDropdown
+            selected={selectedStatus}
+            onChange={setSelectedStatus}
+          />
+          <OperationDropdown
+            selected={selectedOperation}
+            onChange={setSelectedOperation}
+          />
+        </Stack>
+        <SearchField searchKey={searchKey} onSearchDocument={setSearchKey} />
+      </div>
       <DocumentsTable
         searchKey={searchKey}
         ref={documentsTableRef}

@@ -16,23 +16,21 @@ export const SearchField = (props: SearchFieldProps): ReactElement => {
   };
 
   return (
-    <div className="search-field__container">
-      <div className="search-field__wrapper">
-        <FontAwesomeIcon icon={faSearch} />
-        <FormControl
-          placeholder="Search"
-          aria-label="Search"
-          aria-describedby="Search documents"
-          type="text"
-          value={searchKey}
-          onKeyUp={(e) => {
-            if (e.key === 'Enter' || e.keyCode === 13) {
-              searchDocs(e);
-            }
-          }}
-          onChange={searchDocs}
-        />
-      </div>
+    <div className="search-field__wrapper">
+      <FontAwesomeIcon icon={faSearch} />
+      <FormControl
+        placeholder="Search"
+        aria-label="Search"
+        aria-describedby="Search documents"
+        type="text"
+        value={searchKey}
+        onKeyUp={(e) => {
+          if (e.key === 'Enter' || e.keyCode === 13) {
+            searchDocs(e);
+          }
+        }}
+        onChange={searchDocs}
+      />
     </div>
   );
 };

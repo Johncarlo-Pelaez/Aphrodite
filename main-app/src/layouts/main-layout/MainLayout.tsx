@@ -53,7 +53,7 @@ export const MainLayout = (props: MainLayoutProps): ReactElement => {
           </Navbar.Collapse>
         </Container>
       </Navbar>
-      <main className="px-5">{children}</main>
+      <main>{children}</main>
     </Fragment>
   );
 };
