@@ -58,6 +58,7 @@ export class UserRepository {
     user.lastName = param.lastName;
     user.isActive = param.isActive ?? true;
     user.role = param.role;
+    user.objectId = param.objectId;
     user.modifiedDate = param.modifiedDate;
     await this.manager.save(user);
   }

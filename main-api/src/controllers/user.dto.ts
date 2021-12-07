@@ -12,42 +12,50 @@ export class CreateUserAccountDto {
   @ApiProperty({
     format: 'email',
   })
-  @IsString()
+  @IsNotEmpty({ message: 'Email is required.' })
   @IsEmail({}, { message: 'Email is invalid.' })
+  @IsString()
   email: string;
 
   @ApiProperty()
-  @IsString()
   @IsNotEmpty({ message: 'Object ID is required.' })
+  @IsString()
   objectId: string;
 
   @ApiProperty()
+  @IsNotEmpty({ message: 'Role is required.' })
   @IsString()
   role: Role;
 
   @ApiProperty()
-  @IsOptional()
+  @IsNotEmpty({ message: 'First name is required.' })
   @IsString()
   firstName: string;
 
   @ApiProperty()
-  @IsOptional()
+  @IsNotEmpty({ message: 'Last name is required.' })
   @IsString()
   lastName: string;
 }
 
 export class UpdateUserAccountDto {
   @ApiProperty()
+  @IsNotEmpty({ message: 'Object ID is required.' })
+  @IsString()
+  objectId: string;
+
+  @ApiProperty()
+  @IsNotEmpty({ message: 'Role is required.' })
   @IsString()
   role: Role;
 
   @ApiProperty()
-  @IsOptional()
+  @IsNotEmpty({ message: 'First name is required.' })
   @IsString()
   firstName: string;
 
   @ApiProperty()
-  @IsOptional()
+  @IsNotEmpty({ message: 'Last name is required.' })
   @IsString()
   lastName: string;
 
