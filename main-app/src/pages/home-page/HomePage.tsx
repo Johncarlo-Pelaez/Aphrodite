@@ -1,10 +1,9 @@
-import { ReactElement, useState, useRef, useMemo, useEffect } from 'react';
+import { ReactElement, useState, useRef, useEffect } from 'react';
 import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
 import Stack from 'react-bootstrap/Stack';
 import { Document } from 'models';
 import { useRetryDocuments, useCancelDocuments } from 'hooks';
-import { DocumentStatus } from 'core/enum';
 import { SearchField } from 'core/ui';
 import {
   UploadFilesModal,
@@ -17,8 +16,8 @@ import {
 import { OperationOption } from './components/operation-dropdown';
 import { StatusOption } from './components/status-dropdown';
 import {
-  concatDocumentStatuses,
-  getForRetryDocstatuses,
+  getDocStatusFilter,
+  getForRetryDocStatuses,
   getForCancelDocStatuses,
 } from './HomePage.utils';
 
@@ -42,28 +41,17 @@ export const HomePage = (): ReactElement => {
   const selected1Doc =
     selectedDocuments.length === 1 ? selectedDocuments[0] : undefined;
   const hasSelected1Doc = !!selected1Doc;
-  const allOperation = Object.values(OperationOption).filter(
-    (o) => o !== OperationOption.ALL,
-  );
-  const allStatus = Object.values(StatusOption).filter(
-    (s) => s !== StatusOption.ALL,
-  );
-  const enableRetryButton = useMemo(
-    () =>
-      !!selectedDocuments.length &&
-      selectedDocuments.every((doc) =>
-        getForRetryDocstatuses().some((s) => s === doc.status),
-      ),
-    [selectedDocuments],
-  );
-  const enableCancelButton = useMemo(
-    () =>
-      !!selectedDocuments.length &&
-      selectedDocuments.every((doc) =>
-        getForCancelDocStatuses().some((s) => s === doc.status),
-      ),
-    [selectedDocuments],
-  );
+  const enableRetryButton =
+    !!selectedDocuments.length &&
+    selectedDocuments.every((doc) =>
+      getForRetryDocStatuses().some((s) => s === doc.status),
+    );
+  const enableCancelButton =
+    !!selectedDocuments.length &&
+    selectedDocuments.every((doc) =>
+      getForCancelDocStatuses().some((s) => s === doc.status),
+    );
+  const docStatusFilter = getDocStatusFilter(selectedStatus, selectedOperation);
 
   const {
     isLoading: isRetryDocSaving,
@@ -93,46 +81,6 @@ export const HomePage = (): ReactElement => {
     }
   };
 
-  const getDocStatusFilter = (
-    cmbStatusValue: StatusOption,
-    cmbOperationValue: OperationOption,
-  ): DocumentStatus[] => {
-    let strStatusesFilter = '';
-
-    if (
-      cmbOperationValue === OperationOption.ALL &&
-      cmbStatusValue === StatusOption.ALL
-    ) {
-      strStatusesFilter = Object.values(DocumentStatus).join(',');
-    } else if (
-      cmbOperationValue === OperationOption.ALL &&
-      cmbStatusValue !== StatusOption.ALL
-    ) {
-      for (const operation of allOperation) {
-        strStatusesFilter += concatDocumentStatuses(operation, cmbStatusValue);
-      }
-    } else if (
-      cmbOperationValue !== OperationOption.ALL &&
-      cmbStatusValue === StatusOption.ALL
-    ) {
-      for (const status of allStatus) {
-        strStatusesFilter += concatDocumentStatuses(cmbOperationValue, status);
-      }
-    } else {
-      strStatusesFilter = concatDocumentStatuses(
-        cmbOperationValue,
-        cmbStatusValue,
-      );
-    }
-
-    const statusesFilter = strStatusesFilter
-      .split(',')
-      .filter((value, index, self) => self.indexOf(value) === index)
-      .map((status) => status.trim()) as DocumentStatus[];
-
-    return !!statusesFilter.length ? statusesFilter : [];
-  };
-
   const refreshDocumentslist = (): void => {
     documentsTableRef.current?.refresh();
     processDetailsRef.current?.refresh();
@@ -142,12 +90,6 @@ export const HomePage = (): ReactElement => {
     documentsTableRef.current?.next();
     refreshDocumentslist();
   };
-
-  const docStatusFilter = useMemo(
-    () => getDocStatusFilter(selectedStatus, selectedOperation),
-    // eslint-disable-next-line
-    [selectedStatus, selectedOperation],
-  );
 
   useEffect(() => {
     if (hasRetryDocError) alert('Failed to retry documents.');
