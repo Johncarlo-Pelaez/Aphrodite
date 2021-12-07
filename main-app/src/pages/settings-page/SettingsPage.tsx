@@ -4,12 +4,18 @@ import Tab from 'react-bootstrap/Tab';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Nav from 'react-bootstrap/Nav';
-import { NomenclatureLookup, NomenclatureWhiteList, Users } from './components';
+import {
+  NomenclatureLookup,
+  NomenclatureWhiteList,
+  Users,
+  ActivityLogs,
+} from './components';
 
 enum TabKey {
   NOMENCLATURE_LOOKUP = 'NOMENCLATURE_LOOKUP',
   NOMENCLATURE_WHITELIST = 'NOMENCLATURE_WHITELIST',
   USERS_MANAGEMENT = 'USERS_MANAGEMENT',
+  ACTIVITY_LOG = 'ACTIVITY_LOG',
 }
 
 export const SettingsPage = (): ReactElement => {
@@ -36,6 +42,11 @@ export const SettingsPage = (): ReactElement => {
               <Nav.Item>
                 <Nav.Link eventKey={TabKey.USERS_MANAGEMENT}>Users</Nav.Link>
               </Nav.Item>
+              <Nav.Item>
+                <Nav.Link eventKey={TabKey.ACTIVITY_LOG}>
+                  Activity Logs
+                </Nav.Link>
+              </Nav.Item>
             </Nav>
           </Col>
           <Col sm={9}>
@@ -48,6 +59,9 @@ export const SettingsPage = (): ReactElement => {
               </Tab.Pane>
               <Tab.Pane eventKey={TabKey.USERS_MANAGEMENT}>
                 <Users />
+              </Tab.Pane>
+              <Tab.Pane eventKey={TabKey.ACTIVITY_LOG}>
+                <ActivityLogs />
               </Tab.Pane>
             </Tab.Content>
           </Col>

@@ -8,6 +8,7 @@ export class QueryKey {
   public static readonly paginatedDocuments = 'paginatedDocuments';
   public static readonly nomenclaturesWhitelist = 'nomenclaturesWhitelist';
   public static readonly nomenclaturesLookups = 'nomenclaturesLookups';
+  public static readonly activityLogs = 'activityLogs';
 
   public static buildPaginatedDocuments(data: UseDocuments) {
     return [this.paginatedDocuments, data];
