@@ -1,29 +1,70 @@
 import { request } from './request';
 import { ActivityLog } from 'models';
 import queryString from 'query-string';
+import {
+  createQueryString,
+  createTablePaginationQuery,
+} from 'utils/query-string';
 
-export interface GetActivityLogsApi {
+export interface GetActivityLogsApiResponse {
   count: number;
   data: ActivityLog[];
 }
 
-export interface GetActivityLogsReportParams {
+export interface UseActivityLogsFilterParams {
   loggedBy: string;
-  loggedAt: Date;
+  loggedAtFrom: Date | null;
+  loggedAtTo: Date | null;
 }
 
-export type DownloadActivityLogsParams = GetActivityLogsReportParams;
+export interface UseActivityLog extends UseActivityLogsFilterParams {
+  currentPage: number;
+  pageSize: number;
+}
 
-export const getActivityLogsApi = async (): Promise<GetActivityLogsApi> => {
-  const res = await request.get<GetActivityLogsApi>('/api/activity-logs');
+export const getActivityLogsApi =
+  async (): Promise<GetActivityLogsApiResponse> => {
+    const res = await request.get<GetActivityLogsApiResponse>(
+      '/api/activity-logs',
+    );
+    return res.data;
+  };
+
+export const getActivityLogApi = async (
+  params: UseActivityLog,
+): Promise<GetActivityLogsApiResponse> => {
+  const paginationQuery = createTablePaginationQuery(params);
+  if (params.loggedBy === 'All Users') {
+    params.loggedBy = '';
+  }
+
+  const filterQuery = createQueryString({
+    loggedBy: params.loggedBy,
+    loggedAtFrom: params.loggedAtFrom?.toDateString(),
+    loggedAtTo: params.loggedAtTo?.toDateString(),
+  });
+
+  const res = await request.get<GetActivityLogsApiResponse>(
+    `/api/activity-logs?${paginationQuery}&${filterQuery}`,
+  );
   return res.data;
 };
 
-export const getActivityLogsDownload = async () => {
-  await request.get('api/activity-logs/download');
+export const getActivityLogsFilter = async (
+  params: UseActivityLogsFilterParams,
+): Promise<GetActivityLogsApiResponse[]> => {
+  const queryParams = queryString.stringify(params);
+
+  const res = await request.get<GetActivityLogsApiResponse[]>(
+    `/api/activity-logs?${queryParams}`,
+  );
+
+  return res.data;
 };
 
-export const downloadActivityLogs = async (
+export type DownloadActivityLogsParams = UseActivityLogsFilterParams;
+
+export const getDownloadActivityLogs = async (
   params: DownloadActivityLogsParams,
 ): Promise<Blob> => {
   const queryParams = queryString.stringify(params);

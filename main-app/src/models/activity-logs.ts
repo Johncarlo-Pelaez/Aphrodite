@@ -7,3 +7,9 @@ export interface ActivityLog {
   loggedAt: Date;
   loggedBy: string;
 }
+
+export interface ActivityLogOutputParams {
+  description: string;
+  loggedBy: string;
+  loggedAt: Date;
+}
