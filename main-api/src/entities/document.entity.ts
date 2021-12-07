@@ -157,6 +157,10 @@ export class DocumentHistory {
   documentStatus?: DocumentStatus;
 
   @ApiProperty()
+  @Column()
+  isFileDeleted: boolean;
+
+  @ApiProperty()
   @ManyToOne(() => User, (e) => e.username)
   user: User;
 }

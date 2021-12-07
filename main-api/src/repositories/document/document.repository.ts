@@ -25,6 +25,7 @@ import {
   ApproverApproveDisapproveDocParam,
   UpdateForRetryParam,
   UpdateToCancelledParam,
+  DeleteFileParam,
 } from './document.params';
 
 @EntityRepository()
@@ -550,6 +551,22 @@ export class DocumentRepository {
       document.modifiedDate = param.processAt;
       document.modifiedBy = param.cancelledBy;
       document.description = 'Cancelled.';
+      await transaction.save(document);
+
+      const history = this.genarateDocumentHistory(document);
+      await transaction.save(history);
+    });
+  }
+
+  async deleteFile(param: DeleteFileParam): Promise<void> {
+    await this.manager.transaction(async (transaction): Promise<void> => {
+      const document = await this.manager.findOneOrFail(
+        Document,
+        param.documentId,
+      );
+      document.modifiedDate = param.deletedAt;
+      document.modifiedBy = param.deletedBy ?? document.modifiedBy;
+      document.description = 'Delete file from system directory.';
       await transaction.save(document);
 
       const history = this.genarateDocumentHistory(document);
