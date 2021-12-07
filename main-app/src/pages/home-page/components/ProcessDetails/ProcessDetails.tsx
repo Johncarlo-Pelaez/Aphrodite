@@ -101,7 +101,7 @@ export const ProcessDetails = forwardRef(
     );
 
     return (
-      <div className="d-flex justify-content-center flex-wrap my-4">
+      <div className="d-flex justify-content-center flex-wrap my-1">
         <Card className="shadow-sm m-3" style={cardStyle}>
           <Card.Body>
             <Card.Title as="h6">Success</Card.Title>
