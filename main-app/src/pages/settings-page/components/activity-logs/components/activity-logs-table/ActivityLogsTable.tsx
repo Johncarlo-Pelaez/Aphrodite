@@ -1,27 +1,41 @@
 import { ReactElement, useState, useMemo } from 'react';
-import { useActivityLogs } from 'hooks';
+import { useActivityLog, useDebounce } from 'hooks';
 import { SorterResult, SortOrder, Table, TableColumnProps } from 'core/ui';
 import { ActivityLog } from 'models';
 import moment from 'moment';
 import { DEFAULT_DATE_FORMAT } from 'core/constants';
 import { sortDateTime } from 'utils/sort';
+import { UseActivityLogsFilterParams } from 'apis';
 
 const DEFAULT_SORT_ORDER: SorterResult = {
   field: 'loggedAt',
   order: SortOrder.DESC,
 };
 
-export const ActivityLogsTable = (): ReactElement => {
+export const ActivityLogsTable = ({
+  loggedBy,
+  loggedAtFrom,
+  loggedAtTo,
+}: UseActivityLogsFilterParams): ReactElement => {
   const [sorter, setSorter] = useState<SorterResult | undefined>(
     DEFAULT_SORT_ORDER,
   );
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(15);
+  const debouncedSearch = useDebounce(loggedBy);
+
   const {
     isLoading: isActivityLoading,
     isError: hasActivityError,
     data: result,
-  } = useActivityLogs();
+  } = useActivityLog({
+    loggedBy: debouncedSearch,
+    loggedAtFrom,
+    loggedAtTo,
+    currentPage,
+    pageSize,
+  });
+
   const { activityLog, total } = useMemo(
     () => ({ activityLog: result?.data ?? [], total: result?.count ?? 0 }),
     [result?.data, result?.count],
@@ -55,6 +69,7 @@ export const ActivityLogsTable = (): ReactElement => {
 
   return (
     <Table<ActivityLog>
+      isServerSide
       rowKey={(activity) => activity.id}
       loading={isActivityLoading}
       isError={hasActivityError}
@@ -65,7 +80,9 @@ export const ActivityLogsTable = (): ReactElement => {
         pageSize: pageSize,
         current: currentPage,
         pageNumber: 5,
-        onChange: setCurrentPage,
+        onChange: (page) => {
+          setCurrentPage(page);
+        },
         onSizeChange: setPageSize,
       }}
       onChange={changeSort}
