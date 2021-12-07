@@ -5,6 +5,8 @@ import {
   InteractionStatus,
   PopupRequest,
   SilentRequest,
+  InteractionRequiredAuthError,
+  AuthenticationResult,
 } from '@azure/msal-browser';
 import { removeApiHeaders, setApiAccessToken, setApiAuthorization } from 'apis';
 import { useEmailExists } from './user.hook';
@@ -64,16 +66,44 @@ export const useLoadAccountToken = (): UseLoadAccountTokenResult => {
   useEffect(() => {
     if (account && !isLoaded) {
       const request = buildSilentRequest(account);
-      instance.acquireTokenSilent(request).then(async (response) => {
-        if (response.account) {
-          const exists = await checkEmailExists(response.account.username);
-          if (exists) {
-            onSigninSuccess(response.idToken, response.accessToken);
+      instance
+        .acquireTokenSilent(request)
+        .then(async (response) => {
+          if (response?.account) {
+            const exists = await checkEmailExists(response.account.username);
+            if (exists) {
+              onSigninSuccess(response.idToken, response.accessToken);
+              setIsLoaded(true);
+            }
+            setEmailAllowed(exists);
           }
-          setEmailAllowed(exists);
-          setIsLoaded(true);
-        }
-      });
+        })
+        .catch(async (error) => {
+          if (error instanceof InteractionRequiredAuthError) {
+            let response: AuthenticationResult | undefined = undefined;
+            try {
+              response = await instance.acquireTokenPopup(request);
+            } catch (error) {
+              setIsLoaded(false);
+              setEmailAllowed(false);
+            } finally {
+              if (response?.account) {
+                const exists = await checkEmailExists(
+                  response.account.username,
+                );
+                if (exists) {
+                  onSigninSuccess(response.idToken, response.accessToken);
+                  setIsLoaded(true);
+                }
+                setEmailAllowed(exists);
+              }
+            }
+          }
+        })
+        .catch(() => {
+          setIsLoaded(false);
+          setEmailAllowed(false);
+        });
     }
   }, [
     isLoaded,

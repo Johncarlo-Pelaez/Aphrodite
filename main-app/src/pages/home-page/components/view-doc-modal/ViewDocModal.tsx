@@ -4,7 +4,7 @@ import Button from 'react-bootstrap/Button';
 import Spinner from 'react-bootstrap/Spinner';
 import Tabs from 'react-bootstrap/Tabs';
 import Tab from 'react-bootstrap/Tab';
-import { useDocument, useGetCurrentUserRole } from 'hooks';
+import { useDocument, useGetCurrentUser } from 'hooks';
 import { PdfViewer } from 'core/ui';
 import { DocumentStatus, Role } from 'core/enum';
 import {
@@ -44,7 +44,8 @@ export const ViewDocModal = (props: ViewDocModalProps): ReactElement => {
   const { isLoading: isDocsLoading, data: document } = useDocument(
     isVisible ? documentId : undefined,
   );
-  const currentUserRole = useGetCurrentUserRole();
+  const { data: user } = useGetCurrentUser();
+  const currentUserRole = user?.role;
 
   const renderModal = (): ReactElement => (
     <Modal

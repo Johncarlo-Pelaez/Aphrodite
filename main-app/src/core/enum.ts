@@ -27,3 +27,7 @@ export enum Role {
   ENCODER = 'ENCODER',
   REVIEWER = 'REVIEWER',
 }
+
+export enum ErrorStatusCode {
+  UNAUTHORIZE = 401,
+}

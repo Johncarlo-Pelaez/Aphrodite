@@ -4,11 +4,7 @@ import {
   AuthenticatedTemplate,
   UnauthenticatedTemplate,
 } from '@azure/msal-react';
-import {
-  useEmailAllowed,
-  useLoadAccountToken,
-  useGetCurrentUserRole,
-} from 'hooks';
+import { useEmailAllowed, useLoadAccountToken, useGetCurrentUser } from 'hooks';
 import { Role } from 'core/enum';
 
 interface PrivateRouteProps extends RouteProps {
@@ -20,11 +16,11 @@ export const PrivateRoute = (props: PrivateRouteProps) => {
   const { layout: Layout, allowedUserRoles, ...rest } = props;
   const { isAllowed } = useEmailAllowed();
   const { isLoaded } = useLoadAccountToken();
-  const currentUserRole = useGetCurrentUserRole();
+  const { data: user } = useGetCurrentUser();
 
   const hasAccess = (): boolean => {
-    if (!!allowedUserRoles?.length && currentUserRole)
-      return allowedUserRoles.some((ar) => ar === currentUserRole);
+    if (!!allowedUserRoles?.length && user?.role)
+      return allowedUserRoles.some((ar) => ar === user.role);
     return true;
   };
 
