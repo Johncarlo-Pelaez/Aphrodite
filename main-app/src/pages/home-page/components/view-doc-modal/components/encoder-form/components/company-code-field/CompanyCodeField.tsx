@@ -26,7 +26,7 @@ export const CompanyCodeField = ({
       </Form.Label>
       <Form.Control
         {...field}
-        placeholder="Company Code"
+        placeholder="Enter company code"
         onFocus={(event) => event.target.select()}
         isInvalid={!!error}
       />

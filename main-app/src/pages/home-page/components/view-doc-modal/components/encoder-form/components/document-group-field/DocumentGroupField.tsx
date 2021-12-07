@@ -27,7 +27,7 @@ export const DocumentGroupField = ({
       <Form.Control
         {...field}
         readOnly
-        placeholder="Document Group"
+        placeholder="Enter document group"
         isInvalid={!!error}
       />
       <Form.Control.Feedback type="invalid">

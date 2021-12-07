@@ -24,7 +24,7 @@ export const RemarksField = ({ control }: RemarksFieldProps): ReactElement => {
       </Form.Label>
       <Form.Control
         {...field}
-        placeholder="Remarks"
+        placeholder="Enter remarks"
         onFocus={(event) => event.target.select()}
         isInvalid={!!error}
       />
