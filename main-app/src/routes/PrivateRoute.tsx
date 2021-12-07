@@ -1,4 +1,4 @@
-import React, { Fragment, useMemo } from 'react';
+import React, { Fragment } from 'react';
 import { Route, RouteProps, Redirect } from 'react-router-dom';
 import {
   AuthenticatedTemplate,
@@ -21,17 +21,18 @@ export const PrivateRoute = (props: PrivateRouteProps) => {
   const { isAllowed } = useEmailAllowed();
   const { isLoaded } = useLoadAccountToken();
   const currentUserRole = useGetCurrentUserRole();
-  const hasAccess = useMemo((): boolean => {
+
+  const hasAccess = (): boolean => {
     if (!!allowedUserRoles?.length && currentUserRole)
       return allowedUserRoles.some((ar) => ar === currentUserRole);
     return true;
-  }, [allowedUserRoles, currentUserRole]);
+  };
 
   if (isLoaded && !isAllowed) {
     return <Redirect to="/forbidden-account" />;
   }
 
-  if (!hasAccess) {
+  if (!hasAccess()) {
     return <Redirect to="/forbidden" />;
   }
 
