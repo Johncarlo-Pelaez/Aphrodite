@@ -141,72 +141,69 @@ export const ViewDocModal = (props: ViewDocModalProps): ReactElement => {
   const renderModalFooter = (): ReactElement => {
     let formActionButtons: ReactElement[];
 
-    switch (document?.status) {
-      case DocumentStatus.ENCODING:
-        formActionButtons = [
-          <Button
-            key="btn-close"
-            variant="outline-danger"
-            onClick={triggerClose}
-          >
-            Close
-          </Button>,
-          <Button
-            key="btn-save"
-            variant="dark"
-            onClick={triggerEncoderFormSubmit}
-          >
-            Save
-          </Button>,
-        ];
-        break;
-      case DocumentStatus.CHECKING:
-        formActionButtons = [
-          <Button
-            key="btn-disapprove"
-            variant="outline-danger"
-            onClick={triggerCheckerFormSubmitDispprove}
-          >
-            Disapprove
-          </Button>,
-          <Button
-            key="btn-approve"
-            variant="dark"
-            onClick={triggerCheckerFormSubmitApprove}
-          >
-            Approve
-          </Button>,
-        ];
-        break;
-      case DocumentStatus.CHECKING_DISAPPROVED:
-        formActionButtons = [
-          <Button
-            key="btn-disapprove"
-            variant="outline-danger"
-            onClick={triggerApproverFormSubmitDispprove}
-          >
-            Disapprove
-          </Button>,
-          <Button
-            key="btn-approve"
-            variant="dark"
-            onClick={triggerApproverFormSubmitApprove}
-          >
-            Approve
-          </Button>,
-        ];
-        break;
-      default:
-        formActionButtons = [
-          <Button
-            key="btn-close"
-            variant="outline-danger"
-            onClick={triggerClose}
-          >
-            Close
-          </Button>,
-        ];
-        break;
+    const documentStatus = document?.status;
+    if (
+      documentStatus === DocumentStatus.ENCODING &&
+      (currentUserRole === Role.ENCODER || currentUserRole === Role.ADMIN)
+    ) {
+      formActionButtons = [
+        <Button key="btn-close" variant="outline-danger" onClick={triggerClose}>
+          Close
+        </Button>,
+        <Button
+          key="btn-save"
+          variant="dark"
+          onClick={triggerEncoderFormSubmit}
+        >
+          Save
+        </Button>,
+      ];
+    } else if (
+      documentStatus === DocumentStatus.CHECKING &&
+      (currentUserRole === Role.REVIEWER || currentUserRole === Role.ADMIN)
+    ) {
+      formActionButtons = [
+        <Button
+          key="btn-disapprove"
+          variant="outline-danger"
+          onClick={triggerCheckerFormSubmitDispprove}
+        >
+          Disapprove
+        </Button>,
+        <Button
+          key="btn-approve"
+          variant="dark"
+          onClick={triggerCheckerFormSubmitApprove}
+        >
+          Approve
+        </Button>,
+      ];
+    } else if (
+      documentStatus === DocumentStatus.CHECKING_DISAPPROVED &&
+      (currentUserRole === Role.REVIEWER || currentUserRole === Role.ADMIN)
+    ) {
+      formActionButtons = [
+        <Button
+          key="btn-disapprove"
+          variant="outline-danger"
+          onClick={triggerApproverFormSubmitDispprove}
+        >
+          Disapprove
+        </Button>,
+        <Button
+          key="btn-approve"
+          variant="dark"
+          onClick={triggerApproverFormSubmitApprove}
+        >
+          Approve
+        </Button>,
+      ];
+    } else {
+      formActionButtons = [
+        <Button key="btn-close" variant="outline-danger" onClick={triggerClose}>
+          Close
+        </Button>,
+      ];
     }
 
     return <Modal.Footer>{formActionButtons}</Modal.Footer>;
