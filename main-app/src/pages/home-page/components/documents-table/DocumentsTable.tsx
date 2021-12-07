@@ -22,11 +22,18 @@ const DEFAULT_SORT_ORDER: SorterResult = {
   order: SortOrder.DESC,
 };
 
-export interface DocumentsTableProps {
+export interface DataFilterProps {
   searchKey: string;
+  statuses: DocumentStatus[];
+  dateFrom?: Date;
+  dateTo?: Date;
+  username?: string;
+}
+
+export interface DocumentsTableProps {
   selectedDocuments: Document[];
   selectedDocumentKeys: number[];
-  filterDocStatus: DocumentStatus[];
+  dataFilters?: DataFilterProps;
   setSelectedDocuments: React.Dispatch<React.SetStateAction<Document[]>>;
   setSelectedDocumentKeys: React.Dispatch<React.SetStateAction<number[]>>;
 }
@@ -34,10 +41,9 @@ export interface DocumentsTableProps {
 export const DocumentsTable = forwardRef(
   (props: DocumentsTableProps, ref): ReactElement => {
     const {
-      searchKey,
       selectedDocuments,
       selectedDocumentKeys,
-      filterDocStatus,
+      dataFilters,
       setSelectedDocuments,
       setSelectedDocumentKeys,
     } = props;
@@ -46,6 +52,11 @@ export const DocumentsTable = forwardRef(
     const [sorter, setSorter] = useState<SorterResult | undefined>(
       DEFAULT_SORT_ORDER,
     );
+    const searchKey = dataFilters?.searchKey ?? '';
+    const statuses = dataFilters?.statuses ?? [];
+    const dateFrom = dataFilters?.dateFrom;
+    const dateTo = dataFilters?.dateTo;
+    const username = dataFilters?.username;
     const debouncedSearch = useDebounce(searchKey);
 
     const {
@@ -58,7 +69,10 @@ export const DocumentsTable = forwardRef(
       search: debouncedSearch,
       currentPage,
       pageSize,
-      statuses: filterDocStatus,
+      statuses,
+      dateFrom,
+      dateTo,
+      username,
     });
 
     const { documents, total } = useMemo(

@@ -1,6 +1,8 @@
+import moment from 'moment';
 import { CancelTokenSource, request } from './request';
 import { Document, DocumentHistory } from 'models';
 import { DocumentStatus } from 'core/enum';
+import { DEFAULT_DATE_FORMAT } from 'core/constants';
 import {
   createQueryString,
   createTablePaginationQuery,
@@ -11,6 +13,9 @@ export interface GetDocumentsApi {
   pageSize: number;
   search: string;
   statuses: DocumentStatus[];
+  username?: string;
+  dateFrom?: Date;
+  dateTo?: Date;
 }
 
 export interface GetDocumentsApiResponse {
@@ -22,9 +27,20 @@ export const getDocumentsApi = async (
   params: GetDocumentsApi,
 ): Promise<GetDocumentsApiResponse> => {
   const paginationQuery = createTablePaginationQuery(params);
+
+  const dateFromFilter = params.dateFrom
+    ? moment(params.dateFrom).format(DEFAULT_DATE_FORMAT)
+    : undefined;
+  const dateToFilter = params.dateFrom
+    ? moment(params.dateTo).format(DEFAULT_DATE_FORMAT)
+    : undefined;
+
   const filterQuery = createQueryString({
     search: params.search,
     statuses: params.statuses,
+    username: params.username,
+    from: dateFromFilter,
+    to: dateToFilter,
   });
 
   const res = await request.get<GetDocumentsApiResponse>(

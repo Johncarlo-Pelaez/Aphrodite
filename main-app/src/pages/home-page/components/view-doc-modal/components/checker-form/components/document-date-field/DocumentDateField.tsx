@@ -16,7 +16,6 @@ export const DocumentDateField = ({
   } = useController({
     control,
     name: 'documentDate',
-    rules: { required: true },
     defaultValue: '',
   });
 
@@ -25,12 +24,7 @@ export const DocumentDateField = ({
       <Form.Label>
         <b>Document Date</b>
       </Form.Label>
-      <Form.Control
-        {...field}
-        type="date"
-        onFocus={(event) => event.target.select()}
-        isInvalid={!!error}
-      />
+      <Form.Control {...field} type="date" isInvalid={!!error} />
       <Form.Control.Feedback type="invalid">
         {error?.message}
       </Form.Control.Feedback>

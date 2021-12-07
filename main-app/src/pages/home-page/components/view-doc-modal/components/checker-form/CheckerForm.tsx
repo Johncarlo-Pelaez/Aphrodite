@@ -44,6 +44,11 @@ export const CheckerForm = forwardRef(
     ): Promise<void> => {
       const { documentDate, remarks } = data;
 
+      if (!document) {
+        alert('Please select a document.');
+        return;
+      }
+
       if (!documentDate || documentDate === '') {
         setError('documentDate', {
           type: 'required',
@@ -57,11 +62,6 @@ export const CheckerForm = forwardRef(
           type: 'required',
           message: 'Remarks is required',
         });
-        return;
-      }
-
-      if (!document) {
-        alert('Please select a document.');
         return;
       }
 

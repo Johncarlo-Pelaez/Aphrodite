@@ -4,3 +4,4 @@ export * from './view-doc-modal';
 export * from './ProcessDetails';
 export * from './status-dropdown';
 export * from './operation-dropdown';
+export * from './user-dropdown';

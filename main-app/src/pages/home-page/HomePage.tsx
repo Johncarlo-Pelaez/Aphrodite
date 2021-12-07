@@ -2,9 +2,11 @@ import { ReactElement, useState, useRef, useEffect } from 'react';
 import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
 import Stack from 'react-bootstrap/Stack';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 import { Document } from 'models';
 import { useRetryDocuments, useCancelDocuments } from 'hooks';
-import { SearchField } from 'core/ui';
+import { SearchField, DateSelect } from 'core/ui';
 import {
   UploadFilesModal,
   DocumentsTable,
@@ -12,6 +14,7 @@ import {
   ProcessDetails,
   StatusDropdown,
   OperationDropdown,
+  UserDropdown,
 } from './components';
 import { OperationOption } from './components/operation-dropdown';
 import { StatusOption } from './components/status-dropdown';
@@ -35,6 +38,9 @@ export const HomePage = (): ReactElement => {
   );
   const [uploadModalShow, setUploadModalShow] = useState<boolean>(false);
   const [viewDocModalShow, setViewDocModalShow] = useState<boolean>(false);
+  const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
+  const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
+  const [username, setUsername] = useState<string | undefined>(undefined);
   const processDetailsRef = useRef<any>(null);
   const documentsTableRef = useRef<any>(null);
   const hasSelectedRows = !!selectedDocuments.length;
@@ -51,7 +57,10 @@ export const HomePage = (): ReactElement => {
     selectedDocuments.every((doc) =>
       getForCancelDocStatuses().some((s) => s === doc.status),
     );
-  const docStatusFilter = getDocStatusFilter(selectedStatus, selectedOperation);
+  const documentStatusFilter = getDocStatusFilter(
+    selectedStatus,
+    selectedOperation,
+  );
 
   const {
     isLoading: isRetryDocSaving,
@@ -156,25 +165,53 @@ export const HomePage = (): ReactElement => {
           </Button>
         )}
       </Stack>
-      <div className="d-flex justify-content-between align-items-center flex-wrap my-2">
-        <Stack direction="horizontal" gap={3}>
+      <Row className="my-2">
+        <Col className="mb-2" xs={12} lg={2}>
           <StatusDropdown
             selected={selectedStatus}
             onChange={setSelectedStatus}
           />
+        </Col>
+        <Col className="mb-2" xs={12} lg={2}>
           <OperationDropdown
             selected={selectedOperation}
             onChange={setSelectedOperation}
           />
-        </Stack>
+        </Col>
+        <Col className="mb-2" xs={12} lg={2}>
+          <DateSelect
+            value={dateFrom}
+            onChange={setDateFrom}
+            label="Date from"
+            floatLabel
+          />
+        </Col>
+        <Col className="mb-2" xs={12} lg={2}>
+          <DateSelect
+            value={dateTo}
+            onChange={setDateTo}
+            label="Date to"
+            floatLabel
+          />
+        </Col>
+        <Col xs={12} lg={4}>
+          <UserDropdown value={username} onChange={setUsername} />
+        </Col>
+      </Row>
+      <div className="d-flex justify-content-end mb-2">
         <SearchField searchKey={searchKey} onSearchDocument={setSearchKey} />
       </div>
       <DocumentsTable
-        searchKey={searchKey}
         ref={documentsTableRef}
-        filterDocStatus={docStatusFilter}
         selectedDocuments={selectedDocuments}
         selectedDocumentKeys={selectedDocumentKeys}
+        dataFilters={{
+          searchKey,
+          dateFrom,
+          dateTo,
+          statuses: documentStatusFilter,
+          username,
+        }}
         setSelectedDocuments={setSelectedDocuments}
         setSelectedDocumentKeys={setSelectedDocumentKeys}
       />

@@ -98,11 +98,10 @@ export const useLoadAccountToken = (): UseLoadAccountTokenResult => {
                 setEmailAllowed(exists);
               }
             }
+          } else {
+            setIsLoaded(false);
+            setEmailAllowed(false);
           }
-        })
-        .catch(() => {
-          setIsLoaded(false);
-          setEmailAllowed(false);
         });
     }
   }, [
