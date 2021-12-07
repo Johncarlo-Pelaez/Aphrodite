@@ -16,7 +16,7 @@ export const LastNameField = ({
     rules={{ required: true }}
     render={({ field, fieldState: { invalid, error } }) => (
       <Form.Group className="mb-3">
-        <Form.Label>First Name</Form.Label>
+        <Form.Label>Last Name</Form.Label>
         <Form.Control
           {...field}
           placeholder="Enter Last Name"

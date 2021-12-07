@@ -1,9 +1,10 @@
-import { Document, DocumentStatus, DocumentHistory } from 'src/entities';
+import { Document, DocumentStatus, DocumentHistory, User } from 'src/entities';
 import {
   EntityManager,
   EntityRepository,
   ILike,
   In,
+  Between,
   FindOperator,
 } from 'typeorm';
 import {
@@ -25,6 +26,7 @@ import {
   ApproverApproveDisapproveDocParam,
   UpdateForRetryParam,
   UpdateToCancelledParam,
+  DeleteFileParam,
 } from './document.params';
 
 @EntityRepository()
@@ -32,10 +34,11 @@ export class DocumentRepository {
   constructor(private readonly manager: EntityManager) {}
 
   async getDocuments(param: GetDocumentsParam): Promise<Document[]> {
-    const { search = '', documentType, statuses } = param;
-
+    const { search = '', documentType, statuses, username, from, to } = param;
     let whereDocumentType: { documentType: FindOperator<string> };
     let whereStatusIn: { status: FindOperator<DocumentStatus> };
+    let whereUsername: { username: string };
+    let whereModifiedDate: { modifiedDate: FindOperator<Date> };
 
     if (documentType && documentType !== '') {
       whereDocumentType = {
@@ -49,6 +52,18 @@ export class DocumentRepository {
       };
     }
 
+    if (username && username !== '') {
+      whereUsername = {
+        username: username,
+      };
+    }
+
+    if (from && to) {
+      whereModifiedDate = {
+        modifiedDate: Between(from, to),
+      };
+    }
+
     return await this.manager.find(Document, {
       relations: ['user'],
       where: [
@@ -56,20 +71,28 @@ export class DocumentRepository {
           documentName: ILike(`%${search}%`),
           ...whereDocumentType,
           ...whereStatusIn,
+          user: {
+            ...whereUsername,
+          },
+          ...whereModifiedDate,
         },
         {
           user: {
             firstName: ILike(`%${search}%`),
+            ...whereUsername,
           },
           ...whereDocumentType,
           ...whereStatusIn,
+          ...whereModifiedDate,
         },
         {
           user: {
             lastName: ILike(`%${search}%`),
+            ...whereUsername,
           },
           ...whereDocumentType,
           ...whereStatusIn,
+          ...whereModifiedDate,
         },
       ],
       order: { modifiedDate: 'DESC' },
@@ -103,10 +126,11 @@ export class DocumentRepository {
   }
 
   async count(param: CountParam): Promise<number> {
-    const { search = '', documentType, statuses } = param;
-
+    const { search = '', documentType, statuses, username, from, to } = param;
     let whereDocumentType: { documentType: FindOperator<string> };
     let whereStatusIn: { status: FindOperator<DocumentStatus> };
+    let whereUsername: { username: string };
+    let whereModifiedDate: { modifiedDate: FindOperator<Date> };
 
     if (documentType && documentType !== '') {
       whereDocumentType = {
@@ -120,6 +144,18 @@ export class DocumentRepository {
       };
     }
 
+    if (username && username !== '') {
+      whereUsername = {
+        username: username,
+      };
+    }
+
+    if (from && to) {
+      whereModifiedDate = {
+        modifiedDate: Between(from, to),
+      };
+    }
+
     return await this.manager.count(Document, {
       relations: ['user'],
       where: [
@@ -127,20 +163,28 @@ export class DocumentRepository {
           documentName: ILike(`%${search}%`),
           ...whereDocumentType,
           ...whereStatusIn,
+          user: {
+            ...whereUsername,
+          },
+          ...whereModifiedDate,
         },
         {
           user: {
             firstName: ILike(`%${search}%`),
+            ...whereUsername,
           },
           ...whereDocumentType,
           ...whereStatusIn,
+          ...whereModifiedDate,
         },
         {
           user: {
             lastName: ILike(`%${search}%`),
+            ...whereUsername,
           },
           ...whereDocumentType,
           ...whereStatusIn,
+          ...whereModifiedDate,
         },
       ],
     });
@@ -550,6 +594,23 @@ export class DocumentRepository {
       document.modifiedDate = param.processAt;
       document.modifiedBy = param.cancelledBy;
       document.description = 'Cancelled.';
+      await transaction.save(document);
+
+      const history = this.genarateDocumentHistory(document);
+      await transaction.save(history);
+    });
+  }
+
+  async deleteFile(param: DeleteFileParam): Promise<void> {
+    await this.manager.transaction(async (transaction): Promise<void> => {
+      const document = await this.manager.findOneOrFail(
+        Document,
+        param.documentId,
+      );
+      document.modifiedDate = param.deletedAt;
+      document.modifiedBy = param.deletedBy ?? document.modifiedBy;
+      document.isFileDeleted = true;
+      document.description = 'Delete file from system directory.';
       await transaction.save(document);
 
       const history = this.genarateDocumentHistory(document);

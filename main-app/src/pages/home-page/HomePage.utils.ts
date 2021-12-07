@@ -53,7 +53,7 @@ export const concatDocumentStatuses = (
   return strDocumentStatuses;
 };
 
-export const getForRetryDocstatuses = (): DocumentStatus[] =>
+export const getForRetryDocStatuses = (): DocumentStatus[] =>
   Object.values(DocumentStatus).filter((s) => {
     const arrStattmp = s.split('_');
     if (arrStattmp.length === 2) return arrStattmp[1] === 'FAILED';
@@ -67,3 +67,49 @@ export const getForCancelDocStatuses = (): DocumentStatus[] =>
       return arrStattmp[1] !== 'DONE' && arrStattmp[1] !== 'FAILED';
     else return arrStattmp[0] !== DocumentStatus.CANCELLED;
   });
+
+export const getDocStatusFilter = (
+  cmbStatusValue: StatusOption,
+  cmbOperationValue: OperationOption,
+): DocumentStatus[] => {
+  const allOperation = Object.values(OperationOption).filter(
+    (o) => o !== OperationOption.ALL,
+  );
+  const allStatus = Object.values(StatusOption).filter(
+    (s) => s !== StatusOption.ALL,
+  );
+  let strStatusesFilter = '';
+
+  if (
+    cmbOperationValue === OperationOption.ALL &&
+    cmbStatusValue === StatusOption.ALL
+  ) {
+    strStatusesFilter = Object.values(DocumentStatus).join(',');
+  } else if (
+    cmbOperationValue === OperationOption.ALL &&
+    cmbStatusValue !== StatusOption.ALL
+  ) {
+    for (const operation of allOperation) {
+      strStatusesFilter += concatDocumentStatuses(operation, cmbStatusValue);
+    }
+  } else if (
+    cmbOperationValue !== OperationOption.ALL &&
+    cmbStatusValue === StatusOption.ALL
+  ) {
+    for (const status of allStatus) {
+      strStatusesFilter += concatDocumentStatuses(cmbOperationValue, status);
+    }
+  } else {
+    strStatusesFilter = concatDocumentStatuses(
+      cmbOperationValue,
+      cmbStatusValue,
+    );
+  }
+
+  const statusesFilter = strStatusesFilter
+    .split(',')
+    .filter((value, index, self) => self.indexOf(value) === index)
+    .map((status) => status.trim()) as DocumentStatus[];
+
+  return !!statusesFilter.length ? statusesFilter : [];
+};

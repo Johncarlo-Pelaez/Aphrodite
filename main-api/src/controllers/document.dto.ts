@@ -5,6 +5,7 @@ import {
   IsDateString,
   IsOptional,
   IsString,
+  IsEmail,
   IsUUID,
 } from 'class-validator';
 import { DocumentStatus } from 'src/entities';
@@ -34,6 +35,21 @@ export class GetDocumentsDto {
   @IsOptional()
   @IsString({ each: true })
   statuses?: DocumentStatus[];
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsEmail()
+  username?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsDateString()
+  from?: Date;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsDateString()
+  to?: Date;
 }
 
 export class CreateDocumentDto {

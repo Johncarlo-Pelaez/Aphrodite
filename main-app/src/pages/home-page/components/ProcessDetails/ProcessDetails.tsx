@@ -13,7 +13,7 @@ import {
 } from 'hooks';
 import { DocumentStatus } from 'core/enum';
 import {
-  getForRetryDocstatuses,
+  getForRetryDocStatuses,
   getForCancelDocStatuses,
 } from '../../HomePage.utils';
 
@@ -35,7 +35,7 @@ const useDocsProcessDetails = (): UseDocsProcessDetailsResult => {
     });
   const { data: cancelled_error = 0, refetch: refreshErrorCount } =
     useDocumentsProcessCount({
-      statuses: getForRetryDocstatuses(),
+      statuses: getForRetryDocStatuses(),
     });
 
   return {
@@ -101,7 +101,7 @@ export const ProcessDetails = forwardRef(
     );
 
     return (
-      <div className="d-flex justify-content-center flex-wrap my-4">
+      <div className="d-flex justify-content-center flex-wrap my-1">
         <Card className="shadow-sm m-3" style={cardStyle}>
           <Card.Body>
             <Card.Title as="h6">Success</Card.Title>

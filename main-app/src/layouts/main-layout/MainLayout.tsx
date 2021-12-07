@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import { WithChildren, MenuItem } from 'core/types';
 import { Role } from 'core/enum';
-import { useSignOut, useAccount, useGetCurrentUserRole } from 'hooks';
+import { useSignOut, useAccount, useGetCurrentUser } from 'hooks';
 
 type MainLayoutProps = WithChildren<{}>;
 
@@ -17,7 +17,7 @@ export const MainLayout = (props: MainLayoutProps): ReactElement => {
   const history = useHistory();
   const { account } = useAccount();
   const { signOut } = useSignOut();
-  const currentUserRole = useGetCurrentUserRole();
+  const { data: user } = useGetCurrentUser();
   const MainMenuItems: MenuItem[] = [
     {
       label: 'Home',
@@ -30,7 +30,7 @@ export const MainLayout = (props: MainLayoutProps): ReactElement => {
     {
       label: 'Settings',
       path: '/settings',
-      hidden: currentUserRole !== Role.ADMIN,
+      hidden: user?.role !== Role.ADMIN,
     },
   ];
 
@@ -47,7 +47,7 @@ export const MainLayout = (props: MainLayoutProps): ReactElement => {
       <Navbar expand="lg">
         <Container>
           <Navbar.Brand onClick={redirectToHome}>
-            <strong>APP LOGO</strong>
+            <strong>RIS</strong>
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse>

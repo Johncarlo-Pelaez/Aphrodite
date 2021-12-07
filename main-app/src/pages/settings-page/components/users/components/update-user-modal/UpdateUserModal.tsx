@@ -15,12 +15,14 @@ import {
   RoleField,
   LastNameField,
   FirstNameField,
+  ObjectIdField,
 } from '../add-user-modal/components';
 import { IsActiveField } from './components';
 
 interface UpdateUserForm extends UpdateUserApiParams, FieldValues {}
 
 export const updateUserSchema = yup.object().shape({
+  objectId: yup.string().required('Object ID is required.'),
   role: yup
     .mixed<Role>()
     .oneOf(Object.values(Role))
@@ -74,6 +76,7 @@ export const UpdateUserModal = ({
       firstName: '',
       lastName: '',
       isActive: true,
+      objectId: '',
     });
     triggerClose();
   };
@@ -82,6 +85,7 @@ export const UpdateUserModal = ({
     setValue('role', user?.role ?? Role.ENCODER);
     setValue('firstName', user?.firstName ?? '');
     setValue('lastName', user?.lastName ?? '');
+    setValue('objectId', user?.objectId ?? '');
     setValue('isActive', user?.isActive ?? true);
     // eslint-disable-next-line
   }, [user, isVisible]);
@@ -116,6 +120,7 @@ export const UpdateUserModal = ({
             <FirstNameField control={control} />
             <LastNameField control={control} />
             <IsActiveField control={control} />
+            <ObjectIdField control={control} />
           </fieldset>
         </Modal.Body>
         <Modal.Footer>

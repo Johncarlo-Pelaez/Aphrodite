@@ -114,6 +114,10 @@ export class Document {
   userUsername: string;
 
   @ApiProperty()
+  @Column()
+  isFileDeleted: boolean;
+
+  @ApiProperty()
   @ManyToOne(() => User, (e) => e.username)
   user: User;
 }

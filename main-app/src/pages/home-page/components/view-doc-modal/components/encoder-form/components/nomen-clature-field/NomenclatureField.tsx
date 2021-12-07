@@ -57,16 +57,15 @@ export const NomenclatureField = ({
         ref={ref}
         id="nomen-clature-field"
         disabled={isLoading}
-        // @ts-ignore
         defaultSelected={[]}
         isLoading={isLoading}
-        // @ts-ignore
         onChange={onChange}
         options={options}
-        // @ts-ignore
         selected={value ?? []}
         isInvalid={!!error}
         clearButton
+        // @ts-ignore
+        placeholder="Enter Nomenclature"
       />
       <Form.Control.Feedback type="invalid">
         {error?.message}

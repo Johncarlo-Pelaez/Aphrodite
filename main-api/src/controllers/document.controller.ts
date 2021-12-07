@@ -61,6 +61,9 @@ export class DocumentController {
       search: dto.search,
       documentType: dto.documentType,
       statuses: dto.statuses,
+      username: dto.username,
+      from: dto.from,
+      to: dto.to,
     });
     response.data = await this.documentRepository.getDocuments(dto);
 

@@ -24,6 +24,7 @@ import {
 } from 'src/spring-cm-service';
 import { DocumentStatus } from 'src/entities';
 import { DOCUMENT_QUEUE, MIGRATE_JOB } from './document.constants';
+const { readFile, unlink } = fs.promises;
 
 @Processor(DOCUMENT_QUEUE)
 export class DocumentConsumer {
@@ -145,7 +146,7 @@ export class DocumentConsumer {
         B64Attachment: buffer.toString('base64'),
       };
 
-      await this.runUploadToSpringCM(documentId, uploadParams);
+      await this.runUploadToSpringCM(documentId, uploadParams, sysSrcFileName);
     }
   }
 
@@ -286,6 +287,7 @@ export class DocumentConsumer {
   private async runUploadToSpringCM(
     documentId: number,
     uploadParams: UploadDocToSpringParams,
+    sysSrcFileName: string,
   ): Promise<void> {
     const { B64Attachment, ...forStrUploadParams } = uploadParams;
     const strUploadParams = JSON.stringify(forStrUploadParams);
@@ -320,23 +322,29 @@ export class DocumentConsumer {
       !!response?.SalesForce.length &&
       response?.SalesForce[0].created === 'true' &&
       response?.SalesForce[0].success === 'true'
-    )
+    ) {
       await this.updateToMigrateDone(
         documentId,
         strUploadParams,
         JSON.stringify(response),
       );
-    else
+      await unlink(path.join(this.appConfigService.filePath, sysSrcFileName));
+      await this.documentRepository.deleteFile({
+        documentId,
+        deletedAt: this.datesUtil.getDateNow(),
+      });
+    } else {
       await this.updateToMigrateFailed(
         documentId,
         strUploadParams,
         JSON.stringify(response),
       );
+    }
   }
 
-  private async readFile(filename: string): Promise<Buffer> {
-    const location = path.join(this.appConfigService.filePath, filename);
-    const buffer = await fs.promises.readFile(location);
+  private async readFile(sysSrcFileName: string): Promise<Buffer> {
+    const location = path.join(this.appConfigService.filePath, sysSrcFileName);
+    const buffer = await readFile(location);
     return buffer;
   }
 

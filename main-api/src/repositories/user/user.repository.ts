@@ -1,10 +1,6 @@
 import { Role, User } from 'src/entities';
 import { EntityManager, EntityRepository, In } from 'typeorm';
-import {
-  CreateUserParam,
-  UpdateUserParam,
-  DeleteUserParam,
-} from './user.params';
+import { CreateUserParam, UpdateUserParam } from './user.params';
 
 @EntityRepository()
 export class UserRepository {
@@ -62,6 +58,7 @@ export class UserRepository {
     user.lastName = param.lastName;
     user.isActive = param.isActive ?? true;
     user.role = param.role;
+    user.objectId = param.objectId;
     user.modifiedDate = param.modifiedDate;
     await this.manager.save(user);
   }

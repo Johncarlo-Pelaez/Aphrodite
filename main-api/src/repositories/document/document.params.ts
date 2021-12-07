@@ -4,6 +4,9 @@ export interface DocFilterParam {
   search?: string;
   documentType?: string;
   statuses?: DocumentStatus[];
+  username?: string;
+  from?: Date;
+  to?: Date;
 }
 
 export interface CountParam extends DocFilterParam {}
@@ -107,4 +110,10 @@ export interface UpdateForRetryParam extends BeginDocProcessParam {
 
 export interface UpdateToCancelledParam extends BeginDocProcessParam {
   cancelledBy: string;
+}
+
+export interface DeleteFileParam {
+  documentId: number;
+  deletedAt: Date;
+  deletedBy?: string;
 }

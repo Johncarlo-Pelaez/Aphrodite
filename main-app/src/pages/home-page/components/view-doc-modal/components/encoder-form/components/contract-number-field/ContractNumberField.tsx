@@ -26,7 +26,7 @@ export const ContractNumberField = ({
       </Form.Label>
       <Form.Control
         {...field}
-        placeholder="Contract Number"
+        placeholder="Enter contract number"
         onFocus={(event) => event.target.select()}
         isInvalid={!!error}
       />

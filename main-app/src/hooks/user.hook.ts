@@ -6,6 +6,7 @@ import {
   UpdateUserApi,
   updateUserApi,
   getCurrentUser,
+  removeApiHeaders,
 } from 'apis';
 import {
   useQuery,
@@ -14,12 +15,13 @@ import {
   UseMutationResult,
   useQueryClient,
 } from 'react-query';
+import { useSetRecoilState } from 'recoil';
+import { isAccountTokenLoadedState } from 'states';
 import { User } from 'models';
 import { useEmailAllowed, useLoadAccountToken } from 'hooks/account.hook';
 import { ApiError } from 'core/types';
-import { Role } from 'core/enum';
 import { useState } from 'react';
-import { QueryKey } from 'utils';
+import { QueryKey, checkIfUnAuthorize } from 'utils';
 
 export const useUsers = (): UseQueryResult<User[], ApiError> => {
   return useQuery(QueryKey.users, getUsersApi);
@@ -83,16 +85,18 @@ export const useEmailExists = (): UseEmailExistsResult => {
   return { isLoading, checkEmailExists };
 };
 
-export const useGetCurrentUserRole = (): Role | undefined => {
+export const useGetCurrentUser = (): UseQueryResult<User, ApiError> => {
+  const setIsLoaded = useSetRecoilState(isAccountTokenLoadedState);
   const { isAllowed } = useEmailAllowed();
   const { isLoaded } = useLoadAccountToken();
-  const { data: user } = useQuery<User, ApiError>(
-    QueryKey.currentUser,
-    getCurrentUser,
-    {
-      refetchInterval: 1000 * 30,
-      enabled: isAllowed && isLoaded,
+  return useQuery<User, ApiError>(QueryKey.currentUser, getCurrentUser, {
+    refetchInterval: 1000 * 30,
+    enabled: isAllowed && isLoaded,
+    onError: (error) => {
+      if (checkIfUnAuthorize(error)) {
+        removeApiHeaders();
+        setIsLoaded(false);
+      }
     },
-  );
-  return user?.role;
+  });
 };

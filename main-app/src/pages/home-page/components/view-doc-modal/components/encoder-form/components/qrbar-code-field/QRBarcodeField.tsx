@@ -26,7 +26,7 @@ export const QRBarcodeField = ({
       </Form.Label>
       <Form.Control
         {...field}
-        placeholder="Barcode / QR Code"
+        placeholder="Enter barcode / QR code"
         onFocus={(event) => event.target.select()}
         isInvalid={!!error}
       />

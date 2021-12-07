@@ -1,8 +1,6 @@
 import { ParsedUrlQueryInput } from 'querystring';
 import queryString, { ParseOptions } from 'query-string';
 
-export { createTablePaginationQuery, createQueryString };
-
 type TableQueryParams = {
   currentPage: number;
   pageSize: number;
@@ -13,7 +11,9 @@ type CalculatePageSkipParams = {
   pageSize: number;
 };
 
-const createTablePaginationQuery = (tableQuery: TableQueryParams): string => {
+export const createTablePaginationQuery = (
+  tableQuery: TableQueryParams,
+): string => {
   const { currentPage, pageSize } = tableQuery;
   return createQueryString({
     take: pageSize,
@@ -21,7 +21,7 @@ const createTablePaginationQuery = (tableQuery: TableQueryParams): string => {
   });
 };
 
-const createQueryString = (
+export const createQueryString = (
   params: ParsedUrlQueryInput,
   options?: ParseOptions,
 ): string => {
@@ -32,7 +32,9 @@ const createQueryString = (
   return queryString.stringify(params, theOptions);
 };
 
-const calculatePageSkip = (pageSkips: CalculatePageSkipParams): number => {
+export const calculatePageSkip = (
+  pageSkips: CalculatePageSkipParams,
+): number => {
   const { currentPage, pageSize } = pageSkips;
 
   return (currentPage - 1) * pageSize;
