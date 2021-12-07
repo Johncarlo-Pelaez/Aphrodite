@@ -1,10 +1,6 @@
 import { Role, User } from 'src/entities';
 import { EntityManager, EntityRepository, In } from 'typeorm';
-import {
-  CreateUserParam,
-  UpdateUserParam,
-  DeleteUserParam,
-} from './user.params';
+import { CreateUserParam, UpdateUserParam } from './user.params';
 
 @EntityRepository()
 export class UserRepository {

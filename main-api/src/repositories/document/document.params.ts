@@ -4,6 +4,9 @@ export interface DocFilterParam {
   search?: string;
   documentType?: string;
   statuses?: DocumentStatus[];
+  username?: string;
+  from?: Date;
+  to?: Date;
 }
 
 export interface CountParam extends DocFilterParam {}
