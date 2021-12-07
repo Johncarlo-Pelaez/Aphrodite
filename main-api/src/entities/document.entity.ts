@@ -114,6 +114,10 @@ export class Document {
   userUsername: string;
 
   @ApiProperty()
+  @Column()
+  isFileDeleted: boolean;
+
+  @ApiProperty()
   @ManyToOne(() => User, (e) => e.username)
   user: User;
 }
@@ -155,10 +159,6 @@ export class DocumentHistory {
   })
   @Column({ enum: DocumentStatus, nullable: true })
   documentStatus?: DocumentStatus;
-
-  @ApiProperty()
-  @Column()
-  isFileDeleted: boolean;
 
   @ApiProperty()
   @ManyToOne(() => User, (e) => e.username)

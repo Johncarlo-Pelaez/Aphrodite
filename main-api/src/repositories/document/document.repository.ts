@@ -566,6 +566,7 @@ export class DocumentRepository {
       );
       document.modifiedDate = param.deletedAt;
       document.modifiedBy = param.deletedBy ?? document.modifiedBy;
+      document.isFileDeleted = true;
       document.description = 'Delete file from system directory.';
       await transaction.save(document);
 
