@@ -49,7 +49,6 @@ export interface DocumentHistory {
   documentId: number;
   document: Document;
   userUsername: string;
-  user: User;
 }
 
 export interface NomenclatureWhitelist {

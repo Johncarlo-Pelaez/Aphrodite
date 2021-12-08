@@ -44,14 +44,11 @@ export const DocHistoryTable = ({
     },
     {
       title: 'User',
-      dataIndex: 'user',
-      render: (docHistory: DocumentHistory) =>
-        `${docHistory.user.firstName} ${docHistory.user.lastName}`,
+      dataIndex: 'userUsername',
     },
     {
       title: 'Activity',
-      dataIndex: 'user',
-      render: (docHistory: DocumentHistory) => docHistory.description,
+      dataIndex: 'description',
     },
     {
       title: 'Date and Time',

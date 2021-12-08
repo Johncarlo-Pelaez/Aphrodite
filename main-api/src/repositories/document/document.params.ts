@@ -1,17 +1,12 @@
 import { DocumentStatus } from 'src/entities';
 
-export interface DocFilterParam {
+export interface GetDocumentsParam {
   search?: string;
   documentType?: string;
   statuses?: DocumentStatus[];
   username?: string;
   from?: Date;
   to?: Date;
-}
-
-export interface CountParam extends DocFilterParam {}
-
-export interface GetDocumentsParam extends DocFilterParam {
   skip?: number;
   take?: number;
 }
@@ -24,6 +19,7 @@ export interface CreateDocumentParam {
   qrCode?: string;
   createdDate: Date;
   username: string;
+  pageTotal: number;
 }
 
 export interface BeginDocProcessParam {
@@ -44,16 +40,17 @@ export interface FailDocProcessParam {
 
 export interface DoneIndexingParam {
   documentId: number;
+  documentType?: string;
+  docTypeReqParams?: string;
+  contractDetails?: string;
+  contractDetailsReqParams?: string;
   indexedAt: Date;
-  documentType: string;
-  docTypeReqParams: string;
-  contractDetails: string;
-  contractDetailsReqParams: string;
 }
 
 export interface FailIndexingParam extends FailDocProcessParam {
-  docTypeReqParams: string;
-  contractDetailsReqParams: string;
+  docTypeReqParams?: string;
+  contractDetailsReqParams?: string;
+  salesforceResponse?: string;
 }
 
 export interface MigrateDocumentParam {
@@ -68,17 +65,17 @@ export interface FailDocMigrateParam extends FailDocProcessParam {
   springResponse?: string;
 }
 
-interface EncodeProcess {
+interface EncodeProcessParam {
   documentId: number;
   encodedAt: Date;
   encodedBy: string;
 }
 
-export interface EncodeQrBarcodeParam extends EncodeProcess {
+export interface EncodeQrBarcodeParam extends EncodeProcessParam {
   qrBarCode: string;
 }
 
-export interface EncodeAccountDetailsParam extends EncodeProcess {
+export interface EncodeAccountDetailsParam extends EncodeProcessParam {
   encodeValues: string;
 }
 

@@ -1,6 +1,6 @@
 import { StringToIntPipe } from 'src/core/pipes';
-import { GetUploadedDocumentsReportDto } from './report.dto';
+import { GetUploadedReportDto } from './report.dto';
 
-export class GetDocumentsReportIntPipe extends StringToIntPipe<GetUploadedDocumentsReportDto> {
-  props: (keyof GetUploadedDocumentsReportDto)[] = ['skip', 'take'];
+export class GetDocumentsReportIntPipe extends StringToIntPipe<GetUploadedReportDto> {
+  props: (keyof GetUploadedReportDto)[] = ['skip', 'take'];
 }

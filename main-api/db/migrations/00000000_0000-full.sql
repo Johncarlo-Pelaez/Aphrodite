@@ -1,4 +1,4 @@
-/****** Object:  Table [dbo].[activity_log]    Script Date: 12/7/2021 10:49:09 AM ******/
+/****** Object:  Table [dbo].[activity_log]    Script Date: 12/8/2021 7:14:34 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -8,10 +8,14 @@ CREATE TABLE [dbo].[activity_log](
 	[type] [nvarchar](100) NOT NULL,
 	[description] [nvarchar](max) NOT NULL,
 	[loggedAt] [datetime] NOT NULL,
-	[loggedBy] [nvarchar](255) NULL
+	[loggedBy] [nvarchar](255) NULL,
+ CONSTRAINT [PK_activity_log] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[document]    Script Date: 12/7/2021 10:49:09 AM ******/
+/****** Object:  Table [dbo].[document]    Script Date: 12/8/2021 7:14:34 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -35,7 +39,7 @@ CREATE TABLE [dbo].[document](
 	[remarks] [nvarchar](max) NULL,
 	[docTypeReqParams] [nvarchar](max) NULL,
 	[contractDetailsReqParams] [nvarchar](max) NULL,
-	[springReqParams] [nvarchar](max) NULL,
+	[springcmReqParams] [nvarchar](max) NULL,
 	[documentDate] [nvarchar](150) NULL,
 	[encoder] [nvarchar](255) NULL,
 	[encodedAt] [datetime] NULL,
@@ -44,13 +48,14 @@ CREATE TABLE [dbo].[document](
 	[approver] [nvarchar](255) NULL,
 	[encodeValues] [nvarchar](max) NULL,
 	[isFileDeleted] [bit] NOT NULL,
+	[pageTotal] [int] NOT NULL,
  CONSTRAINT [PK_document] PRIMARY KEY CLUSTERED 
 (
 	[id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[document_history]    Script Date: 12/7/2021 10:49:09 AM ******/
+/****** Object:  Table [dbo].[document_history]    Script Date: 12/8/2021 7:14:34 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -63,13 +68,15 @@ CREATE TABLE [dbo].[document_history](
 	[documentId] [int] NOT NULL,
 	[userUsername] [nvarchar](255) NOT NULL,
 	[documentStatus] [nvarchar](100) NULL,
+	[salesforceResponse] [nvarchar](max) NULL,
+	[springcmResponse] [nvarchar](max) NULL,
  CONSTRAINT [PK_0783dd4cd636039459ee63c9a8b] PRIMARY KEY CLUSTERED 
 (
 	[id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[nomenclature_lookup]    Script Date: 12/7/2021 10:49:09 AM ******/
+/****** Object:  Table [dbo].[nomenclature_lookup]    Script Date: 12/8/2021 7:14:34 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -80,7 +87,7 @@ CREATE TABLE [dbo].[nomenclature_lookup](
 	[documentGroup] [nvarchar](max) NOT NULL
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[nomenclature_whitelist]    Script Date: 12/7/2021 10:49:09 AM ******/
+/****** Object:  Table [dbo].[nomenclature_whitelist]    Script Date: 12/8/2021 7:14:34 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -90,7 +97,7 @@ CREATE TABLE [dbo].[nomenclature_whitelist](
 	[description] [nvarchar](255) NOT NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[user]    Script Date: 12/7/2021 10:49:09 AM ******/
+/****** Object:  Table [dbo].[user]    Script Date: 12/8/2021 7:14:34 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -113,12 +120,15 @@ CREATE TABLE [dbo].[user](
 GO
 ALTER TABLE [dbo].[document] ADD  CONSTRAINT [DF_document_isFileDeleted]  DEFAULT ((0)) FOR [isFileDeleted]
 GO
+ALTER TABLE [dbo].[document] ADD  CONSTRAINT [DF_document_pageTotal]  DEFAULT ((1)) FOR [pageTotal]
+GO
 ALTER TABLE [dbo].[user] ADD  CONSTRAINT [DF_user_IsActive]  DEFAULT ((1)) FOR [isActive]
 GO
 ALTER TABLE [dbo].[user] ADD  DEFAULT ('NA') FOR [objectId]
 GO
 ALTER TABLE [dbo].[document]  WITH CHECK ADD  CONSTRAINT [FK_document_user] FOREIGN KEY([userUsername])
 REFERENCES [dbo].[user] ([username])
+ON UPDATE CASCADE
 GO
 ALTER TABLE [dbo].[document] CHECK CONSTRAINT [FK_document_user]
 GO
@@ -126,9 +136,4 @@ ALTER TABLE [dbo].[document_history]  WITH CHECK ADD  CONSTRAINT [FK_4a948639850
 REFERENCES [dbo].[document] ([id])
 GO
 ALTER TABLE [dbo].[document_history] CHECK CONSTRAINT [FK_4a9486398505240b92812660f7f]
-GO
-ALTER TABLE [dbo].[document_history]  WITH CHECK ADD  CONSTRAINT [FK_document_history_user] FOREIGN KEY([userUsername])
-REFERENCES [dbo].[user] ([username])
-GO
-ALTER TABLE [dbo].[document_history] CHECK CONSTRAINT [FK_document_history_user]
 GO

@@ -1,4 +1,4 @@
-import moment from 'moment';
+import * as moment from 'moment';
 import { ActivityLog, ActivityLogType } from 'src/entities';
 import {
   EntityManager,
@@ -8,7 +8,6 @@ import {
 } from 'typeorm';
 import {
   GetActivityLogsParam,
-  GetActivityLogsCountParam,
   InsertCreateUserLogParam,
   InsertUpdateUserLogParam,
   InsertCreateLookupLogParam,
@@ -52,9 +51,7 @@ export class ActivityLogRepository {
     });
   }
 
-  async getActivityLogsCount(
-    param: GetActivityLogsCountParam,
-  ): Promise<number> {
+  async getActivityLogsCount(param: GetActivityLogsParam): Promise<number> {
     const { activityType, loggedBy, from, to } = param;
 
     let whereConditions: FindConditions<ActivityLog> = {};
