@@ -45,47 +45,47 @@ export class Document {
   @Column({ enum: DocumentStatus })
   status: DocumentStatus;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @Column({ nullable: true })
   qrCode?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @Column({ nullable: true })
   qrAt?: Date;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @Column({ nullable: true })
   documentType?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @Column({ nullable: true })
   contractDetails?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @Column({ nullable: true })
   springResponse?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @Column({ nullable: true })
   remarks?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @Column({ nullable: true })
   docTypeReqParams?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @Column({ nullable: true })
   contractDetailsReqParams?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @Column({ nullable: true })
-  springReqParams?: string;
+  springcmReqParams?: string;
 
   @ApiProperty()
   @Column({ nullable: true })
   documentDate?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @Column({ nullable: true })
   encoder?: string;
 
@@ -93,19 +93,19 @@ export class Document {
   @Column({ nullable: true })
   encodedAt?: Date;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @Column({ nullable: true })
   encodeValues?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @Column({ nullable: true })
   checker?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @Column({ nullable: true })
   checkedAt?: Date;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @Column({ nullable: true })
   approver?: string;
 
@@ -156,11 +156,16 @@ export class DocumentHistory {
 
   @ApiProperty({
     enum: DocumentStatus,
+    required: false,
   })
   @Column({ enum: DocumentStatus, nullable: true })
   documentStatus?: DocumentStatus;
 
-  @ApiProperty()
-  @ManyToOne(() => User, (e) => e.username)
-  user: User;
+  @ApiProperty({ required: false })
+  @Column({ nullable: true })
+  salesforceResponse?: string;
+
+  @ApiProperty({ required: false })
+  @Column({ nullable: true })
+  springcmResponse?: string;
 }

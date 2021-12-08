@@ -44,16 +44,17 @@ export interface FailDocProcessParam {
 
 export interface DoneIndexingParam {
   documentId: number;
+  documentType?: string;
+  docTypeReqParams?: string;
+  contractDetails?: string;
+  contractDetailsReqParams?: string;
   indexedAt: Date;
-  documentType: string;
-  docTypeReqParams: string;
-  contractDetails: string;
-  contractDetailsReqParams: string;
 }
 
 export interface FailIndexingParam extends FailDocProcessParam {
-  docTypeReqParams: string;
-  contractDetailsReqParams: string;
+  docTypeReqParams?: string;
+  contractDetailsReqParams?: string;
+  salesforceResponse?: string;
 }
 
 export interface MigrateDocumentParam {
