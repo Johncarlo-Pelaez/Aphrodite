@@ -222,22 +222,19 @@ export class DocumentConsumer {
       });
       this.logger.error(error);
       throw error;
-    } finally {
-      documentType = !!getDocTypeResult.response.length
-        ? getDocTypeResult.response[0]
-        : undefined;
+    }
 
-      if (!documentType) {
-        const error = new NotFoundException();
-        await this.documentRepository.failIndexing({
-          documentId,
-          docTypeReqParams: JSON.stringify(getDocTypeReqParams),
-          salesforceResponse: JSON.stringify(getDocTypeResult),
-          failedAt: this.datesUtil.getDateNow(),
-        });
-        this.logger.error(error);
-        throw error;
-      }
+    documentType = !!getDocTypeResult.response.length
+      ? getDocTypeResult.response[0]
+      : undefined;
+
+    if (!documentType) {
+      await this.documentRepository.failIndexing({
+        documentId,
+        docTypeReqParams: JSON.stringify(getDocTypeReqParams),
+        salesforceResponse: JSON.stringify(getDocTypeResult),
+        failedAt: this.datesUtil.getDateNow(),
+      });
     }
 
     await this.documentRepository.doneIndexing({
@@ -280,24 +277,21 @@ export class DocumentConsumer {
       });
       this.logger.error(error);
       throw error;
-    } finally {
-      contractDetail =
-        !!getContractDetailsResult?.response?.length &&
-        !!getContractDetailsResult?.response[0].items?.length
-          ? getContractDetailsResult.response[0].items[0]
-          : undefined;
+    }
 
-      if (!contractDetail) {
-        const error = new NotFoundException();
-        await this.documentRepository.failIndexing({
-          documentId,
-          contractDetailsReqParams: JSON.stringify(getContractDetailsReqParams),
-          salesforceResponse: JSON.stringify(getContractDetailsResult),
-          failedAt: this.datesUtil.getDateNow(),
-        });
-        this.logger.error(error);
-        throw error;
-      }
+    contractDetail =
+      !!getContractDetailsResult?.response?.length &&
+      !!getContractDetailsResult?.response[0].items?.length
+        ? getContractDetailsResult.response[0].items[0]
+        : undefined;
+
+    if (!contractDetail) {
+      await this.documentRepository.failIndexing({
+        documentId,
+        contractDetailsReqParams: JSON.stringify(getContractDetailsReqParams),
+        salesforceResponse: JSON.stringify(getContractDetailsResult),
+        failedAt: this.datesUtil.getDateNow(),
+      });
     }
 
     const documentType = {

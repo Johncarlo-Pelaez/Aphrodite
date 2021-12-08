@@ -10,7 +10,6 @@ import {
 } from 'typeorm';
 import {
   CreateDocumentParam,
-  CountParam,
   GetDocumentsParam,
   BeginDocProcessParam,
   QrDocumentParam,
@@ -131,7 +130,7 @@ export class DocumentRepository {
     });
   }
 
-  async count(param: CountParam): Promise<number> {
+  async count(param: GetDocumentsParam): Promise<number> {
     const { search = '', documentType, statuses, username, from, to } = param;
     let whereDocumentType: { documentType: FindOperator<string> };
     let whereStatusIn: { status: FindOperator<DocumentStatus> };
@@ -203,7 +202,7 @@ export class DocumentRepository {
 
   async getHistory(documentId: number): Promise<DocumentHistory[]> {
     return await this.manager.find(DocumentHistory, {
-      relations: ['document', 'user'],
+      relations: ['document'],
       where: { documentId },
       order: { createdDate: 'DESC', id: 'DESC' },
     });

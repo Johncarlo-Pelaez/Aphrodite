@@ -6,11 +6,38 @@ import {
   IsEmail,
 } from 'class-validator';
 
-export class GetUploadedDocumentsReportDto {
+export class GetUploadedReportDto {
   @ApiProperty({ required: false })
   @IsOptional()
   @IsEmail()
-  username?: string;
+  uploader?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsDateString()
+  from?: Date;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsDateString()
+  to?: Date;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsNumberString()
+  skip?: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsNumberString()
+  take?: number;
+}
+
+export class GetInformationRequestReportDto {
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsEmail()
+  encoder?: string;
 
   @ApiProperty({ required: false })
   @IsOptional()

@@ -1,17 +1,12 @@
 import { DocumentStatus } from 'src/entities';
 
-export interface DocFilterParam {
+export interface GetDocumentsParam {
   search?: string;
   documentType?: string;
   statuses?: DocumentStatus[];
   username?: string;
   from?: Date;
   to?: Date;
-}
-
-export interface CountParam extends DocFilterParam {}
-
-export interface GetDocumentsParam extends DocFilterParam {
   skip?: number;
   take?: number;
 }
@@ -70,17 +65,17 @@ export interface FailDocMigrateParam extends FailDocProcessParam {
   springResponse?: string;
 }
 
-interface EncodeProcess {
+interface EncodeProcessParam {
   documentId: number;
   encodedAt: Date;
   encodedBy: string;
 }
 
-export interface EncodeQrBarcodeParam extends EncodeProcess {
+export interface EncodeQrBarcodeParam extends EncodeProcessParam {
   qrBarCode: string;
 }
 
-export interface EncodeAccountDetailsParam extends EncodeProcess {
+export interface EncodeAccountDetailsParam extends EncodeProcessParam {
   encodeValues: string;
 }
 

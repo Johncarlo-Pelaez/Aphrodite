@@ -9,13 +9,6 @@ export interface GetActivityLogsParam {
   take?: number;
 }
 
-export interface GetActivityLogsCountParam {
-  activityType?: ActivityLogType;
-  loggedBy?: string;
-  from?: Date;
-  to?: Date;
-}
-
 export interface InsertCreateUserLogParam {
   username: string;
   createdBy: string;
