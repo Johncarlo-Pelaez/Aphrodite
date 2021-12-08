@@ -20,15 +20,15 @@ enum TabKey {
 
 export const SettingsPage = (): ReactElement => {
   return (
-    <Container className="my-4" fluid>
-      <h4 className="fw-normal py-3">Settings</h4>
+    <Container className="my-2" fluid>
+      <h5 className="fw-normal m-3">Settings</h5>
       <Tab.Container
         id="left-tabs-example"
         defaultActiveKey={TabKey.NOMENCLATURE_LOOKUP}
       >
         <Row>
-          <Col sm={3}>
-            <Nav variant="pills" className="flex-column">
+          <Col sm={2} md={2}>
+            <Nav variant="pills" className="flex-column text-wrap">
               <Nav.Item>
                 <Nav.Link eventKey={TabKey.NOMENCLATURE_LOOKUP}>
                   Nomenclature lookup
@@ -49,7 +49,7 @@ export const SettingsPage = (): ReactElement => {
               </Nav.Item>
             </Nav>
           </Col>
-          <Col sm={9}>
+          <Col sm={10} md={10}>
             <Tab.Content>
               <Tab.Pane eventKey={TabKey.NOMENCLATURE_LOOKUP}>
                 <NomenclatureLookup />

@@ -1,32 +1,36 @@
-import { ReactElement, Dispatch, SetStateAction, ChangeEvent } from 'react';
+import { ReactElement, Dispatch, SetStateAction } from 'react';
 import { Form, Stack } from 'react-bootstrap';
+import { DateSelect } from 'core/ui';
 
 export interface DateRangeProps {
-  setDateFrom: Dispatch<SetStateAction<Date | null>>;
-  setDateTo: Dispatch<SetStateAction<Date | null>>;
+  setDateFrom: Dispatch<SetStateAction<Date | undefined>>;
+  setDateTo: Dispatch<SetStateAction<Date | undefined>>;
+  dateFrom: Date | undefined;
+  dateTo: Date | undefined;
 }
 
 export const DateRange = ({
   setDateFrom,
   setDateTo,
+  dateFrom,
+  dateTo,
 }: DateRangeProps): ReactElement => {
-  const onChangeFrom = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.valueAsDate)
-      setDateFrom(new Date(e.target.valueAsDate?.toDateString()));
-  };
-  const onChangeTo = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.valueAsDate)
-      setDateTo(new Date(e.target.valueAsDate?.toDateString()));
-  };
   return (
     <div className="d-flex justify-content-between align-items-center flex-wrap my-1">
       <Form>
-        <Stack direction="horizontal" gap={3}>
-          <Form.Label htmlFor="inlineFormInputFromDate">From:</Form.Label>
-          <Form.Control type="date" name="from" onChange={onChangeFrom} />
-
-          <Form.Label htmlFor="inlineFormInputToDate">To:</Form.Label>
-          <Form.Control type="date" name="to" onChange={onChangeTo} />
+        <Stack direction="horizontal" gap={2}>
+          <DateSelect
+            value={dateFrom}
+            onChange={setDateFrom}
+            label="Date Logged Start"
+            floatLabel
+          />
+          <DateSelect
+            value={dateTo}
+            onChange={setDateTo}
+            label="Date Logged End"
+            floatLabel
+          />
         </Stack>
       </Form>
     </div>

@@ -1,11 +1,12 @@
-import { ReactElement, useState, useMemo } from 'react';
-import { useActivityLog, useDebounce } from 'hooks';
+import { ReactElement, useState, useMemo, useEffect, useCallback } from 'react';
 import { SorterResult, SortOrder, Table, TableColumnProps } from 'core/ui';
-import { ActivityLog } from 'models';
-import moment from 'moment';
+import { useActivityLog, useDebounce } from 'hooks';
+import { UseActivityLogsFilterParams } from 'apis';
 import { DEFAULT_DATE_FORMAT } from 'core/constants';
 import { sortDateTime } from 'utils/sort';
-import { UseActivityLogsFilterParams } from 'apis';
+import { ActivityLog } from 'models';
+import moment from 'moment';
+import { Card } from 'react-bootstrap';
 
 const DEFAULT_SORT_ORDER: SorterResult = {
   field: 'loggedAt',
@@ -22,16 +23,18 @@ export const ActivityLogsTable = ({
   );
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(15);
-  const debouncedSearch = useDebounce(loggedBy);
+  const [from, setFrom] = useState<Date | undefined>(undefined);
+  const [to, setTo] = useState<Date | undefined>(undefined);
 
+  const debouncedSearch = useDebounce(loggedBy);
   const {
     isLoading: isActivityLoading,
     isError: hasActivityError,
     data: result,
   } = useActivityLog({
     loggedBy: debouncedSearch,
-    loggedAtFrom,
-    loggedAtTo,
+    loggedAtFrom: from,
+    loggedAtTo: to,
     currentPage,
     pageSize,
   });
@@ -41,20 +44,20 @@ export const ActivityLogsTable = ({
     [result?.data, result?.count],
   );
 
-  const columns: TableColumnProps<ActivityLog>[] = [
+  const renderColumns = (): TableColumnProps<ActivityLog>[] => [
     {
-      title: 'Activity',
+      title: 'Activities',
       dataIndex: 'type',
-      render: (activity: ActivityLog) => {
-        return activity.type;
+      render: ({ type }: ActivityLog) => {
+        return type;
       },
     },
     {
-      title: 'Description',
+      title: 'Descriptions',
       dataIndex: 'description',
     },
     {
-      title: 'Logged At',
+      title: 'Date Logged',
       dataIndex: 'loggedAt',
       render: ({ loggedAt }: ActivityLog) =>
         moment(loggedAt).format(DEFAULT_DATE_FORMAT),
@@ -67,26 +70,51 @@ export const ActivityLogsTable = ({
     setSorter(sorterResult ?? DEFAULT_SORT_ORDER);
   };
 
+  const processDateRangeValue = useCallback(() => {
+    const start = new Date(moment(loggedAtFrom).format(DEFAULT_DATE_FORMAT));
+    start.setDate(start.getDate() - 1);
+    setFrom(start);
+
+    const end = new Date(moment(loggedAtTo).format(DEFAULT_DATE_FORMAT));
+    end.setDate(end.getDate() - 1);
+    setTo(end);
+  }, [loggedAtFrom, loggedAtTo]);
+
+  useEffect(() => {
+    if (loggedAtFrom && loggedAtTo) processDateRangeValue();
+
+    return () => {
+      setCurrentPage(1);
+      setPageSize(15);
+      setFrom(undefined);
+      setTo(undefined);
+    };
+  }, [loggedAtFrom, loggedAtTo, processDateRangeValue]);
+
   return (
-    <Table<ActivityLog>
-      isServerSide
-      rowKey={(activity) => activity.id}
-      loading={isActivityLoading}
-      isError={hasActivityError}
-      columns={columns}
-      data={activityLog}
-      pagination={{
-        total: total,
-        pageSize: pageSize,
-        current: currentPage,
-        pageNumber: 5,
-        onChange: (page) => {
-          setCurrentPage(page);
-        },
-        onSizeChange: setPageSize,
-      }}
-      onChange={changeSort}
-    />
+    <Card>
+      <Card.Body className="p-1 flex-column position-">
+        <Table<ActivityLog>
+          isServerSide
+          rowKey={(activity) => activity.id}
+          loading={isActivityLoading}
+          isError={hasActivityError}
+          columns={renderColumns()}
+          data={activityLog}
+          pagination={{
+            total: total,
+            pageSize: pageSize,
+            current: currentPage,
+            pageNumber: 5,
+            onChange: (page) => {
+              setCurrentPage(page);
+            },
+            onSizeChange: setPageSize,
+          }}
+          onChange={changeSort}
+        />
+      </Card.Body>
+    </Card>
   );
 };
 

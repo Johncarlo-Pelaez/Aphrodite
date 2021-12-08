@@ -1,37 +1,41 @@
 import { ReactElement } from 'react';
+import { useUsers } from 'hooks';
 import Form from 'react-bootstrap/Form';
 import styles from './UsersDropdown.module.css';
-
-import { useUsers } from 'hooks';
-
-export const AllUsers = [{ label: 'All Users' }];
+import FloatingLabel from 'react-bootstrap/FloatingLabel';
+import { DEFAULT_ALL_USER_SELECTED } from 'core/constants';
 
 export interface UserDropdownProps {
   onChange: (username: string) => void;
 }
+export const AllUsers = [{ label: DEFAULT_ALL_USER_SELECTED }];
 
 export const UsersDropdown = ({
   onChange,
 }: UserDropdownProps): ReactElement => {
   const { data: users = [] } = useUsers();
 
-  const handleOnChange = (event: React.FormEvent<HTMLSelectElement>): void => {
+  const onChangeUser = (event: React.FormEvent<HTMLSelectElement>): void => {
     onChange(event.currentTarget.value);
   };
 
   return (
-    <Form.Select className={styles.select} onChange={handleOnChange}>
-      {AllUsers.map((op, index) => (
-        <option key={index} value={op.label}>
-          {op.label}
-        </option>
-      ))}
-      {users.map((op, index) => (
-        <option key={index} value={op.username}>
-          {op.username}
-        </option>
-      ))}
-    </Form.Select>
+    <div>
+      <FloatingLabel label="Email Accounts">
+        <Form.Select className={styles.select} onChange={onChangeUser}>
+          {AllUsers.map((op, index) => (
+            <option className={styles.prop} key={index} value={op.label}>
+              {op.label}
+            </option>
+          ))}
+          {users.map((op, index) => (
+            <option className={styles.prop} key={index} value={op.username}>
+              {op.username}
+            </option>
+          ))}
+        </Form.Select>
+      </FloatingLabel>
+    </div>
   );
 };
 

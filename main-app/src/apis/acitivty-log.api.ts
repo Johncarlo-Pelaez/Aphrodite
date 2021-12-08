@@ -5,6 +5,8 @@ import {
   createQueryString,
   createTablePaginationQuery,
 } from 'utils/query-string';
+import moment from 'moment';
+import { DEFAULT_DATE_FORMAT, DEFAULT_ALL_USER_SELECTED } from 'core/constants';
 
 export interface GetActivityLogsApiResponse {
   count: number;
@@ -13,8 +15,8 @@ export interface GetActivityLogsApiResponse {
 
 export interface UseActivityLogsFilterParams {
   loggedBy: string;
-  loggedAtFrom: Date | null;
-  loggedAtTo: Date | null;
+  loggedAtFrom?: Date;
+  loggedAtTo?: Date;
 }
 
 export interface UseActivityLog extends UseActivityLogsFilterParams {
@@ -34,14 +36,20 @@ export const getActivityLogApi = async (
   params: UseActivityLog,
 ): Promise<GetActivityLogsApiResponse> => {
   const paginationQuery = createTablePaginationQuery(params);
-  if (params.loggedBy === 'All Users') {
+  if (params.loggedBy === DEFAULT_ALL_USER_SELECTED) {
     params.loggedBy = '';
   }
+  const dateFromFilter = params.loggedAtFrom
+    ? moment(params.loggedAtFrom).startOf('day').format(DEFAULT_DATE_FORMAT)
+    : undefined;
+  const dateToFilter = params.loggedAtTo
+    ? moment(params.loggedAtTo).endOf('day').format(DEFAULT_DATE_FORMAT)
+    : undefined;
 
   const filterQuery = createQueryString({
     loggedBy: params.loggedBy,
-    loggedAtFrom: params.loggedAtFrom?.toDateString(),
-    loggedAtTo: params.loggedAtTo?.toDateString(),
+    from: dateFromFilter,
+    to: dateToFilter,
   });
 
   const res = await request.get<GetActivityLogsApiResponse>(
