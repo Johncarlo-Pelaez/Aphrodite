@@ -33,9 +33,7 @@ export const HomePage = (): ReactElement => {
     OperationOption.ALL,
   );
   const [selectedDocuments, setSelectedDocuments] = useState<Document[]>([]);
-  const [selectedDocumentKeys, setSelectedDocumentKeys] = useState<number[]>(
-    [],
-  );
+  const selectedDocumentKeys = selectedDocuments.map((d) => d.id);
   const [uploadModalShow, setUploadModalShow] = useState<boolean>(false);
   const [viewDocModalShow, setViewDocModalShow] = useState<boolean>(false);
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
@@ -76,10 +74,15 @@ export const HomePage = (): ReactElement => {
     reset: resetCancelDoc,
   } = useCancelDocuments();
 
+  const resetTableSelection = (): void => {
+    setSelectedDocuments([]);
+  };
+
   const handleRetryDocs = async (): Promise<void> => {
     if (!isRetryDocSaving && enableRetryButton) {
       await retryDocumentsAsync(selectedDocumentKeys);
       alert('Success.');
+      resetTableSelection();
     }
   };
 
@@ -87,6 +90,7 @@ export const HomePage = (): ReactElement => {
     if (!isCancelDocSaving && enableCancelButton) {
       await cancelDocumentsAsync(selectedDocumentKeys);
       alert('Success.');
+      resetTableSelection();
     }
   };
 
@@ -204,7 +208,6 @@ export const HomePage = (): ReactElement => {
       <DocumentsTable
         ref={documentsTableRef}
         selectedDocuments={selectedDocuments}
-        selectedDocumentKeys={selectedDocumentKeys}
         dataFilters={{
           searchKey,
           dateFrom,
@@ -213,7 +216,6 @@ export const HomePage = (): ReactElement => {
           username,
         }}
         setSelectedDocuments={setSelectedDocuments}
-        setSelectedDocumentKeys={setSelectedDocumentKeys}
       />
       <UploadFilesModal
         isVisible={uploadModalShow}
