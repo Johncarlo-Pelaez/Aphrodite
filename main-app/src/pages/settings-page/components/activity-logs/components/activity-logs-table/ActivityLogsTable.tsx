@@ -1,12 +1,27 @@
-import { ReactElement, useState, useMemo, useEffect, useCallback } from 'react';
+import {
+  ReactElement,
+  useState,
+  useMemo,
+  useEffect,
+  useCallback,
+  SetStateAction,
+  Dispatch,
+} from 'react';
 import { SorterResult, SortOrder, Table, TableColumnProps } from 'core/ui';
 import { useActivityLog, useDebounce } from 'hooks';
-import { UseActivityLogsFilterParams } from 'apis';
 import { DEFAULT_DATE_FORMAT } from 'core/constants';
 import { sortDateTime } from 'utils/sort';
 import { ActivityLog } from 'models';
-import moment from 'moment';
 import { Card } from 'react-bootstrap';
+import moment from 'moment';
+
+export interface ActivityLogTableProps {
+  loggedBy: string;
+  loggedAtFrom: Date | undefined;
+  loggedAtTo: Date | undefined;
+  setTablePageSize: Dispatch<SetStateAction<number>>;
+  setTableCurrentPage: Dispatch<SetStateAction<number>>;
+}
 
 const DEFAULT_SORT_ORDER: SorterResult = {
   field: 'loggedAt',
@@ -17,7 +32,9 @@ export const ActivityLogsTable = ({
   loggedBy,
   loggedAtFrom,
   loggedAtTo,
-}: UseActivityLogsFilterParams): ReactElement => {
+  setTablePageSize,
+  setTableCurrentPage,
+}: ActivityLogTableProps): ReactElement => {
   const [sorter, setSorter] = useState<SorterResult | undefined>(
     DEFAULT_SORT_ORDER,
   );
@@ -72,11 +89,9 @@ export const ActivityLogsTable = ({
 
   const processDateRangeValue = useCallback(() => {
     const start = new Date(moment(loggedAtFrom).format(DEFAULT_DATE_FORMAT));
-    start.setDate(start.getDate() - 1);
     setFrom(start);
 
     const end = new Date(moment(loggedAtTo).format(DEFAULT_DATE_FORMAT));
-    end.setDate(end.getDate() - 1);
     setTo(end);
   }, [loggedAtFrom, loggedAtTo]);
 

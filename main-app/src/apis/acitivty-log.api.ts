@@ -14,7 +14,7 @@ export interface GetActivityLogsApiResponse {
 }
 
 export interface UseActivityLogsFilterParams {
-  loggedBy: string;
+  loggedBy?: string;
   loggedAtFrom?: Date;
   loggedAtTo?: Date;
 }
@@ -35,10 +35,11 @@ export const getActivityLogsApi =
 export const getActivityLogApi = async (
   params: UseActivityLog,
 ): Promise<GetActivityLogsApiResponse> => {
-  const paginationQuery = createTablePaginationQuery(params);
-  if (params.loggedBy === DEFAULT_ALL_USER_SELECTED) {
-    params.loggedBy = '';
-  }
+  const paginationQuery = createTablePaginationQuery({
+    currentPage: params.currentPage,
+    pageSize: params.pageSize,
+  });
+
   const dateFromFilter = params.loggedAtFrom
     ? moment(params.loggedAtFrom).startOf('day').format(DEFAULT_DATE_FORMAT)
     : undefined;
@@ -47,7 +48,8 @@ export const getActivityLogApi = async (
     : undefined;
 
   const filterQuery = createQueryString({
-    loggedBy: params.loggedBy,
+    loggedBy:
+      params.loggedBy === DEFAULT_ALL_USER_SELECTED ? '' : params.loggedBy,
     from: dateFromFilter,
     to: dateToFilter,
   });
@@ -70,15 +72,29 @@ export const getActivityLogsFilter = async (
   return res.data;
 };
 
-export type DownloadActivityLogsParams = UseActivityLogsFilterParams;
+export type DownloadActivityLogsParams = UseActivityLog;
 
 export const getDownloadActivityLogs = async (
   params: DownloadActivityLogsParams,
 ): Promise<Blob> => {
-  const queryParams = queryString.stringify(params);
+  const paginationQuery = createTablePaginationQuery(params);
+
+  const dateFromFilter = params.loggedAtFrom
+    ? moment(params.loggedAtFrom).startOf('day').format(DEFAULT_DATE_FORMAT)
+    : undefined;
+  const dateToFilter = params.loggedAtTo
+    ? moment(params.loggedAtTo).endOf('day').format(DEFAULT_DATE_FORMAT)
+    : undefined;
+
+  const filterQuery = createQueryString({
+    loggedBy:
+      params.loggedBy === DEFAULT_ALL_USER_SELECTED ? '' : params.loggedBy,
+    from: dateFromFilter,
+    to: dateToFilter,
+  });
 
   const res = await request.get<Blob>(
-    `/api/activity-logs/download?${queryParams}`,
+    `/api/activity-logs/download?${paginationQuery}&${filterQuery}`,
     {
       responseType: 'blob',
     },
