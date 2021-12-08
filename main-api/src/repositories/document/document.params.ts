@@ -24,6 +24,7 @@ export interface CreateDocumentParam {
   qrCode?: string;
   createdDate: Date;
   username: string;
+  pageTotal: number;
 }
 
 export interface BeginDocProcessParam {

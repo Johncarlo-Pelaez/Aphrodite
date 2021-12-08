@@ -238,6 +238,7 @@ export class DocumentRepository {
         document.qrCode = param.qrCode;
         document.qrAt = param.createdDate;
         document.userUsername = param.username;
+        document.pageTotal = param.pageTotal;
         await transaction.save(document);
 
         const history = this.genarateDocumentHistory(document);

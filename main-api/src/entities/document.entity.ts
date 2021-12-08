@@ -118,6 +118,10 @@ export class Document {
   isFileDeleted: boolean;
 
   @ApiProperty()
+  @Column()
+  pageTotal: number;
+
+  @ApiProperty()
   @ManyToOne(() => User, (e) => e.username)
   user: User;
 }

@@ -1,5 +1,6 @@
 import { Injectable, ConflictException, Logger } from '@nestjs/common';
 import * as fs from 'fs';
+import * as pdfParse from 'pdf-parse';
 import { v4 as uuidv4 } from 'uuid';
 import { DatesUtil, FilenameUtil } from 'src/utils';
 import { AppConfigService } from 'src/app-config';
@@ -61,7 +62,9 @@ export class DocumentService {
 
     await writeFile(fileFullPath, buffer);
 
+    const pdfData = await pdfParse(buffer);
     const response = new CreatedResponse();
+
     response.id = await this.documentRepository.createDocument({
       uuid,
       documentName: originalname,
@@ -70,6 +73,7 @@ export class DocumentService {
       qrCode: qrCode,
       createdDate: dateRightNow,
       username: data.uploadedBy,
+      pageTotal: pdfData?.numpages,
     });
 
     await this.documentProducer.migrate(response.id);
