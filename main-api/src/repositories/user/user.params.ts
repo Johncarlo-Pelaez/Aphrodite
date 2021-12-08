@@ -14,7 +14,6 @@ export interface UpdateUserParam {
   firstName: string;
   lastName: string;
   role: Role;
-  objectId: string;
   modifiedDate: Date;
   isActive?: boolean;
 }

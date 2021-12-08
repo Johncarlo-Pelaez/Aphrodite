@@ -39,7 +39,6 @@ export interface UpdateUserApiParams {
   role: Role;
   firstname: string;
   lastname: string;
-  objectId: string;
   isActive?: boolean;
 }
 

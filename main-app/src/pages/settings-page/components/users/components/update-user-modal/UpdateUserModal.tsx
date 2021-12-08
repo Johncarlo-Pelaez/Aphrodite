@@ -15,14 +15,12 @@ import {
   RoleField,
   LastNameField,
   FirstNameField,
-  ObjectIdField,
 } from '../add-user-modal/components';
 import { IsActiveField } from './components';
 
 interface UpdateUserForm extends UpdateUserApiParams, FieldValues {}
 
 export const updateUserSchema = yup.object().shape({
-  objectId: yup.string().required('Object ID is required.'),
   role: yup
     .mixed<Role>()
     .oneOf(Object.values(Role))
@@ -31,6 +29,21 @@ export const updateUserSchema = yup.object().shape({
   lastName: yup.string().required('Last name must be filled'),
   isActive: yup.boolean().required('Active is required'),
 });
+
+interface ReadOnlyFieldProps {
+  label: string;
+  value?: string;
+}
+
+export const ReadOnlyField = ({
+  label,
+  value = '',
+}: ReadOnlyFieldProps): ReactElement => (
+  <Form.Group className="mb-3">
+    <Form.Label>{label}</Form.Label>
+    <Form.Control value={value} readOnly />
+  </Form.Group>
+);
 
 export interface UpdateUserModalProps {
   user?: User;
@@ -76,7 +89,6 @@ export const UpdateUserModal = ({
       firstName: '',
       lastName: '',
       isActive: true,
-      objectId: '',
     });
     triggerClose();
   };
@@ -85,7 +97,6 @@ export const UpdateUserModal = ({
     setValue('role', user?.role ?? Role.ENCODER);
     setValue('firstName', user?.firstName ?? '');
     setValue('lastName', user?.lastName ?? '');
-    setValue('objectId', user?.objectId ?? '');
     setValue('isActive', user?.isActive ?? true);
     // eslint-disable-next-line
   }, [user, isVisible]);
@@ -119,7 +130,8 @@ export const UpdateUserModal = ({
             <RoleField control={control} />
             <FirstNameField control={control} />
             <LastNameField control={control} />
-            <ObjectIdField control={control} />
+            <ReadOnlyField label="Email" value={user?.username} />
+            <ReadOnlyField label="Object ID" value={user?.objectId} />
             <IsActiveField control={control} />
           </fieldset>
         </Modal.Body>

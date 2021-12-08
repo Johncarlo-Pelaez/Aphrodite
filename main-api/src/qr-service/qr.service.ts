@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import Dynamsoft from 'dbr/dbr';
 import * as gm from 'gm';
+import * as pdfParse from 'pdf-parse';
 import { AppConfigService } from 'src/app-config';
 const imageMagick = gm.subClass({ imageMagick: true });
 
@@ -55,16 +56,7 @@ export class QRService {
   }
 
   private async countPage(buffer: Buffer): Promise<number> {
-    return new Promise((resolve, reject) => {
-      imageMagick(buffer).identify(async (err, imageInfo) => {
-        if (!!err) {
-          reject(err);
-        } else {
-          resolve(
-            Array.isArray(imageInfo.Format) ? imageInfo.Format.length : 1,
-          );
-        }
-      });
-    });
+    const pdfData = await pdfParse(buffer);
+    return pdfData.numpages;
   }
 }

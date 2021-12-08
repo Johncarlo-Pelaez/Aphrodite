@@ -1,16 +1,15 @@
-import { DocumentStatus } from 'src/entities';
-
-export interface DocumentReportsFilterParam {
-  statuses?: DocumentStatus[];
-  username?: string;
+export interface GetUploadedReportParam {
+  uploadedBy?: string;
   from?: Date;
   to?: Date;
+  skip?: number;
+  take?: number;
 }
 
-export interface GetDocumentReportsCountParam
-  extends DocumentReportsFilterParam {}
-
-export interface GetUploadedReportsParam extends DocumentReportsFilterParam {
+export interface GetInformationRequestReportParam {
+  encoder?: string;
+  from?: Date;
+  to?: Date;
   skip?: number;
   take?: number;
 }

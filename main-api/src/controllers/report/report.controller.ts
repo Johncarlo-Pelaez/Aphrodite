@@ -6,11 +6,13 @@ import {
   AzureADGuard,
 } from 'src/core';
 import { DocumentHistory, Document } from 'src/entities';
-import { DocumentStatus } from 'src/entities/document.enum';
 import { ReportRepository } from 'src/repositories';
 import { ExcelService, ExcelRowItem } from 'src/excel-service';
 import { FilenameUtil } from 'src/utils';
-import { GetUploadedDocumentsReportDto } from './report.dto';
+import {
+  GetUploadedReportDto,
+  GetInformationRequestReportDto,
+} from './report.dto';
 import { GetDocumentsReportIntPipe } from './report.pipe';
 
 @Controller('/reports')
@@ -24,32 +26,25 @@ export class ReportController {
 
   @ApiPaginatedResponse(DocumentHistory)
   @Get('/uploaded')
-  async getUploadedDocumentsReport(
-    @Query(GetDocumentsReportIntPipe) dto: GetUploadedDocumentsReportDto,
+  async getUploadedReport(
+    @Query(GetDocumentsReportIntPipe) dto: GetUploadedReportDto,
   ): Promise<PaginatedResponse<DocumentHistory>> {
     const response = new PaginatedResponse<DocumentHistory>();
-    response.count = await this.reportRepository.getDocumentReportsCount({
-      username: dto.username,
+    response.count = await this.reportRepository.getUploadedCountReport({
+      uploadedBy: dto.uploader,
       from: dto.from,
       to: dto.to,
-      statuses: [DocumentStatus.UPLOADED],
     });
-    response.data = await this.reportRepository.getDocumentReports({
-      ...dto,
-      statuses: [DocumentStatus.UPLOADED],
-    });
+    response.data = await this.reportRepository.getUploadedReport(dto);
     return response;
   }
 
   @Get('/uploaded/download')
-  async downloadUploadedDocumentsReport(
-    @Query() dto: GetUploadedDocumentsReportDto,
+  async downloadUploadedReport(
+    @Query() dto: GetUploadedReportDto,
     @Res() res: Response,
   ): Promise<void> {
-    const data = await this.reportRepository.getDocumentReports({
-      ...dto,
-      statuses: [DocumentStatus.UPLOADED],
-    });
+    const data = await this.reportRepository.getUploadedReport(dto);
     const excelFileBuffer = await this.excelService.create({
       columns: [
         {
@@ -101,5 +96,24 @@ export class ReportController {
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     );
     res.send(excelFileBuffer);
+  }
+
+  @ApiPaginatedResponse(DocumentHistory)
+  @Get('/information-request')
+  async getInformationRequestReport(
+    @Query(GetDocumentsReportIntPipe) dto: GetInformationRequestReportDto,
+  ): Promise<PaginatedResponse<DocumentHistory>> {
+    const response = new PaginatedResponse<DocumentHistory>();
+    response.count = (
+      await this.reportRepository.getInformationRequestReport({
+        encoder: dto.encoder,
+        from: dto.from,
+        to: dto.to,
+      })
+    ).length;
+    response.data = await this.reportRepository.getInformationRequestReport(
+      dto,
+    );
+    return response;
   }
 }
