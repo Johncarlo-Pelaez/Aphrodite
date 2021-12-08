@@ -11,11 +11,6 @@ import { ActivityLogType } from 'src/entities';
 export class GetActivityLogsDto {
   @ApiProperty({ required: false })
   @IsOptional()
-  @IsString()
-  activityType?: ActivityLogType;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
   @IsEmail()
   loggedBy?: string;
 
@@ -41,11 +36,6 @@ export class GetActivityLogsDto {
 }
 
 export class DownloadActivityLogsDto {
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsString()
-  activityType?: ActivityLogType;
-
   @ApiProperty({ required: false })
   @IsOptional()
   @IsEmail()

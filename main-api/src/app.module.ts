@@ -10,6 +10,7 @@ import {
   NomenclatureWhitelistController,
   NomenclatureLookupController,
   ActivityLogController,
+  ReportController,
 } from './controllers';
 import { UtilsModule } from './utils/utils.module';
 import { DocumentProducer } from './producers';
@@ -19,6 +20,7 @@ import {
   NomenclatureWhitelistRepository,
   NomenclatureLookupRepository,
   ActivityLogRepository,
+  ReportRepository,
 } from './repositories';
 import { DocumentService } from './document-service';
 import { QRService } from 'src/qr-service';
@@ -79,6 +81,7 @@ const logger = new Logger('AppModule');
     NomenclatureWhitelistController,
     NomenclatureLookupController,
     ActivityLogController,
+    ReportController,
   ],
   providers: [
     QRService,
@@ -95,6 +98,7 @@ const logger = new Logger('AppModule');
     NomenclatureLookupRepository,
     ActivityLogRepository,
     ExcelService,
+    ReportRepository,
   ],
 })
 export class AppModule {}

@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { ActivityLog, ActivityLogType } from 'src/entities';
 import {
   EntityManager,
@@ -35,8 +36,12 @@ export class ActivityLogRepository {
       whereConditions['loggedBy'] = loggedBy;
     }
 
-    if (from && to) {
-      whereConditions['loggedAt'] = Between(from, to);
+    if (from) {
+      const dateTo = moment(!!to ? to : from)
+        .add(1, 'day')
+        .add(-1, 'millisecond')
+        .toDate();
+      whereConditions['loggedAt'] = Between(from, dateTo);
     }
 
     return await this.manager.find(ActivityLog, {
@@ -62,8 +67,12 @@ export class ActivityLogRepository {
       whereConditions['loggedBy'] = loggedBy;
     }
 
-    if (from && to) {
-      whereConditions['loggedAt'] = Between(from, to);
+    if (from) {
+      const dateTo = moment(!!to ? to : from)
+        .add(1, 'day')
+        .add(-1, 'millisecond')
+        .toDate();
+      whereConditions['loggedAt'] = Between(from, dateTo);
     }
 
     return await this.manager.count(ActivityLog, {

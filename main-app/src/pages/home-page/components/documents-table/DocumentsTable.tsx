@@ -32,26 +32,19 @@ export interface DataFilterProps {
 
 export interface DocumentsTableProps {
   selectedDocuments: Document[];
-  selectedDocumentKeys: number[];
   dataFilters?: DataFilterProps;
   setSelectedDocuments: React.Dispatch<React.SetStateAction<Document[]>>;
-  setSelectedDocumentKeys: React.Dispatch<React.SetStateAction<number[]>>;
 }
 
 export const DocumentsTable = forwardRef(
   (props: DocumentsTableProps, ref): ReactElement => {
-    const {
-      selectedDocuments,
-      selectedDocumentKeys,
-      dataFilters,
-      setSelectedDocuments,
-      setSelectedDocumentKeys,
-    } = props;
+    const { selectedDocuments, dataFilters, setSelectedDocuments } = props;
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [pageSize, setPageSize] = useState<number>(15);
     const [sorter, setSorter] = useState<SorterResult | undefined>(
       DEFAULT_SORT_ORDER,
     );
+    const selectedDocumentKeys = selectedDocuments.map((d) => d.id);
     const searchKey = dataFilters?.searchKey ?? '';
     const statuses = dataFilters?.statuses ?? [];
     const dateFrom = dataFilters?.dateFrom;
@@ -173,7 +166,6 @@ export const DocumentsTable = forwardRef(
       selectedRows: Document[],
     ) => {
       setSelectedDocuments(selectedRows);
-      setSelectedDocumentKeys(selectedRowKeys as number[]);
     };
 
     const selectNextDocument = useCallback(() => {
@@ -181,7 +173,6 @@ export const DocumentsTable = forwardRef(
       const nextDocument = documents[nextIndex];
       if (nextDocument) {
         setSelectedDocuments([nextDocument]);
-        setSelectedDocumentKeys([nextDocument.id]);
       }
       // eslint-disable-next-line
     }, [selectedIndexes, documents]);
@@ -201,16 +192,7 @@ export const DocumentsTable = forwardRef(
       setSelectedDocuments((current) =>
         current.filter((d) => pageDocKeys.includes(d.id)),
       );
-      setSelectedDocumentKeys((current) =>
-        current.filter((key) => pageDocKeys.includes(key)),
-      );
-    }, [
-      documents,
-      currentPage,
-      pageSize,
-      setSelectedDocuments,
-      setSelectedDocumentKeys,
-    ]);
+    }, [documents, currentPage, pageSize, setSelectedDocuments]);
 
     return (
       <Table<Document>
@@ -244,12 +226,8 @@ export const DocumentsTable = forwardRef(
             setSelectedDocuments((current) =>
               current.filter((d) => d.id !== document.id),
             );
-            setSelectedDocumentKeys((current) =>
-              current.filter((key) => key !== document.id),
-            );
           } else {
             setSelectedDocuments((current) => [...current, document]);
-            setSelectedDocumentKeys((current) => [...current, document.id]);
           }
         }}
         onChange={changeSort}

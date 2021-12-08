@@ -119,8 +119,8 @@ export const UpdateUserModal = ({
             <RoleField control={control} />
             <FirstNameField control={control} />
             <LastNameField control={control} />
-            <IsActiveField control={control} />
             <ObjectIdField control={control} />
+            <IsActiveField control={control} />
           </fieldset>
         </Modal.Body>
         <Modal.Footer>
