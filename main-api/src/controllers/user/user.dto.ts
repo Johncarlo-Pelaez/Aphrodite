@@ -40,11 +40,6 @@ export class CreateUserAccountDto {
 
 export class UpdateUserAccountDto {
   @ApiProperty()
-  @IsNotEmpty({ message: 'Object ID is required.' })
-  @IsString()
-  objectId: string;
-
-  @ApiProperty()
   @IsNotEmpty({ message: 'Role is required.' })
   @IsString()
   role: Role;
