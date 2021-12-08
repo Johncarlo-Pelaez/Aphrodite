@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { DocumentHistory } from 'src/entities';
 import {
   EntityManager,
@@ -29,8 +30,12 @@ export class ReportRepository {
       whereConditions['documentStatus'] = In(statuses);
     }
 
-    if (from && to) {
-      whereConditions['createdDate'] = Between(from, to);
+    if (from) {
+      const dateTo = moment(!!to ? to : from)
+        .add(1, 'day')
+        .add(-1, 'millisecond')
+        .toDate();
+      whereConditions['createdDate'] = Between(from, dateTo);
     }
 
     return await this.manager.find(DocumentHistory, {
@@ -56,8 +61,12 @@ export class ReportRepository {
       whereConditions['documentStatus'] = In(statuses);
     }
 
-    if (from && to) {
-      whereConditions['createdDate'] = Between(from, to);
+    if (from) {
+      const dateTo = moment(!!to ? to : from)
+        .add(1, 'day')
+        .add(-1, 'millisecond')
+        .toDate();
+      whereConditions['createdDate'] = Between(from, dateTo);
     }
 
     return await this.manager.count(DocumentHistory, {
