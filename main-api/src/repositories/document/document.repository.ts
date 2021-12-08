@@ -1,4 +1,5 @@
-import { Document, DocumentStatus, DocumentHistory, User } from 'src/entities';
+import * as moment from 'moment';
+import { Document, DocumentStatus, DocumentHistory } from 'src/entities';
 import {
   EntityManager,
   EntityRepository,
@@ -58,9 +59,14 @@ export class DocumentRepository {
       };
     }
 
-    if (from && to) {
+    if (from) {
+      const dateTo = moment(!!to ? to : from)
+        .add(1, 'day')
+        .add(-1, 'millisecond')
+        .toDate();
+
       whereModifiedDate = {
-        modifiedDate: Between(from, to),
+        modifiedDate: Between(from, dateTo),
       };
     }
 
@@ -150,9 +156,14 @@ export class DocumentRepository {
       };
     }
 
-    if (from && to) {
+    if (from) {
+      const dateTo = moment(!!to ? to : from)
+        .add(1, 'day')
+        .add(-1, 'millisecond')
+        .toDate();
+
       whereModifiedDate = {
-        modifiedDate: Between(from, to),
+        modifiedDate: Between(from, dateTo),
       };
     }
 
