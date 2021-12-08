@@ -169,6 +169,18 @@ export class DocumentConsumer {
       throw error;
     }
 
+    if (qrCode?.match(/^ecr/i) || qrCode?.match(/^ecp/i)) {
+      qrCode = qrCode;
+    }
+
+    if (qrCode?.match(/_/g)) {
+      qrCode = qrCode.replace(/_/g, '|');
+    }
+
+    if (qrCode && qrCode.length >= 18) {
+      qrCode = qrCode.substr(0, 15);
+    }
+
     await this.updateToQrDone(qrCode, documentId);
 
     return qrCode;

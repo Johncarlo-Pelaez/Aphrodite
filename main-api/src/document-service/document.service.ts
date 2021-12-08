@@ -46,10 +46,14 @@ export class DocumentService {
 
     if (filename.match(/^ecr/i) || filename.match(/^ecp/i)) {
       qrCode = filename;
-    } else if (filename.match(/_/g)) {
+    }
+
+    if (filename.match(/_/g)) {
       qrCode = filename.replace(/_/g, '|');
-    } else if (filename.length === 18) {
-      qrCode = filename.substr(0, 15);
+    }
+
+    if (qrCode && qrCode.length >= 18) {
+      qrCode = qrCode.substr(0, 15);
     }
 
     if (qrCode && !!(await this.documentRepository.getDocumentByQRCode(qrCode)))
