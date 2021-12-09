@@ -23,6 +23,7 @@ import {
   DownloadActivityLogsDto,
 } from './activity-log.dto';
 import { GetActivityLogsIntPipe } from './activity-log.pipe';
+import * as moment from 'moment';
 
 @Controller('/activity-logs')
 @UseGuards(AzureADGuard)
@@ -71,10 +72,22 @@ export class ActivityLogController {
       rows: data.map((activityLog) =>
         Object.keys(activityLog).reduce((excelRowItem: ExcelRowItem[], key) => {
           if (key !== 'id' && key !== 'type') {
-            excelRowItem.push({
-              key,
-              value: activityLog[key],
-            });
+            if (key == 'loggedAt') {
+              const loggedAt = new Date(
+                new Date(
+                  moment(activityLog[key]).format('MM/DD/YYYY h:mm A'),
+                ).setDate(activityLog[key].getDate() + 1),
+              ).toDateString();
+
+              excelRowItem.push({
+                key,
+                value: loggedAt,
+              });
+            } else
+              excelRowItem.push({
+                key,
+                value: activityLog[key],
+              });
           }
           return excelRowItem;
         }, []),
