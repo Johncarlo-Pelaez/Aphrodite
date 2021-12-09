@@ -56,13 +56,13 @@ export interface FailIndexingParam extends FailDocProcessParam {
 export interface MigrateDocumentParam {
   documentId: number;
   migratedAt: Date;
-  springReqParams: string;
-  springResponse: string;
+  springcmReqParams: string;
+  springcmResponse: string;
 }
 
 export interface FailDocMigrateParam extends FailDocProcessParam {
-  springReqParams: string;
-  springResponse?: string;
+  springcmReqParams: string;
+  springcmResponse?: string;
 }
 
 interface EncodeProcessParam {

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import axios, { AxiosInstance, AxiosResponse, CancelTokenSource } from 'axios';
+import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { AppConfigService } from 'src/app-config';
 import { UploadDocToSpringParams } from './spring-cm.types';
 
@@ -12,22 +12,9 @@ export class SpringCMService {
     });
   }
 
-  createCancelTokenSource(): CancelTokenSource {
-    return axios.CancelToken.source();
-  }
-
-  cancelRequest(cancelTokenSource?: CancelTokenSource): void {
-    cancelTokenSource?.cancel();
-  }
-
   async uploadDocToSpring(
     params: UploadDocToSpringParams,
-    cancelToken?: CancelTokenSource,
   ): Promise<AxiosResponse> {
-    return await this.request.post(
-      '/DataCapUploadDocToSpring',
-      { ...params },
-      { cancelToken: cancelToken?.token },
-    );
+    return await this.request.post('/DataCapUploadDocToSpring', { ...params });
   }
 }

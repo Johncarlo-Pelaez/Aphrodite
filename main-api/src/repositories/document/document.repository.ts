@@ -220,6 +220,7 @@ export class DocumentRepository {
     history.createdDate = document.modifiedDate;
     history.documentStatus = document.status;
     history.documentId = document.id;
+    history.document = document;
 
     if (!!customValue?.userUsername) {
       history.userUsername = customValue.userUsername;
@@ -401,13 +402,13 @@ export class DocumentRepository {
       );
       document.status = DocumentStatus.MIGRATE_DONE;
       document.modifiedDate = param.migratedAt;
-      document.springcmReqParams = param.springReqParams;
-      document.springResponse = param.springResponse;
+      document.springcmReqParams = param.springcmReqParams;
+      document.springResponse = param.springcmResponse;
       document.description = 'Successfully migrated.';
       await transaction.save(document);
 
       const history = this.genarateDocumentHistory(document, {
-        springcmResponse: param.springResponse,
+        springcmResponse: param.springcmResponse,
         userUsername: document.approver ?? document.checker,
       });
       await transaction.save(history);
@@ -422,12 +423,14 @@ export class DocumentRepository {
       );
       document.status = DocumentStatus.MIGRATE_FAILED;
       document.modifiedDate = param.failedAt;
-      document.springcmReqParams = param.springReqParams;
-      document.springResponse = param.springResponse;
+      document.springcmReqParams = param.springcmReqParams;
+      document.springResponse = param.springcmResponse;
       document.description = 'Migration failed.';
       await transaction.save(document);
 
-      const history = this.genarateDocumentHistory(document);
+      const history = this.genarateDocumentHistory(document, {
+        springcmResponse: document.springResponse,
+      });
       await transaction.save(history);
     });
   }
