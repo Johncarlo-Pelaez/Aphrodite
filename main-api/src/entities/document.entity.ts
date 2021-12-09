@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
 import { DocumentStatus } from './document.enum';
 import { User } from './user.entity';
 
@@ -121,6 +127,12 @@ export class Document {
   @Column()
   pageTotal: number;
 
+  @OneToMany(
+    () => DocumentHistory,
+    (documentHistory) => documentHistory.document,
+  )
+  documentHistories: DocumentHistory[];
+
   @ApiProperty()
   @ManyToOne(() => User, (e) => e.username)
   user: User;
@@ -151,7 +163,7 @@ export class DocumentHistory {
   documentId: number;
 
   @ApiProperty()
-  @ManyToOne(() => Document, (e) => e.id)
+  @ManyToOne(() => Document, (document) => document.documentHistories)
   document: Document;
 
   @ApiProperty()

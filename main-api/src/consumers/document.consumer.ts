@@ -376,6 +376,7 @@ export class DocumentConsumer {
       await this.documentRepository.deleteFile({
         documentId,
         deletedAt: this.datesUtil.getDateNow(),
+        deletedBy: 'RIS',
       });
     } else {
       await this.updateToMigrateFailed(

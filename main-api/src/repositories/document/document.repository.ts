@@ -218,15 +218,18 @@ export class DocumentRepository {
     history.description = document.description;
     history.documentSize = document.documentSize;
     history.createdDate = document.modifiedDate;
-    history.userUsername = document.userUsername;
     history.documentStatus = document.status;
-    history.salesforceResponse =
-      document.documentType ?? document.contractDetails;
-    history.springcmResponse = document.springResponse;
     history.documentId = document.id;
 
-    if (customValue) {
+    if (!!customValue?.userUsername) {
+      history.userUsername = customValue.userUsername;
+    }
+
+    if (!!customValue?.salesforceResponse) {
       history.salesforceResponse = customValue.salesforceResponse;
+    }
+
+    if (!!customValue?.springcmResponse) {
       history.springcmResponse = customValue.springcmResponse;
     }
 
@@ -251,7 +254,9 @@ export class DocumentRepository {
         document.pageTotal = param.pageTotal;
         await transaction.save(document);
 
-        const history = this.genarateDocumentHistory(document);
+        const history = this.genarateDocumentHistory(document, {
+          userUsername: document.modifiedBy,
+        });
         await transaction.save(history);
 
         return document.id;
@@ -345,6 +350,7 @@ export class DocumentRepository {
 
       const history = this.genarateDocumentHistory(document, {
         salesforceResponse: param.documentType ?? param.contractDetails,
+        userUsername: document.encoder,
       });
       await transaction.save(history);
     });
@@ -402,6 +408,7 @@ export class DocumentRepository {
 
       const history = this.genarateDocumentHistory(document, {
         springcmResponse: param.springResponse,
+        userUsername: document.approver ?? document.checker,
       });
       await transaction.save(history);
     });
@@ -473,7 +480,9 @@ export class DocumentRepository {
       document.description = 'Qr or Barcode has successfully encoded.';
       await transaction.save(document);
 
-      const history = this.genarateDocumentHistory(document);
+      const history = this.genarateDocumentHistory(document, {
+        userUsername: document.encoder,
+      });
       await transaction.save(history);
     });
   }
@@ -493,7 +502,9 @@ export class DocumentRepository {
       document.description = 'Successfully encoded.';
       await transaction.save(document);
 
-      const history = this.genarateDocumentHistory(document);
+      const history = this.genarateDocumentHistory(document, {
+        userUsername: document.encoder,
+      });
       await transaction.save(history);
     });
   }
@@ -532,7 +543,9 @@ export class DocumentRepository {
       document.modifiedBy = param.checkedBy;
       await transaction.save(document);
 
-      const history = this.genarateDocumentHistory(document);
+      const history = this.genarateDocumentHistory(document, {
+        userUsername: document.checker,
+      });
       await transaction.save(history);
     });
   }
@@ -553,7 +566,9 @@ export class DocumentRepository {
       document.modifiedBy = param.checkedBy;
       await transaction.save(document);
 
-      const history = this.genarateDocumentHistory(document);
+      const history = this.genarateDocumentHistory(document, {
+        userUsername: document.checker,
+      });
       await transaction.save(history);
     });
   }
@@ -573,7 +588,9 @@ export class DocumentRepository {
       document.modifiedBy = param.approver;
       await transaction.save(document);
 
-      const history = this.genarateDocumentHistory(document);
+      const history = this.genarateDocumentHistory(document, {
+        userUsername: document.approver,
+      });
       await transaction.save(history);
     });
   }
@@ -593,7 +610,9 @@ export class DocumentRepository {
       document.modifiedBy = param.approver;
       await transaction.save(document);
 
-      const history = this.genarateDocumentHistory(document);
+      const history = this.genarateDocumentHistory(document, {
+        userUsername: document.approver,
+      });
       await transaction.save(history);
     });
   }
@@ -610,7 +629,9 @@ export class DocumentRepository {
       document.description = 'Retrying process.';
       await transaction.save(document);
 
-      const history = this.genarateDocumentHistory(document);
+      const history = this.genarateDocumentHistory(document, {
+        userUsername: document.modifiedBy,
+      });
       await transaction.save(history);
     });
   }
@@ -627,7 +648,9 @@ export class DocumentRepository {
       document.description = 'Cancelled.';
       await transaction.save(document);
 
-      const history = this.genarateDocumentHistory(document);
+      const history = this.genarateDocumentHistory(document, {
+        userUsername: document.modifiedBy,
+      });
       await transaction.save(history);
     });
   }
@@ -644,7 +667,9 @@ export class DocumentRepository {
       document.description = 'Delete file from system directory.';
       await transaction.save(document);
 
-      const history = this.genarateDocumentHistory(document);
+      const history = this.genarateDocumentHistory(document, {
+        userUsername: param.deletedBy,
+      });
       await transaction.save(history);
     });
   }
