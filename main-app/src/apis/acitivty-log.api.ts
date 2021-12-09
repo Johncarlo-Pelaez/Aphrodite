@@ -1,6 +1,5 @@
 import { request } from './request';
 import { ActivityLog } from 'models';
-import queryString from 'query-string';
 import {
   createQueryString,
   createTablePaginationQuery,
@@ -23,14 +22,6 @@ export interface UseActivityLog extends UseActivityLogsFilterParams {
   currentPage: number;
   pageSize: number;
 }
-
-export const getActivityLogsApi =
-  async (): Promise<GetActivityLogsApiResponse> => {
-    const res = await request.get<GetActivityLogsApiResponse>(
-      '/api/activity-logs',
-    );
-    return res.data;
-  };
 
 export const getActivityLogApi = async (
   params: UseActivityLog,
@@ -57,18 +48,6 @@ export const getActivityLogApi = async (
   const res = await request.get<GetActivityLogsApiResponse>(
     `/api/activity-logs?${paginationQuery}&${filterQuery}`,
   );
-  return res.data;
-};
-
-export const getActivityLogsFilter = async (
-  params: UseActivityLogsFilterParams,
-): Promise<GetActivityLogsApiResponse[]> => {
-  const queryParams = queryString.stringify(params);
-
-  const res = await request.get<GetActivityLogsApiResponse[]>(
-    `/api/activity-logs?${queryParams}`,
-  );
-
   return res.data;
 };
 
