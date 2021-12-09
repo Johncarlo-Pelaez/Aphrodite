@@ -19,7 +19,11 @@ export class ExcelService {
       data.rows.map((items) => {
         const row: any = {};
         items.forEach((i) => {
-          row[i.key] = i.value;
+          const render = data.columns.find((c) => c.key === i.key)?.render;
+          row[i.key] =
+            !!render && typeof render === 'function'
+              ? render(i.value)
+              : i.value ?? '';
         });
         return row;
       }),

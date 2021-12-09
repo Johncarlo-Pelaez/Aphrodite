@@ -1,26 +1,32 @@
 import { Controller, Get, Query, UseGuards, Res } from '@nestjs/common';
+import { ApiExtraModels } from '@nestjs/swagger';
 import { Response } from 'express';
 import {
   ApiPaginatedResponse,
   PaginatedResponse,
   AzureADGuard,
 } from 'src/core';
-import { DocumentHistory, Document } from 'src/entities';
+import { DocumentHistory } from 'src/entities';
 import { ReportRepository } from 'src/repositories';
-import { ExcelService, ExcelRowItem } from 'src/excel-service';
+import { InformationRequestReport } from 'src/repositories/report';
+import { ExcelService } from 'src/excel-service';
+import { ReportService } from 'src/report-service';
 import { FilenameUtil } from 'src/utils';
 import {
   GetUploadedReportDto,
+  DownloadUploadedReportDto,
   GetInformationRequestReportDto,
+  DownloadInformationRequestReportDto,
 } from './report.dto';
 import { GetDocumentsReportIntPipe } from './report.pipe';
 
 @Controller('/reports')
-@UseGuards(AzureADGuard)
+//@UseGuards(AzureADGuard)
 export class ReportController {
   constructor(
     private readonly reportRepository: ReportRepository,
     private readonly excelService: ExcelService,
+    private readonly reportService: ReportService,
     private readonly filenameUtil: FilenameUtil,
   ) {}
 
@@ -30,65 +36,35 @@ export class ReportController {
     @Query(GetDocumentsReportIntPipe) dto: GetUploadedReportDto,
   ): Promise<PaginatedResponse<DocumentHistory>> {
     const response = new PaginatedResponse<DocumentHistory>();
-    response.count = await this.reportRepository.getUploadedCountReport({
-      uploadedBy: dto.uploader,
+    response.count = await this.reportService.getUploadedCountReport({
+      uploader: dto.uploader,
       from: dto.from,
       to: dto.to,
     });
-    response.data = await this.reportRepository.getUploadedReport(dto);
+    response.data = await this.reportService.getUploadedReport({
+      uploader: dto.uploader,
+      from: dto.from,
+      to: dto.to,
+      skip: dto.skip,
+      take: dto.take,
+    });
     return response;
   }
 
   @Get('/uploaded/download')
   async downloadUploadedReport(
-    @Query() dto: GetUploadedReportDto,
+    @Query() dto: DownloadUploadedReportDto,
     @Res() res: Response,
   ): Promise<void> {
-    const data = await this.reportRepository.getUploadedReport(dto);
-    const excelFileBuffer = await this.excelService.create({
-      columns: [
-        {
-          key: 'filename',
-          title: 'Filename',
-        },
-        {
-          key: 'uploader',
-          title: 'Uploader',
-        },
-        {
-          key: 'uploadedDate',
-          title: 'Uploaded Date',
-        },
-      ],
-      rows: data.map((doc) =>
-        Object.entries(doc).reduce(
-          (excelRowItem: ExcelRowItem[], [key, value]) => {
-            if (key === 'userUsername') {
-              excelRowItem.push({
-                key: 'uploader',
-                value,
-              });
-            }
-            if (key === 'createdDate') {
-              excelRowItem.push({
-                key: 'uploadedDate',
-                value,
-              });
-            } else if (key === 'document' && value instanceof Document) {
-              excelRowItem.push({
-                key: 'filename',
-                value: value.documentName,
-              });
-            }
-            return excelRowItem;
-          },
-          [],
-        ),
-      ),
-    });
+    const excelFileBuffer =
+      await this.reportService.generateUploadedExcelReport({
+        uploader: dto.uploader,
+        from: dto.from,
+        to: dto.to,
+      });
     res.setHeader(
       'Content-Disposition',
-      `attachment; filename=uploaded-documents-report${this.filenameUtil.generateName()}`,
+      `attachment; filename=documents-uploaded-report${this.filenameUtil.generateName()}`,
     );
     res.setHeader('Content-Length', excelFileBuffer.length);
     res.setHeader(
@@ -98,22 +74,45 @@ export class ReportController {
     res.send(excelFileBuffer);
   }
 
-  @ApiPaginatedResponse(DocumentHistory)
+  @ApiExtraModels(InformationRequestReport)
+  @ApiPaginatedResponse(InformationRequestReport)
   @Get('/information-request')
   async getInformationRequestReport(
     @Query(GetDocumentsReportIntPipe) dto: GetInformationRequestReportDto,
-  ): Promise<PaginatedResponse<DocumentHistory>> {
-    const response = new PaginatedResponse<DocumentHistory>();
-    response.count = (
-      await this.reportRepository.getInformationRequestReport({
+  ): Promise<PaginatedResponse<InformationRequestReport>> {
+    const response = new PaginatedResponse<InformationRequestReport>();
+    response.count =
+      await this.reportRepository.getInformationRequestCountReport({
         encoder: dto.encoder,
         from: dto.from,
         to: dto.to,
-      })
-    ).length;
+      });
     response.data = await this.reportRepository.getInformationRequestReport(
       dto,
     );
     return response;
+  }
+
+  @Get('/information-request/download')
+  async downloadInformationRequestReport(
+    @Query() dto: DownloadInformationRequestReportDto,
+    @Res() res: Response,
+  ): Promise<void> {
+    const excelFileBuffer =
+      await this.reportService.generateInformationRequestExcelReport({
+        encoder: dto.encoder,
+        from: dto.from,
+        to: dto.to,
+      });
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=documents-information-request-report${this.filenameUtil.generateName()}`,
+    );
+    res.setHeader('Content-Length', excelFileBuffer.length);
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+    res.send(excelFileBuffer);
   }
 }

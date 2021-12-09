@@ -11,7 +11,11 @@ import {
   GetUploadedReportParam,
   GetInformationRequestReportParam,
 } from './report.params';
-import { FIND_INFORMATION_REQUEST_REPORTS } from './reports.queries';
+import {
+  FIND_INFORMATION_REQUEST_REPORTS,
+  COUNT_INFORMATION_REQUEST_REPORTS,
+} from './reports.queries';
+import { InformationRequestReport } from './report.schemas';
 
 @EntityRepository()
 export class ReportRepository {
@@ -67,47 +71,95 @@ export class ReportRepository {
 
   async getInformationRequestReport(
     param: GetInformationRequestReportParam,
-  ): Promise<DocumentHistory[]> {
-    const { encoder, from, to, skip, take } = param;
+  ): Promise<InformationRequestReport[]> {
+    const queryConditions: string[] = [
+      `document_history.documentStatus = @0 or document_history.documentStatus = @1`,
+    ];
+    const queryParams: (string | number | Date | DocumentStatus)[] = [
+      DocumentStatus.INDEXING_DONE,
+      DocumentStatus.INDEXING_FAILED,
+    ];
 
-    const conditions: string[] = [];
-    const params: (string | number | Date)[] = [];
-
-    if (!!encoder) {
-      conditions.push(`document.encoder = @${params.length}`);
-      params.push(encoder);
+    if (!!param.encoder) {
+      queryConditions.push(`document.encoder = @${queryParams.length}`);
+      queryParams.push(param.encoder);
     }
 
-    if (!!from) {
-      conditions.push(
-        `document_history.createdDate BETWEEN @${params.length} AND @${
-          params.length + 1
+    if (!!param.from) {
+      queryConditions.push(
+        `document_history.createdDate BETWEEN @${queryParams.length} AND @${
+          queryParams.length + 1
         }`,
       );
-      const dateTo = moment(!!to ? to : from)
+      const dateTo = moment(!!param.to ? param.to : param.from)
         .add(1, 'day')
         .add(-1, 'millisecond')
         .toDate();
-      params.push(from, dateTo);
+      queryParams.push(param.from, dateTo);
     }
 
     let sql = FIND_INFORMATION_REQUEST_REPORTS;
 
-    if (!!conditions.length) {
-      sql += `\nWHERE ${conditions.join(' AND ')}`;
+    if (!!queryConditions.length) {
+      sql += `\nWHERE ${queryConditions.join(' AND ')}`;
     }
 
     sql += '\nORDER BY document_history.createdDate DESC';
 
-    if (!!skip && !!take) {
-      sql += `\nOFFSET @${params.length} ROWS FETCH NEXT @${
-        params.length + 1
+    if (!!param.skip && !!param.take) {
+      sql += `\nOFFSET @${queryParams.length} ROWS FETCH NEXT @${
+        queryParams.length + 1
       } ROWS ONLY`;
-      params.push(skip, take);
+      queryParams.push(param.skip, param.take);
     }
 
     sql += ';';
 
-    return (await this.manager.query(sql, params)) || [];
+    return await this.manager.query(sql, queryParams);
+  }
+
+  async getInformationRequestCountReport(
+    param: GetInformationRequestReportParam,
+  ): Promise<number> {
+    const queryConditions: string[] = [
+      `document_history.documentStatus = @0 or document_history.documentStatus = @1`,
+    ];
+    const queryParams: (string | number | Date | DocumentStatus)[] = [
+      DocumentStatus.INDEXING_DONE,
+      DocumentStatus.INDEXING_FAILED,
+    ];
+
+    if (!!param.encoder) {
+      queryConditions.push(`document.encoder = @${queryParams.length}`);
+      queryParams.push(param.encoder);
+    }
+
+    if (!!param.from) {
+      queryConditions.push(
+        `document_history.createdDate BETWEEN @${queryParams.length} AND @${
+          queryParams.length + 1
+        }`,
+      );
+      const dateTo = moment(!!param.to ? param.to : param.from)
+        .add(1, 'day')
+        .add(-1, 'millisecond')
+        .toDate();
+      queryParams.push(param.from, dateTo);
+    }
+
+    let sql = COUNT_INFORMATION_REQUEST_REPORTS;
+
+    if (!!queryConditions.length) {
+      sql += `\nWHERE ${queryConditions.join(' AND ')}`;
+    }
+
+    sql += ';';
+
+    const queryData = await this.manager.query(sql, queryParams);
+    const queryObject = !!queryData?.length ? queryData[0] : null;
+    const queryObjectValues = !!queryObject ? Object.values(queryObject) : [];
+    return !!queryObjectValues.length
+      ? (queryObjectValues[0] as number) ?? 0
+      : 0;
   }
 }

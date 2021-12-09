@@ -36,6 +36,7 @@
     "class-validator": "^0.13.1",
     "exceljs": "^4.3.0",
     "filenamify": "^4.3.0",
+    "filesize": "^8.0.6",
     "gm": "^1.23.1",
     "mssql": "^7.2.1",
     "passport-azure-ad": "^4.3.1",

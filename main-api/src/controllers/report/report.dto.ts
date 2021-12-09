@@ -33,6 +33,23 @@ export class GetUploadedReportDto {
   take?: number;
 }
 
+export class DownloadUploadedReportDto {
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsEmail()
+  uploader?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsDateString()
+  from?: Date;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsDateString()
+  to?: Date;
+}
+
 export class GetInformationRequestReportDto {
   @ApiProperty({ required: false })
   @IsOptional()
@@ -58,4 +75,21 @@ export class GetInformationRequestReportDto {
   @IsOptional()
   @IsNumberString()
   take?: number;
+}
+
+export class DownloadInformationRequestReportDto {
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsEmail()
+  encoder?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsDateString()
+  from?: Date;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsDateString()
+  to?: Date;
 }
