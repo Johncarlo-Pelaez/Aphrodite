@@ -1,4 +1,56 @@
-/****** Object:  Table [dbo].[activity_log]    Script Date: 12/8/2021 7:14:34 PM ******/
+/****** Object:  Table [dbo].[document_history]    Script Date: 12/10/2021 12:22:29 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[document_history](
+	[id] [int] IDENTITY(1,1) NOT NULL,
+	[description] [nvarchar](500) NOT NULL,
+	[documentSize] [int] NOT NULL,
+	[createdDate] [datetime] NOT NULL,
+	[documentId] [int] NOT NULL,
+	[userUsername] [nvarchar](255) NULL,
+	[documentStatus] [nvarchar](100) NULL,
+	[salesforceResponse] [nvarchar](max) NULL,
+	[springcmResponse] [nvarchar](max) NULL,
+ CONSTRAINT [PK_0783dd4cd636039459ee63c9a8b] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  View [dbo].[document_latest_distinct_status]    Script Date: 12/10/2021 12:22:29 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE VIEW [dbo].[document_latest_distinct_status] AS
+SELECT 
+documentId, 
+documentStatus,
+MAX(createdDate) AS updatedDate
+FROM document_history
+GROUP BY documentId,
+documentStatus
+GO
+/****** Object:  View [dbo].[document_latest_info_request]    Script Date: 12/10/2021 12:22:29 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE VIEW [dbo].[document_latest_info_request] AS
+SELECT 
+document_latest_distinct_status.documentId,
+MAX(document_latest_distinct_status.updatedDate) AS updatedDate
+FROM document_latest_distinct_status
+INNER JOIN document_history
+ON document_latest_distinct_status.documentId = document_history.documentId 
+AND document_latest_distinct_status.updatedDate = document_history.createdDate 
+AND document_latest_distinct_status.documentStatus = document_history.documentStatus
+WHERE document_history.documentStatus = 'INDEXING_FAILED' or document_history.documentStatus = 'INDEXING_DONE'
+GROUP BY document_latest_distinct_status.documentId
+GO
+/****** Object:  Table [dbo].[activity_log]    Script Date: 12/10/2021 12:22:29 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -15,7 +67,7 @@ CREATE TABLE [dbo].[activity_log](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[document]    Script Date: 12/8/2021 7:14:34 PM ******/
+/****** Object:  Table [dbo].[document]    Script Date: 12/10/2021 12:22:29 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -55,28 +107,7 @@ CREATE TABLE [dbo].[document](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[document_history]    Script Date: 12/8/2021 7:14:34 PM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[document_history](
-	[id] [int] IDENTITY(1,1) NOT NULL,
-	[description] [nvarchar](500) NOT NULL,
-	[documentSize] [int] NOT NULL,
-	[createdDate] [datetime] NOT NULL,
-	[documentId] [int] NOT NULL,
-	[userUsername] [nvarchar](255) NOT NULL,
-	[documentStatus] [nvarchar](100) NULL,
-	[salesforceResponse] [nvarchar](max) NULL,
-	[springcmResponse] [nvarchar](max) NULL,
- CONSTRAINT [PK_0783dd4cd636039459ee63c9a8b] PRIMARY KEY CLUSTERED 
-(
-	[id] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
-GO
-/****** Object:  Table [dbo].[nomenclature_lookup]    Script Date: 12/8/2021 7:14:34 PM ******/
+/****** Object:  Table [dbo].[nomenclature_lookup]    Script Date: 12/10/2021 12:22:29 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -87,7 +118,7 @@ CREATE TABLE [dbo].[nomenclature_lookup](
 	[documentGroup] [nvarchar](max) NOT NULL
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[nomenclature_whitelist]    Script Date: 12/8/2021 7:14:34 PM ******/
+/****** Object:  Table [dbo].[nomenclature_whitelist]    Script Date: 12/10/2021 12:22:29 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -97,7 +128,7 @@ CREATE TABLE [dbo].[nomenclature_whitelist](
 	[description] [nvarchar](255) NOT NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[user]    Script Date: 12/8/2021 7:14:34 PM ******/
+/****** Object:  Table [dbo].[user]    Script Date: 12/10/2021 12:22:29 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON

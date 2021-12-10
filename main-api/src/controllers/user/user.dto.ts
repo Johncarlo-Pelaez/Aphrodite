@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsEmail,
   IsString,
@@ -22,7 +22,7 @@ export class CreateUserAccountDto {
   @IsString()
   objectId: string;
 
-  @ApiProperty()
+  @ApiProperty({ enum: Role })
   @IsNotEmpty({ message: 'Role is required.' })
   @IsString()
   role: Role;
@@ -39,7 +39,7 @@ export class CreateUserAccountDto {
 }
 
 export class UpdateUserAccountDto {
-  @ApiProperty()
+  @ApiProperty({ enum: Role })
   @IsNotEmpty({ message: 'Role is required.' })
   @IsString()
   role: Role;
@@ -54,7 +54,7 @@ export class UpdateUserAccountDto {
   @IsString()
   lastName: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;

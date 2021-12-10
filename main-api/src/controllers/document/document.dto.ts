@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsNumber,
   IsNumberString,
@@ -6,112 +6,105 @@ import {
   IsOptional,
   IsString,
   IsEmail,
-  IsUUID,
+  IsNotEmpty,
 } from 'class-validator';
 import { DocumentStatus } from 'src/entities';
 
 export class GetDocumentsDto {
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   search?: string;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsNumberString()
   skip?: number;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsNumberString()
   take?: number;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   documentType?: string;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional({ enum: DocumentStatus, isArray: true })
   @IsOptional()
   @IsString({ each: true })
   statuses?: DocumentStatus[];
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsEmail()
   username?: string;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsDateString()
   from?: Date;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsDateString()
   to?: Date;
 }
 
-export class CreateDocumentDto {
-  @ApiProperty({ format: 'uuid' })
-  @IsUUID()
-  uuid: string;
-
-  @ApiProperty()
-  @IsString()
-  documentName: string;
-
-  @ApiProperty({
-    description: 'In bytes',
-  })
-  @IsNumber()
-  documentSize: number;
-}
-
 export class EncodeDocDetailsDto {
   @ApiProperty()
+  @IsNotEmpty({ message: 'Company is required.' })
   @IsString()
   companyCode: string;
 
   @ApiProperty()
+  @IsNotEmpty({ message: 'Contract number is required.' })
   @IsString()
   contractNumber: string;
 
   @ApiProperty()
   @IsString()
+  @IsNotEmpty({ message: 'Nomenclature is required.' })
   nomenclature: string;
 
   @ApiProperty()
+  @IsNotEmpty({ message: 'Document group is required.' })
   @IsString()
   documentGroup: string;
 }
 
 export class EncodeDocQRBarCodeDto {
   @ApiProperty()
+  @IsNotEmpty({ message: 'Barcode or QR Code is required.' })
   @IsString()
   qrBarCode: string;
 }
 
 export class CheckerApproveDocDto {
   @ApiProperty()
+  @IsNotEmpty({ message: 'Document date is required.' })
   @IsDateString()
   documentDate: string;
 }
 
 export class CheckerDisApproveDocDto extends CheckerApproveDocDto {
   @ApiProperty()
+  @IsNotEmpty({ message: 'Remarks is required.' })
   @IsString()
   remarks: string;
 }
 
 export class RetryDocumentsDto {
   @ApiProperty()
+  @IsNotEmpty({ message: 'Document IDs is required.' })
   @IsNumber({ allowNaN: false }, { each: true })
   documentIds: number[];
 }
 
 export class GetDocumentsProcessCountDto {
-  @ApiProperty()
+  @ApiProperty({ enum: DocumentStatus, isArray: true, required: true })
+  @IsNotEmpty({ message: 'Statuses is required.' })
   @IsString({ each: true })
   statuses: DocumentStatus[];
 }
