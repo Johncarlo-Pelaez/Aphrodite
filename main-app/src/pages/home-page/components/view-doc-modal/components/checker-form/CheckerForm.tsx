@@ -84,7 +84,6 @@ export const CheckerForm = forwardRef(
         }
 
         triggerSubmitted();
-        setFocus('documentDate');
       }
     };
 
@@ -117,6 +116,8 @@ export const CheckerForm = forwardRef(
       };
       // eslint-disable-next-line
     }, []);
+
+    useEffect(() => setFocus('documentDate'), [document, setFocus]);
 
     return (
       <Fragment>

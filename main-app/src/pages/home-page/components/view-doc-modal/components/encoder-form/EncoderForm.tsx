@@ -91,7 +91,7 @@ export const EncoderForm = forwardRef(
       const hasDefaultQrCode = !!document?.qrCode;
       const isQRBarCodeInputEmpty = !qrBarCode || qrBarCode === '';
       const isNomenclatureInputEmpty =
-        !arrNomenclature || (arrNomenclature && arrNomenclature.length < 1);
+        !arrNomenclature || arrNomenclature?.length < 1;
       const isDocumentGroupInputEmpty = !documentGroup || documentGroup === '';
       const isCompanyCodeInputEmpty = !companyCode || companyCode === '';
       const isContractNumberInputEmpty =
@@ -177,20 +177,13 @@ export const EncoderForm = forwardRef(
         return;
       }
 
-      const nomenclature =
-        arrNomenclature && !!arrNomenclature.length
-          ? arrNomenclature[0].label
-          : '';
+      const nomenclature = !!arrNomenclature?.length
+        ? arrNomenclature[0].label
+        : '';
 
       if (!isEncodeDocSaving) {
-        let isQRBarCode;
-
-        if (!isQRBarCodeInputEmpty && qrBarCode !== document.qrCode) {
-          isQRBarCode = true;
-        } else {
-          isQRBarCode = false;
-        }
-
+        const isQRBarCode =
+          !isQRBarCodeInputEmpty && qrBarCode !== document.qrCode;
         await encodeDocumentAsync({
           documentId: document?.id as number,
           qrBarCode,
@@ -203,7 +196,6 @@ export const EncoderForm = forwardRef(
 
         alert('Encode Saved.');
         triggerSubmitted();
-        setFocus('qrBarCode');
       }
     };
 
@@ -211,9 +203,7 @@ export const EncoderForm = forwardRef(
       function onChangeNomenclatureField() {
         setValue(
           'documentGroup',
-          nomenclature && !!nomenclature.length
-            ? nomenclature[0].documentGroup
-            : '',
+          !!nomenclature?.length ? nomenclature[0].documentGroup : '',
         );
       },
       // eslint-disable-next-line
@@ -239,6 +229,8 @@ export const EncoderForm = forwardRef(
       };
       // eslint-disable-next-line
     }, []);
+
+    useEffect(() => setFocus('qrBarCode'), [document, setFocus]);
 
     return (
       <Fragment>
