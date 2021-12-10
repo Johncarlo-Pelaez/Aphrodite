@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiPropertyOptional, IntersectionType } from '@nestjs/swagger';
 import {
   IsNumberString,
   IsDateString,
@@ -6,56 +6,111 @@ import {
   IsEmail,
 } from 'class-validator';
 
-export class GetUploadedReportDto {
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsEmail()
-  uploader?: string;
-
-  @ApiProperty({ required: false })
+class GetReportDateRangeFilterDto {
+  @ApiPropertyOptional()
   @IsOptional()
   @IsDateString()
   from?: Date;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsDateString()
   to?: Date;
+}
 
-  @ApiProperty({ required: false })
+class GetReportPageFilterDto {
+  @ApiPropertyOptional()
   @IsOptional()
   @IsNumberString()
   skip?: number;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsNumberString()
   take?: number;
 }
 
-export class GetInformationRequestReportDto {
-  @ApiProperty({ required: false })
+export class GetUploadedReportDto extends IntersectionType(
+  GetReportDateRangeFilterDto,
+  GetReportPageFilterDto,
+) {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsEmail()
+  uploader?: string;
+}
+
+export class DownloadUploadedReportDto extends GetReportDateRangeFilterDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsEmail()
+  uploader?: string;
+}
+
+export class GetInformationRequestReportDto extends IntersectionType(
+  GetReportDateRangeFilterDto,
+  GetReportPageFilterDto,
+) {
+  @ApiPropertyOptional()
   @IsOptional()
   @IsEmail()
   encoder?: string;
+}
 
-  @ApiProperty({ required: false })
+export class DownloadInformationRequestReportDto extends GetReportDateRangeFilterDto {
+  @ApiPropertyOptional()
   @IsOptional()
-  @IsDateString()
-  from?: Date;
+  @IsEmail()
+  encoder?: string;
+}
 
-  @ApiProperty({ required: false })
+export class GetQualityCheckReportDto extends IntersectionType(
+  GetReportDateRangeFilterDto,
+  GetReportPageFilterDto,
+) {
+  @ApiPropertyOptional()
   @IsOptional()
-  @IsDateString()
-  to?: Date;
+  @IsEmail()
+  checker?: string;
+}
 
-  @ApiProperty({ required: false })
+export class DonwloadQualityCheckReportDto extends GetReportDateRangeFilterDto {
+  @ApiPropertyOptional()
   @IsOptional()
-  @IsNumberString()
-  skip?: number;
+  @IsEmail()
+  checker?: string;
+}
 
-  @ApiProperty({ required: false })
+export class GetApprovalReportDto extends IntersectionType(
+  GetReportDateRangeFilterDto,
+  GetReportPageFilterDto,
+) {
+  @ApiPropertyOptional()
   @IsOptional()
-  @IsNumberString()
-  take?: number;
+  @IsEmail()
+  approver?: string;
+}
+
+export class DownloadApprovalReportDto extends GetReportDateRangeFilterDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsEmail()
+  approver?: string;
+}
+
+export class GetImportReportDto extends IntersectionType(
+  GetReportDateRangeFilterDto,
+  GetReportPageFilterDto,
+) {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsEmail()
+  username?: string;
+}
+
+export class DownloadImportReportDto extends GetReportDateRangeFilterDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsEmail()
+  username?: string;
 }

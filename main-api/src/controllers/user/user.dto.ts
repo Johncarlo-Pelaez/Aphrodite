@@ -1,12 +1,39 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsEmail,
   IsString,
   IsOptional,
   IsNotEmpty,
   IsBoolean,
+  IsDateString,
+  IsEnum,
 } from 'class-validator';
 import { Role } from 'src/entities';
+
+export class GetUsersDto {
+  @ApiPropertyOptional({ enum: Role, isArray: true })
+  @IsOptional()
+  @IsEnum(Role, {
+    each: true,
+    message: `Role must be ${Object.values(Role).join(', ')}.`,
+  })
+  role?: Role[];
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  isActive?: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  from?: Date;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  to?: Date;
+}
 
 export class CreateUserAccountDto {
   @ApiProperty({
@@ -22,7 +49,7 @@ export class CreateUserAccountDto {
   @IsString()
   objectId: string;
 
-  @ApiProperty()
+  @ApiProperty({ enum: Role })
   @IsNotEmpty({ message: 'Role is required.' })
   @IsString()
   role: Role;
@@ -39,7 +66,7 @@ export class CreateUserAccountDto {
 }
 
 export class UpdateUserAccountDto {
-  @ApiProperty()
+  @ApiProperty({ enum: Role })
   @IsNotEmpty({ message: 'Role is required.' })
   @IsString()
   role: Role;
@@ -54,7 +81,7 @@ export class UpdateUserAccountDto {
   @IsString()
   lastName: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;

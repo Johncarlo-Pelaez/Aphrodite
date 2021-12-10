@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 import { ActivityLogType } from './activity-log.enum';
 
@@ -22,7 +22,7 @@ export class ActivityLog {
   @Column()
   loggedAt: Date;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @Column({ nullable: true })
   loggedBy?: string;
 }

@@ -1,5 +1,11 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
 import { DocumentStatus } from './document.enum';
 import { User } from './user.entity';
 
@@ -45,67 +51,67 @@ export class Document {
   @Column({ enum: DocumentStatus })
   status: DocumentStatus;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @Column({ nullable: true })
   qrCode?: string;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @Column({ nullable: true })
   qrAt?: Date;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @Column({ nullable: true })
   documentType?: string;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @Column({ nullable: true })
   contractDetails?: string;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @Column({ nullable: true })
   springResponse?: string;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @Column({ nullable: true })
   remarks?: string;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @Column({ nullable: true })
   docTypeReqParams?: string;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @Column({ nullable: true })
   contractDetailsReqParams?: string;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @Column({ nullable: true })
   springcmReqParams?: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @Column({ nullable: true })
   documentDate?: string;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @Column({ nullable: true })
   encoder?: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @Column({ nullable: true })
   encodedAt?: Date;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @Column({ nullable: true })
   encodeValues?: string;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @Column({ nullable: true })
   checker?: string;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @Column({ nullable: true })
   checkedAt?: Date;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @Column({ nullable: true })
   approver?: string;
 
@@ -120,6 +126,12 @@ export class Document {
   @ApiProperty()
   @Column()
   pageTotal: number;
+
+  @OneToMany(
+    () => DocumentHistory,
+    (documentHistory) => documentHistory.document,
+  )
+  documentHistories: DocumentHistory[];
 
   @ApiProperty()
   @ManyToOne(() => User, (e) => e.username)
@@ -151,25 +163,24 @@ export class DocumentHistory {
   documentId: number;
 
   @ApiProperty()
-  @ManyToOne(() => Document, (e) => e.id)
+  @ManyToOne(() => Document, (document) => document.documentHistories)
   document: Document;
 
-  @ApiProperty()
-  @Column()
+  @ApiPropertyOptional()
+  @Column({ nullable: true })
   userUsername: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     enum: DocumentStatus,
-    required: false,
   })
   @Column({ enum: DocumentStatus, nullable: true })
   documentStatus?: DocumentStatus;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @Column({ nullable: true })
   salesforceResponse?: string;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @Column({ nullable: true })
   springcmResponse?: string;
 }

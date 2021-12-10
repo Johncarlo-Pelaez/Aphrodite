@@ -217,7 +217,9 @@ export class DocumentConsumer {
       await this.documentRepository.failIndexing({
         documentId,
         docTypeReqParams: JSON.stringify(getDocTypeReqParams),
-        salesforceResponse: error,
+        salesforceResponse: !!getDocTypeResult
+          ? JSON.stringify(getDocTypeResult)
+          : error,
         failedAt: this.datesUtil.getDateNow(),
       });
       this.logger.error(error);
@@ -272,7 +274,9 @@ export class DocumentConsumer {
       await this.documentRepository.failIndexing({
         documentId,
         contractDetailsReqParams: JSON.stringify(getContractDetailsReqParams),
-        salesforceResponse: error,
+        salesforceResponse: !!getContractDetailsResult
+          ? JSON.stringify(getContractDetailsResult)
+          : error,
         failedAt: this.datesUtil.getDateNow(),
       });
       this.logger.error(error);
@@ -347,12 +351,15 @@ export class DocumentConsumer {
         uploadParams,
       );
     } catch (error) {
-      await this.updateToMigrateFailed(
+      await this.documentRepository.failMigrate({
         documentId,
-        strUploadParams,
-        undefined,
-        error,
-      );
+        springcmReqParams: strUploadParams,
+        springcmResponse: !!uploadDocToSpringResult
+          ? JSON.stringify(uploadDocToSpringResult)
+          : error,
+        failedAt: this.datesUtil.getDateNow(),
+      });
+      this.logger.error(error);
       throw error;
     }
 
@@ -368,21 +375,23 @@ export class DocumentConsumer {
     ) {
       await this.documentRepository.migrateDocument({
         documentId,
-        springReqParams: strUploadParams,
-        springResponse: JSON.stringify(response),
+        springcmReqParams: strUploadParams,
+        springcmResponse: JSON.stringify(response),
         migratedAt: this.datesUtil.getDateNow(),
       });
       await unlink(path.join(this.appConfigService.filePath, sysSrcFileName));
       await this.documentRepository.deleteFile({
         documentId,
         deletedAt: this.datesUtil.getDateNow(),
+        deletedBy: 'RIS',
       });
     } else {
-      await this.updateToMigrateFailed(
+      await this.documentRepository.failMigrate({
         documentId,
-        strUploadParams,
-        JSON.stringify(response),
-      );
+        springcmReqParams: strUploadParams,
+        springcmResponse: JSON.stringify(uploadDocToSpringResult),
+        failedAt: this.datesUtil.getDateNow(),
+      });
     }
   }
 
@@ -390,22 +399,6 @@ export class DocumentConsumer {
     const location = path.join(this.appConfigService.filePath, sysSrcFileName);
     const buffer = await readFile(location);
     return buffer;
-  }
-
-  private async updateToMigrateFailed(
-    documentId: number,
-    springReqParams: string,
-    springResponse?: string,
-    error?: any,
-  ): Promise<void> {
-    const failedAt = this.datesUtil.getDateNow();
-    await this.documentRepository.failMigrate({
-      documentId,
-      springReqParams,
-      springResponse,
-      failedAt: this.datesUtil.getDateNow(),
-    });
-    this.logger.error(error);
   }
 
   private async updateForManualEncode(documentId: number): Promise<void> {

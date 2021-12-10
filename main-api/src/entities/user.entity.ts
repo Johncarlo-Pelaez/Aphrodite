@@ -49,4 +49,8 @@ export class User {
   @ApiProperty()
   @Column()
   objectId: string;
+
+  @ApiProperty()
+  @Column()
+  isDeleted: boolean;
 }

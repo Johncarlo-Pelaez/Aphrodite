@@ -30,6 +30,7 @@ import { PassportModule } from '@nestjs/passport';
 import { AzureADStrategy } from './core';
 import { AzureAdService } from './azure-ad-service';
 import { ExcelService } from './excel-service';
+import { ReportService } from './report-service';
 
 const logger = new Logger('AppModule');
 
@@ -99,6 +100,7 @@ const logger = new Logger('AppModule');
     ActivityLogRepository,
     ExcelService,
     ReportRepository,
+    ReportService,
   ],
 })
 export class AppModule {}

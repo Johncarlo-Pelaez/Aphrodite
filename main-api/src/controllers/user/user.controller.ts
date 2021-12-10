@@ -5,12 +5,15 @@ import {
   Get,
   Post,
   Put,
+  Delete,
   ValidationPipe,
   Query,
   Param,
   UseGuards,
   ParseIntPipe,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import {
   ApiConflictResponse,
   ApiCreatedResponse,
@@ -24,7 +27,10 @@ import {
 } from 'src/core';
 import { User } from 'src/entities';
 import { UserRepository, ActivityLogRepository } from 'src/repositories';
+import { ExcelService, ExcelColumn } from 'src/excel-service';
+import { FilenameUtil } from 'src/utils';
 import {
+  GetUsersDto,
   CreateUserAccountDto,
   UserIsExistDto,
   UpdateUserAccountDto,
@@ -35,6 +41,8 @@ export class UserController {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly activityLogRepository: ActivityLogRepository,
+    private readonly excelService: ExcelService,
+    private readonly filenameUtil: FilenameUtil,
   ) {}
 
   @ApiOkResponse({
@@ -43,8 +51,60 @@ export class UserController {
   })
   @Get('/')
   @UseGuards(AzureADGuard)
-  async getUsers(): Promise<User[]> {
-    return await this.userRepository.getUsers();
+  async getUsers(@Query() dto: GetUsersDto): Promise<User[]> {
+    return await this.userRepository.getUsers(dto);
+  }
+
+  @UseGuards(AzureADGuard)
+  @Get('/download')
+  async downloadUsersReport(
+    @Query() dto: GetUsersDto,
+    @Res() res: Response,
+  ): Promise<void> {
+    const data = await this.userRepository.getUsers(dto);
+    const columns: ExcelColumn[] = [
+      {
+        key: 'createdDate',
+        title: 'Date and Time',
+      },
+      {
+        key: 'username',
+        title: 'Email Address',
+      },
+      {
+        key: 'firstName',
+        title: 'First Name',
+      },
+      {
+        key: 'lastName',
+        title: 'Last Name',
+      },
+      {
+        key: 'role',
+        title: 'Role',
+      },
+      {
+        key: 'isActive',
+        title: 'Status',
+        render: (isActive: boolean) => (isActive ? 'Active' : 'Inactive'),
+      },
+    ];
+    const excelFileBuffer = await this.excelService.create({
+      columns,
+      rows: data.map((user) =>
+        this.excelService.buildExcelRowItems(user, columns),
+      ),
+    });
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=users-report${this.filenameUtil.generateName()}`,
+    );
+    res.setHeader('Content-Length', excelFileBuffer.length);
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+    res.send(excelFileBuffer);
   }
 
   @ApiOkResponse({
@@ -113,6 +173,24 @@ export class UserController {
       oldUser: `${user.role}, ${user.firstName}, ${user.lastName}, ${user.isActive}`,
       updatedBy: azureUser.preferred_username,
       updatedAt: rightNow,
+    });
+  }
+
+  @ApiOkResponse()
+  @Delete('/:id')
+  async deleteUser(
+    @GetAzureUser() azureUser: AzureUser,
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<void> {
+    const user = await this.userRepository.getUser(id);
+    await this.userRepository.deleteUser({
+      id,
+      modifiedDate: new Date(),
+    });
+    await this.activityLogRepository.insertDeleteUserLog({
+      username: user.username,
+      deletedBy: azureUser.preferred_username,
+      deletedAt: new Date(),
     });
   }
 }

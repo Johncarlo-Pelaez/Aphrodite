@@ -215,6 +215,8 @@ export class DocumentService {
       await this.documentRepository.getDocuments({
         statuses: [
           DocumentStatus.UPLOADED,
+          DocumentStatus.ENCODING,
+          DocumentStatus.CHECKING,
           DocumentStatus.RETRYING,
           DocumentStatus.APPROVED,
           DocumentStatus.CHECKING_APPROVED,

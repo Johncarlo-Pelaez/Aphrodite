@@ -6,9 +6,10 @@ export interface ExcelCreate {
 export interface ExcelColumn {
   key: string;
   title: string;
+  render?: (value: any) => string;
 }
 
 export interface ExcelRowItem {
   key: string;
-  value: string;
+  value: any;
 }
