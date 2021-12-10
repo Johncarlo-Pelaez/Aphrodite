@@ -22,6 +22,12 @@ export interface InsertUpdateUserLogParam {
   updatedAt: Date;
 }
 
+export interface InsertDeleteUserLogParam {
+  username: string;
+  deletedBy: string;
+  deletedAt: Date;
+}
+
 export interface InsertCreateLookupLogParam {
   nomenclature: string;
   createdBy: string;

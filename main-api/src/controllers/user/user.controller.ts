@@ -5,6 +5,7 @@ import {
   Get,
   Post,
   Put,
+  Delete,
   ValidationPipe,
   Query,
   Param,
@@ -113,6 +114,24 @@ export class UserController {
       oldUser: `${user.role}, ${user.firstName}, ${user.lastName}, ${user.isActive}`,
       updatedBy: azureUser.preferred_username,
       updatedAt: rightNow,
+    });
+  }
+
+  @ApiOkResponse()
+  @Delete('/:id')
+  async deleteUser(
+    @GetAzureUser() azureUser: AzureUser,
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<void> {
+    const user = await this.userRepository.getUser(id);
+    await this.userRepository.deleteUser({
+      id,
+      modifiedDate: new Date(),
+    });
+    await this.activityLogRepository.insertDeleteUserLog({
+      username: user.username,
+      deletedBy: azureUser.preferred_username,
+      deletedAt: new Date(),
     });
   }
 }

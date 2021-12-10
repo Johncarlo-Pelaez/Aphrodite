@@ -17,3 +17,8 @@ export interface UpdateUserParam {
   modifiedDate: Date;
   isActive?: boolean;
 }
+
+export interface DeleteUserParam {
+  id: number;
+  modifiedDate: Date;
+}

@@ -10,6 +10,7 @@ import {
   GetActivityLogsParam,
   InsertCreateUserLogParam,
   InsertUpdateUserLogParam,
+  InsertDeleteUserLogParam,
   InsertCreateLookupLogParam,
   InsertUpdateLookupLogParam,
   InsertDeleteLookupLogParam,
@@ -96,6 +97,15 @@ export class ActivityLogRepository {
     activityLogs.description = `From ${param.oldUser} to ${param.newUser}`;
     activityLogs.loggedBy = param.updatedBy;
     activityLogs.loggedAt = param.updatedAt;
+    await this.manager.save(activityLogs);
+  }
+
+  async insertDeleteUserLog(param: InsertDeleteUserLogParam): Promise<void> {
+    const activityLogs = new ActivityLog();
+    activityLogs.type = ActivityLogType.DELETE_USER;
+    activityLogs.description = param.username;
+    activityLogs.loggedBy = param.deletedBy;
+    activityLogs.loggedAt = param.deletedAt;
     await this.manager.save(activityLogs);
   }
 
