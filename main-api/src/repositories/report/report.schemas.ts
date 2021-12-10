@@ -86,3 +86,32 @@ export class ApprovalReport {
   @ApiProperty()
   note: string;
 }
+
+export class ImportReport {
+  @ApiProperty()
+  importedDate: Date;
+
+  @ApiProperty()
+  filename: string;
+
+  @ApiProperty()
+  username: string;
+
+  @ApiProperty()
+  qrCode: string;
+
+  @ApiProperty()
+  documentType: string;
+
+  @ApiProperty()
+  documentSize: number;
+
+  @ApiProperty()
+  pageTotal: number;
+
+  @ApiProperty()
+  documentStatus: number;
+
+  @ApiProperty()
+  note: string;
+}

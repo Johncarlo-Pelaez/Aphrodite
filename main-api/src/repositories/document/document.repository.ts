@@ -222,6 +222,10 @@ export class DocumentRepository {
     history.documentId = document.id;
     history.document = document;
 
+    if (!!customValue?.documentStatus) {
+      history.documentStatus = customValue.documentStatus;
+    }
+
     if (!!customValue?.userUsername) {
       history.userUsername = customValue.userUsername;
     }
@@ -672,6 +676,7 @@ export class DocumentRepository {
 
       const history = this.genarateDocumentHistory(document, {
         userUsername: param.deletedBy,
+        documentStatus: null,
       });
       await transaction.save(history);
     });

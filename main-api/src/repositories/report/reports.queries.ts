@@ -54,3 +54,22 @@ export const COUNT_APPROVAL_REPORTS = `
     SELECT 
     COUNT(approval.documentId)
     FROM document_latest_approval AS approval`;
+
+export const FIND_IMPORT_REPORTS = `
+    SELECT 
+    import.documentId,
+    import.importedDate,
+    import.filename,
+    import.username,
+    import.qrCode,
+    import.documentType,
+    import.documentSize,
+    import.pageTotal,
+    import.documentStatus,
+    import.note
+    FROM document_latest_import AS import`;
+
+export const COUNT_IMPORT_REPORTS = `
+    SELECT 
+    COUNT(import.documentId)
+    FROM document_latest_import AS import`;

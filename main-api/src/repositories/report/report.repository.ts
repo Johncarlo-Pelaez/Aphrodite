@@ -12,6 +12,7 @@ import {
   GetInformationRequestReportParam,
   GetQualityCheckReportParam,
   GetApprovalReportParam,
+  GetImportReportParam,
 } from './report.params';
 import {
   FIND_INFORMATION_REQUEST_REPORTS,
@@ -20,11 +21,14 @@ import {
   COUNT_QUALITY_CHECK_REPORTS,
   FIND_APPROVAL_REPORTS,
   COUNT_APPROVAL_REPORTS,
+  FIND_IMPORT_REPORTS,
+  COUNT_IMPORT_REPORTS,
 } from './reports.queries';
 import {
   InformationRequestReport,
   QualityCheckReport,
   ApprovalReport,
+  ImportReport,
 } from './report.schemas';
 
 @EntityRepository()
@@ -313,7 +317,87 @@ export class ReportRepository {
       queryParams.push(param.from, dateTo);
     }
 
-    let sql = FIND_APPROVAL_REPORTS;
+    let sql = COUNT_APPROVAL_REPORTS;
+
+    if (!!queryConditions.length) {
+      sql += `\nWHERE ${queryConditions.join(' AND ')}`;
+    }
+
+    sql += ';';
+
+    const queryData = await this.manager.query(sql, queryParams);
+    const queryObject = !!queryData?.length ? queryData[0] : null;
+    const queryObjectValues = !!queryObject ? Object.values(queryObject) : [];
+    return !!queryObjectValues.length
+      ? (queryObjectValues[0] as number) ?? 0
+      : 0;
+  }
+
+  async getImportReport(param: GetImportReportParam): Promise<ImportReport[]> {
+    const queryConditions: string[] = [];
+    const queryParams: (string | number | Date)[] = [];
+
+    if (!!param.username) {
+      queryConditions.push(`import.username = @${queryParams.length}`);
+      queryParams.push(param.username);
+    }
+
+    if (!!param.from) {
+      queryConditions.push(
+        `import.importedDate BETWEEN @${queryParams.length} AND @${
+          queryParams.length + 1
+        }`,
+      );
+      const dateTo = moment(!!param.to ? param.to : param.from)
+        .add(1, 'day')
+        .add(-1, 'millisecond')
+        .toDate();
+      queryParams.push(param.from, dateTo);
+    }
+
+    let sql = FIND_IMPORT_REPORTS;
+
+    if (!!queryConditions.length) {
+      sql += `\nWHERE ${queryConditions.join(' AND ')}`;
+    }
+
+    sql += '\nORDER BY import.importedDate DESC';
+
+    if (!!param.skip && !!param.take) {
+      sql += `\nOFFSET @${queryParams.length} ROWS FETCH NEXT @${
+        queryParams.length + 1
+      } ROWS ONLY`;
+      queryParams.push(param.skip, param.take);
+    }
+
+    sql += ';';
+
+    return await this.manager.query(sql, queryParams);
+  }
+
+  async getImportCountReport(param: GetImportReportParam): Promise<number> {
+    const queryConditions: string[] = [];
+    const queryParams: (string | number | Date)[] = [];
+
+    if (!!param.username) {
+      queryConditions.push(`import.username = @${queryParams.length}`);
+      queryParams.push(param.username);
+    }
+
+    if (!!param.from) {
+      queryConditions.push(
+        `import.importedDate BETWEEN @${queryParams.length} AND @${
+          queryParams.length + 1
+        }`,
+      );
+      const dateTo = moment(!!param.to ? param.to : param.from)
+        .add(1, 'day')
+        .add(-1, 'millisecond')
+        .toDate();
+      queryParams.push(param.from, dateTo);
+    }
+
+    let sql = COUNT_IMPORT_REPORTS;
 
     if (!!queryConditions.length) {
       sql += `\nWHERE ${queryConditions.join(' AND ')}`;

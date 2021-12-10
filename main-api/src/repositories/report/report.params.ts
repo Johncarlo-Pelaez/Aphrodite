@@ -29,3 +29,11 @@ export interface GetApprovalReportParam {
   skip?: number;
   take?: number;
 }
+
+export interface GetImportReportParam {
+  username?: string;
+  from?: Date;
+  to?: Date;
+  skip?: number;
+  take?: number;
+}

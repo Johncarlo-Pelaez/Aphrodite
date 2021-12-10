@@ -10,6 +10,7 @@ import {
   GenerateInformationRequestExcekParam,
   GenerateQualityCheckExcelParam,
   GenerateApprovalExcelParam,
+  GenerateImportExcelParam,
 } from './report.params';
 
 @Injectable()
@@ -225,6 +226,68 @@ export class ReportService {
       {
         key: 'approver',
         title: 'Approver',
+      },
+      {
+        key: 'qrCode',
+        title: 'Barcode / QR Code',
+      },
+      {
+        key: 'documentType',
+        title: 'Document Type',
+        render: (value) => {
+          const salesforceRes: GetDocumentTypeResult =
+            !!value && value !== '' ? JSON.parse(value) : undefined;
+          const nomenclature = !!salesforceRes?.response?.length
+            ? salesforceRes.response[0]
+            : undefined;
+          return nomenclature?.Nomenclature ?? '';
+        },
+      },
+      {
+        key: 'documentSize',
+        title: 'File Size',
+        render: (value) => fileSize(value),
+      },
+      {
+        key: 'pageTotal',
+        title: 'Number of Pages',
+      },
+      {
+        key: 'documentStatus',
+        title: 'Status',
+      },
+      {
+        key: 'note',
+        title: 'Note',
+      },
+    ];
+    return await this.excelService.create({
+      columns,
+      rows: data.map((qualityCheck) =>
+        this.buildExcelRowItems(qualityCheck, columns),
+      ),
+    });
+  }
+
+  async generateImportExcel(param: GenerateImportExcelParam): Promise<Buffer> {
+    const data = await this.reportRepository.getImportReport({
+      username: param.username,
+      from: param.from,
+      to: param.to,
+    });
+    const columns: ExcelColumn[] = [
+      {
+        key: 'importedDate',
+        title: 'Date and Time',
+        render: (value) => moment(value).format(DEFAULT_DATE_FORMAT),
+      },
+      {
+        key: 'filename',
+        title: 'File Name',
+      },
+      {
+        key: 'username',
+        title: 'User',
       },
       {
         key: 'qrCode',

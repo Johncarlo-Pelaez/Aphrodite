@@ -12,6 +12,7 @@ import {
   InformationRequestReport,
   QualityCheckReport,
   ApprovalReport,
+  ImportReport,
 } from 'src/repositories/report';
 import { ReportService } from 'src/report-service';
 import { FilenameUtil } from 'src/utils';
@@ -24,11 +25,13 @@ import {
   DonwloadQualityCheckReportDto,
   GetApprovalReportDto,
   DownloadApprovalReportDto,
+  GetImportReportDto,
+  DownloadImportReportDto,
 } from './report.dto';
 import { GetDocumentsReportIntPipe } from './report.pipe';
 
 @Controller('/reports')
-//@UseGuards(AzureADGuard)
+@UseGuards(AzureADGuard)
 export class ReportController {
   constructor(
     private readonly reportRepository: ReportRepository,
@@ -188,6 +191,44 @@ export class ReportController {
     res.setHeader(
       'Content-Disposition',
       `attachment; filename=documents-approval-report${this.filenameUtil.generateName()}`,
+    );
+    res.setHeader('Content-Length', excelFileBuffer.length);
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+    res.send(excelFileBuffer);
+  }
+
+  @ApiExtraModels(ImportReport)
+  @ApiPaginatedResponse(ImportReport)
+  @Get('/import')
+  async getImportReport(
+    @Query(GetDocumentsReportIntPipe) dto: GetImportReportDto,
+  ): Promise<PaginatedResponse<ImportReport>> {
+    const response = new PaginatedResponse<ImportReport>();
+    response.count = await this.reportRepository.getImportCountReport({
+      username: dto.username,
+      from: dto.from,
+      to: dto.to,
+    });
+    response.data = await this.reportRepository.getImportReport(dto);
+    return response;
+  }
+
+  @Get('/import/download')
+  async downloadImportReport(
+    @Query() dto: DownloadImportReportDto,
+    @Res() res: Response,
+  ): Promise<void> {
+    const excelFileBuffer = await this.reportService.generateImportExcel({
+      username: dto.username,
+      from: dto.from,
+      to: dto.to,
+    });
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=documents-import-report${this.filenameUtil.generateName()}`,
     );
     res.setHeader('Content-Length', excelFileBuffer.length);
     res.setHeader(

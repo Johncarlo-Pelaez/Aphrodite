@@ -29,3 +29,11 @@ export interface GenerateApprovalExcelParam {
   skip?: number;
   take?: number;
 }
+
+export interface GenerateImportExcelParam {
+  username?: string;
+  from?: Date;
+  to?: Date;
+  skip?: number;
+  take?: number;
+}
