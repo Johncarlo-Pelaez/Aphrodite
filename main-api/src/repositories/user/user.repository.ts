@@ -1,6 +1,14 @@
-import { Role, User } from 'src/entities';
-import { EntityManager, EntityRepository, In } from 'typeorm';
+import * as moment from 'moment';
 import {
+  EntityManager,
+  EntityRepository,
+  In,
+  FindConditions,
+  Between,
+} from 'typeorm';
+import { Role, User } from 'src/entities';
+import {
+  GetUsersParam,
   CreateUserParam,
   UpdateUserParam,
   DeleteUserParam,
@@ -10,13 +18,28 @@ import {
 export class UserRepository {
   constructor(private readonly manager: EntityManager) {}
 
-  async getUsers(): Promise<User[]> {
+  async getUsers(param: GetUsersParam): Promise<User[]> {
+    let whereConditions: FindConditions<User> = {};
+
+    if (!!param.roles?.length) {
+      whereConditions['role'] = In(param.roles);
+    }
+
+    if (!!param.isActive) {
+      whereConditions['isActive'] = param.isActive;
+    }
+
+    if (!!param.from) {
+      const dateTo = moment(!!param.to ? param.to : param.from)
+        .add(1, 'day')
+        .add(-1, 'millisecond')
+        .toDate();
+      whereConditions['modifiedDate'] = Between(param.from, dateTo);
+    }
+
     return await this.manager.find(User, {
-      where: [
-        {
-          isDeleted: false,
-        },
-      ],
+      where: [{ ...whereConditions, isDeleted: false }],
+      order: { modifiedDate: 'DESC' },
     });
   }
 
@@ -32,7 +55,13 @@ export class UserRepository {
         where: { role: In(roles), isDeleted: false },
       });
     }
-    return await this.manager.count(User);
+    return await this.manager.count(User, {
+      where: [
+        {
+          isDeleted: false,
+        },
+      ],
+    });
   }
 
   async getAuthUserByEmail(email: string): Promise<User> {

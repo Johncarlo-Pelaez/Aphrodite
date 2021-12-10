@@ -5,8 +5,35 @@ import {
   IsOptional,
   IsNotEmpty,
   IsBoolean,
+  IsDateString,
+  IsEnum,
 } from 'class-validator';
 import { Role } from 'src/entities';
+
+export class GetUsersDto {
+  @ApiPropertyOptional({ enum: Role, isArray: true })
+  @IsOptional()
+  @IsEnum(Role, {
+    each: true,
+    message: `Role must be ${Object.values(Role).join(', ')}.`,
+  })
+  role?: Role[];
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  isActive?: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  from?: Date;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  to?: Date;
+}
 
 export class CreateUserAccountDto {
   @ApiProperty({

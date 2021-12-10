@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as moment from 'moment';
 import * as fileSize from 'filesize';
 import { ReportRepository } from 'src/repositories';
-import { ExcelService, ExcelColumn, ExcelRowItem } from 'src/excel-service';
+import { ExcelService, ExcelColumn } from 'src/excel-service';
 import { DEFAULT_DATE_FORMAT } from 'src/core/constants';
 import { GetDocumentTypeResult } from 'src/sales-force-service';
 import {
@@ -19,25 +19,6 @@ export class ReportService {
     private readonly reportRepository: ReportRepository,
     private readonly excelService: ExcelService,
   ) {}
-
-  private buildExcelRowItems(
-    queryObject: Object,
-    columns: ExcelColumn[],
-  ): ExcelRowItem[] {
-    return Object.entries(queryObject).reduce(
-      (excelRowItem: ExcelRowItem[], [objectKey, objectValue]) => {
-        const column = columns.find((col) => col.key === objectKey);
-        if (column) {
-          excelRowItem.push({
-            key: column.key,
-            value: objectValue,
-          });
-        }
-        return excelRowItem;
-      },
-      [],
-    );
-  }
 
   async generateUploadedExcel(
     param: GenerateUploadedExcelParam,
@@ -74,7 +55,7 @@ export class ReportService {
     return await this.excelService.create({
       columns,
       rows: data.map((documenHistory) =>
-        this.buildExcelRowItems(documenHistory, columns),
+        this.excelService.buildExcelRowItems(documenHistory, columns),
       ),
     });
   }
@@ -137,7 +118,9 @@ export class ReportService {
     ];
     return await this.excelService.create({
       columns,
-      rows: data.map((infoReq) => this.buildExcelRowItems(infoReq, columns)),
+      rows: data.map((infoReq) =>
+        this.excelService.buildExcelRowItems(infoReq, columns),
+      ),
     });
   }
 
@@ -200,7 +183,7 @@ export class ReportService {
     return await this.excelService.create({
       columns,
       rows: data.map((qualityCheck) =>
-        this.buildExcelRowItems(qualityCheck, columns),
+        this.excelService.buildExcelRowItems(qualityCheck, columns),
       ),
     });
   }
@@ -264,7 +247,7 @@ export class ReportService {
     return await this.excelService.create({
       columns,
       rows: data.map((qualityCheck) =>
-        this.buildExcelRowItems(qualityCheck, columns),
+        this.excelService.buildExcelRowItems(qualityCheck, columns),
       ),
     });
   }
@@ -326,7 +309,7 @@ export class ReportService {
     return await this.excelService.create({
       columns,
       rows: data.map((qualityCheck) =>
-        this.buildExcelRowItems(qualityCheck, columns),
+        this.excelService.buildExcelRowItems(qualityCheck, columns),
       ),
     });
   }

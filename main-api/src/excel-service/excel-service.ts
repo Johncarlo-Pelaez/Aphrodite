@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as ExcelJS from 'exceljs';
-import { ExcelCreate } from './excel-service.types';
+import { ExcelCreate, ExcelColumn, ExcelRowItem } from './excel-service.types';
 
 @Injectable()
 export class ExcelService {
@@ -30,5 +30,24 @@ export class ExcelService {
     );
 
     return (await workbook.xlsx.writeBuffer()) as Buffer;
+  }
+
+  buildExcelRowItems(
+    dataObject: Object,
+    columns: ExcelColumn[],
+  ): ExcelRowItem[] {
+    return Object.entries(dataObject).reduce(
+      (excelRowItem: ExcelRowItem[], [objectKey, objectValue]) => {
+        const column = columns.find((col) => col.key === objectKey);
+        if (column) {
+          excelRowItem.push({
+            key: column.key,
+            value: objectValue,
+          });
+        }
+        return excelRowItem;
+      },
+      [],
+    );
   }
 }

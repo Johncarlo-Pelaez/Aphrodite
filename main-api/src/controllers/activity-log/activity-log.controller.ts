@@ -16,7 +16,7 @@ import {
 } from 'src/core';
 import { ActivityLog } from 'src/entities';
 import { ActivityLogRepository } from 'src/repositories';
-import { ExcelService, ExcelRowItem } from 'src/excel-service';
+import { ExcelService, ExcelColumn } from 'src/excel-service';
 import { FilenameUtil } from 'src/utils';
 import {
   GetActivityLogsDto,
@@ -53,31 +53,28 @@ export class ActivityLogController {
     @Res() res: Response,
   ): Promise<void> {
     const data = await this.activityLogRepository.getActivityLogs(dto);
+    const columns: ExcelColumn[] = [
+      {
+        key: 'loggedAt',
+        title: 'Date and Time',
+      },
+      {
+        key: 'loggedBy',
+        title: 'User',
+      },
+      {
+        key: 'type',
+        title: 'Activity',
+      },
+      {
+        key: 'description',
+        title: 'Description',
+      },
+    ];
     const excelFileBuffer = await this.excelService.create({
-      columns: [
-        {
-          key: 'description',
-          title: 'Description',
-        },
-        {
-          key: 'loggedBy',
-          title: 'Logged By',
-        },
-        {
-          key: 'loggedAt',
-          title: 'Logged Date',
-        },
-      ],
+      columns,
       rows: data.map((activityLog) =>
-        Object.keys(activityLog).reduce((excelRowItem: ExcelRowItem[], key) => {
-          if (key !== 'id' && key !== 'type') {
-            excelRowItem.push({
-              key,
-              value: activityLog[key],
-            });
-          }
-          return excelRowItem;
-        }, []),
+        this.excelService.buildExcelRowItems(activityLog, columns),
       ),
     });
     res.setHeader(
