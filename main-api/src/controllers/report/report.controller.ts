@@ -25,7 +25,7 @@ import {
 import { GetDocumentsReportIntPipe } from './report.pipe';
 
 @Controller('/reports')
-//@UseGuards(AzureADGuard)
+@UseGuards(AzureADGuard)
 export class ReportController {
   constructor(
     private readonly reportRepository: ReportRepository,
