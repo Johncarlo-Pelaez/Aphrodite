@@ -75,22 +75,17 @@ export class ReportRepository {
   async getInformationRequestReport(
     param: GetInformationRequestReportParam,
   ): Promise<InformationRequestReport[]> {
-    const queryConditions: string[] = [
-      `document_history.documentStatus = @0 or document_history.documentStatus = @1`,
-    ];
-    const queryParams: (string | number | Date | DocumentStatus)[] = [
-      DocumentStatus.INDEXING_DONE,
-      DocumentStatus.INDEXING_FAILED,
-    ];
+    const queryConditions: string[] = [];
+    const queryParams: (string | number | Date)[] = [];
 
     if (!!param.encoder) {
-      queryConditions.push(`document.encoder = @${queryParams.length}`);
+      queryConditions.push(`indexing.encoder = @${queryParams.length}`);
       queryParams.push(param.encoder);
     }
 
     if (!!param.from) {
       queryConditions.push(
-        `document_history.createdDate BETWEEN @${queryParams.length} AND @${
+        `indexing.requestedDate BETWEEN @${queryParams.length} AND @${
           queryParams.length + 1
         }`,
       );
@@ -107,7 +102,7 @@ export class ReportRepository {
       sql += `\nWHERE ${queryConditions.join(' AND ')}`;
     }
 
-    sql += '\nORDER BY document_history.createdDate DESC';
+    sql += '\nORDER BY indexing.requestedDate DESC';
 
     if (!!param.skip && !!param.take) {
       sql += `\nOFFSET @${queryParams.length} ROWS FETCH NEXT @${
@@ -124,22 +119,17 @@ export class ReportRepository {
   async getInformationRequestCountReport(
     param: GetInformationRequestReportParam,
   ): Promise<number> {
-    const queryConditions: string[] = [
-      `document_history.documentStatus = @0 or document_history.documentStatus = @1`,
-    ];
-    const queryParams: (string | number | Date | DocumentStatus)[] = [
-      DocumentStatus.INDEXING_DONE,
-      DocumentStatus.INDEXING_FAILED,
-    ];
+    const queryConditions: string[] = [];
+    const queryParams: (string | number | Date)[] = [];
 
     if (!!param.encoder) {
-      queryConditions.push(`document.encoder = @${queryParams.length}`);
+      queryConditions.push(`indexing.encoder = @${queryParams.length}`);
       queryParams.push(param.encoder);
     }
 
     if (!!param.from) {
       queryConditions.push(
-        `document_history.createdDate BETWEEN @${queryParams.length} AND @${
+        `indexing.requestedDate BETWEEN @${queryParams.length} AND @${
           queryParams.length + 1
         }`,
       );
@@ -169,23 +159,17 @@ export class ReportRepository {
   async getQualityCheckReport(
     param: GetQualityCheckReportParam,
   ): Promise<QualityCheckReport[]> {
-    const queryConditions: string[] = [
-      `document_history.documentStatus = @0 or document_history.documentStatus = @1 or document_history.documentStatus = @2`,
-    ];
-    const queryParams: (string | number | Date | DocumentStatus)[] = [
-      DocumentStatus.CHECKING_APPROVED,
-      DocumentStatus.CHECKING_DISAPPROVED,
-      DocumentStatus.CHECKING_FAILED,
-    ];
+    const queryConditions: string[] = [];
+    const queryParams: (string | number | Date)[] = [];
 
     if (!!param.checker) {
-      queryConditions.push(`document.checker = @${queryParams.length}`);
+      queryConditions.push(`qa.checker = @${queryParams.length}`);
       queryParams.push(param.checker);
     }
 
     if (!!param.from) {
       queryConditions.push(
-        `document_history.createdDate BETWEEN @${queryParams.length} AND @${
+        `qa.checkedDate BETWEEN @${queryParams.length} AND @${
           queryParams.length + 1
         }`,
       );
@@ -202,7 +186,7 @@ export class ReportRepository {
       sql += `\nWHERE ${queryConditions.join(' AND ')}`;
     }
 
-    sql += '\nORDER BY document_history.createdDate DESC';
+    sql += '\nORDER BY qa.checkedDate DESC';
 
     if (!!param.skip && !!param.take) {
       sql += `\nOFFSET @${queryParams.length} ROWS FETCH NEXT @${
@@ -219,23 +203,17 @@ export class ReportRepository {
   async getQualityCheckCountReport(
     param: GetQualityCheckReportParam,
   ): Promise<number> {
-    const queryConditions: string[] = [
-      `document_history.documentStatus = @0 or document_history.documentStatus = @1 or document_history.documentStatus = @2`,
-    ];
-    const queryParams: (string | number | Date | DocumentStatus)[] = [
-      DocumentStatus.CHECKING_APPROVED,
-      DocumentStatus.CHECKING_DISAPPROVED,
-      DocumentStatus.CHECKING_FAILED,
-    ];
+    const queryConditions: string[] = [];
+    const queryParams: (string | number | Date)[] = [];
 
     if (!!param.checker) {
-      queryConditions.push(`document.checker = @${queryParams.length}`);
+      queryConditions.push(`qa.checker = @${queryParams.length}`);
       queryParams.push(param.checker);
     }
 
     if (!!param.from) {
       queryConditions.push(
-        `document_history.createdDate BETWEEN @${queryParams.length} AND @${
+        `qa.checkedDate BETWEEN @${queryParams.length} AND @${
           queryParams.length + 1
         }`,
       );

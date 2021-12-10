@@ -96,7 +96,7 @@ export class CheckerDisApproveDocDto extends CheckerApproveDocDto {
 }
 
 export class RetryDocumentsDto {
-  @ApiProperty()
+  @ApiProperty({ type: [Number] })
   @IsNotEmpty({ message: 'Document IDs is required.' })
   @IsNumber({ allowNaN: false }, { each: true })
   documentIds: number[];

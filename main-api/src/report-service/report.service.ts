@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as moment from 'moment';
 import * as fileSize from 'filesize';
-import { Document } from 'src/entities';
 import { ReportRepository } from 'src/repositories';
 import { ExcelService, ExcelColumn, ExcelRowItem } from 'src/excel-service';
 import { DEFAULT_DATE_FORMAT } from 'src/core/constants';
@@ -25,24 +24,12 @@ export class ReportService {
   ): ExcelRowItem[] {
     return Object.entries(queryObject).reduce(
       (excelRowItem: ExcelRowItem[], [objectKey, objectValue]) => {
-        if (objectKey === 'document' && objectValue instanceof Document) {
-          Object.entries(objectValue).forEach(([docKey, value]) => {
-            const column = columns.find((col) => col.key === docKey);
-            if (column) {
-              excelRowItem.push({
-                key: column.key,
-                value,
-              });
-            }
+        const column = columns.find((col) => col.key === objectKey);
+        if (column) {
+          excelRowItem.push({
+            key: column.key,
+            value: objectValue,
           });
-        } else {
-          const column = columns.find((col) => col.key === objectKey);
-          if (column) {
-            excelRowItem.push({
-              key: column.key,
-              value: objectValue,
-            });
-          }
         }
         return excelRowItem;
       },
