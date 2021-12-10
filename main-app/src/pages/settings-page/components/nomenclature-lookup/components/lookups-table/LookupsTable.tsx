@@ -2,6 +2,7 @@ import { ReactElement, useState, useEffect, useMemo } from 'react';
 import { useNomenclatureLookups } from 'hooks';
 import { Table, TableColumnProps } from 'core/ui';
 import { nomenclatureLookup } from 'models';
+import { Card } from 'react-bootstrap';
 
 const columns: TableColumnProps<nomenclatureLookup>[] = [
   {
@@ -60,23 +61,27 @@ export const LookupsTable = (props: LookupsTableProps): ReactElement => {
   );
 
   return (
-    <Table<nomenclatureLookup>
-      rowKey={(doc) => doc.id}
-      loading={isLoading}
-      isError={isError}
-      columns={columns}
-      data={lookups}
-      pagination={{
-        total: total,
-        pageSize: pageSize,
-        current: currentPage,
-        pageNumber: 5,
-        onChange: setCurrentPage,
-        onSizeChange: setPageSize,
-      }}
-      selectedRow={selectedLookup}
-      onSelectRow={handleSelectRow}
-    />
+    <Card>
+      <Card.Body className="p-1 m-1 display-fixed">
+        <Table<nomenclatureLookup>
+          rowKey={(doc) => doc.id}
+          loading={isLoading}
+          isError={isError}
+          columns={columns}
+          data={lookups}
+          pagination={{
+            total: total,
+            pageSize: pageSize,
+            current: currentPage,
+            pageNumber: 5,
+            onChange: setCurrentPage,
+            onSizeChange: setPageSize,
+          }}
+          selectedRow={selectedLookup}
+          onSelectRow={handleSelectRow}
+        />
+      </Card.Body>
+    </Card>
   );
 };
 

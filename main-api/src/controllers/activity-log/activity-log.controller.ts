@@ -40,10 +40,11 @@ export class ActivityLogController {
     @Query(GetActivityLogsIntPipe) dto: GetActivityLogsDto,
   ): Promise<PaginatedResponse<ActivityLog>> {
     const response = new PaginatedResponse<ActivityLog>();
-    const { skip, take, ...countParam } = dto;
-    response.count = await this.activityLogRepository.getActivityLogsCount(
-      countParam,
-    );
+    response.count = await this.activityLogRepository.getActivityLogsCount({
+      loggedBy: dto.loggedBy,
+      from: dto.from,
+      to: dto.to,
+    });
     response.data = await this.activityLogRepository.getActivityLogs(dto);
     return response;
   }

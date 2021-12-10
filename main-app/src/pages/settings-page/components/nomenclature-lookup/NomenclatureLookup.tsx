@@ -6,6 +6,7 @@ import Alert from 'react-bootstrap/Alert';
 import { useDeleteNomenclatureLookup } from 'hooks';
 import { SearchField, DeleteModal } from 'core/ui';
 import { LookupsTable, AddModal, EditModal } from './components';
+import { Card } from 'react-bootstrap';
 
 export const NomenclatureLookup = (): ReactElement => {
   const [selectedlookup, setSelectedlookup] = useState<
@@ -75,8 +76,11 @@ export const NomenclatureLookup = (): ReactElement => {
       <Alert variant="danger" show={hasDeleteError}>
         {deleteError}
       </Alert>
-      <div className="d-flex justify-content-between align-items-center flex-wrap my-2">
-        <ButtonGroup>
+      <Card className="flex-wrap lh-lg bg-light position-relative p-2">
+        <h6 className="text-muted mt-0 mb-0 fw-bolder">Nomenclature Lookups</h6>
+      </Card>
+      <div className="d-flex justify-content-between align-items-center flex-wrap position-relative my-1 m-0 p-0">
+        <ButtonGroup className="m-2">
           <Button
             variant="outline-secondary"
             onClick={() => setIsAddModalOpen(true)}

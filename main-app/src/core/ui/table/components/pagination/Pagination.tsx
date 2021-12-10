@@ -92,6 +92,7 @@ export const Pagination = (props: PaginationProps): ReactElement => {
             />
             {paginations.map((pageNumber: number, index: number) => (
               <BPagination.Item
+                className="page-item"
                 key={index}
                 active={pageNumber === currentPage}
                 onClick={() => onPageChanged(pageNumber)}

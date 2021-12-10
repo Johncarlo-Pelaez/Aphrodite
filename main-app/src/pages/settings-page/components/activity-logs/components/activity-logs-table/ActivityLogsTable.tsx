@@ -8,7 +8,7 @@ import {
   Dispatch,
 } from 'react';
 import { SorterResult, SortOrder, Table, TableColumnProps } from 'core/ui';
-import { useActivityLog, useDebounce } from 'hooks';
+import { useActivityLog } from 'hooks';
 import { DEFAULT_DATE_FORMAT } from 'core/constants';
 import { sortDateTime } from 'utils/sort';
 import { ActivityLog } from 'models';
@@ -43,13 +43,12 @@ export const ActivityLogsTable = ({
   const [from, setFrom] = useState<Date | undefined>(undefined);
   const [to, setTo] = useState<Date | undefined>(undefined);
 
-  const debouncedSearch = useDebounce(loggedBy);
   const {
     isLoading: isActivityLoading,
     isError: hasActivityError,
     data: result,
   } = useActivityLog({
-    loggedBy: debouncedSearch,
+    loggedBy: loggedBy,
     loggedAtFrom: from,
     loggedAtTo: to,
     currentPage,
@@ -89,9 +88,11 @@ export const ActivityLogsTable = ({
 
   const processDateRangeValue = useCallback(() => {
     const start = new Date(moment(loggedAtFrom).format(DEFAULT_DATE_FORMAT));
+    start.setDate(start.getDate() - 1);
     setFrom(start);
 
     const end = new Date(moment(loggedAtTo).format(DEFAULT_DATE_FORMAT));
+    end.setDate(end.getDate() - 1);
     setTo(end);
   }, [loggedAtFrom, loggedAtTo]);
 
@@ -108,7 +109,7 @@ export const ActivityLogsTable = ({
 
   return (
     <Card>
-      <Card.Body className="p-1 flex-column position-">
+      <Card.Body className="p-1 m-1 display-fixed">
         <Table<ActivityLog>
           isServerSide
           rowKey={(activity) => activity.id}

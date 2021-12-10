@@ -2,6 +2,7 @@ import { ReactElement, useState, useEffect, useMemo } from 'react';
 import { useNomenclaturesWhitelist } from 'hooks';
 import { Table, TableColumnProps } from 'core/ui';
 import { NomenclatureWhitelist } from 'models';
+import { Card } from 'react-bootstrap';
 
 const columns: TableColumnProps<NomenclatureWhitelist>[] = [
   {
@@ -56,23 +57,27 @@ export const WhitelistTable = (props: WhitelistTableProps): ReactElement => {
   );
 
   return (
-    <Table<NomenclatureWhitelist>
-      rowKey={(doc) => doc.id}
-      loading={isLoading}
-      isError={isError}
-      columns={columns}
-      data={whitelists}
-      pagination={{
-        total: total,
-        pageSize: pageSize,
-        current: currentPage,
-        pageNumber: 5,
-        onChange: setCurrentPage,
-        onSizeChange: setPageSize,
-      }}
-      selectedRow={selectedWhitelist}
-      onSelectRow={handleSelectRow}
-    />
+    <Card>
+      <Card.Body className="p-1 m-1 display-fixed">
+        <Table<NomenclatureWhitelist>
+          rowKey={(doc) => doc.id}
+          loading={isLoading}
+          isError={isError}
+          columns={columns}
+          data={whitelists}
+          pagination={{
+            total: total,
+            pageSize: pageSize,
+            current: currentPage,
+            pageNumber: 5,
+            onChange: setCurrentPage,
+            onSizeChange: setPageSize,
+          }}
+          selectedRow={selectedWhitelist}
+          onSelectRow={handleSelectRow}
+        />
+      </Card.Body>
+    </Card>
   );
 };
 

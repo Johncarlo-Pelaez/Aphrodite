@@ -1,0 +1,34 @@
+.setting-container {
+  display: flexbox;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  position: relative;
+  flex-wrap: wrap;
+
+  .nav {
+    margin-top: 1.2rem;
+  }
+
+  .nav-link {
+    background-color: transparent; /*will change background-color of element */
+    color: gray; /*will change color of text within the element */
+    display: inline-flexbox;
+    position: relative;
+    text-align: center;
+    justify-items: center;
+    padding-top: 5px;
+    margin: 5px;
+
+    &:hover {
+      background-color: gray; /*will change background-color of element on hover */
+      color: white; /*will change color of text within the element on hover */
+    }
+  }
+
+  .tab-content {
+    position: relative;
+    display: inline-flexbox;
+    margin-top: 1rem;
+  }
+}

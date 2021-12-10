@@ -6,6 +6,7 @@ import Alert from 'react-bootstrap/Alert';
 import { useDeleteNomenclatureWhitelist } from 'hooks';
 import { SearchField, DeleteModal } from 'core/ui';
 import { WhitelistTable, AddEditModal, ModalAction } from './components';
+import { Card } from 'react-bootstrap';
 
 export const NomenclatureWhiteList = (): ReactElement => {
   const [selectedWhitelist, setSelectedWhitelist] = useState<
@@ -76,8 +77,13 @@ export const NomenclatureWhiteList = (): ReactElement => {
       <Alert variant="danger" show={hasDeleteError}>
         {deleteError}
       </Alert>
-      <div className="d-flex justify-content-between align-items-center flex-wrap my-2">
-        <ButtonGroup>
+      <Card className="flex-wrap lh-lg bg-light position-relative p-2">
+        <h6 className="text-muted mt-0 mb-0 fw-bolder">
+          Nomenclature Whitelists
+        </h6>
+      </Card>
+      <div className="d-flex justify-content-between align-items-center flex-wrap position-relative my-1">
+        <ButtonGroup className="m-2">
           <Button variant="outline-secondary" onClick={handleOpenAddModal}>
             Add
           </Button>

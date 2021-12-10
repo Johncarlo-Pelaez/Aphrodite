@@ -2,6 +2,7 @@ import { ReactElement, useState, useEffect, useMemo } from 'react';
 import { useUsers } from 'hooks';
 import { Table, TableColumnProps } from 'core/ui';
 import { User } from 'models';
+import { Card } from 'react-bootstrap';
 
 export interface UsersTableProps {
   searchKey: string;
@@ -65,23 +66,27 @@ export const UsersTable = (props: UsersTableProps): ReactElement => {
   );
 
   return (
-    <Table<User>
-      rowKey={(user) => user.id}
-      loading={isDocsLoading}
-      isError={hasDocsError}
-      columns={columns}
-      data={users}
-      pagination={{
-        total: total,
-        pageSize: pageSize,
-        current: currentPage,
-        pageNumber: 5,
-        onChange: setCurrentPage,
-        onSizeChange: setPageSize,
-      }}
-      selectedRow={selectedUser}
-      onSelectRow={handleSelectRow}
-    />
+    <Card>
+      <Card.Body className="p-1 m-1 display-fixed">
+        <Table<User>
+          rowKey={(user) => user.id}
+          loading={isDocsLoading}
+          isError={hasDocsError}
+          columns={columns}
+          data={users}
+          pagination={{
+            total: total,
+            pageSize: pageSize,
+            current: currentPage,
+            pageNumber: 5,
+            onChange: setCurrentPage,
+            onSizeChange: setPageSize,
+          }}
+          selectedRow={selectedUser}
+          onSelectRow={handleSelectRow}
+        />
+      </Card.Body>
+    </Card>
   );
 };
 
