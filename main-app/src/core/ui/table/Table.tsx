@@ -27,6 +27,7 @@ export const Table = <T extends Record<string, any> = {}>(
     pagination,
     selectedRow,
     onSelectRow,
+    onDoubleClickRow,
     onChange,
   } = props;
 
@@ -88,8 +89,13 @@ export const Table = <T extends Record<string, any> = {}>(
       : '';
   };
 
-  const triggerOnSelectRow = (rowData: T): void => {
+  const triggerSelectRow = (rowData: T): void => {
     if (onSelectRow && typeof onSelectRow === 'function') onSelectRow(rowData);
+  };
+
+  const triggerDoubleClickRow = (rowData: T): void => {
+    if (onDoubleClickRow && typeof onDoubleClickRow === 'function')
+      onDoubleClickRow(rowData);
   };
 
   const triggerSelectionOnChange = (
@@ -232,7 +238,8 @@ export const Table = <T extends Record<string, any> = {}>(
               <tr
                 key={`row-${index}`}
                 className={showRowHighlight(data)}
-                onClick={() => triggerOnSelectRow(data)}
+                onClick={() => triggerSelectRow(data)}
+                onDoubleClick={() => triggerDoubleClickRow(data)}
               >
                 {rowSelection && (
                   <td key={`selection-row-${index}`}>

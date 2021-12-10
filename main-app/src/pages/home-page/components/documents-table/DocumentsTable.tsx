@@ -34,11 +34,17 @@ export interface DocumentsTableProps {
   selectedDocuments: Document[];
   dataFilters?: DataFilterProps;
   setSelectedDocuments: React.Dispatch<React.SetStateAction<Document[]>>;
+  onDoubleClickRow: () => void;
 }
 
 export const DocumentsTable = forwardRef(
   (props: DocumentsTableProps, ref): ReactElement => {
-    const { selectedDocuments, dataFilters, setSelectedDocuments } = props;
+    const {
+      selectedDocuments,
+      dataFilters,
+      setSelectedDocuments,
+      onDoubleClickRow: triggerDoubleClickRow,
+    } = props;
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [pageSize, setPageSize] = useState<number>(15);
     const [sorter, setSorter] = useState<SorterResult | undefined>(
@@ -231,6 +237,7 @@ export const DocumentsTable = forwardRef(
           }
         }}
         onChange={changeSort}
+        onDoubleClickRow={triggerDoubleClickRow}
       />
     );
   },

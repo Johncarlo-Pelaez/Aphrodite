@@ -40,5 +40,6 @@ export interface TableProps<T> {
   pagination?: TablePaginationConfig;
   selectedRow?: T;
   onSelectRow?: (selectedRow: T) => void;
+  onDoubleClickRow?: (selectedRow: T) => void;
   onChange?: (sorter?: SorterResult) => void;
 }
