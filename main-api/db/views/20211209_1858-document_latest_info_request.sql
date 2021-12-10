@@ -1,11 +1,11 @@
 CREATE VIEW document_latest_info_request AS
 SELECT 
-document_latest_distinct_status.documentId,
-MAX(document_latest_distinct_status.updatedDate) AS updatedDate
-FROM document_latest_distinct_status
-INNER JOIN document_history
-ON document_latest_distinct_status.documentId = document_history.documentId 
-AND document_latest_distinct_status.updatedDate = document_history.createdDate 
-AND document_latest_distinct_status.documentStatus = document_history.documentStatus
-WHERE document_history.documentStatus = 'INDEXING_FAILED' or document_history.documentStatus = 'INDEXING_DONE'
-GROUP BY document_latest_distinct_status.documentId
+    t.documentId,
+    MAX(t.updatedDate) AS updatedDate
+    FROM document_latest_distinct_status as t
+    INNER JOIN document_history
+    ON t.documentId = document_history.documentId 
+    AND t.updatedDate = document_history.createdDate 
+    AND t.documentStatus = document_history.documentStatus
+    WHERE document_history.documentStatus = 'INDEXING_FAILED' or document_history.documentStatus = 'INDEXING_DONE'
+    GROUP BY t.documentId

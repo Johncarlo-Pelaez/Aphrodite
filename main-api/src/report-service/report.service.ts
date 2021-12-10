@@ -164,11 +164,10 @@ export class ReportService {
         render: (value) => {
           const salesforceRes: GetDocumentTypeResult =
             !!value && value !== '' ? JSON.parse(value) : undefined;
-          const nomenclature =
-            !!salesforceRes && !!salesforceRes.response.length
-              ? salesforceRes.response[0]
-              : undefined;
-          return !!nomenclature ? nomenclature?.Nomenclature : '';
+          const nomenclature = !!salesforceRes?.response?.length
+            ? salesforceRes.response[0]
+            : undefined;
+          return nomenclature?.Nomenclature ?? '';
         },
       },
       {
