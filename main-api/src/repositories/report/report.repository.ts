@@ -10,12 +10,15 @@ import {
 import {
   GetUploadedReportParam,
   GetInformationRequestReportParam,
+  GetQualityCheckReportParam,
 } from './report.params';
 import {
   FIND_INFORMATION_REQUEST_REPORTS,
   COUNT_INFORMATION_REQUEST_REPORTS,
+  FIND_QUALITY_CHECK_REPORTS,
+  COUNT_QUALITY_CHECK_REPORTS,
 } from './reports.queries';
-import { InformationRequestReport } from './report.schemas';
+import { InformationRequestReport, QualityCheckReport } from './report.schemas';
 
 @EntityRepository()
 export class ReportRepository {
@@ -24,7 +27,7 @@ export class ReportRepository {
   async getUploadedReport(
     param: GetUploadedReportParam,
   ): Promise<DocumentHistory[]> {
-    const { uploadedBy, from, to } = param;
+    const { uploader: uploadedBy, from, to } = param;
     let whereConditions: FindConditions<DocumentHistory> = {};
 
     if (uploadedBy) {
@@ -49,7 +52,7 @@ export class ReportRepository {
   }
 
   async getUploadedCountReport(param: GetUploadedReportParam): Promise<number> {
-    const { uploadedBy, from, to } = param;
+    const { uploader: uploadedBy, from, to } = param;
     let whereConditions: FindConditions<DocumentHistory> = {};
 
     if (uploadedBy) {
@@ -148,6 +151,102 @@ export class ReportRepository {
     }
 
     let sql = COUNT_INFORMATION_REQUEST_REPORTS;
+
+    if (!!queryConditions.length) {
+      sql += `\nWHERE ${queryConditions.join(' AND ')}`;
+    }
+
+    sql += ';';
+
+    const queryData = await this.manager.query(sql, queryParams);
+    const queryObject = !!queryData?.length ? queryData[0] : null;
+    const queryObjectValues = !!queryObject ? Object.values(queryObject) : [];
+    return !!queryObjectValues.length
+      ? (queryObjectValues[0] as number) ?? 0
+      : 0;
+  }
+
+  async getQualityCheckReport(
+    param: GetQualityCheckReportParam,
+  ): Promise<QualityCheckReport[]> {
+    const queryConditions: string[] = [
+      `document_history.documentStatus = @0 or document_history.documentStatus = @1 or document_history.documentStatus = @2`,
+    ];
+    const queryParams: (string | number | Date | DocumentStatus)[] = [
+      DocumentStatus.CHECKING_APPROVED,
+      DocumentStatus.CHECKING_DISAPPROVED,
+      DocumentStatus.CHECKING_FAILED,
+    ];
+
+    if (!!param.checker) {
+      queryConditions.push(`document.checker = @${queryParams.length}`);
+      queryParams.push(param.checker);
+    }
+
+    if (!!param.from) {
+      queryConditions.push(
+        `document_history.createdDate BETWEEN @${queryParams.length} AND @${
+          queryParams.length + 1
+        }`,
+      );
+      const dateTo = moment(!!param.to ? param.to : param.from)
+        .add(1, 'day')
+        .add(-1, 'millisecond')
+        .toDate();
+      queryParams.push(param.from, dateTo);
+    }
+
+    let sql = FIND_QUALITY_CHECK_REPORTS;
+
+    if (!!queryConditions.length) {
+      sql += `\nWHERE ${queryConditions.join(' AND ')}`;
+    }
+
+    sql += '\nORDER BY document_history.createdDate DESC';
+
+    if (!!param.skip && !!param.take) {
+      sql += `\nOFFSET @${queryParams.length} ROWS FETCH NEXT @${
+        queryParams.length + 1
+      } ROWS ONLY`;
+      queryParams.push(param.skip, param.take);
+    }
+
+    sql += ';';
+
+    return await this.manager.query(sql, queryParams);
+  }
+
+  async getQualityCheckCountReport(
+    param: GetQualityCheckReportParam,
+  ): Promise<number> {
+    const queryConditions: string[] = [
+      `document_history.documentStatus = @0 or document_history.documentStatus = @1 or document_history.documentStatus = @2`,
+    ];
+    const queryParams: (string | number | Date | DocumentStatus)[] = [
+      DocumentStatus.CHECKING_APPROVED,
+      DocumentStatus.CHECKING_DISAPPROVED,
+      DocumentStatus.CHECKING_FAILED,
+    ];
+
+    if (!!param.checker) {
+      queryConditions.push(`document.checker = @${queryParams.length}`);
+      queryParams.push(param.checker);
+    }
+
+    if (!!param.from) {
+      queryConditions.push(
+        `document_history.createdDate BETWEEN @${queryParams.length} AND @${
+          queryParams.length + 1
+        }`,
+      );
+      const dateTo = moment(!!param.to ? param.to : param.from)
+        .add(1, 'day')
+        .add(-1, 'millisecond')
+        .toDate();
+      queryParams.push(param.from, dateTo);
+    }
+
+    let sql = COUNT_QUALITY_CHECK_REPORTS;
 
     if (!!queryConditions.length) {
       sql += `\nWHERE ${queryConditions.join(' AND ')}`;

@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import * as moment from 'moment';
 import * as fileSize from 'filesize';
-import { DocumentHistory, Document } from 'src/entities';
+import { Document } from 'src/entities';
 import { ReportRepository } from 'src/repositories';
-import { InformationRequestReport } from 'src/repositories/report';
 import { ExcelService, ExcelColumn, ExcelRowItem } from 'src/excel-service';
 import { DEFAULT_DATE_FORMAT } from 'src/core/constants';
 import { GetDocumentTypeResult } from 'src/sales-force-service';
 import {
   GetUploadedReportParam,
   GetInformationRequestReportParam,
+  GetQualityCheckReportParam,
 } from './report.params';
 
 @Injectable()
@@ -50,31 +50,11 @@ export class ReportService {
     );
   }
 
-  async getUploadedReport(
-    param: GetUploadedReportParam,
-  ): Promise<DocumentHistory[]> {
-    return await this.reportRepository.getUploadedReport({
-      uploadedBy: param.uploader,
-      from: param.from,
-      to: param.to,
-      skip: param.skip,
-      take: param.take,
-    });
-  }
-
-  async getUploadedCountReport(param: GetUploadedReportParam): Promise<number> {
-    return await this.reportRepository.getUploadedCountReport({
-      uploadedBy: param.uploader,
-      from: param.from,
-      to: param.to,
-    });
-  }
-
   async generateUploadedExcelReport(
     param: GetUploadedReportParam,
   ): Promise<Buffer> {
     const data = await this.reportRepository.getUploadedReport({
-      uploadedBy: param.uploader,
+      uploader: param.uploader,
       from: param.from,
       to: param.to,
     });
@@ -107,28 +87,6 @@ export class ReportService {
       rows: data.map((documenHistory) =>
         this.buildExcelRowItems(documenHistory, columns),
       ),
-    });
-  }
-
-  async getInformationRequestReport(
-    param: GetInformationRequestReportParam,
-  ): Promise<InformationRequestReport[]> {
-    return await this.reportRepository.getInformationRequestReport({
-      encoder: param.encoder,
-      from: param.from,
-      to: param.to,
-      skip: param.skip,
-      take: param.take,
-    });
-  }
-
-  async getInformationRequestCountReport(
-    param: GetInformationRequestReportParam,
-  ): Promise<number> {
-    return await this.reportRepository.getInformationRequestCountReport({
-      encoder: param.encoder,
-      from: param.from,
-      to: param.to,
     });
   }
 
@@ -191,6 +149,70 @@ export class ReportService {
     return await this.excelService.create({
       columns,
       rows: data.map((infoReq) => this.buildExcelRowItems(infoReq, columns)),
+    });
+  }
+
+  async generateQualityCheckExcelReport(
+    param: GetQualityCheckReportParam,
+  ): Promise<Buffer> {
+    const data = await this.reportRepository.getQualityCheckReport({
+      checker: param.checker,
+      from: param.from,
+      to: param.to,
+    });
+    const columns: ExcelColumn[] = [
+      {
+        key: 'checkedDate',
+        title: 'Date and Time',
+        render: (value) => moment(value).format(DEFAULT_DATE_FORMAT),
+      },
+      {
+        key: 'filename',
+        title: 'File Name',
+      },
+      {
+        key: 'cheker',
+        title: 'Checker',
+      },
+      {
+        key: 'qrCode',
+        title: 'Barcode / QR Code',
+      },
+      {
+        key: 'documentType',
+        title: 'Document Type',
+        render: (value) => {
+          const salesforceRes: GetDocumentTypeResult =
+            !!value && value !== '' ? JSON.parse(value) : undefined;
+          const nomenclature = !!salesforceRes?.response?.length
+            ? salesforceRes.response[0]
+            : undefined;
+          return nomenclature?.Nomenclature ?? '';
+        },
+      },
+      {
+        key: 'documentSize',
+        title: 'File Size',
+        render: (value) => fileSize(value),
+      },
+      {
+        key: 'pageTotal',
+        title: 'Number of Pages',
+      },
+      {
+        key: 'documentStatus',
+        title: 'Status',
+      },
+      {
+        key: 'note',
+        title: 'Note',
+      },
+    ];
+    return await this.excelService.create({
+      columns,
+      rows: data.map((qualityCheck) =>
+        this.buildExcelRowItems(qualityCheck, columns),
+      ),
     });
   }
 }

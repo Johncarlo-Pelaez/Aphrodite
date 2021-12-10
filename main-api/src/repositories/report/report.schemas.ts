@@ -28,3 +28,32 @@ export class InformationRequestReport {
   @ApiProperty()
   note: string;
 }
+
+export class QualityCheckReport {
+  @ApiProperty()
+  checkedDate: Date;
+
+  @ApiProperty()
+  filename: string;
+
+  @ApiProperty()
+  checker: string;
+
+  @ApiProperty()
+  qrCode: string;
+
+  @ApiProperty()
+  documentType: string;
+
+  @ApiProperty()
+  documentSize: number;
+
+  @ApiProperty()
+  pageTotal: number;
+
+  @ApiProperty()
+  documentStatus: number;
+
+  @ApiProperty()
+  note: string;
+}

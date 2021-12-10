@@ -8,8 +8,10 @@ import {
 } from 'src/core';
 import { DocumentHistory } from 'src/entities';
 import { ReportRepository } from 'src/repositories';
-import { InformationRequestReport } from 'src/repositories/report';
-import { ExcelService } from 'src/excel-service';
+import {
+  InformationRequestReport,
+  QualityCheckReport,
+} from 'src/repositories/report';
 import { ReportService } from 'src/report-service';
 import { FilenameUtil } from 'src/utils';
 import {
@@ -17,15 +19,16 @@ import {
   DownloadUploadedReportDto,
   GetInformationRequestReportDto,
   DownloadInformationRequestReportDto,
+  GetQualityCheckReportDto,
+  DonwloadQualityCheckReportDto,
 } from './report.dto';
 import { GetDocumentsReportIntPipe } from './report.pipe';
 
 @Controller('/reports')
-//@UseGuards(AzureADGuard)
+@UseGuards(AzureADGuard)
 export class ReportController {
   constructor(
     private readonly reportRepository: ReportRepository,
-    private readonly excelService: ExcelService,
     private readonly reportService: ReportService,
     private readonly filenameUtil: FilenameUtil,
   ) {}
@@ -36,12 +39,12 @@ export class ReportController {
     @Query(GetDocumentsReportIntPipe) dto: GetUploadedReportDto,
   ): Promise<PaginatedResponse<DocumentHistory>> {
     const response = new PaginatedResponse<DocumentHistory>();
-    response.count = await this.reportService.getUploadedCountReport({
+    response.count = await this.reportRepository.getUploadedCountReport({
       uploader: dto.uploader,
       from: dto.from,
       to: dto.to,
     });
-    response.data = await this.reportService.getUploadedReport({
+    response.data = await this.reportRepository.getUploadedReport({
       uploader: dto.uploader,
       from: dto.from,
       to: dto.to,
@@ -107,6 +110,45 @@ export class ReportController {
     res.setHeader(
       'Content-Disposition',
       `attachment; filename=documents-information-request-report${this.filenameUtil.generateName()}`,
+    );
+    res.setHeader('Content-Length', excelFileBuffer.length);
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+    res.send(excelFileBuffer);
+  }
+
+  @ApiExtraModels(QualityCheckReport)
+  @ApiPaginatedResponse(QualityCheckReport)
+  @Get('/quality-check')
+  async getQualityCheckReport(
+    @Query(GetDocumentsReportIntPipe) dto: GetQualityCheckReportDto,
+  ): Promise<PaginatedResponse<QualityCheckReport>> {
+    const response = new PaginatedResponse<QualityCheckReport>();
+    response.count = await this.reportRepository.getQualityCheckCountReport({
+      checker: dto.checker,
+      from: dto.from,
+      to: dto.to,
+    });
+    response.data = await this.reportRepository.getQualityCheckReport(dto);
+    return response;
+  }
+
+  @Get('/quality-check/download')
+  async downloadQualityCheckReport(
+    @Query() dto: DonwloadQualityCheckReportDto,
+    @Res() res: Response,
+  ): Promise<void> {
+    const excelFileBuffer =
+      await this.reportService.generateQualityCheckExcelReport({
+        checker: dto.checker,
+        from: dto.from,
+        to: dto.to,
+      });
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=documents-quality-check-report${this.filenameUtil.generateName()}`,
     );
     res.setHeader('Content-Length', excelFileBuffer.length);
     res.setHeader(

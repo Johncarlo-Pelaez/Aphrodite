@@ -93,3 +93,47 @@ export class DownloadInformationRequestReportDto {
   @IsDateString()
   to?: Date;
 }
+
+export class GetQualityCheckReportDto {
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsEmail()
+  checker?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsDateString()
+  from?: Date;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsDateString()
+  to?: Date;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsNumberString()
+  skip?: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsNumberString()
+  take?: number;
+}
+
+export class DonwloadQualityCheckReportDto {
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsEmail()
+  checker?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsDateString()
+  from?: Date;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsDateString()
+  to?: Date;
+}

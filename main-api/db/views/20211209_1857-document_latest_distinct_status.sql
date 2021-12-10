@@ -4,5 +4,4 @@ SELECT
     documentStatus,
     MAX(createdDate) AS updatedDate
     FROM document_history
-    GROUP BY documentId,
-    documentStatus
+    GROUP BY documentId, documentStatus

@@ -1,5 +1,5 @@
 export interface GetUploadedReportParam {
-  uploadedBy?: string;
+  uploader?: string;
   from?: Date;
   to?: Date;
   skip?: number;
@@ -8,6 +8,14 @@ export interface GetUploadedReportParam {
 
 export interface GetInformationRequestReportParam {
   encoder?: string;
+  from?: Date;
+  to?: Date;
+  skip?: number;
+  take?: number;
+}
+
+export interface GetQualityCheckReportParam {
+  checker?: string;
   from?: Date;
   to?: Date;
   skip?: number;

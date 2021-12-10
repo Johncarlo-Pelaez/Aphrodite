@@ -13,3 +13,11 @@ export interface GetInformationRequestReportParam {
   skip?: number;
   take?: number;
 }
+
+export interface GetQualityCheckReportParam {
+  checker?: string;
+  from?: Date;
+  to?: Date;
+  skip?: number;
+  take?: number;
+}
