@@ -78,6 +78,10 @@ export const HomePage = (): ReactElement => {
     setSelectedDocuments([]);
   };
 
+  const handleOpen = (): void => {
+    if (hasSelected1Doc) setViewDocModalShow(true);
+  };
+
   const handleRetryDocs = async (): Promise<void> => {
     if (!isRetryDocSaving && enableRetryButton) {
       await retryDocumentsAsync(selectedDocumentKeys);
@@ -144,7 +148,7 @@ export const HomePage = (): ReactElement => {
           className="px-4"
           variant="outline-secondary"
           disabled={!hasSelected1Doc}
-          onClick={() => setViewDocModalShow(true)}
+          onClick={handleOpen}
         >
           Open
         </Button>
@@ -216,6 +220,7 @@ export const HomePage = (): ReactElement => {
           username,
         }}
         setSelectedDocuments={setSelectedDocuments}
+        onDoubleClickRow={handleOpen}
       />
       <UploadFilesModal
         isVisible={uploadModalShow}
