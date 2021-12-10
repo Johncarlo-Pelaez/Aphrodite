@@ -1,4 +1,4 @@
-export interface GetUploadedReportParam {
+export interface GenerateUploadedExcelParam {
   uploader?: string;
   from?: Date;
   to?: Date;
@@ -6,7 +6,7 @@ export interface GetUploadedReportParam {
   take?: number;
 }
 
-export interface GetInformationRequestReportParam {
+export interface GenerateInformationRequestExcekParam {
   encoder?: string;
   from?: Date;
   to?: Date;
@@ -14,7 +14,7 @@ export interface GetInformationRequestReportParam {
   take?: number;
 }
 
-export interface GetQualityCheckReportParam {
+export interface GenerateQualityCheckExcelParam {
   checker?: string;
   from?: Date;
   to?: Date;

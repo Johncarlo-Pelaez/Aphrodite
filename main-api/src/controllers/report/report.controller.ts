@@ -59,12 +59,11 @@ export class ReportController {
     @Query() dto: DownloadUploadedReportDto,
     @Res() res: Response,
   ): Promise<void> {
-    const excelFileBuffer =
-      await this.reportService.generateUploadedExcelReport({
-        uploader: dto.uploader,
-        from: dto.from,
-        to: dto.to,
-      });
+    const excelFileBuffer = await this.reportService.generateUploadedExcel({
+      uploader: dto.uploader,
+      from: dto.from,
+      to: dto.to,
+    });
     res.setHeader(
       'Content-Disposition',
       `attachment; filename=documents-uploaded-report${this.filenameUtil.generateName()}`,
@@ -102,7 +101,7 @@ export class ReportController {
     @Res() res: Response,
   ): Promise<void> {
     const excelFileBuffer =
-      await this.reportService.generateInformationRequestExcelReport({
+      await this.reportService.generateInformationRequestExcel({
         encoder: dto.encoder,
         from: dto.from,
         to: dto.to,
@@ -140,12 +139,11 @@ export class ReportController {
     @Query() dto: DonwloadQualityCheckReportDto,
     @Res() res: Response,
   ): Promise<void> {
-    const excelFileBuffer =
-      await this.reportService.generateQualityCheckExcelReport({
-        checker: dto.checker,
-        from: dto.from,
-        to: dto.to,
-      });
+    const excelFileBuffer = await this.reportService.generateQualityCheckExcel({
+      checker: dto.checker,
+      from: dto.from,
+      to: dto.to,
+    });
     res.setHeader(
       'Content-Disposition',
       `attachment; filename=documents-quality-check-report${this.filenameUtil.generateName()}`,

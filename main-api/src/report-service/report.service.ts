@@ -7,9 +7,9 @@ import { ExcelService, ExcelColumn, ExcelRowItem } from 'src/excel-service';
 import { DEFAULT_DATE_FORMAT } from 'src/core/constants';
 import { GetDocumentTypeResult } from 'src/sales-force-service';
 import {
-  GetUploadedReportParam,
-  GetInformationRequestReportParam,
-  GetQualityCheckReportParam,
+  GenerateUploadedExcelParam,
+  GenerateInformationRequestExcekParam,
+  GenerateQualityCheckExcelParam,
 } from './report.params';
 
 @Injectable()
@@ -50,8 +50,8 @@ export class ReportService {
     );
   }
 
-  async generateUploadedExcelReport(
-    param: GetUploadedReportParam,
+  async generateUploadedExcel(
+    param: GenerateUploadedExcelParam,
   ): Promise<Buffer> {
     const data = await this.reportRepository.getUploadedReport({
       uploader: param.uploader,
@@ -90,8 +90,8 @@ export class ReportService {
     });
   }
 
-  async generateInformationRequestExcelReport(
-    param: GetInformationRequestReportParam,
+  async generateInformationRequestExcel(
+    param: GenerateInformationRequestExcekParam,
   ): Promise<Buffer> {
     const data = await this.reportRepository.getInformationRequestReport({
       encoder: param.encoder,
@@ -152,8 +152,8 @@ export class ReportService {
     });
   }
 
-  async generateQualityCheckExcelReport(
-    param: GetQualityCheckReportParam,
+  async generateQualityCheckExcel(
+    param: GenerateQualityCheckExcelParam,
   ): Promise<Buffer> {
     const data = await this.reportRepository.getQualityCheckReport({
       checker: param.checker,
