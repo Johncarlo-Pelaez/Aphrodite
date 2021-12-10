@@ -11,6 +11,7 @@ import { ReportRepository } from 'src/repositories';
 import {
   InformationRequestReport,
   QualityCheckReport,
+  ApprovalReport,
 } from 'src/repositories/report';
 import { ReportService } from 'src/report-service';
 import { FilenameUtil } from 'src/utils';
@@ -21,11 +22,13 @@ import {
   DownloadInformationRequestReportDto,
   GetQualityCheckReportDto,
   DonwloadQualityCheckReportDto,
+  GetApprovalReportDto,
+  DownloadApprovalReportDto,
 } from './report.dto';
 import { GetDocumentsReportIntPipe } from './report.pipe';
 
 @Controller('/reports')
-@UseGuards(AzureADGuard)
+//@UseGuards(AzureADGuard)
 export class ReportController {
   constructor(
     private readonly reportRepository: ReportRepository,
@@ -147,6 +150,44 @@ export class ReportController {
     res.setHeader(
       'Content-Disposition',
       `attachment; filename=documents-quality-check-report${this.filenameUtil.generateName()}`,
+    );
+    res.setHeader('Content-Length', excelFileBuffer.length);
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+    res.send(excelFileBuffer);
+  }
+
+  @ApiExtraModels(ApprovalReport)
+  @ApiPaginatedResponse(ApprovalReport)
+  @Get('/approval')
+  async getApprovalReport(
+    @Query(GetDocumentsReportIntPipe) dto: GetApprovalReportDto,
+  ): Promise<PaginatedResponse<ApprovalReport>> {
+    const response = new PaginatedResponse<ApprovalReport>();
+    response.count = await this.reportRepository.getApprovalCountReport({
+      appover: dto.approver,
+      from: dto.from,
+      to: dto.to,
+    });
+    response.data = await this.reportRepository.getApprovalReport(dto);
+    return response;
+  }
+
+  @Get('/approval/download')
+  async downloadApprovalReport(
+    @Query() dto: DownloadApprovalReportDto,
+    @Res() res: Response,
+  ): Promise<void> {
+    const excelFileBuffer = await this.reportService.generateApprovalExcel({
+      approver: dto.approver,
+      from: dto.from,
+      to: dto.to,
+    });
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=documents-approval-report${this.filenameUtil.generateName()}`,
     );
     res.setHeader('Content-Length', excelFileBuffer.length);
     res.setHeader(

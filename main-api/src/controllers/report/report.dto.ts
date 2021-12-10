@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsNumberString,
   IsDateString,
@@ -7,132 +7,176 @@ import {
 } from 'class-validator';
 
 export class GetUploadedReportDto {
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsEmail()
   uploader?: string;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsDateString()
   from?: Date;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsDateString()
   to?: Date;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsNumberString()
   skip?: number;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsNumberString()
   take?: number;
 }
 
 export class DownloadUploadedReportDto {
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsEmail()
   uploader?: string;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsDateString()
   from?: Date;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsDateString()
   to?: Date;
 }
 
 export class GetInformationRequestReportDto {
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsEmail()
   encoder?: string;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsDateString()
   from?: Date;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsDateString()
   to?: Date;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsNumberString()
   skip?: number;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsNumberString()
   take?: number;
 }
 
 export class DownloadInformationRequestReportDto {
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsEmail()
   encoder?: string;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsDateString()
   from?: Date;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsDateString()
   to?: Date;
 }
 
 export class GetQualityCheckReportDto {
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsEmail()
   checker?: string;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsDateString()
   from?: Date;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsDateString()
   to?: Date;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsNumberString()
   skip?: number;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsNumberString()
   take?: number;
 }
 
 export class DonwloadQualityCheckReportDto {
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsEmail()
   checker?: string;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsDateString()
   from?: Date;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  to?: Date;
+}
+
+export class GetApprovalReportDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsEmail()
+  approver?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  from?: Date;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  to?: Date;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumberString()
+  skip?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumberString()
+  take?: number;
+}
+
+export class DownloadApprovalReportDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsEmail()
+  approver?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  from?: Date;
+
+  @ApiPropertyOptional()
   @IsOptional()
   @IsDateString()
   to?: Date;

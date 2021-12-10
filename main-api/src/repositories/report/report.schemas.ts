@@ -57,3 +57,32 @@ export class QualityCheckReport {
   @ApiProperty()
   note: string;
 }
+
+export class ApprovalReport {
+  @ApiProperty()
+  approvalDate: Date;
+
+  @ApiProperty()
+  filename: string;
+
+  @ApiProperty()
+  approver: string;
+
+  @ApiProperty()
+  qrCode: string;
+
+  @ApiProperty()
+  documentType: string;
+
+  @ApiProperty()
+  documentSize: number;
+
+  @ApiProperty()
+  pageTotal: number;
+
+  @ApiProperty()
+  documentStatus: number;
+
+  @ApiProperty()
+  note: string;
+}

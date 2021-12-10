@@ -21,3 +21,11 @@ export interface GetQualityCheckReportParam {
   skip?: number;
   take?: number;
 }
+
+export interface GetApprovalReportParam {
+  appover?: string;
+  from?: Date;
+  to?: Date;
+  skip?: number;
+  take?: number;
+}

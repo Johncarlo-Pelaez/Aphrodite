@@ -11,14 +11,21 @@ import {
   GetUploadedReportParam,
   GetInformationRequestReportParam,
   GetQualityCheckReportParam,
+  GetApprovalReportParam,
 } from './report.params';
 import {
   FIND_INFORMATION_REQUEST_REPORTS,
   COUNT_INFORMATION_REQUEST_REPORTS,
   FIND_QUALITY_CHECK_REPORTS,
   COUNT_QUALITY_CHECK_REPORTS,
+  FIND_APPROVAL_REPORTS,
+  COUNT_APPROVAL_REPORTS,
 } from './reports.queries';
-import { InformationRequestReport, QualityCheckReport } from './report.schemas';
+import {
+  InformationRequestReport,
+  QualityCheckReport,
+  ApprovalReport,
+} from './report.schemas';
 
 @EntityRepository()
 export class ReportRepository {
@@ -225,6 +232,88 @@ export class ReportRepository {
     }
 
     let sql = COUNT_QUALITY_CHECK_REPORTS;
+
+    if (!!queryConditions.length) {
+      sql += `\nWHERE ${queryConditions.join(' AND ')}`;
+    }
+
+    sql += ';';
+
+    const queryData = await this.manager.query(sql, queryParams);
+    const queryObject = !!queryData?.length ? queryData[0] : null;
+    const queryObjectValues = !!queryObject ? Object.values(queryObject) : [];
+    return !!queryObjectValues.length
+      ? (queryObjectValues[0] as number) ?? 0
+      : 0;
+  }
+
+  async getApprovalReport(
+    param: GetApprovalReportParam,
+  ): Promise<ApprovalReport[]> {
+    const queryConditions: string[] = [];
+    const queryParams: (string | number | Date)[] = [];
+
+    if (!!param.appover) {
+      queryConditions.push(`approval.approver = @${queryParams.length}`);
+      queryParams.push(param.appover);
+    }
+
+    if (!!param.from) {
+      queryConditions.push(
+        `approval.approvalDate BETWEEN @${queryParams.length} AND @${
+          queryParams.length + 1
+        }`,
+      );
+      const dateTo = moment(!!param.to ? param.to : param.from)
+        .add(1, 'day')
+        .add(-1, 'millisecond')
+        .toDate();
+      queryParams.push(param.from, dateTo);
+    }
+
+    let sql = FIND_APPROVAL_REPORTS;
+
+    if (!!queryConditions.length) {
+      sql += `\nWHERE ${queryConditions.join(' AND ')}`;
+    }
+
+    sql += '\nORDER BY approval.approvalDate DESC';
+
+    if (!!param.skip && !!param.take) {
+      sql += `\nOFFSET @${queryParams.length} ROWS FETCH NEXT @${
+        queryParams.length + 1
+      } ROWS ONLY`;
+      queryParams.push(param.skip, param.take);
+    }
+
+    sql += ';';
+
+    return await this.manager.query(sql, queryParams);
+  }
+
+  async getApprovalCountReport(param: GetApprovalReportParam): Promise<number> {
+    const queryConditions: string[] = [];
+    const queryParams: (string | number | Date)[] = [];
+
+    if (!!param.appover) {
+      queryConditions.push(`approval.approver = @${queryParams.length}`);
+      queryParams.push(param.appover);
+    }
+
+    if (!!param.from) {
+      queryConditions.push(
+        `approval.approvalDate BETWEEN @${queryParams.length} AND @${
+          queryParams.length + 1
+        }`,
+      );
+      const dateTo = moment(!!param.to ? param.to : param.from)
+        .add(1, 'day')
+        .add(-1, 'millisecond')
+        .toDate();
+      queryParams.push(param.from, dateTo);
+    }
+
+    let sql = FIND_APPROVAL_REPORTS;
 
     if (!!queryConditions.length) {
       sql += `\nWHERE ${queryConditions.join(' AND ')}`;

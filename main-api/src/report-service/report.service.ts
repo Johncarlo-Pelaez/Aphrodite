@@ -9,6 +9,7 @@ import {
   GenerateUploadedExcelParam,
   GenerateInformationRequestExcekParam,
   GenerateQualityCheckExcelParam,
+  GenerateApprovalExcelParam,
 } from './report.params';
 
 @Injectable()
@@ -158,8 +159,72 @@ export class ReportService {
         title: 'File Name',
       },
       {
-        key: 'cheker',
+        key: 'checker',
         title: 'Checker',
+      },
+      {
+        key: 'qrCode',
+        title: 'Barcode / QR Code',
+      },
+      {
+        key: 'documentType',
+        title: 'Document Type',
+        render: (value) => {
+          const salesforceRes: GetDocumentTypeResult =
+            !!value && value !== '' ? JSON.parse(value) : undefined;
+          const nomenclature = !!salesforceRes?.response?.length
+            ? salesforceRes.response[0]
+            : undefined;
+          return nomenclature?.Nomenclature ?? '';
+        },
+      },
+      {
+        key: 'documentSize',
+        title: 'File Size',
+        render: (value) => fileSize(value),
+      },
+      {
+        key: 'pageTotal',
+        title: 'Number of Pages',
+      },
+      {
+        key: 'documentStatus',
+        title: 'Status',
+      },
+      {
+        key: 'note',
+        title: 'Note',
+      },
+    ];
+    return await this.excelService.create({
+      columns,
+      rows: data.map((qualityCheck) =>
+        this.buildExcelRowItems(qualityCheck, columns),
+      ),
+    });
+  }
+
+  async generateApprovalExcel(
+    param: GenerateApprovalExcelParam,
+  ): Promise<Buffer> {
+    const data = await this.reportRepository.getApprovalReport({
+      appover: param.approver,
+      from: param.from,
+      to: param.to,
+    });
+    const columns: ExcelColumn[] = [
+      {
+        key: 'approvalDate',
+        title: 'Date and Time',
+        render: (value) => moment(value).format(DEFAULT_DATE_FORMAT),
+      },
+      {
+        key: 'filename',
+        title: 'File Name',
+      },
+      {
+        key: 'approver',
+        title: 'Approver',
       },
       {
         key: 'qrCode',

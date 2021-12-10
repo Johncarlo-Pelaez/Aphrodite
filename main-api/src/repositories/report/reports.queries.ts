@@ -35,3 +35,22 @@ export const COUNT_QUALITY_CHECK_REPORTS = `
     SELECT 
     COUNT(qa.documentId)
     FROM document_latest_qa AS qa`;
+
+export const FIND_APPROVAL_REPORTS = `
+    SELECT 
+    approval.documentId,
+    approval.approvalDate,
+    approval.filename,
+    approval.approver,
+    approval.qrCode,
+    approval.documentType,
+    approval.documentSize,
+    approval.pageTotal,
+    approval.documentStatus,
+    approval.note
+    FROM document_latest_approval AS approval`;
+
+export const COUNT_APPROVAL_REPORTS = `
+    SELECT 
+    COUNT(approval.documentId)
+    FROM document_latest_approval AS approval`;
