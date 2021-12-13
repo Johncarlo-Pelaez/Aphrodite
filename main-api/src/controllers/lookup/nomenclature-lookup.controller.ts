@@ -71,11 +71,22 @@ export class NomenclatureLookupController {
     @Param('id', ParseIntPipe) id: number,
     @Body(ValidationPipe) dto: UpdateNomenclatureLookupDto,
   ): Promise<void> {
+    const oldLookup: string[] = [];
+    const newLookup: string[] = [];
+    const lookup = await this.lookupRepository.getNomenclatureLookup(id);
+
+    if (dto.nomenclature !== lookup.nomenclature) {
+      oldLookup.push(lookup.nomenclature);
+      newLookup.push(dto.nomenclature);
+    } else if (dto.documentGroup !== lookup.documentGroup) {
+      oldLookup.push(lookup.documentGroup);
+      newLookup.push(dto.documentGroup);
+    }
+
     await this.lookupRepository.updateNomenclatureLookup({
       id,
       ...dto,
     });
-    const lookup = await this.lookupRepository.getNomenclatureLookup(id);
     await this.activityLogRepository.insertUpdateLookupLog({
       newNomenclature: Object.values(dto).join(', '),
       oldNomenclature: `${lookup.nomenclature}, ${lookup.documentGroup}`,

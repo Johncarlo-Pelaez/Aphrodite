@@ -71,13 +71,13 @@ export class NomenclatureWhitelistController {
     @Param('id', ParseIntPipe) id: number,
     @Body(ValidationPipe) dto: UpdateNomenclatureWhitelistDto,
   ): Promise<void> {
+    const whitelist = await this.whitelistRepository.getNomenclatureWhitelist(
+      id,
+    );
     await this.whitelistRepository.updateNomenclatureWhitelist({
       id,
       description: dto.description,
     });
-    const whitelist = await this.whitelistRepository.getNomenclatureWhitelist(
-      id,
-    );
     await this.activityLogRepository.insertUpdateWhitelistLog({
       newNomenclature: dto.description,
       oldNomenclature: whitelist.description,
