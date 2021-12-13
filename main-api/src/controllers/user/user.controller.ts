@@ -169,7 +169,6 @@ export class UserController {
     Object.entries(dto).forEach(([key, value]) => {
       const oldValue = user[key];
       const newValue = value;
-      console.log(oldValue, newValue);
       if (newValue !== oldValue) {
         oldUser.push(
           key === 'isActive' ? (oldValue ? 'Active' : 'Inactive') : oldValue,
