@@ -28,6 +28,7 @@ import {
   UpdateToCancelledParam,
   DeleteFileParam,
 } from './document.params';
+import { DEFAULT_DATE_FORMAT } from 'src/core/constants';
 
 @EntityRepository()
 export class DocumentRepository {
@@ -59,7 +60,7 @@ export class DocumentRepository {
     }
 
     if (from) {
-      const dateTo = moment(!!to ? to : from)
+      const dateTo = moment(!!to ? to : from, DEFAULT_DATE_FORMAT)
         .add(1, 'day')
         .add(-1, 'millisecond')
         .toDate();
@@ -152,17 +153,6 @@ export class DocumentRepository {
     if (username && username !== '') {
       whereUsername = {
         username: username,
-      };
-    }
-
-    if (from) {
-      const dateTo = moment(!!to ? to : from)
-        .add(1, 'day')
-        .add(-1, 'millisecond')
-        .toDate();
-
-      whereModifiedDate = {
-        modifiedDate: Between(from, dateTo),
       };
     }
 
