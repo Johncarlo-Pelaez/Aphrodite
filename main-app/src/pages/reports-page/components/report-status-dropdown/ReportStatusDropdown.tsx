@@ -14,7 +14,6 @@ export interface IStatusDropdownOptions {
 }
 
 export enum StatusOption {
-  SELECT = 'SELECT',
   UPLOADED = 'UPLOADED',
   INFORMATION_REQUEST = 'INFORMATION REQUEST',
   QUALITY_CHECKED = 'QUALITY CHECKED',
