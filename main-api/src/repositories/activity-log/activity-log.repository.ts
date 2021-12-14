@@ -1,9 +1,10 @@
+import * as moment from 'moment';
 import { ActivityLog, ActivityLogType } from 'src/entities';
 import {
   EntityManager,
   EntityRepository,
   Between,
-  FindOperator,
+  FindConditions,
 } from 'typeorm';
 import {
   GetActivityLogsParam,
@@ -17,58 +18,58 @@ import {
   InsertUpdateWhitelistLogParam,
   InsertDeleteWhitelistLogParam,
 } from './activity-log.params';
+import { DEFAULT_DATE_FORMAT } from 'src/core/constants';
 
 @EntityRepository()
 export class ActivityLogRepository {
   constructor(private readonly manager: EntityManager) {}
 
   async getActivityLogs(param: GetActivityLogsParam): Promise<ActivityLog[]> {
-    const { loggedBy, from, to, skip, take } = param;
+    let whereConditions: FindConditions<ActivityLog> = {};
 
-    let whereLoggedBy: { loggedBy: string };
-    let whereLoggedAt: { loggedAt: FindOperator<Date> };
-
-    if (loggedBy) {
-      whereLoggedBy = { loggedBy: loggedBy === 'All Users' ? '' : loggedBy };
+    if (!!param.loggedBy) {
+      whereConditions['loggedBy'] = param.loggedBy;
     }
-    if (from && to) {
-      whereLoggedAt = { loggedAt: Between(from, to) };
+
+    if (!!param.from) {
+      const dateTo = moment(
+        !!param.to ? param.to : param.from,
+        DEFAULT_DATE_FORMAT,
+      )
+        .add(1, 'day')
+        .add(-1, 'millisecond')
+        .toDate();
+      whereConditions['loggedAt'] = Between(param.from, dateTo);
     }
 
     return await this.manager.find(ActivityLog, {
-      where: [
-        {
-          ...whereLoggedBy,
-          ...whereLoggedAt,
-        },
-      ],
+      where: [whereConditions],
       order: { loggedAt: 'DESC' },
-      skip,
-      take,
+      skip: param.skip,
+      take: param.take,
     });
   }
 
   async getActivityLogsCount(param: GetActivityLogsParam): Promise<number> {
-    const { loggedBy, from, to } = param;
+    let whereConditions: FindConditions<ActivityLog> = {};
 
-    let whereLoggedBy: { loggedBy: string };
-    let whereLoggedAt: { loggedAt: FindOperator<Date> };
-
-    if (loggedBy) {
-      whereLoggedBy = { loggedBy: loggedBy === 'All Users' ? '' : loggedBy };
+    if (!!param.loggedBy) {
+      whereConditions['loggedBy'] = param.loggedBy;
     }
-    if (from && to) {
-      whereLoggedAt = { loggedAt: Between(from, to) };
+
+    if (!!param.from) {
+      const dateTo = moment(
+        !!param.to ? param.to : param.from,
+        DEFAULT_DATE_FORMAT,
+      )
+        .add(1, 'day')
+        .add(-1, 'millisecond')
+        .toDate();
+      whereConditions['loggedAt'] = Between(param.from, dateTo);
     }
 
     return await this.manager.count(ActivityLog, {
-      where: [
-        {
-          ...whereLoggedBy,
-          ...whereLoggedAt,
-        },
-      ],
-      order: { loggedAt: 'DESC' },
+      where: [whereConditions],
     });
   }
 

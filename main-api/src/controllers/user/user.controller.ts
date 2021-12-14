@@ -162,15 +162,31 @@ export class UserController {
     @Body(ValidationPipe) dto: UpdateUserAccountDto,
   ): Promise<void> {
     const rightNow = new Date();
+    const oldUser: string[] = [];
+    const newUser: string[] = [];
+    const user = await this.userRepository.getUser(id);
+
+    Object.entries(dto).forEach(([key, value]) => {
+      const oldValue = user[key];
+      const newValue = value;
+      if (newValue !== oldValue) {
+        oldUser.push(
+          key === 'isActive' ? (oldValue ? 'Active' : 'Inactive') : oldValue,
+        );
+        newUser.push(
+          key === 'isActive' ? (newValue ? 'Active' : 'Inactive') : newValue,
+        );
+      }
+    });
+
     await this.userRepository.updateUser({
       id,
       ...dto,
       modifiedDate: rightNow,
     });
-    const user = await this.userRepository.getUser(id);
     await this.activityLogRepository.insertUpdateUserLog({
-      newUser: Object.values(dto).join(', '),
-      oldUser: `${user.role}, ${user.firstName}, ${user.lastName}, ${user.isActive}`,
+      newUser: Object.values(newUser).join(', '),
+      oldUser: Object.values(oldUser).join(', '),
       updatedBy: azureUser.preferred_username,
       updatedAt: rightNow,
     });
