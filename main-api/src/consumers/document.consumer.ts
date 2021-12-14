@@ -98,16 +98,23 @@ export class DocumentConsumer {
     if (
       isWhiteListed &&
       status !== DocumentStatus.APPROVED &&
-      status !== DocumentStatus.CHECKING_APPROVED
+      status !== DocumentStatus.CHECKING_APPROVED &&
+      status !== DocumentStatus.MIGRATE_BEGIN &&
+      status !== DocumentStatus.MIGRATE_FAILED &&
+      status !== DocumentStatus.MIGRATE_DONE
     ) {
-      await this.updateForChecking(documentId);
+      await this.documentRepository.updateForChecking({
+        documentId,
+        processAt: this.datesUtil.getDateNow(),
+      });
       return;
     }
 
     if (
       !isWhiteListed ||
       status === DocumentStatus.APPROVED ||
-      status === DocumentStatus.CHECKING_APPROVED
+      status === DocumentStatus.CHECKING_APPROVED ||
+      status === DocumentStatus.MIGRATE_FAILED
     ) {
       const empty = '';
       const uploadParams = {
@@ -403,14 +410,6 @@ export class DocumentConsumer {
   private async updateForManualEncode(documentId: number): Promise<void> {
     const processAt = this.datesUtil.getDateNow();
     await this.documentRepository.updateForManualEncode({
-      documentId,
-      processAt,
-    });
-  }
-
-  private async updateForChecking(documentId: number): Promise<void> {
-    const processAt = this.datesUtil.getDateNow();
-    await this.documentRepository.updateForChecking({
       documentId,
       processAt,
     });
