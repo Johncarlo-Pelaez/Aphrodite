@@ -208,26 +208,12 @@ export class DocumentRepository {
     history.description = document.description;
     history.documentSize = document.documentSize;
     history.createdDate = document.modifiedDate;
-    history.documentStatus = document.status;
+    history.documentStatus = customValue?.documentStatus ?? document.status;
+    history.userUsername = customValue?.userUsername ?? 'RIS';
     history.documentId = document.id;
+    history.salesforceResponse = customValue?.salesforceResponse;
+    history.springcmResponse = customValue?.springcmResponse;
     history.document = document;
-
-    if (!!customValue?.documentStatus) {
-      history.documentStatus = customValue.documentStatus;
-    }
-
-    if (!!customValue?.userUsername) {
-      history.userUsername = customValue.userUsername;
-    }
-
-    if (!!customValue?.salesforceResponse) {
-      history.salesforceResponse = customValue.salesforceResponse;
-    }
-
-    if (!!customValue?.springcmResponse) {
-      history.springcmResponse = customValue.springcmResponse;
-    }
-
     return history;
   }
 
