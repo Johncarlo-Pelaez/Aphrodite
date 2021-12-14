@@ -29,65 +29,6 @@ $table-height: 50vh;
     align-items: center;
     margin-top: 1rem;
 
-    &__bs-table {
-      &hover {
-        color: $white;
-      }
-    }
-
-    .page-link {
-      position: relative;
-      display: block;
-      color: $dark-bg;
-      text-decoration: if($link-decoration == none, null, none);
-      background-color: $pagination-bg;
-      border: $pagination-border-width solid $pagination-border-color;
-      @include transition($pagination-transition);
-
-      &:hover {
-        z-index: 2;
-        color: $dark-bg;
-        text-decoration: if($link-hover-decoration == underline, none, null);
-        background-color: $pagination-hover-bg;
-        border-color: $pagination-hover-border-color;
-      }
-
-      &:focus {
-        z-index: 3;
-        color: $dark-bg;
-        background-color: $pagination-focus-bg;
-        outline: $pagination-focus-outline;
-        box-shadow: $pagination-focus-box-shadow;
-      }
-    }
-
-    .page-item {
-      &:not(:first-child) .page-link {
-        margin-left: $pagination-margin-start;
-      }
-
-      &.active .page-link {
-        z-index: 3;
-        color: $white !important;
-        @include gradient-bg($secondary-color);
-        border-color: $secondary-color;
-      }
-
-      &.disabled .page-link {
-        color: $pagination-disabled-color;
-        pointer-events: none;
-        background-color: $pagination-disabled-bg;
-        border-color: $pagination-disabled-border-color;
-      }
-    }
-
-    .option {
-      &:hover {
-        background-color: $secondary-color;
-        color: $white;
-      }
-    }
-
     @include breakpoint-up(md) {
       flex-direction: row;
     }
@@ -114,13 +55,13 @@ $table-height: 50vh;
   }
 
   & > tr.highlight-row {
-    background-color: $secondary-color;
+    background-color: $primary-color;
     color: $white;
   }
 
   & > tr.highlight-row:hover {
     & > td {
-      background-color: $secondary-color;
+      background-color: $primary-color;
       color: $white;
     }
   }

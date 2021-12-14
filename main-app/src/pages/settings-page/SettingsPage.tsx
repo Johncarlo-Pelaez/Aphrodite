@@ -17,6 +17,9 @@ enum TabKey {
 export const SettingsPage = (): ReactElement => {
   return (
     <Container className="setting-container" fluid>
+      <h5 className="setting-page-header mt-1 fw-bolder position-relative mx-auto flex-wrap flex-column py-3">
+        Settings
+      </h5>
       <Tab.Container
         id="left-tabs-example"
         defaultActiveKey={TabKey.NOMENCLATURE_LOOKUP}
@@ -25,9 +28,6 @@ export const SettingsPage = (): ReactElement => {
           <Col sm={2} md={2} className="flex-column flex-wrap p-0 0 0">
             <Nav className="flex-column text-wrap flex-wrap">
               <Card className="flex-wrap flex-column bg-light p-0 card mb-4 border-0">
-                <h6 className="setting-page-header mt-1 fw-bolder text-muted position-relative mx-auto flex-wrap flex-column">
-                  Menu
-                </h6>
                 <Nav.Item>
                   <Nav.Link
                     className="nav-link"

@@ -57,27 +57,23 @@ export const WhitelistTable = (props: WhitelistTableProps): ReactElement => {
   );
 
   return (
-    <Card>
-      <Card.Body className="p-1 m-1 display-fixed">
-        <Table<NomenclatureWhitelist>
-          rowKey={(doc) => doc.id}
-          loading={isLoading}
-          isError={isError}
-          columns={columns}
-          data={whitelists}
-          pagination={{
-            total: total,
-            pageSize: pageSize,
-            current: currentPage,
-            pageNumber: 5,
-            onChange: setCurrentPage,
-            onSizeChange: setPageSize,
-          }}
-          selectedRow={selectedWhitelist}
-          onSelectRow={handleSelectRow}
-        />
-      </Card.Body>
-    </Card>
+    <Table<NomenclatureWhitelist>
+      rowKey={(doc) => doc.id}
+      loading={isLoading}
+      isError={isError}
+      columns={columns}
+      data={whitelists}
+      pagination={{
+        total: total,
+        pageSize: pageSize,
+        current: currentPage,
+        pageNumber: 5,
+        onChange: setCurrentPage,
+        onSizeChange: setPageSize,
+      }}
+      selectedRow={selectedWhitelist}
+      onSelectRow={handleSelectRow}
+    />
   );
 };
 

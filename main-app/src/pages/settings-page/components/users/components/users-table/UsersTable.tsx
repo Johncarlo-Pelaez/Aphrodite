@@ -66,27 +66,23 @@ export const UsersTable = (props: UsersTableProps): ReactElement => {
   );
 
   return (
-    <Card>
-      <Card.Body className="p-1 m-1 display-fixed">
-        <Table<User>
-          rowKey={(user) => user.id}
-          loading={isDocsLoading}
-          isError={hasDocsError}
-          columns={columns}
-          data={users}
-          pagination={{
-            total: total,
-            pageSize: pageSize,
-            current: currentPage,
-            pageNumber: 5,
-            onChange: setCurrentPage,
-            onSizeChange: setPageSize,
-          }}
-          selectedRow={selectedUser}
-          onSelectRow={handleSelectRow}
-        />
-      </Card.Body>
-    </Card>
+    <Table<User>
+      rowKey={(user) => user.id}
+      loading={isDocsLoading}
+      isError={hasDocsError}
+      columns={columns}
+      data={users}
+      pagination={{
+        total: total,
+        pageSize: pageSize,
+        current: currentPage,
+        pageNumber: 5,
+        onChange: setCurrentPage,
+        onSizeChange: setPageSize,
+      }}
+      selectedRow={selectedUser}
+      onSelectRow={handleSelectRow}
+    />
   );
 };
 

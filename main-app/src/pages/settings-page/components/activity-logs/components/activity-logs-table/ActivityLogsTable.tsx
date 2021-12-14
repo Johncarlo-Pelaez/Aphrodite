@@ -108,29 +108,25 @@ export const ActivityLogsTable = ({
   }, [loggedAtFrom, loggedAtTo, processDateRangeValue]);
 
   return (
-    <Card>
-      <Card.Body className="p-1 m-1 display-fixed">
-        <Table<ActivityLog>
-          isServerSide
-          rowKey={(activity) => activity.id}
-          loading={isActivityLoading}
-          isError={hasActivityError}
-          columns={renderColumns()}
-          data={activityLog}
-          pagination={{
-            total: total,
-            pageSize: pageSize,
-            current: currentPage,
-            pageNumber: 5,
-            onChange: (page) => {
-              setCurrentPage(page);
-            },
-            onSizeChange: setPageSize,
-          }}
-          onChange={changeSort}
-        />
-      </Card.Body>
-    </Card>
+    <Table<ActivityLog>
+      isServerSide
+      rowKey={(activity) => activity.id}
+      loading={isActivityLoading}
+      isError={hasActivityError}
+      columns={renderColumns()}
+      data={activityLog}
+      pagination={{
+        total: total,
+        pageSize: pageSize,
+        current: currentPage,
+        pageNumber: 5,
+        onChange: (page) => {
+          setCurrentPage(page);
+        },
+        onSizeChange: setPageSize,
+      }}
+      onChange={changeSort}
+    />
   );
 };
 

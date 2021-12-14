@@ -61,27 +61,23 @@ export const LookupsTable = (props: LookupsTableProps): ReactElement => {
   );
 
   return (
-    <Card>
-      <Card.Body className="p-1 m-1 display-fixed">
-        <Table<nomenclatureLookup>
-          rowKey={(doc) => doc.id}
-          loading={isLoading}
-          isError={isError}
-          columns={columns}
-          data={lookups}
-          pagination={{
-            total: total,
-            pageSize: pageSize,
-            current: currentPage,
-            pageNumber: 5,
-            onChange: setCurrentPage,
-            onSizeChange: setPageSize,
-          }}
-          selectedRow={selectedLookup}
-          onSelectRow={handleSelectRow}
-        />
-      </Card.Body>
-    </Card>
+    <Table<nomenclatureLookup>
+      rowKey={(doc) => doc.id}
+      loading={isLoading}
+      isError={isError}
+      columns={columns}
+      data={lookups}
+      pagination={{
+        total: total,
+        pageSize: pageSize,
+        current: currentPage,
+        pageNumber: 5,
+        onChange: setCurrentPage,
+        onSizeChange: setPageSize,
+      }}
+      selectedRow={selectedLookup}
+      onSelectRow={handleSelectRow}
+    />
   );
 };
 
