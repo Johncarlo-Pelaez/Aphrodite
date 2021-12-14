@@ -2,7 +2,6 @@ import { ReactElement, useState, useEffect, useMemo } from 'react';
 import { useNomenclaturesWhitelist } from 'hooks';
 import { Table, TableColumnProps } from 'core/ui';
 import { NomenclatureWhitelist } from 'models';
-import { Card } from 'react-bootstrap';
 
 const columns: TableColumnProps<NomenclatureWhitelist>[] = [
   {

@@ -12,7 +12,6 @@ import { useActivityLog } from 'hooks';
 import { DEFAULT_DATE_FORMAT } from 'core/constants';
 import { sortDateTime } from 'utils/sort';
 import { ActivityLog } from 'models';
-import { Card } from 'react-bootstrap';
 import moment from 'moment';
 
 export interface ActivityLogTableProps {

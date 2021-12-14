@@ -2,7 +2,6 @@ import { ReactElement, useState, useEffect, useMemo } from 'react';
 import { useNomenclatureLookups } from 'hooks';
 import { Table, TableColumnProps } from 'core/ui';
 import { nomenclatureLookup } from 'models';
-import { Card } from 'react-bootstrap';
 
 const columns: TableColumnProps<nomenclatureLookup>[] = [
   {

@@ -2,7 +2,6 @@ import { ReactElement, useState, useEffect, useMemo } from 'react';
 import { useUsers } from 'hooks';
 import { Table, TableColumnProps } from 'core/ui';
 import { User } from 'models';
-import { Card } from 'react-bootstrap';
 
 export interface UsersTableProps {
   searchKey: string;
