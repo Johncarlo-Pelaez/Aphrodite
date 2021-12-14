@@ -112,5 +112,5 @@ export interface UpdateToCancelledParam extends BeginDocProcessParam {
 export interface DeleteFileParam {
   documentId: number;
   deletedAt: Date;
-  deletedBy: string;
+  deletedBy?: string;
 }

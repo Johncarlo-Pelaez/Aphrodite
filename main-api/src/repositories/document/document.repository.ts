@@ -651,8 +651,7 @@ export class DocumentRepository {
       await transaction.save(document);
 
       const history = this.genarateDocumentHistory(document, {
-        userUsername: param.deletedBy,
-        documentStatus: null,
+        documentStatus: '',
       });
       await transaction.save(history);
     });
