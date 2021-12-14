@@ -1,5 +1,5 @@
 import { Process, Processor } from '@nestjs/bull';
-import { Logger, NotFoundException } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { Job } from 'bull';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -86,7 +86,10 @@ export class DocumentConsumer {
       documentType = await this.runGetDocumentType(qrCode, documentId);
 
     if (!documentType) {
-      await this.updateForManualEncode(documentId);
+      await this.documentRepository.updateForManualEncode({
+        documentId,
+        processAt: this.datesUtil.getDateNow(),
+      });
       return;
     }
 
@@ -95,20 +98,30 @@ export class DocumentConsumer {
         documentType.Nomenclature,
       );
 
-    if (
+    const isForQa =
       isWhiteListed &&
       status !== DocumentStatus.APPROVED &&
-      status !== DocumentStatus.CHECKING_APPROVED
-    ) {
-      await this.updateForChecking(documentId);
+      status !== DocumentStatus.CHECKING_APPROVED &&
+      status !== DocumentStatus.MIGRATE_BEGIN &&
+      status !== DocumentStatus.MIGRATE_FAILED &&
+      status !== DocumentStatus.MIGRATE_DONE;
+
+    const isForImport =
+      (!isWhiteListed ||
+        status === DocumentStatus.APPROVED ||
+        status === DocumentStatus.CHECKING_APPROVED ||
+        status === DocumentStatus.MIGRATE_FAILED) &&
+      status !== DocumentStatus.MIGRATE_DONE;
+
+    if (isForQa) {
+      await this.documentRepository.updateForChecking({
+        documentId,
+        processAt: this.datesUtil.getDateNow(),
+      });
       return;
     }
 
-    if (
-      !isWhiteListed ||
-      status === DocumentStatus.APPROVED ||
-      status === DocumentStatus.CHECKING_APPROVED
-    ) {
+    if (isForImport) {
       const empty = '';
       const uploadParams = {
         Brand: documentType?.Brand ?? empty,
@@ -383,7 +396,6 @@ export class DocumentConsumer {
       await this.documentRepository.deleteFile({
         documentId,
         deletedAt: this.datesUtil.getDateNow(),
-        deletedBy: 'RIS',
       });
     } else {
       await this.documentRepository.failMigrate({
@@ -399,21 +411,5 @@ export class DocumentConsumer {
     const location = path.join(this.appConfigService.filePath, sysSrcFileName);
     const buffer = await readFile(location);
     return buffer;
-  }
-
-  private async updateForManualEncode(documentId: number): Promise<void> {
-    const processAt = this.datesUtil.getDateNow();
-    await this.documentRepository.updateForManualEncode({
-      documentId,
-      processAt,
-    });
-  }
-
-  private async updateForChecking(documentId: number): Promise<void> {
-    const processAt = this.datesUtil.getDateNow();
-    await this.documentRepository.updateForChecking({
-      documentId,
-      processAt,
-    });
   }
 }

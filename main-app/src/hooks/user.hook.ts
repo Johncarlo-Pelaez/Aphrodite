@@ -6,6 +6,7 @@ import {
   UpdateUserApi,
   updateUserApi,
   getCurrentUser,
+  deleteUserApi,
   removeApiHeaders,
 } from 'apis';
 import {
@@ -99,4 +100,18 @@ export const useGetCurrentUser = (): UseQueryResult<User, ApiError> => {
       }
     },
   });
+};
+
+export const useDeleteUser = (): UseMutationResult<void, ApiError, number> => {
+  const queryClient = useQueryClient();
+  return useMutation<void, ApiError, number>(
+    (data) => {
+      return deleteUserApi(data);
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(QueryKey.users);
+      },
+    },
+  );
 };

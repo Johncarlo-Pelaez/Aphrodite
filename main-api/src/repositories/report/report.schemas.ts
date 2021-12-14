@@ -2,6 +2,9 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class InformationRequestReport {
   @ApiProperty()
+  documentId: number;
+
+  @ApiProperty()
   requestedDate: Date;
 
   @ApiProperty()
@@ -30,6 +33,9 @@ export class InformationRequestReport {
 }
 
 export class QualityCheckReport {
+  @ApiProperty()
+  documentId: number;
+
   @ApiProperty()
   checkedDate: Date;
 
@@ -60,6 +66,9 @@ export class QualityCheckReport {
 
 export class ApprovalReport {
   @ApiProperty()
+  documentId: number;
+
+  @ApiProperty()
   approvalDate: Date;
 
   @ApiProperty()
@@ -88,6 +97,9 @@ export class ApprovalReport {
 }
 
 export class ImportReport {
+  @ApiProperty()
+  documentId: number;
+
   @ApiProperty()
   importedDate: Date;
 
