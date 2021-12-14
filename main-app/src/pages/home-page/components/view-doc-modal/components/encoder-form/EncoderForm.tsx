@@ -88,7 +88,11 @@ export const EncoderForm = forwardRef(
         documentGroup,
       } = data;
 
-      const hasDefaultQrCode = !!document?.qrCode;
+      if (!document) {
+        alert('Please select a document.');
+        return;
+      }
+
       const isQRBarCodeInputEmpty = !qrBarCode || qrBarCode === '';
       const isNomenclatureInputEmpty =
         !arrNomenclature || arrNomenclature?.length < 1;
@@ -118,21 +122,6 @@ export const EncoderForm = forwardRef(
       }
 
       if (
-        hasDefaultQrCode &&
-        qrBarCode === document?.qrCode &&
-        isCompanyCodeInputEmpty &&
-        isContractNumberInputEmpty
-      ) {
-        setError('companyCode', {
-          type: 'required',
-          message: 'Company Code is required',
-        });
-        setError('contractNumber', {
-          type: 'required',
-          message: 'Contract Number is required',
-        });
-        return;
-      } else if (
         isQRBarCodeInputEmpty &&
         isCompanyCodeInputEmpty &&
         isContractNumberInputEmpty
@@ -172,18 +161,11 @@ export const EncoderForm = forwardRef(
         return;
       }
 
-      if (!document) {
-        alert('Please select a document.');
-        return;
-      }
-
       const nomenclature = !!arrNomenclature?.length
         ? arrNomenclature[0].label
         : '';
 
       if (!isEncodeDocSaving) {
-        const isQRBarCode =
-          !isQRBarCodeInputEmpty && qrBarCode !== document.qrCode;
         await encodeDocumentAsync({
           documentId: document?.id as number,
           qrBarCode,
@@ -191,7 +173,7 @@ export const EncoderForm = forwardRef(
           contractNumber,
           nomenclature,
           documentGroup,
-          isQRBarCode,
+          isQRBarCode: !isQRBarCodeInputEmpty,
         });
 
         alert('Encode Saved.');
