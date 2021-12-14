@@ -5,6 +5,7 @@ import {
   In,
   FindConditions,
   Between,
+  getConnection,
 } from 'typeorm';
 import { Role, User } from 'src/entities';
 import {
@@ -109,11 +110,18 @@ export class UserRepository {
     const user = await this.manager.findOneOrFail(User, {
       where: { id: param.id, isDeleted: false },
     });
-    user.isDeleted = true;
-    user.firstName = 'Deleted User';
-    user.lastName = '';
-    user.username = `deleteduser@${user.username.split('@')[1]}`;
-    user.modifiedDate = param.modifiedDate;
-    await this.manager.save(user);
+
+    await getConnection()
+      .createQueryBuilder()
+      .update(User)
+      .set({
+        isDeleted: true,
+        firstName: 'Deleted User',
+        lastName: '',
+        username: `deleteduser@${user.username.split('@')[1]}`,
+        modifiedDate: param.modifiedDate,
+      })
+      .where('id = :id', { id: param.id })
+      .execute();
   }
 }

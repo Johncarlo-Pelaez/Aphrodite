@@ -194,6 +194,7 @@ export class UserController {
 
   @ApiOkResponse()
   @Delete('/:id')
+  @UseGuards(AzureADGuard)
   async deleteUser(
     @GetAzureUser() azureUser: AzureUser,
     @Param('id', ParseIntPipe) id: number,
