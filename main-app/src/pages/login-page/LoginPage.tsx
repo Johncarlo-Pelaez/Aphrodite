@@ -3,6 +3,7 @@ import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
+import Figure from 'react-bootstrap/Figure';
 import Alert from 'react-bootstrap/Alert';
 import Spinner from 'react-bootstrap/Spinner';
 import { useSignIn } from 'hooks';
@@ -19,14 +20,9 @@ const signinFormSchema: yup.SchemaOf<SigninForm> = yup.object().shape({
 
 export const LoginPage = (): ReactElement => {
   const { isLoading, error, signIn } = useSignIn();
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<SigninForm>({
+  const { control, handleSubmit } = useForm<SigninForm>({
     resolver: yupResolver(signinFormSchema),
   });
-  const emailError = errors.email?.message || error;
 
   const handleSignin: SubmitHandler<SigninForm> = async (
     params,
@@ -36,39 +32,52 @@ export const LoginPage = (): ReactElement => {
 
   return (
     <div className={styles.loginContainer}>
-      <Form className={styles.loginForm} onSubmit={handleSubmit(handleSignin)}>
-        <div className="d-grid">
-          <Alert variant="danger" show={!!emailError}>
-            {emailError}
-          </Alert>
-          <Form.Group className="mb-3">
-            <Form.Label>Email address</Form.Label>
+      <div>
+        <Figure>
+          <Figure.Image width={350} height={60} alt="logo" src="/logo.png" />
+        </Figure>
+        <Form
+          className={styles.loginForm}
+          onSubmit={handleSubmit(handleSignin)}
+        >
+          <div className="d-grid gap-2">
             <Controller
               name="email"
               control={control}
               defaultValue=""
-              render={({ field }) => (
-                <Form.Control
-                  {...field}
-                  disabled={isLoading}
-                  placeholder="Enter email"
-                />
+              render={({ field, fieldState: { invalid, error } }) => (
+                <Form.Group className="mb-3">
+                  <Form.Label>Email address</Form.Label>
+                  <Form.Control
+                    {...field}
+                    disabled={isLoading}
+                    placeholder="Enter email"
+                    onFocus={(event) => event.target.select()}
+                    isInvalid={invalid}
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {error?.message}
+                  </Form.Control.Feedback>
+                </Form.Group>
               )}
             />
-          </Form.Group>
-          <Button variant="primary" type="submit" disabled={isLoading}>
-            <Spinner
-              hidden={!isLoading}
-              as="span"
-              animation="border"
-              size="sm"
-              role="status"
-              aria-hidden="true"
-            />
-            {isLoading ? ' Logging In...' : 'Log In'}
-          </Button>
-        </div>
-      </Form>
+            <Button variant="warning" type="submit" disabled={isLoading}>
+              <Spinner
+                hidden={!isLoading}
+                as="span"
+                animation="border"
+                size="sm"
+                role="status"
+                aria-hidden="true"
+              />
+              {isLoading ? ' Logging In...' : 'Log In'}
+            </Button>
+            <Alert variant="danger" show={!!error}>
+              {error}
+            </Alert>
+          </div>
+        </Form>
+      </div>
     </div>
   );
 };

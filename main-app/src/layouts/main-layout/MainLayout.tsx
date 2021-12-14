@@ -47,7 +47,13 @@ export const MainLayout = (props: MainLayoutProps): ReactElement => {
       <Navbar expand="lg">
         <Container>
           <Navbar.Brand onClick={redirectToHome}>
-            <strong>RIS</strong>
+            <img
+              alt=""
+              src="/logo.png"
+              width="200px"
+              height="30px"
+              className="d-inline-block align-top"
+            />
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse>
