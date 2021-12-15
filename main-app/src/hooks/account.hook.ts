@@ -83,24 +83,16 @@ export const useLoadAccountToken = (): UseLoadAccountTokenResult => {
             let response: AuthenticationResult | undefined = undefined;
             try {
               response = await instance.acquireTokenPopup(request);
-            } catch (error) {
-              setIsLoaded(false);
-              setEmailAllowed(false);
-            } finally {
-              if (response?.account) {
-                const exists = await checkEmailExists(
-                  response.account.username,
-                );
-                if (exists) {
-                  onSigninSuccess(response.idToken, response.accessToken);
-                  setIsLoaded(true);
-                }
-                setEmailAllowed(exists);
+            } catch (error) {}
+
+            if (response?.account) {
+              const exists = await checkEmailExists(response.account.username);
+              if (exists) {
+                onSigninSuccess(response.idToken, response.accessToken);
+                setIsLoaded(true);
               }
+              setEmailAllowed(exists);
             }
-          } else {
-            setIsLoaded(false);
-            setEmailAllowed(false);
           }
         });
     }
