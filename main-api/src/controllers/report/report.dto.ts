@@ -142,4 +142,14 @@ export class DownloadRISReportDto extends GetReportDateRangeFilterDto {
   @IsOptional()
   @IsEmail()
   scannerUsername?: string;
+
+  @ApiPropertyOptional({ enum: DocumentStatus, isArray: true })
+  @IsOptional()
+  @IsString({ each: true })
+  statuses?: DocumentStatus[];
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  nomenclature?: string;
 }

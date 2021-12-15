@@ -1,3 +1,5 @@
+import { DocumentStatus } from 'src/entities/document.enum';
+
 export interface GenerateUploadedExcelParam {
   uploader?: string;
   from?: Date;
@@ -30,6 +32,8 @@ export interface GenerateImportExcelParam {
 
 export interface GenerateRISReportParam {
   scannerUsername?: string;
+  nomenclature?: string;
+  statuses?: DocumentStatus[];
   from?: Date;
   to?: Date;
 }

@@ -335,6 +335,8 @@ export class ReportService {
   async generateRISReportExcel(param: GenerateRISReportParam): Promise<Buffer> {
     const data = await this.reportRepository.getRISReport({
       scannerUsername: param.scannerUsername,
+      nomenclature: param.nomenclature,
+      statuses: param.statuses,
       from: param.from,
       to: param.to,
     });

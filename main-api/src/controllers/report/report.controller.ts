@@ -34,7 +34,7 @@ import {
 import { GetDocumentsReportIntPipe } from './report.pipe';
 
 @Controller('/reports')
-//@UseGuards(AzureADGuard)
+@UseGuards(AzureADGuard)
 export class ReportController {
   constructor(
     private readonly reportRepository: ReportRepository,
@@ -266,6 +266,8 @@ export class ReportController {
   ): Promise<void> {
     const excelFileBuffer = await this.reportService.generateRISReportExcel({
       scannerUsername: dto.scannerUsername,
+      nomenclature: dto.nomenclature,
+      statuses: dto.statuses,
       from: dto.from,
       to: dto.to,
     });
