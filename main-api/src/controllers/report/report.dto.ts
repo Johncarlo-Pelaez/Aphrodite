@@ -4,7 +4,9 @@ import {
   IsDateString,
   IsOptional,
   IsEmail,
+  IsString,
 } from 'class-validator';
+import { DocumentStatus } from 'src/entities/document.enum';
 
 class GetReportDateRangeFilterDto {
   @ApiPropertyOptional()
@@ -123,6 +125,16 @@ export class GetRISReportDto extends IntersectionType(
   @IsOptional()
   @IsEmail()
   scannerUsername?: string;
+
+  @ApiPropertyOptional({ enum: DocumentStatus, isArray: true })
+  @IsOptional()
+  @IsString({ each: true })
+  statuses?: DocumentStatus[];
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  nomenclature?: string;
 }
 
 export class DownloadRISReportDto extends GetReportDateRangeFilterDto {

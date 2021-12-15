@@ -364,6 +364,11 @@ export class ReportService {
         dataIndex: 'pageTotal',
       },
       {
+        key: 'documentsCount',
+        title: 'Number of Documents',
+        dataIndex: 'documentsCount',
+      },
+      {
         key: 'documentsNumber',
         title: 'Number of Documents',
         dataIndex: 'documentsNumber',

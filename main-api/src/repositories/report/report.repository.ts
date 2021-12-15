@@ -453,6 +453,28 @@ export class ReportRepository {
       queryParams.push(param.scannerUsername);
     }
 
+    if (!!param.nomenclature) {
+      queryConditions.push(`ris_report.indexes LIKE @${queryParams.length}`);
+      queryParams.push(`%${param.nomenclature}%`);
+    }
+
+    if (typeof param.statuses === 'string') {
+      queryConditions.push(`ris_report.status = @${queryParams.length}`);
+      queryParams.push(param.statuses);
+    } else if (param.statuses instanceof Array && !!param.statuses.length) {
+      let escapeParams = '';
+      param.statuses.forEach((status) => {
+        escapeParams += `@${queryParams.length}, `;
+        queryParams.push(status);
+      });
+      queryConditions.push(
+        `ris_report.status IN(${escapeParams.substring(
+          0,
+          escapeParams.length - 2,
+        )})`,
+      );
+    }
+
     if (!!param.from) {
       queryConditions.push(
         `ris_report.modifiedDate BETWEEN @${queryParams.length} AND @${

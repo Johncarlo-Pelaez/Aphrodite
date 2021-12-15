@@ -1,2 +1,2 @@
 export * from './document.service';
-export * from './document.inputs';
+export * from './document.params';

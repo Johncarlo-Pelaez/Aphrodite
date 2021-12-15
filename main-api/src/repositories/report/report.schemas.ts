@@ -145,6 +145,9 @@ export class RISReport {
   pageTotal: number;
 
   @ApiProperty()
+  documentsCount: number;
+
+  @ApiProperty()
   fileSize: number;
 
   @ApiProperty()

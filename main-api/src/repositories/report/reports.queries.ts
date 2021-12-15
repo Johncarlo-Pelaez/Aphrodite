@@ -82,6 +82,7 @@ export const FIND_RIS_REPORTS = `
     scannerName,
     fileName,
     pageTotal,
+    1 AS documentsCount,
     fileSize,
     fileType,
     dateScanned,
