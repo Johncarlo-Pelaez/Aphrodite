@@ -13,6 +13,7 @@ import {
   GetQualityCheckReportParam,
   GetApprovalReportParam,
   GetImportReportParam,
+  GetRISReportParam,
 } from './report.params';
 import {
   FIND_INFORMATION_REQUEST_REPORTS,
@@ -23,12 +24,15 @@ import {
   COUNT_APPROVAL_REPORTS,
   FIND_IMPORT_REPORTS,
   COUNT_IMPORT_REPORTS,
+  FIND_RIS_REPORTS,
+  COUNT_RIS_REPORTS,
 } from './reports.queries';
 import {
   InformationRequestReport,
   QualityCheckReport,
   ApprovalReport,
   ImportReport,
+  RISReport,
 } from './report.schemas';
 import { DEFAULT_DATE_FORMAT } from 'src/core/constants';
 
@@ -423,6 +427,140 @@ export class ReportRepository {
     }
 
     let sql = COUNT_IMPORT_REPORTS;
+
+    if (!!queryConditions.length) {
+      sql += `\nWHERE ${queryConditions.join(' AND ')}`;
+    }
+
+    sql += ';';
+
+    const queryData = await this.manager.query(sql, queryParams);
+    const queryObject = !!queryData?.length ? queryData[0] : null;
+    const queryObjectValues = !!queryObject ? Object.values(queryObject) : [];
+    return !!queryObjectValues.length
+      ? (queryObjectValues[0] as number) ?? 0
+      : 0;
+  }
+
+  async getRISReport(param: GetRISReportParam): Promise<RISReport[]> {
+    const queryConditions: string[] = [];
+    const queryParams: (string | number | Date)[] = [];
+
+    if (!!param.scannerUsername) {
+      queryConditions.push(
+        `ris_report.scannerUsername = @${queryParams.length}`,
+      );
+      queryParams.push(param.scannerUsername);
+    }
+
+    if (!!param.nomenclature) {
+      queryConditions.push(`ris_report.indexes LIKE @${queryParams.length}`);
+      queryParams.push(`%${param.nomenclature}%`);
+    }
+
+    if (typeof param.statuses === 'string') {
+      queryConditions.push(`ris_report.status = @${queryParams.length}`);
+      queryParams.push(param.statuses);
+    } else if (param.statuses instanceof Array && !!param.statuses.length) {
+      let escapeParams = '';
+      param.statuses.forEach((status) => {
+        escapeParams += `@${queryParams.length}, `;
+        queryParams.push(status);
+      });
+      queryConditions.push(
+        `ris_report.status IN(${escapeParams.substring(
+          0,
+          escapeParams.length - 2,
+        )})`,
+      );
+    }
+
+    if (!!param.from) {
+      queryConditions.push(
+        `ris_report.modifiedDate BETWEEN @${queryParams.length} AND @${
+          queryParams.length + 1
+        }`,
+      );
+      const dateTo = moment(
+        !!param.to ? param.to : param.from,
+        DEFAULT_DATE_FORMAT,
+      )
+        .add(1, 'day')
+        .add(-1, 'millisecond')
+        .toDate();
+      queryParams.push(param.from, dateTo);
+    }
+
+    let sql = FIND_RIS_REPORTS;
+
+    if (!!queryConditions.length) {
+      sql += `\nWHERE ${queryConditions.join(' AND ')}`;
+    }
+
+    sql += '\nORDER BY ris_report.modifiedDate DESC';
+
+    if (!!param.skip && !!param.take) {
+      sql += `\nOFFSET @${queryParams.length} ROWS FETCH NEXT @${
+        queryParams.length + 1
+      } ROWS ONLY`;
+      queryParams.push(param.skip, param.take);
+    }
+
+    sql += ';';
+
+    return await this.manager.query(sql, queryParams);
+  }
+
+  async getRISCountReport(param: GetRISReportParam): Promise<number> {
+    const queryConditions: string[] = [];
+    const queryParams: (string | number | Date)[] = [];
+
+    if (!!param.scannerUsername) {
+      queryConditions.push(
+        `ris_report.scannerUsername = @${queryParams.length}`,
+      );
+      queryParams.push(param.scannerUsername);
+    }
+
+    if (!!param.nomenclature) {
+      queryConditions.push(`ris_report.indexes LIKE @${queryParams.length}`);
+      queryParams.push(`%${param.nomenclature}%`);
+    }
+
+    if (typeof param.statuses === 'string') {
+      queryConditions.push(`ris_report.status = @${queryParams.length}`);
+      queryParams.push(param.statuses);
+    } else if (param.statuses instanceof Array && !!param.statuses.length) {
+      let escapeParams = '';
+      param.statuses.forEach((status) => {
+        escapeParams += `@${queryParams.length}, `;
+        queryParams.push(status);
+      });
+      queryConditions.push(
+        `ris_report.status IN(${escapeParams.substring(
+          0,
+          escapeParams.length - 2,
+        )})`,
+      );
+    }
+
+    if (!!param.from) {
+      queryConditions.push(
+        `ris_report.modifiedDate BETWEEN @${queryParams.length} AND @${
+          queryParams.length + 1
+        }`,
+      );
+      const dateTo = moment(
+        !!param.to ? param.to : param.from,
+        DEFAULT_DATE_FORMAT,
+      )
+        .add(1, 'day')
+        .add(-1, 'millisecond')
+        .toDate();
+      queryParams.push(param.from, dateTo);
+    }
+
+    let sql = COUNT_RIS_REPORTS;
 
     if (!!queryConditions.length) {
       sql += `\nWHERE ${queryConditions.join(' AND ')}`;

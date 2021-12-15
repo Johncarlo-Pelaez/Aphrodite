@@ -103,7 +103,7 @@ export const ViewDocModal = (props: ViewDocModalProps): ReactElement => {
     const documentStatus = document?.status;
     if (
       documentStatus === DocumentStatus.ENCODING &&
-      (currentUserRole === Role.ENCODER || currentUserRole === Role.ADMIN)
+      currentUserRole === Role.ENCODER
     ) {
       return (
         <EncoderForm
@@ -114,7 +114,7 @@ export const ViewDocModal = (props: ViewDocModalProps): ReactElement => {
       );
     } else if (
       documentStatus === DocumentStatus.CHECKING &&
-      (currentUserRole === Role.REVIEWER || currentUserRole === Role.ADMIN)
+      currentUserRole === Role.REVIEWER
     ) {
       return (
         <CheckerForm
@@ -125,7 +125,7 @@ export const ViewDocModal = (props: ViewDocModalProps): ReactElement => {
       );
     } else if (
       documentStatus === DocumentStatus.CHECKING_DISAPPROVED &&
-      (currentUserRole === Role.REVIEWER || currentUserRole === Role.ADMIN)
+      currentUserRole === Role.REVIEWER
     ) {
       return (
         <AppoverForm
@@ -145,7 +145,7 @@ export const ViewDocModal = (props: ViewDocModalProps): ReactElement => {
     const documentStatus = document?.status;
     if (
       documentStatus === DocumentStatus.ENCODING &&
-      (currentUserRole === Role.ENCODER || currentUserRole === Role.ADMIN)
+      currentUserRole === Role.ENCODER
     ) {
       formActionButtons = [
         <Button key="btn-close" variant="outline-danger" onClick={triggerClose}>
@@ -161,7 +161,7 @@ export const ViewDocModal = (props: ViewDocModalProps): ReactElement => {
       ];
     } else if (
       documentStatus === DocumentStatus.CHECKING &&
-      (currentUserRole === Role.REVIEWER || currentUserRole === Role.ADMIN)
+      currentUserRole === Role.REVIEWER
     ) {
       formActionButtons = [
         <Button
@@ -181,7 +181,7 @@ export const ViewDocModal = (props: ViewDocModalProps): ReactElement => {
       ];
     } else if (
       documentStatus === DocumentStatus.CHECKING_DISAPPROVED &&
-      (currentUserRole === Role.REVIEWER || currentUserRole === Role.ADMIN)
+      currentUserRole === Role.REVIEWER
     ) {
       formActionButtons = [
         <Button

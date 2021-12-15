@@ -18,7 +18,7 @@ import {
   DocumentApprover,
   RetryDocuments,
   CancelDocuments,
-} from './document.inputs';
+} from './document.params';
 const { readFile, writeFile } = fs.promises;
 
 @Injectable()

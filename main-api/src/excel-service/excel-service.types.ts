@@ -1,15 +1,11 @@
-export interface ExcelCreate {
-  columns: ExcelColumn[];
-  rows: ExcelRowItem[][];
+export interface ExcelCreate<T> {
+  columns: ExcelColumn<T>[];
+  rows: T[];
 }
 
-export interface ExcelColumn {
+export interface ExcelColumn<T> {
   key: string;
   title: string;
-  render?: (value: any) => string;
-}
-
-export interface ExcelRowItem {
-  key: string;
-  value: any;
+  dataIndex?: string;
+  render?: (rowData: T) => string;
 }

@@ -1,3 +1,5 @@
+import { DocumentStatus } from 'src/entities/document.enum';
+
 export interface GetUploadedReportParam {
   uploader?: string;
   from?: Date;
@@ -32,6 +34,16 @@ export interface GetApprovalReportParam {
 
 export interface GetImportReportParam {
   username?: string;
+  from?: Date;
+  to?: Date;
+  skip?: number;
+  take?: number;
+}
+
+export interface GetRISReportParam {
+  scannerUsername?: string;
+  nomenclature?: string;
+  statuses?: DocumentStatus[];
   from?: Date;
   to?: Date;
   skip?: number;

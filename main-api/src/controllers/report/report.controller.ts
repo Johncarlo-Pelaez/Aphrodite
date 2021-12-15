@@ -13,6 +13,7 @@ import {
   QualityCheckReport,
   ApprovalReport,
   ImportReport,
+  RISReport,
 } from 'src/repositories/report';
 import { ReportService } from 'src/report-service';
 import { FilenameUtil } from 'src/utils';
@@ -27,6 +28,8 @@ import {
   DownloadApprovalReportDto,
   GetImportReportDto,
   DownloadImportReportDto,
+  GetRISReportDto,
+  DownloadRISReportDto,
 } from './report.dto';
 import { GetDocumentsReportIntPipe } from './report.pipe';
 
@@ -229,6 +232,48 @@ export class ReportController {
     res.setHeader(
       'Content-Disposition',
       `attachment; filename=documents-import-report${this.filenameUtil.generateName()}`,
+    );
+    res.setHeader('Content-Length', excelFileBuffer.length);
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+    res.send(excelFileBuffer);
+  }
+
+  @ApiExtraModels(RISReport)
+  @ApiPaginatedResponse(RISReport)
+  @Get('/ris')
+  async getRISReport(
+    @Query(GetDocumentsReportIntPipe) dto: GetRISReportDto,
+  ): Promise<PaginatedResponse<RISReport>> {
+    const response = new PaginatedResponse<RISReport>();
+    response.count = await this.reportRepository.getRISCountReport({
+      scannerUsername: dto.scannerUsername,
+      nomenclature: dto.nomenclature,
+      statuses: dto.statuses,
+      from: dto.from,
+      to: dto.to,
+    });
+    response.data = await this.reportRepository.getRISReport(dto);
+    return response;
+  }
+
+  @Get('/ris/download')
+  async downloadRISReport(
+    @Query() dto: DownloadRISReportDto,
+    @Res() res: Response,
+  ): Promise<void> {
+    const excelFileBuffer = await this.reportService.generateRISReportExcel({
+      scannerUsername: dto.scannerUsername,
+      nomenclature: dto.nomenclature,
+      statuses: dto.statuses,
+      from: dto.from,
+      to: dto.to,
+    });
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=ris-report${this.filenameUtil.generateName()}`,
     );
     res.setHeader('Content-Length', excelFileBuffer.length);
     res.setHeader(

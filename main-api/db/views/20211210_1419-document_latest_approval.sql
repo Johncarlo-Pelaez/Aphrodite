@@ -14,21 +14,15 @@ SELECT
     FROM (
 		SELECT 
 			t.documentId,
-			MAX(t.updatedDate) AS approvalDate
+			MAX(t.historyId) AS historyId
 			FROM document_latest_distinct_status AS t
-			INNER JOIN document_history
-			ON t.documentId = document_history.documentId 
-			AND t.updatedDate = document_history.createdDate 
-			AND t.documentStatus = document_history.documentStatus
-			WHERE document_history.documentStatus = 'APPROVED' 
-			OR document_history.documentStatus = 'DISAPPROVED' 
+			WHERE t.documentStatus = 'APPROVED' 
+			OR t.documentStatus = 'DISAPPROVED' 
 			GROUP BY t.documentId
 	) AS document_latest_approval
 
     INNER JOIN document_history
     ON document_latest_approval.documentId = document_history.documentId
-    AND document_latest_approval.approvalDate = document_history.createdDate
+    AND document_latest_approval.historyId = document_history.id
     INNER JOIN document 
     ON document_history.documentId = document.id
-	WHERE document_history.documentStatus = 'APPROVED' 
-	OR document_history.documentStatus = 'DISAPPROVED' 
