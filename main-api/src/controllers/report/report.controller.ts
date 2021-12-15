@@ -34,7 +34,7 @@ import {
 import { GetDocumentsReportIntPipe } from './report.pipe';
 
 @Controller('/reports')
-@UseGuards(AzureADGuard)
+//@UseGuards(AzureADGuard)
 export class ReportController {
   constructor(
     private readonly reportRepository: ReportRepository,
@@ -250,6 +250,8 @@ export class ReportController {
     const response = new PaginatedResponse<RISReport>();
     response.count = await this.reportRepository.getRISCountReport({
       scannerUsername: dto.scannerUsername,
+      nomenclature: dto.nomenclature,
+      statuses: dto.statuses,
       from: dto.from,
       to: dto.to,
     });
