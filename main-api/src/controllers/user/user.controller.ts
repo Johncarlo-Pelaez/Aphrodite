@@ -62,38 +62,41 @@ export class UserController {
     @Res() res: Response,
   ): Promise<void> {
     const data = await this.userRepository.getUsers(dto);
-    const columns: ExcelColumn[] = [
+    const columns: ExcelColumn<User>[] = [
       {
         key: 'createdDate',
         title: 'Date and Time',
+        dataIndex: 'createdDate',
       },
       {
         key: 'username',
         title: 'Email Address',
+        dataIndex: 'username',
       },
       {
         key: 'firstName',
         title: 'First Name',
+        dataIndex: 'firstName',
       },
       {
         key: 'lastName',
         title: 'Last Name',
+        dataIndex: 'lastName',
       },
       {
         key: 'role',
         title: 'Role',
+        dataIndex: 'role',
       },
       {
         key: 'isActive',
         title: 'Status',
-        render: (isActive: boolean) => (isActive ? 'Active' : 'Inactive'),
+        render: (user) => (user.isActive ? 'Active' : 'Inactive'),
       },
     ];
     const excelFileBuffer = await this.excelService.create({
       columns,
-      rows: data.map((user) =>
-        this.excelService.buildExcelRowItems(user, columns),
-      ),
+      rows: data,
     });
     res.setHeader(
       'Content-Disposition',

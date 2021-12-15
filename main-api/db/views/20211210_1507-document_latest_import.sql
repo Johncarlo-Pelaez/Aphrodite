@@ -14,21 +14,15 @@ SELECT
     FROM (
 		SELECT 
 			t.documentId,
-			MAX(t.updatedDate) AS importedDate
+			MAX(t.historyId) AS historyId
 			FROM document_latest_distinct_status AS t
-			INNER JOIN document_history
-			ON t.documentId = document_history.documentId 
-			AND t.updatedDate = document_history.createdDate 
-			AND t.documentStatus = document_history.documentStatus
-			WHERE document_history.documentStatus = 'MIGRATE_DONE' 
-			OR document_history.documentStatus = 'MIGRATE_FAILED' 
+			WHERE t.documentStatus = 'MIGRATE_DONE' 
+			OR t.documentStatus = 'MIGRATE_FAILED' 
 			GROUP BY t.documentId
 	) AS document_latest_import
 
     INNER JOIN document_history
     ON document_latest_import.documentId = document_history.documentId
-    AND document_latest_import.importedDate = document_history.createdDate
+    AND document_latest_import.historyId = document_history.id
     INNER JOIN document 
     ON document_history.documentId = document.id
-	WHERE document_history.documentStatus = 'MIGRATE_DONE' 
-	OR document_history.documentStatus = 'MIGRATE_FAILED' 

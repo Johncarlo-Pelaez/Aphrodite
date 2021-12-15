@@ -73,3 +73,31 @@ export const COUNT_IMPORT_REPORTS = `
     SELECT 
     COUNT(import.documentId)
     FROM document_latest_import AS import`;
+
+export const FIND_RIS_REPORTS = `
+    SELECT 
+    documentId,
+    modifiedDate,
+    scannerUsername,
+    scannerName,
+    fileName,
+    pageTotal,
+    fileSize,
+    fileType,
+    dateScanned,
+    indexes,
+    documentDate,
+    indexedBy,
+    dateIndexed,
+    uploadedBy,
+    dateUploaded,
+    remarks,
+    status,
+    notes,
+    errorDate
+    FROM ris_report`;
+
+export const COUNT_RIS_REPORTS = `
+    SELECT 
+    COUNT(documentId)
+    FROM ris_report`;

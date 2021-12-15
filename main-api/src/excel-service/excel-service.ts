@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import * as ExcelJS from 'exceljs';
-import { ExcelCreate, ExcelColumn, ExcelRowItem } from './excel-service.types';
+import { ExcelCreate } from './excel-service.types';
 
 @Injectable()
 export class ExcelService {
   constructor() {}
 
-  async create(data: ExcelCreate): Promise<Buffer> {
+  async create<T extends Record<string, any> = {}>(
+    data: ExcelCreate<T>,
+  ): Promise<Buffer> {
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet();
 
@@ -16,38 +18,18 @@ export class ExcelService {
     }));
 
     sheet.addRows(
-      data.rows.map((items) => {
-        const row: any = {};
-        items.forEach((i) => {
-          const render = data.columns.find((c) => c.key === i.key)?.render;
-          row[i.key] =
+      data.rows.map((rowData) => {
+        const excelRow: any = {};
+        data.columns.forEach(({ key, dataIndex, render }) => {
+          excelRow[key] =
             !!render && typeof render === 'function'
-              ? render(i.value)
-              : i.value ?? '';
+              ? render(rowData)
+              : (dataIndex && rowData && rowData[dataIndex]) || '';
         });
-        return row;
+        return excelRow;
       }),
     );
 
     return (await workbook.xlsx.writeBuffer()) as Buffer;
-  }
-
-  buildExcelRowItems(
-    dataObject: Object,
-    columns: ExcelColumn[],
-  ): ExcelRowItem[] {
-    return Object.entries(dataObject).reduce(
-      (excelRowItem: ExcelRowItem[], [objectKey, objectValue]) => {
-        const column = columns.find((col) => col.key === objectKey);
-        if (column) {
-          excelRowItem.push({
-            key: column.key,
-            value: objectValue,
-          });
-        }
-        return excelRowItem;
-      },
-      [],
-    );
   }
 }

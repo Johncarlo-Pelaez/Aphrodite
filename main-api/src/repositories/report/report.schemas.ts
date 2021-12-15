@@ -127,3 +127,59 @@ export class ImportReport {
   @ApiProperty()
   note: string;
 }
+
+export class RISReport {
+  @ApiProperty()
+  documentId: number;
+
+  @ApiProperty()
+  scannerUsername: string;
+
+  @ApiProperty()
+  scannerName: string;
+
+  @ApiProperty()
+  fileName: string;
+
+  @ApiProperty()
+  pageTotal: number;
+
+  @ApiProperty()
+  fileSize: number;
+
+  @ApiProperty()
+  fileType: string;
+
+  @ApiProperty()
+  dateScanned: Date;
+
+  @ApiProperty()
+  indexes: string;
+
+  @ApiProperty()
+  documentDate: string;
+
+  @ApiProperty()
+  indexedBy: string;
+
+  @ApiProperty()
+  dateIndexed: Date;
+
+  @ApiProperty()
+  uploadedBy: string;
+
+  @ApiProperty()
+  dateUploaded: Date;
+
+  @ApiProperty()
+  remarks: string;
+
+  @ApiProperty()
+  status: string;
+
+  @ApiProperty()
+  notes: string;
+
+  @ApiProperty()
+  errorDate: Date;
+}

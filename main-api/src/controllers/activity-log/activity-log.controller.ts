@@ -55,29 +55,31 @@ export class ActivityLogController {
     @Res() res: Response,
   ): Promise<void> {
     const data = await this.activityLogRepository.getActivityLogs(dto);
-    const columns: ExcelColumn[] = [
+    const columns: ExcelColumn<ActivityLog>[] = [
       {
         key: 'loggedAt',
         title: 'Date and Time',
+        dataIndex: 'loggedAt',
       },
       {
         key: 'loggedBy',
         title: 'User',
+        dataIndex: 'loggedBy',
       },
       {
         key: 'type',
         title: 'Activity',
+        dataIndex: 'type',
       },
       {
         key: 'description',
         title: 'Description',
+        dataIndex: 'description',
       },
     ];
     const excelFileBuffer = await this.excelService.create({
       columns,
-      rows: data.map((activityLog) =>
-        this.excelService.buildExcelRowItems(activityLog, columns),
-      ),
+      rows: data,
     });
     res.setHeader(
       'Content-Disposition',

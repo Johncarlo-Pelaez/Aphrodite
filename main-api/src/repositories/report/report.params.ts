@@ -37,3 +37,11 @@ export interface GetImportReportParam {
   skip?: number;
   take?: number;
 }
+
+export interface GetRISReportParam {
+  scannerUsername?: string;
+  from?: Date;
+  to?: Date;
+  skip?: number;
+  take?: number;
+}

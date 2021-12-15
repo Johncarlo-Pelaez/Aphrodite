@@ -114,3 +114,20 @@ export class DownloadImportReportDto extends GetReportDateRangeFilterDto {
   @IsEmail()
   username?: string;
 }
+
+export class GetRISReportDto extends IntersectionType(
+  GetReportDateRangeFilterDto,
+  GetReportPageFilterDto,
+) {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsEmail()
+  scannerUsername?: string;
+}
+
+export class DownloadRISReportDto extends GetReportDateRangeFilterDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsEmail()
+  scannerUsername?: string;
+}

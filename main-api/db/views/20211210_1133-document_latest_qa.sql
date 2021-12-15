@@ -14,23 +14,16 @@ SELECT
     FROM (
 		SELECT 
 			t.documentId,
-			MAX(t.updatedDate) AS checkedDate
+			MAX(t.historyId) AS historyId
 			FROM document_latest_distinct_status AS t
-			INNER JOIN document_history
-			ON t.documentId = document_history.documentId 
-			AND t.updatedDate = document_history.createdDate 
-			AND t.documentStatus = document_history.documentStatus
-			WHERE document_history.documentStatus = 'CHECKING_APPROVED' 
-			OR document_history.documentStatus = 'CHECKING_DISAPPROVED' 
-			OR document_history.documentStatus = 'CHECKING_FAILED'
+			WHERE t.documentStatus = 'CHECKING_APPROVED' 
+			OR t.documentStatus = 'CHECKING_DISAPPROVED' 
+			OR t.documentStatus = 'CHECKING_FAILED'
 			GROUP BY t.documentId
 	) AS document_latest_qa
 
     INNER JOIN document_history
     ON document_latest_qa.documentId = document_history.documentId
-    AND document_latest_qa.checkedDate = document_history.createdDate
+    AND document_latest_qa.historyId = document_history.id
     INNER JOIN document 
     ON document_history.documentId = document.id
-	WHERE document_history.documentStatus = 'CHECKING_APPROVED' 
-	OR document_history.documentStatus = 'CHECKING_DISAPPROVED' 
-	OR document_history.documentStatus = 'CHECKING_FAILED'
