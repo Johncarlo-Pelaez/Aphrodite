@@ -19,6 +19,7 @@ export enum StatusOption {
   QUALITY_CHECKED = 'QUALITY CHECKED',
   APPROVAL = 'APPROVAL',
   IMPORT = 'IMPORT',
+  RIS = 'RIS',
 }
 
 export const StatusDropdownOptions: IStatusDropdownOptions[] = [
@@ -41,6 +42,10 @@ export const StatusDropdownOptions: IStatusDropdownOptions[] = [
   {
     label: 'Import',
     value: StatusOption.IMPORT,
+  },
+  {
+    label: 'RIS',
+    value: StatusOption.RIS,
   },
 ];
 
