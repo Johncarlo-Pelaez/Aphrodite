@@ -18,5 +18,6 @@ export interface FileInfo {
   file: File;
   percent: number;
   status: UploadStatus;
+  error?: string;
   cancelToken?: CancelTokenSource;
 }

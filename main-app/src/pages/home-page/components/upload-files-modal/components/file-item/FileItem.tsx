@@ -11,16 +11,20 @@ export interface FileItemProps {
   progress: number;
   status: UploadStatus;
   cancelToken?: CancelTokenSource;
+  error?: string;
   onRetryUpload: () => void;
 }
 
-export const FileItem = ({
-  fileName,
-  progress,
-  status,
-  cancelToken,
-  onRetryUpload: triggerOnRetryUpload,
-}: FileItemProps): ReactElement => {
+export const FileItem = (props: FileItemProps): ReactElement => {
+  const {
+    fileName,
+    progress,
+    status,
+    cancelToken,
+    error,
+    onRetryUpload: triggerOnRetryUpload,
+  } = props;
+
   const isCancelVisible =
     status === UploadStatus.PENDING ||
     status === UploadStatus.UPLOADING ||
@@ -31,7 +35,7 @@ export const FileItem = ({
   const getStatusText = (): string => {
     switch (status) {
       case UploadStatus.FAILED:
-        return 'Error';
+        return `Error${!!error ? ': ' + error : ''}`;
       case UploadStatus.SUCCESS:
         return 'Success';
       case UploadStatus.CANCELED:
