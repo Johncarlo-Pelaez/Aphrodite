@@ -7,6 +7,7 @@ import {
   createCancelTokenSource,
 } from 'apis';
 import { useUploadDocument } from 'hooks';
+import { checkIfConflict } from 'utils';
 import { FileItem, DropZone } from './components';
 import {
   UploadModalProps,
@@ -112,14 +113,19 @@ export const UploadFilesModal = ({
       });
       let newfiles = [...files];
       newfiles[index].status = UploadStatus.SUCCESS;
+      newfiles[index].error = undefined;
       setFiles(newfiles);
-    } catch (ex) {
+    } catch (ex: any) {
       let newfiles = [...files];
       let newItemFile = newfiles[index];
       let newStatus: UploadStatus;
-      if (isCanceled(ex) && newItemFile.percent < 100)
+      if (isCanceled(ex) && newItemFile.percent < 100) {
         newStatus = UploadStatus.CANCELED;
-      else newStatus = UploadStatus.FAILED;
+      } else {
+        newStatus = UploadStatus.FAILED;
+        if (checkIfConflict(ex))
+          newfiles[index].error = 'QR Code or Barcode already exist.';
+      }
       newfiles[index].status = newStatus;
       setFiles(newfiles);
     } finally {
@@ -138,7 +144,7 @@ export const UploadFilesModal = ({
   const renderListItems = (): ReactElement => {
     return (
       <Stack gap={1}>
-        {files.map(({ file, percent, status, cancelToken }, index) => {
+        {files.map(({ file, percent, status, error, cancelToken }, index) => {
           return (
             <FileItem
               key={index}
@@ -146,6 +152,7 @@ export const UploadFilesModal = ({
               progress={percent}
               status={status}
               cancelToken={cancelToken}
+              error={error}
               onRetryUpload={() => retryUpload(index + 1)}
             />
           );

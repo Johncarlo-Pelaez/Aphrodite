@@ -41,4 +41,5 @@ export enum ActivityLogType {
 
 export enum ErrorStatusCode {
   UNAUTHORIZE = 401,
+  CONFLICT = 409,
 }

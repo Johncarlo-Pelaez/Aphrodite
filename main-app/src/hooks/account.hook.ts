@@ -65,9 +65,10 @@ export const useLoadAccountToken = (): UseLoadAccountTokenResult => {
 
   useEffect(() => {
     if (account && !isLoaded) {
-      const request = buildSilentRequest(account);
+      const requestSilent = buildSilentRequest(account);
+      const loginRequest = buildLoginRequest(account.username);
       instance
-        .acquireTokenSilent(request)
+        .acquireTokenSilent(requestSilent)
         .then(async (response) => {
           if (response?.account) {
             const exists = await checkEmailExists(response.account.username);
@@ -82,25 +83,19 @@ export const useLoadAccountToken = (): UseLoadAccountTokenResult => {
           if (error instanceof InteractionRequiredAuthError) {
             let response: AuthenticationResult | undefined = undefined;
             try {
-              response = await instance.acquireTokenPopup(request);
+              response = await instance.acquireTokenPopup(loginRequest);
             } catch (error) {
-              setIsLoaded(false);
-              setEmailAllowed(false);
-            } finally {
-              if (response?.account) {
-                const exists = await checkEmailExists(
-                  response.account.username,
-                );
-                if (exists) {
-                  onSigninSuccess(response.idToken, response.accessToken);
-                  setIsLoaded(true);
-                }
-                setEmailAllowed(exists);
-              }
+              alert(error);
             }
-          } else {
-            setIsLoaded(false);
-            setEmailAllowed(false);
+
+            if (response?.account) {
+              const exists = await checkEmailExists(response.account.username);
+              if (exists) {
+                onSigninSuccess(response.idToken, response.accessToken);
+                setIsLoaded(true);
+              }
+              setEmailAllowed(exists);
+            }
           }
         });
     }

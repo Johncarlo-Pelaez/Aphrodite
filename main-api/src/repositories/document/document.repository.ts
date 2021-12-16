@@ -83,6 +83,15 @@ export class DocumentRepository {
           ...whereModifiedDate,
         },
         {
+          documentType: ILike(`%${search}%`),
+          ...whereDocumentType,
+          ...whereStatusIn,
+          user: {
+            ...whereUsername,
+          },
+          ...whereModifiedDate,
+        },
+        {
           user: {
             firstName: ILike(`%${search}%`),
             ...whereUsername,

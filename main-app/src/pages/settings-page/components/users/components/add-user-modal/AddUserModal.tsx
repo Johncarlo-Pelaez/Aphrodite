@@ -6,6 +6,7 @@ import Alert from 'react-bootstrap/Alert';
 import Spinner from 'react-bootstrap/Spinner';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
+import { checkIfConflict } from 'utils';
 import { useCreateUser } from 'hooks';
 import * as yup from 'yup';
 import { CreateUserApi } from 'apis';
@@ -100,7 +101,7 @@ export const AddUserModal = ({
         </Modal.Header>
         <Modal.Body>
           <Alert variant="danger" show={isError}>
-            {error?.response?.statusText === 'Conflict'
+            {!!error && checkIfConflict(error)
               ? 'Email already exist'
               : 'Create user failed.'}
           </Alert>
