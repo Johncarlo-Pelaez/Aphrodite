@@ -4,20 +4,38 @@ import {
   UseDocumentReport,
   DownloadDocumentReportUploadedParams,
   getDownloadDocumentReportUploaded,
+} from 'apis';
+import {
   getDocumentReportApiInfoRequest,
   getDownloadDocumentReportInfoRequest,
   GetDocumentReportInfoRequestApiResponse,
   UseInfoRequest,
+  DownloadReportInfoRequestParams,
+} from 'apis';
+import {
   UseDocumentReportQC,
   GetDocumentReportQCApiResponse,
-  getReportQCApiInfoRequest,
+  getReportQCApi,
+} from 'apis';
+import {
   UseReportApproval,
   GetReportApprovalApiResponse,
   getReportApprovalApi,
+} from 'apis';
+import {
   UseReportImport,
   GetReportImportApiResponse,
   getReportImportApi,
 } from 'apis';
+
+import {
+  GetReportRISApiResponse,
+  getDownloadReportRIS,
+  UseReportRIS,
+  geReportRISApi,
+  DownloadReportRISParams,
+} from 'apis';
+
 import {
   useMutation,
   UseMutationResult,
@@ -59,9 +77,9 @@ export const useDocumentReportInfoRequest = (
 export const useDownloadDocumentReportInfoRequest = (): UseMutationResult<
   Blob,
   ApiError,
-  DownloadDocumentReportUploadedParams
+  DownloadReportInfoRequestParams
 > => {
-  return useMutation<Blob, ApiError, DownloadDocumentReportUploadedParams>(
+  return useMutation<Blob, ApiError, DownloadReportInfoRequestParams>(
     getDownloadDocumentReportInfoRequest,
     {
       onError: () => {},
@@ -73,7 +91,7 @@ export const useDocumentReportQC = (
   params: UseDocumentReportQC,
 ): UseQueryResult<GetDocumentReportQCApiResponse, ApiError> => {
   return useQuery(QueryKey.buildPaginatedReportQualityChecked(params), () =>
-    getReportQCApiInfoRequest(params),
+    getReportQCApi(params),
   );
 };
 
@@ -90,5 +108,26 @@ export const useReportImport = (
 ): UseQueryResult<GetReportImportApiResponse, ApiError> => {
   return useQuery(QueryKey.buildPaginatedReportImport(params), () =>
     getReportImportApi(params),
+  );
+};
+
+export const useReportRIS = (
+  params: UseReportRIS,
+): UseQueryResult<GetReportRISApiResponse, ApiError> => {
+  return useQuery(QueryKey.buildPaginatedReportRIS(params), () =>
+    geReportRISApi(params),
+  );
+};
+
+export const useDownloadReportRIS = (): UseMutationResult<
+  Blob,
+  ApiError,
+  DownloadReportRISParams
+> => {
+  return useMutation<Blob, ApiError, DownloadReportRISParams>(
+    getDownloadReportRIS,
+    {
+      onError: () => {},
+    },
   );
 };

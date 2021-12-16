@@ -4,7 +4,7 @@ import { DocumentStatus } from 'core/enum';
 export interface DocumentReport {
   id: number;
   description: string;
-  documentSize: string;
+  documentSize: number;
   createdDate: Date;
   documentId: number;
   document: Document;
@@ -64,4 +64,26 @@ export interface ImportReport {
   pageTotal: number;
   documentStatus: number;
   note: string;
+}
+
+export interface RISReport {
+  documentId: number;
+  scannerUsername: string;
+  scannerName: string;
+  fileName: string;
+  pageTotal: number;
+  documentsCount: number;
+  fileSize: number;
+  fileType: string;
+  dateScanned: Date;
+  indexes: string;
+  documentDate: string;
+  indexedBy: string;
+  dateIndexed: Date;
+  uploadedBy: string;
+  dateUploaded: Date;
+  remarks: string;
+  status: string;
+  notes: string;
+  errorDate: Date;
 }
