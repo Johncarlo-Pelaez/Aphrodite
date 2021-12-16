@@ -53,8 +53,6 @@ export const ActivityLogs = (): ReactElement => {
         pageSize,
       });
 
-      console.log(activityParams);
-
       downloadFile({
         file: activityParams,
         filename: `Activity_Logs_${getCurrentDate()}.xlsx`,

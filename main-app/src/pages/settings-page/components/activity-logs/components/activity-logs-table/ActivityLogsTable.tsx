@@ -87,11 +87,9 @@ export const ActivityLogsTable = ({
 
   const processDateRangeValue = useCallback(() => {
     const start = new Date(moment(loggedAtFrom).format(DEFAULT_DATE_FORMAT));
-    start.setDate(start.getDate() - 1);
     setFrom(start);
 
     const end = new Date(moment(loggedAtTo).format(DEFAULT_DATE_FORMAT));
-    end.setDate(end.getDate() - 1);
     setTo(end);
   }, [loggedAtFrom, loggedAtTo]);
 
@@ -121,8 +119,12 @@ export const ActivityLogsTable = ({
         pageNumber: 5,
         onChange: (page) => {
           setCurrentPage(page);
+          setTableCurrentPage(page);
         },
-        onSizeChange: setPageSize,
+        onSizeChange: (page) => {
+          setPageSize(page);
+          setTablePageSize(page);
+        },
       }}
       onChange={changeSort}
     />
