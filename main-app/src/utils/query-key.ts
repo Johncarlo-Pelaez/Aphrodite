@@ -6,6 +6,7 @@ import {
   UseDocumentReportQC,
   UseReportApproval,
   UseReportImport,
+  UseReportRIS,
 } from 'apis';
 
 export class QueryKey {
@@ -17,7 +18,6 @@ export class QueryKey {
   public static readonly nomenclaturesWhitelist = 'nomenclaturesWhitelist';
   public static readonly nomenclaturesLookups = 'nomenclaturesLookups';
   public static readonly activityLogs = 'activityLogs';
-  public static readonly downloadActivityLogs = 'downloadActivityLogs';
   public static readonly paginatedActivityLogs = 'paginatedActivityLogs';
   public static readonly paginatedDocumentReportUploaded =
     'paginatedDocumentReportUploaded';
@@ -28,6 +28,7 @@ export class QueryKey {
 
   public static readonly paginatedReportApproval = 'paginatedReportApproval';
   public static readonly paginatedReportImport = 'paginatedReportImport';
+  public static readonly paginatedReportRIS = 'paginatedReportRIS';
 
   public static buildPaginatedActivityLogs(data: UseActivityLog) {
     return [this.paginatedActivityLogs, data];
@@ -54,18 +55,22 @@ export class QueryKey {
   }
 
   public static builPaginatedReportInformationRequest(data: UseInfoRequest) {
-    return [this.builPaginatedReportInformationRequest, data];
+    return [this.paginatedReportInfoRequest, data];
   }
 
   public static buildPaginatedReportQualityChecked(data: UseDocumentReportQC) {
-    return [this.buildPaginatedReportQualityChecked, data];
+    return [this.paginatedDocumentReportQualityChecked, data];
   }
 
   public static buildPaginatedReportApproval(data: UseReportApproval) {
-    return [this.buildPaginatedReportApproval, data];
+    return [this.paginatedReportApproval, data];
   }
 
   public static buildPaginatedReportImport(data: UseReportImport) {
-    return [this.buildPaginatedReportImport, data];
+    return [this.paginatedReportImport, data];
+  }
+
+  public static buildPaginatedReportRIS(data: UseReportRIS) {
+    return [this.paginatedReportRIS, data];
   }
 }
