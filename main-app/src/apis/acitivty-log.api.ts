@@ -32,15 +32,17 @@ export const getActivityLogApi = async (
   });
 
   const dateFromFilter = params.loggedAtFrom
-    ? moment(params.loggedAtFrom).startOf('day').format(DEFAULT_DATE_FORMAT)
+    ? moment(params.loggedAtFrom).format(DEFAULT_DATE_FORMAT)
     : undefined;
   const dateToFilter = params.loggedAtTo
-    ? moment(params.loggedAtTo).endOf('day').format(DEFAULT_DATE_FORMAT)
+    ? moment(params.loggedAtTo).format(DEFAULT_DATE_FORMAT)
     : undefined;
 
   const filterQuery = createQueryString({
     loggedBy:
-      params.loggedBy === DEFAULT_ALL_USER_SELECTED ? '' : params.loggedBy,
+      params.loggedBy === DEFAULT_ALL_USER_SELECTED
+        ? undefined
+        : params.loggedBy,
     from: dateFromFilter,
     to: dateToFilter,
   });
@@ -59,15 +61,17 @@ export const getDownloadActivityLogs = async (
   const paginationQuery = createTablePaginationQuery(params);
 
   const dateFromFilter = params.loggedAtFrom
-    ? moment(params.loggedAtFrom).startOf('day').format(DEFAULT_DATE_FORMAT)
+    ? moment(params.loggedAtFrom).format(DEFAULT_DATE_FORMAT)
     : undefined;
   const dateToFilter = params.loggedAtTo
-    ? moment(params.loggedAtTo).endOf('day').format(DEFAULT_DATE_FORMAT)
+    ? moment(params.loggedAtTo).format(DEFAULT_DATE_FORMAT)
     : undefined;
 
   const filterQuery = createQueryString({
     loggedBy:
-      params.loggedBy === DEFAULT_ALL_USER_SELECTED ? '' : params.loggedBy,
+      params.loggedBy === DEFAULT_ALL_USER_SELECTED
+        ? undefined
+        : params.loggedBy,
     from: dateFromFilter,
     to: dateToFilter,
   });
