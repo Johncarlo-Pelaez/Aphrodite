@@ -55,8 +55,7 @@ export const ImportReportTable = ({
       title: 'Size',
       dataIndex: 'documentSize',
       render: ({ documentSize }: ImportReport) => {
-        var docSize: number = +documentSize;
-        return fileSize(docSize);
+        return fileSize(documentSize);
       },
     },
   ];

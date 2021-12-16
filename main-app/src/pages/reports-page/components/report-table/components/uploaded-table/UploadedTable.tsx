@@ -2,11 +2,15 @@ import { ReactElement, useState, useMemo } from 'react';
 import fileSize from 'filesize';
 import moment from 'moment';
 import { DEFAULT_DATE_FORMAT } from 'core/constants';
-import { useDocumentReportUploaded } from 'hooks';
+import {
+  useDocumentReportUploaded,
+  useDownloadDocumentReportInfoRequest,
+} from 'hooks';
 import { Table, TableColumnProps, SorterResult, SortOrder } from 'core/ui';
 import { DocumentReport } from 'models';
 import { sortDateTime } from 'utils/sort';
-import { Button } from 'react-bootstrap';
+import { Button, Toast } from 'react-bootstrap';
+import { downloadFile } from 'utils';
 
 const DEFAULT_SORT_ORDER_UPLOADED: SorterResult = {
   field: 'createdDate',
@@ -29,10 +33,51 @@ export const UploadedTable = ({
   const [sorterUploaded, setSorterUploaded] = useState<
     SorterResult | undefined
   >(DEFAULT_SORT_ORDER_UPLOADED);
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [displayErrorMessage, setDisplayErrorMessage] =
+    useState<boolean>(false);
+
+  const {
+    isLoading: isDownloadLoading,
+    mutateAsync: downloadUploadedReportAsync,
+  } = useDownloadDocumentReportInfoRequest();
 
   const changeSortUploaded = (sorterResult?: SorterResult): void => {
     setSorterUploaded(sorterResult ?? DEFAULT_SORT_ORDER_UPLOADED);
   };
+
+  const downloadReportUpload = async (): Promise<void> => {
+    if (!from || !to) {
+      setErrorMessage('Date range of date uploaded must be selected');
+      setDisplayErrorMessage(true);
+    }
+
+    if (from && to) {
+      if (from > to) {
+        setErrorMessage('Incorrect date range of date uploaded');
+        setDisplayErrorMessage(true);
+        return;
+      }
+
+      const uploadedParams = await downloadUploadedReportAsync({
+        username,
+        from,
+        to,
+        currentPage: currentPageUploaded,
+        pageSize: pageSizeUploaded,
+      });
+
+      downloadFile({
+        file: uploadedParams,
+        filename: `Uploaded_Report_${getCurrentDate()}.xlsx`,
+      });
+    }
+  };
+
+  const getCurrentDate = (): string => {
+    return moment().format(DEFAULT_DATE_FORMAT);
+  };
+
   const renderColumnsUpload = (): TableColumnProps<DocumentReport>[] => [
     {
       title: 'Date Created',
@@ -50,16 +95,18 @@ export const UploadedTable = ({
       dataIndex: 'description',
     },
     {
+      title: 'Document Name',
+      dataIndex: 'document',
+      render: ({ document }: DocumentReport) => document.documentName,
+    },
+    {
       title: 'Uploader',
       dataIndex: 'userUsername',
     },
     {
       title: 'Size',
       dataIndex: 'documentSize',
-      render: ({ documentSize }: DocumentReport) => {
-        var docSize: number = +documentSize;
-        return fileSize(docSize);
-      },
+      render: (document: DocumentReport) => fileSize(document.documentSize),
     },
   ];
 
@@ -76,7 +123,6 @@ export const UploadedTable = ({
     username,
   });
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { uploaded, total } = useMemo(
     () => ({ uploaded: result?.data ?? [], total: result?.count ?? 0 }),
     [result?.data, result?.count],
@@ -84,6 +130,18 @@ export const UploadedTable = ({
 
   return (
     <div>
+      <Toast
+        className="error-date-range d-inline-block m-1"
+        bg="light"
+        autohide
+        show={displayErrorMessage}
+        onClose={() => setDisplayErrorMessage(false)}
+      >
+        <Toast.Header>
+          <strong className="me-auto">Download warning</strong>
+        </Toast.Header>
+        <Toast.Body className="light text-dark">{errorMessage}</Toast.Body>
+      </Toast>
       <Table<DocumentReport>
         isServerSide
         rowKey={(doc) => doc.id}
@@ -103,7 +161,13 @@ export const UploadedTable = ({
         }}
         onChange={changeSortUploaded}
       />
-      <Button>Download</Button>
+      <Button
+        disabled={isDownloadLoading}
+        variant="outline-secondary"
+        onClick={downloadReportUpload}
+      >
+        Download
+      </Button>
     </div>
   );
 };

@@ -1,11 +1,15 @@
-import { ReactElement } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 import {
   UploadedTable,
   InformationRequestTable,
   QualityCheckTable,
   ApprovalReportTable,
   ImportReportTable,
+  RISReportTable,
 } from './components';
+import moment from 'moment';
+import { DEFAULT_DATE_FORMAT } from 'core/constants';
+import { StatusOption } from '../report-status-dropdown';
 
 export interface DocumentsTableProps {
   dateFrom?: Date;
@@ -20,31 +24,36 @@ export const ReportTable = ({
   username,
   reportType,
 }: DocumentsTableProps): ReactElement => {
+  const [start, setStart] = useState<Date | undefined>(undefined);
+  const [end, setEnd] = useState<Date | undefined>(undefined);
+
   const renderTable = (): ReactElement => {
-    console.log(reportType);
-    if (reportType === 'UPLOADED')
-      return <UploadedTable username={username} from={dateFrom} to={dateTo} />;
-    if (reportType === 'INFORMATION REQUEST')
+    if (reportType === StatusOption.UPLOADED)
+      return <UploadedTable username={username} from={start} to={end} />;
+    if (reportType === StatusOption.INFORMATION_REQUEST)
       return (
-        <InformationRequestTable
-          username={username}
-          from={dateFrom}
-          to={dateTo}
-        />
+        <InformationRequestTable username={username} from={start} to={end} />
       );
-    if (reportType === 'QUALITY CHECKED')
-      return (
-        <QualityCheckTable username={username} from={dateFrom} to={dateTo} />
-      );
-    if (reportType === 'APPROVAL')
-      return (
-        <ApprovalReportTable username={username} from={dateFrom} to={dateTo} />
-      );
-    else
-      return (
-        <ImportReportTable username={username} from={dateFrom} to={dateTo} />
-      );
+    if (reportType === StatusOption.QUALITY_CHECKED)
+      return <QualityCheckTable username={username} from={start} to={end} />;
+    if (reportType === StatusOption.APPROVAL)
+      return <ApprovalReportTable username={username} from={start} to={end} />;
+    if (reportType === StatusOption.IMPORT)
+      return <ImportReportTable username={username} from={start} to={end} />;
+    else return <RISReportTable username={username} from={start} to={end} />;
   };
+
+  useEffect(() => {
+    if (dateFrom && dateTo) {
+      setStart(new Date(moment(dateFrom).format(DEFAULT_DATE_FORMAT)));
+      setEnd(new Date(moment(dateTo).format(DEFAULT_DATE_FORMAT)));
+    }
+
+    return () => {
+      setStart(undefined);
+      setEnd(undefined);
+    };
+  }, [dateFrom, dateTo]);
 
   return renderTable();
 };

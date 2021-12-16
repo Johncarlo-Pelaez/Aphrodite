@@ -1,5 +1,4 @@
 import { ReactElement, useState, useMemo } from 'react';
-import fileSize from 'filesize';
 import moment from 'moment';
 import { DEFAULT_DATE_FORMAT } from 'core/constants';
 import { useDocumentReportInfoRequest } from 'hooks';
@@ -7,6 +6,7 @@ import { Table, TableColumnProps, SorterResult, SortOrder } from 'core/ui';
 import { InformationRequestReport } from 'models';
 import { sortDateTime } from 'utils/sort';
 import { Button } from 'react-bootstrap';
+import fileSize from 'filesize';
 
 const DEFAULT_SORT_ORDER_INFO_REQUEST: SorterResult = {
   field: 'requestedDate',
@@ -51,16 +51,14 @@ export const InformationRequestTable = ({
         dataIndex: 'filename',
       },
       {
-        title: 'Total Page',
-        dataIndex: 'pageTotal',
-      },
-      {
         title: 'Size',
         dataIndex: 'documentSize',
-        render: ({ documentSize }: InformationRequestReport) => {
-          var docSize: number = +documentSize;
-          return fileSize(docSize);
-        },
+        render: ({ documentSize }: InformationRequestReport) =>
+          fileSize(documentSize),
+      },
+      {
+        title: 'Status',
+        dataIndex: 'documentStatus',
       },
     ];
 
@@ -76,8 +74,6 @@ export const InformationRequestTable = ({
     to,
     username,
   });
-
-  console.log(result);
 
   const { infoRequest, infoRequestTotal } = useMemo(
     () => ({

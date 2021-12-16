@@ -59,8 +59,7 @@ export const QualityCheckTable = ({
         title: 'Size',
         dataIndex: 'documentSize',
         render: ({ documentSize }: QualityCheckReport) => {
-          var docSize: number = +documentSize;
-          return fileSize(docSize);
+          return fileSize(documentSize);
         },
       },
     ];

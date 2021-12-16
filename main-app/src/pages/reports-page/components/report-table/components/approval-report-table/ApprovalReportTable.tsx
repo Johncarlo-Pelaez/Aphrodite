@@ -57,8 +57,7 @@ export const ApprovalReportTable = ({
       title: 'Size',
       dataIndex: 'documentSize',
       render: ({ documentSize }: ApprovalReport) => {
-        var docSize: number = +documentSize;
-        return fileSize(docSize);
+        return fileSize(documentSize);
       },
     },
   ];
