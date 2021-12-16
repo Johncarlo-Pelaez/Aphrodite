@@ -110,7 +110,7 @@ export const ProcessDetails = forwardRef(
         </Card>
         <Card className="shadow-sm m-3" style={cardStyle}>
           <Card.Body>
-            <Card.Title as="h6">Proccessing / Waiting</Card.Title>
+            <Card.Title as="h6">Processing / Waiting</Card.Title>
             <Card.Text className="text-center p-3 fs-4">
               {processing_waiting}
             </Card.Text>
