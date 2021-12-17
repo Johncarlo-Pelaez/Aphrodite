@@ -7,6 +7,7 @@ import { Table, TableColumnProps, SorterResult, SortOrder } from 'core/ui';
 import { ApprovalReport } from 'models';
 import { sortDateTime } from 'utils/sort';
 import { Button } from 'react-bootstrap';
+import styles from './ApprovalReportTable.module.css';
 
 const DEFAULT_SORT_ORDER_APPROVAL_REPORT: SorterResult = {
   field: 'approvalDate',
@@ -82,6 +83,9 @@ export const ApprovalReportTable = ({
 
   return (
     <div>
+      <Button variant="outline-secondary" className={styles.prop} disabled>
+        Download
+      </Button>
       <Table<ApprovalReport>
         isServerSide
         rowKey={(doc) => doc.documentId}
@@ -101,7 +105,6 @@ export const ApprovalReportTable = ({
         }}
         onChange={changeSortApproval}
       />
-      <Button>Download</Button>
     </div>
   );
 };

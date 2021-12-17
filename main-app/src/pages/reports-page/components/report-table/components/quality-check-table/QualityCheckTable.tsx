@@ -7,6 +7,7 @@ import { Table, TableColumnProps, SorterResult, SortOrder } from 'core/ui';
 import { QualityCheckReport } from 'models';
 import { sortDateTime } from 'utils/sort';
 import { Button } from 'react-bootstrap';
+import styles from './QualityCheckTable.module.css';
 
 const DEFAULT_SORT_ORDER_QUALITY_CHECK: SorterResult = {
   field: 'checkedDate',
@@ -88,6 +89,9 @@ export const QualityCheckTable = ({
 
   return (
     <div>
+      <Button variant="outline-secondary" className={styles.prop} disabled>
+        Download
+      </Button>
       <Table<QualityCheckReport>
         isServerSide
         rowKey={(doc) => doc.documentId}
@@ -107,7 +111,6 @@ export const QualityCheckTable = ({
         }}
         onChange={changeSortQualityCheck}
       />
-      <Button>Download</Button>
     </div>
   );
 };

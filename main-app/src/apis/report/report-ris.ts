@@ -5,10 +5,7 @@ import {
   createTablePaginationQuery,
 } from 'utils/query-string';
 import moment from 'moment';
-import {
-  DEFAULT_ALL_DOCUMNET_STATUS,
-  DEFAULT_ALL_NOMENCLATURE,
-} from 'core/constants';
+import { DEFAULT_ALL_DOCUMNET_STATUS } from 'core/constants';
 
 import { DEFAULT_DATE_FORMAT } from 'core/constants';
 
@@ -73,10 +70,6 @@ export const getDownloadReportRIS = async (
     params.statuses === DEFAULT_ALL_DOCUMNET_STATUS
       ? undefined
       : params.statuses;
-  const docTypeNomenclature =
-    params.nomenclature === DEFAULT_ALL_NOMENCLATURE
-      ? undefined
-      : params.nomenclature;
 
   const dateFromFilter = params.from
     ? moment(params.from).format(DEFAULT_DATE_FORMAT)
@@ -92,7 +85,7 @@ export const getDownloadReportRIS = async (
     from: dateFromFilter,
     to: dateToFilter,
     statuses: status,
-    nomenclature: docTypeNomenclature,
+    nomenclature: params.nomenclature,
   });
 
   const res = await request.get<Blob>(

@@ -7,6 +7,7 @@ import { InformationRequestReport } from 'models';
 import { sortDateTime } from 'utils/sort';
 import { Button } from 'react-bootstrap';
 import fileSize from 'filesize';
+import styles from './InformationRequestTable.module.css';
 
 const DEFAULT_SORT_ORDER_INFO_REQUEST: SorterResult = {
   field: 'requestedDate',
@@ -85,6 +86,9 @@ export const InformationRequestTable = ({
 
   return (
     <div>
+      <Button variant="outline-secondary" className={styles.prop} disabled>
+        Download
+      </Button>
       <Table<InformationRequestReport>
         isServerSide
         rowKey={(doc) => doc.documentId}
@@ -104,7 +108,6 @@ export const InformationRequestTable = ({
         }}
         onChange={changeSortInfoRequest}
       />
-      <Button>Download</Button>
     </div>
   );
 };

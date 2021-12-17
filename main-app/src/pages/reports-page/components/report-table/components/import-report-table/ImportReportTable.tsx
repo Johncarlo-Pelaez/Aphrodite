@@ -7,6 +7,7 @@ import { Table, TableColumnProps, SorterResult, SortOrder } from 'core/ui';
 import { ImportReport } from 'models';
 import { sortDateTime } from 'utils/sort';
 import { Button } from 'react-bootstrap';
+import styles from './ImportReportTable.module.css';
 
 const DEFAULT_SORT_ORDER_IMPORT_REPORT: SorterResult = {
   field: 'importedDate',
@@ -81,6 +82,9 @@ export const ImportReportTable = ({
 
   return (
     <div>
+      <Button variant="outline-secondary" className={styles.prop} disabled>
+        Download
+      </Button>
       <Table<ImportReport>
         isServerSide
         rowKey={(doc) => doc.documentId}
@@ -100,7 +104,6 @@ export const ImportReportTable = ({
         }}
         onChange={changeSortImport}
       />
-      <Button>Download</Button>
     </div>
   );
 };

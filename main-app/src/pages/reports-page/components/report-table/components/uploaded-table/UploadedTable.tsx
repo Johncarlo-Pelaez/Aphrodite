@@ -11,6 +11,7 @@ import { DocumentReport } from 'models';
 import { sortDateTime } from 'utils/sort';
 import { Button, Toast } from 'react-bootstrap';
 import { downloadFile } from 'utils';
+import styles from './UploadedTable.module.css';
 
 const DEFAULT_SORT_ORDER_UPLOADED: SorterResult = {
   field: 'createdDate',
@@ -142,6 +143,14 @@ export const UploadedTable = ({
         </Toast.Header>
         <Toast.Body className="light text-dark">{errorMessage}</Toast.Body>
       </Toast>
+      <Button
+        disabled={isDownloadLoading}
+        variant="outline-secondary"
+        onClick={downloadReportUpload}
+        className={styles.prop}
+      >
+        Download
+      </Button>
       <Table<DocumentReport>
         isServerSide
         rowKey={(doc) => doc.id}
@@ -161,13 +170,6 @@ export const UploadedTable = ({
         }}
         onChange={changeSortUploaded}
       />
-      <Button
-        disabled={isDownloadLoading}
-        variant="outline-secondary"
-        onClick={downloadReportUpload}
-      >
-        Download
-      </Button>
     </div>
   );
 };
