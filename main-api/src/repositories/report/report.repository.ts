@@ -123,7 +123,7 @@ export class ReportRepository {
 
     sql += '\nORDER BY indexing.requestedDate DESC';
 
-    if (!!param.skip && !!param.take) {
+    if (param.skip !== undefined && param.take !== undefined) {
       sql += `\nOFFSET @${queryParams.length} ROWS FETCH NEXT @${
         queryParams.length + 1
       } ROWS ONLY`;
@@ -213,7 +213,7 @@ export class ReportRepository {
 
     sql += '\nORDER BY qa.checkedDate DESC';
 
-    if (!!param.skip && !!param.take) {
+    if (param.skip !== undefined && param.take !== undefined) {
       sql += `\nOFFSET @${queryParams.length} ROWS FETCH NEXT @${
         queryParams.length + 1
       } ROWS ONLY`;
@@ -303,7 +303,7 @@ export class ReportRepository {
 
     sql += '\nORDER BY approval.approvalDate DESC';
 
-    if (!!param.skip && !!param.take) {
+    if (param.skip !== undefined && param.take !== undefined) {
       sql += `\nOFFSET @${queryParams.length} ROWS FETCH NEXT @${
         queryParams.length + 1
       } ROWS ONLY`;
@@ -389,7 +389,7 @@ export class ReportRepository {
 
     sql += '\nORDER BY import.importedDate DESC';
 
-    if (!!param.skip && !!param.take) {
+    if (param.skip !== undefined && param.take !== undefined) {
       sql += `\nOFFSET @${queryParams.length} ROWS FETCH NEXT @${
         queryParams.length + 1
       } ROWS ONLY`;
@@ -499,7 +499,7 @@ export class ReportRepository {
 
     sql += '\nORDER BY ris_report.modifiedDate DESC';
 
-    if (!!param.skip && !!param.take) {
+    if (param.skip !== undefined && param.take !== undefined) {
       sql += `\nOFFSET @${queryParams.length} ROWS FETCH NEXT @${
         queryParams.length + 1
       } ROWS ONLY`;
