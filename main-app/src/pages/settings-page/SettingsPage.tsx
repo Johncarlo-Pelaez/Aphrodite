@@ -26,7 +26,7 @@ export const SettingsPage = (): ReactElement => {
       >
         <Row>
           <Col sm={2} md={2} className="flex-column flex-wrap p-0 0 0">
-            <Nav className="flex-column text-wrap flex-wrap">
+            <Nav variant="pills" className="flex-column text-wrap flex-wrap">
               <Card className="flex-wrap flex-column bg-light p-0 card mb-4 border-0">
                 <Nav.Item>
                   <Nav.Link

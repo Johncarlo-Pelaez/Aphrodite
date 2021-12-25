@@ -15,7 +15,6 @@ import {
 import { Stack } from 'react-bootstrap';
 import { DEFAULT_ALL_DOCUMNET_STATUS } from 'core/constants';
 import { downloadFile } from 'utils';
-import {} from './components';
 
 const DEFAULT_SORT_ORDER_RIS_REPORT: SorterResult = {
   field: 'dateScanned',
