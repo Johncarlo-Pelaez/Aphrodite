@@ -355,6 +355,7 @@ export class DocumentConsumer {
         uploadParams,
       );
     } catch (error) {
+      console.log(error);
       await this.documentRepository.failMigrate({
         documentId,
         springcmReqParams: strUploadParams,
@@ -392,7 +393,7 @@ export class DocumentConsumer {
       await this.documentRepository.failMigrate({
         documentId,
         springcmReqParams: strUploadParams,
-        springcmResponse: JSON.stringify(uploadDocToSpringResult),
+        springcmResponse: JSON.stringify(response),
         failedAt: this.datesUtil.getDateNow(),
       });
     }
