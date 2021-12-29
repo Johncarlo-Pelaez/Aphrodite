@@ -46,7 +46,6 @@ export class DocumentConsumer {
       id: documentId,
       uuid: sysSrcFileName,
       qrCode: docQrCode,
-      status,
       documentType: strGetDocTypeReqRes,
       contractDetails: strGetContDetailsReqRes,
       encodeValues: strEncodeValues,
