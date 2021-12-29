@@ -50,6 +50,7 @@ export class DocumentConsumer {
       documentType: strGetDocTypeReqRes,
       contractDetails: strGetContDetailsReqRes,
       encodeValues: strEncodeValues,
+      documentHistories,
     } = document;
 
     let qrCode = docQrCode;
@@ -97,21 +98,13 @@ export class DocumentConsumer {
       await this.nomenClatureRepository.checkNomenclatureWhitelistIfExist(
         documentType.Nomenclature,
       );
-
-    const isForQa =
-      isWhiteListed &&
-      status !== DocumentStatus.APPROVED &&
-      status !== DocumentStatus.CHECKING_APPROVED &&
-      status !== DocumentStatus.MIGRATE_BEGIN &&
-      status !== DocumentStatus.MIGRATE_FAILED &&
-      status !== DocumentStatus.MIGRATE_DONE;
-
-    const isForImport =
-      (!isWhiteListed ||
-        status === DocumentStatus.APPROVED ||
-        status === DocumentStatus.CHECKING_APPROVED ||
-        status === DocumentStatus.MIGRATE_FAILED) &&
-      status !== DocumentStatus.MIGRATE_DONE;
+    const isApproved = !!documentHistories.filter(
+      (h) =>
+        h.documentStatus === DocumentStatus.APPROVED ||
+        h.documentStatus === DocumentStatus.CHECKING_APPROVED,
+    ).length;
+    const isForQa = isWhiteListed && !isApproved;
+    const isForImport = !isWhiteListed || isApproved;
 
     if (isForQa) {
       await this.documentRepository.updateForChecking({
