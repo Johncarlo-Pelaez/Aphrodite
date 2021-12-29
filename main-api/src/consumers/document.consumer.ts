@@ -97,7 +97,8 @@ export class DocumentConsumer {
       await this.nomenClatureRepository.checkNomenclatureWhitelistIfExist(
         documentType.Nomenclature,
       );
-    const isApproved = !!documentHistories.filter(
+
+    const isApproved = !!documentHistories?.filter(
       (h) =>
         h.documentStatus === DocumentStatus.APPROVED ||
         h.documentStatus === DocumentStatus.CHECKING_APPROVED,

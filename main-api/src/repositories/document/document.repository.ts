@@ -129,7 +129,7 @@ export class DocumentRepository {
 
   async getDocument(id: number): Promise<Document> {
     return await this.manager.findOne(Document, {
-      relations: ['user'],
+      relations: ['user', 'documentHistories'],
       where: { id },
     });
   }
