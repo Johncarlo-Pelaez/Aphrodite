@@ -103,10 +103,8 @@ export class DocumentConsumer {
         h.documentStatus === DocumentStatus.APPROVED ||
         h.documentStatus === DocumentStatus.CHECKING_APPROVED,
     ).length;
-    const isForQa = isWhiteListed && !isApproved;
-    const isForImport = !isWhiteListed || isApproved;
 
-    if (isForQa) {
+    if (isWhiteListed && !isApproved) {
       await this.documentRepository.updateForChecking({
         documentId,
         processAt: this.datesUtil.getDateNow(),
@@ -114,7 +112,7 @@ export class DocumentConsumer {
       return;
     }
 
-    if (isForImport) {
+    if (!isWhiteListed || isApproved) {
       const empty = '';
       const uploadParams = {
         Brand: documentType?.Brand ?? empty,
