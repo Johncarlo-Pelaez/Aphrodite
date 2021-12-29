@@ -396,6 +396,7 @@ export class DocumentConsumer {
         springcmResponse: JSON.stringify(response),
         failedAt: this.datesUtil.getDateNow(),
       });
+      throw new Error(response?.faultInfo?.message);
     }
   }
 
