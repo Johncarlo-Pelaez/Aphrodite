@@ -17,7 +17,7 @@ import { DEFAULT_ALL_DOCUMNET_STATUS } from 'core/constants';
 import { downloadFile } from 'utils';
 
 const DEFAULT_SORT_ORDER_RIS_REPORT: SorterResult = {
-  field: 'dateScanned',
+  field: 'dateIndexed',
   order: SortOrder.DESC,
 };
 
@@ -32,9 +32,9 @@ export const RISReportTable = ({
   from,
   to,
 }: RISReportTableProps): ReactElement => {
-  const [currentPageRIS, setCurrentPageRIS] = useState<number>(1);
-  const [pageSizeRIS, setPageSizeRIS] = useState<number>(15);
-  const [sorterRIS, setSorterRIS] = useState<SorterResult | undefined>(
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(15);
+  const [sorter, setSorter] = useState<SorterResult | undefined>(
     DEFAULT_SORT_ORDER_RIS_REPORT,
   );
   const [nomenclature, setNomenclature] = useState<string | undefined>(
@@ -65,8 +65,8 @@ export const RISReportTable = ({
         username,
         from,
         to,
-        currentPage: currentPageRIS,
-        pageSize: pageSizeRIS,
+        currentPage,
+        pageSize,
       });
 
       downloadFile({
@@ -81,17 +81,17 @@ export const RISReportTable = ({
   };
 
   const changeSortRIS = (sorterResult?: SorterResult): void => {
-    setSorterRIS(sorterResult ?? DEFAULT_SORT_ORDER_RIS_REPORT);
+    setSorter(sorterResult ?? DEFAULT_SORT_ORDER_RIS_REPORT);
   };
+
   const renderColumnsRIS = (): TableColumnProps<RISReport>[] => [
     {
-      title: 'Date Scanned',
-      dataIndex: 'dateScanned',
-      render: ({ dateScanned }: RISReport) =>
-        moment(dateScanned).format(DEFAULT_DATE_FORMAT),
-      sorter: sortDateTime('dateScanned'),
-      sortOrder:
-        sorterRIS?.field === 'dateScanned' ? sorterRIS.order : undefined,
+      title: 'Date Indexed',
+      dataIndex: 'dateIndexed',
+      render: ({ dateIndexed }: RISReport) =>
+        moment(dateIndexed).format(DEFAULT_DATE_FORMAT),
+      sorter: sortDateTime('dateIndexed'),
+      sortOrder: sorter?.field === 'dateIndexed' ? sorter.order : undefined,
     },
     {
       title: 'File name',
@@ -118,8 +118,8 @@ export const RISReportTable = ({
     isError: hasDocsError,
     data: result,
   } = useReportRIS({
-    currentPage: currentPageRIS,
-    pageSize: pageSizeRIS,
+    currentPage,
+    pageSize,
     from,
     to,
     username,
@@ -178,13 +178,13 @@ export const RISReportTable = ({
         data={ris}
         pagination={{
           total: risTotal,
-          pageSize: pageSizeRIS,
-          current: currentPageRIS,
+          pageSize,
+          current: currentPage,
           pageNumber: 5,
           onChange: (page) => {
-            setCurrentPageRIS(page);
+            setCurrentPage(page);
           },
-          onSizeChange: setPageSizeRIS,
+          onSizeChange: setPageSize,
         }}
         onChange={changeSortRIS}
       />

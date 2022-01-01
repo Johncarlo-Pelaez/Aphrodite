@@ -53,7 +53,7 @@ export const NomenclatureDropdown = ({
       <AutoSuggestField
         isLoading={isLoading}
         isInvalid={isError}
-        placeholder="Filter by NomenClature"
+        placeholder="Filter by Nomenclature"
         options={nomenclature}
         value={value ? [value] : []}
         onChange={(nomenclature) => {
