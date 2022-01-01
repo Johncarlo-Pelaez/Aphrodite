@@ -14,7 +14,12 @@ export interface NomenclatureDropdownProps {
 export const DocumentStatusDropdown = ({
   onChange,
 }: NomenclatureDropdownProps): ReactElement => {
-  const documentStatuses = Object.values(DocumentStatus);
+  const statuses = [];
+
+  for (let value in DocumentStatus) {
+    value = value.toLowerCase().replace('_', ' ');
+    statuses.push(value.charAt(0).toUpperCase() + value.slice(1, value.length));
+  }
 
   const onChangeDocumentStatus = (
     event: React.FormEvent<HTMLSelectElement>,
@@ -33,7 +38,7 @@ export const DocumentStatusDropdown = ({
               {opt.label}
             </option>
           ))}
-          {documentStatuses.map((opt, index) => (
+          {statuses.map((opt, index) => (
             <option className={styles.prop} key={index} value={opt}>
               {opt}
             </option>
