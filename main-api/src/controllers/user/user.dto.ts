@@ -60,7 +60,30 @@ export class GetUsersDto {
   to?: Date;
 }
 
-export class CreateUserAccountDto extends CreateRootUserDto {
+export class CreateUserAccountDto {
+  @ApiProperty({
+    format: 'email',
+  })
+  @IsNotEmpty({ message: 'Email is required.' })
+  @IsEmail({}, { message: 'Email is invalid.' })
+  @IsString()
+  email: string;
+
+  @ApiProperty()
+  @IsNotEmpty({ message: 'Object ID is required.' })
+  @IsString()
+  objectId: string;
+
+  @ApiProperty()
+  @IsNotEmpty({ message: 'First name is required.' })
+  @IsString()
+  firstName: string;
+
+  @ApiProperty()
+  @IsNotEmpty({ message: 'Last name is required.' })
+  @IsString()
+  lastName: string;
+
   @ApiProperty({ enum: Role })
   @IsNotEmpty({ message: 'Role is required.' })
   @IsString()

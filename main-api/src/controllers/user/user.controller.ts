@@ -1,6 +1,7 @@
 import {
   Body,
   ConflictException,
+  NotAcceptableException,
   Controller,
   Get,
   Post,
@@ -18,6 +19,7 @@ import {
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiOkResponse,
+  ApiNotAcceptableResponse,
 } from '@nestjs/swagger';
 import {
   AzureADGuard,
@@ -51,7 +53,7 @@ export class UserController {
   })
   @Get('/is-root-exist')
   async checkRootUserExist(): Promise<boolean> {
-    return (await this.userRepository.count([Role.ADMIN])) > 0;
+    return (await this.userRepository.count()) > 0;
   }
 
   @ApiOkResponse({
@@ -235,6 +237,7 @@ export class UserController {
     });
   }
 
+  @ApiNotAcceptableResponse()
   @ApiOkResponse()
   @Delete('/:id')
   @UseGuards(AzureADGuard)
@@ -242,6 +245,9 @@ export class UserController {
     @GetAzureUser() azureUser: AzureUser,
     @Param('id', ParseIntPipe) id: number,
   ): Promise<void> {
+    if ((await this.userRepository.count([Role.ADMIN])) <= 1)
+      throw new NotAcceptableException();
+
     const user = await this.userRepository.getUser(id);
     await this.userRepository.deleteUser({
       id,
