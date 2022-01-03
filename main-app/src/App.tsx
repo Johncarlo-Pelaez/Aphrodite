@@ -18,6 +18,7 @@ const ReportsPage = lazy(() => import('pages/reports-page'));
 const SettingsPage = lazy(() => import('pages/settings-page'));
 const NotFoundPage = lazy(() => import('pages/not-found-page'));
 const Forbidden = lazy(() => import('pages/forbidden'));
+const RootUserPage = lazy(() => import('pages/root-user-page'));
 
 export interface AppProps {
   msalInstance: IPublicClientApplication;
@@ -59,6 +60,12 @@ const AppContent = () => {
             path="/"
             layout={MainLayout}
             component={HomePage}
+          />
+          <AnonymousRoute
+            exact
+            path="/auth/root"
+            layout={PublicLayout}
+            component={RootUserPage}
           />
           <PrivateRoute
             exact

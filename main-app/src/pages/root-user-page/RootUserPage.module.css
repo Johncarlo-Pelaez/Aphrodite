@@ -1,0 +1,11 @@
+.FormContainer {
+  height: 100vh;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.CreateRootUserForm {
+  min-width: 320px;
+}

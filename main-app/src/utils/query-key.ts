@@ -10,6 +10,7 @@ import {
 } from 'apis';
 
 export class QueryKey {
+  public static readonly root = 'root';
   public static readonly currentUser = 'currentUser';
   public static readonly users = 'users';
   private static readonly documents = 'documents';

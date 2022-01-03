@@ -35,6 +35,24 @@ export const createUserApi = async (params: CreateUserApi): Promise<void> => {
   await request.post('/api/users/create', params);
 };
 
+export interface CreateRootUserApi {
+  email: string;
+  firstName: string;
+  lastName: string;
+  objectId: string;
+}
+
+export const createRootUserApi = async (
+  params: CreateRootUserApi,
+): Promise<void> => {
+  await request.post('/api/users/root', params);
+};
+
+export const checkIsRootUserExistsApi = async (): Promise<boolean> => {
+  const res = await request.get<boolean>('/api/users/is-root-exist');
+  return res.data;
+};
+
 export interface UpdateUserApiParams {
   role: Role;
   firstname: string;

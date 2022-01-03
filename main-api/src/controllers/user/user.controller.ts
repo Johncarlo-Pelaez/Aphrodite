@@ -77,7 +77,8 @@ export class UserController {
     @Body() dto: CreateRootUserDto,
   ): Promise<CreatedResponse> {
     const user = await this.userRepository.getUserByEmail(dto.email);
-    if (user) throw new ConflictException();
+    if (user || (await this.checkRootUserExist()))
+      throw new ConflictException();
 
     const response = new CreatedResponse();
     const rightNow = new Date();

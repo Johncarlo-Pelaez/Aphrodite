@@ -1,5 +1,8 @@
 import {
   getUsersApi,
+  checkIsRootUserExistsApi,
+  createRootUserApi,
+  CreateRootUserApi,
   createUserApi,
   checkEmailExistsApi,
   CreateUserApi,
@@ -26,6 +29,28 @@ import { QueryKey, checkIfUnAuthorize } from 'utils';
 
 export const useUsers = (): UseQueryResult<User[], ApiError> => {
   return useQuery(QueryKey.users, getUsersApi);
+};
+
+export const useRootUserExists = (): UseQueryResult<boolean, ApiError> => {
+  return useQuery<boolean, ApiError>(QueryKey.root, checkIsRootUserExistsApi);
+};
+
+export const useCreateRootUser = (): UseMutationResult<
+  void,
+  ApiError,
+  CreateRootUserApi
+> => {
+  const queryClient = useQueryClient();
+  return useMutation<void, ApiError, CreateRootUserApi>(
+    (data) => {
+      return createRootUserApi(data);
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(QueryKey.users);
+      },
+    },
+  );
 };
 
 export const useCreateUser = (): UseMutationResult<
