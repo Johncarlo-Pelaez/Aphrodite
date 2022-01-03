@@ -15,3 +15,12 @@ body,
   font-size: 16px;
   background-color: $page-bg;
 }
+
+.error-date-range {
+  position: fixed;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  top: 10%;
+  left: 50%;
+  backdrop-filter: blur(100%);
+}
