@@ -11,7 +11,6 @@ import {
   UpdateUserModal,
   UserDetailsModal,
 } from './components';
-import { Card } from 'react-bootstrap';
 
 export const Users = (): ReactElement => {
   const [selectedUser, setSelectedUser] = useState<User | undefined>(undefined);
@@ -89,9 +88,6 @@ export const Users = (): ReactElement => {
       <Alert variant="danger" show={hasDeleteError}>
         {deleteError}
       </Alert>
-      <Card className="flex-wrap lh-lg bg-light position-relative p-2">
-        <h6 className="text-muted mt-0 mb-0 fw-bolder">Accounts Information</h6>
-      </Card>
       <div className="d-flex justify-content-between align-items-center flex-wrap position-relative my-1">
         <ButtonGroup className="m-2">
           <Button

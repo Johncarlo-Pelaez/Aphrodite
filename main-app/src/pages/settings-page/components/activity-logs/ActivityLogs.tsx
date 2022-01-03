@@ -1,6 +1,6 @@
 import { ReactElement, Fragment, useState } from 'react';
 import { ActivityLogsTable } from './components';
-import { Card, Stack, Toast, Button } from 'react-bootstrap';
+import { Stack, Toast, Button } from 'react-bootstrap';
 import { UsersDropdown, DateRange } from './components';
 import { downloadFile } from 'utils';
 import { useDownloadActivityLogs } from 'hooks';
@@ -62,9 +62,6 @@ export const ActivityLogs = (): ReactElement => {
 
   return (
     <Fragment>
-      <Card className="flex-wrap lh-lg bg-light p-2">
-        <h6 className="text-muted mt-0 mb-0 fw-bolder">Logs</h6>
-      </Card>
       <Toast
         className="error-date-range d-inline-block m-1"
         bg="light"
