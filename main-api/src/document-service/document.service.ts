@@ -53,8 +53,8 @@ export class DocumentService {
       qrCode = filename.replace(/_/g, '|');
     }
 
-    if (qrCode && qrCode.length >= 18) {
-      qrCode = qrCode.substr(0, 15);
+    if (filename.length >= 18) {
+      qrCode = filename.substr(0, 15);
     }
 
     if (qrCode && !!(await this.documentRepository.getDocumentByQRCode(qrCode)))
