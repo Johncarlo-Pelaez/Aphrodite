@@ -77,6 +77,17 @@ export class ActivityLogRepository {
     return await this.manager.findOneOrFail(ActivityLog, id);
   }
 
+  async insertCreateRootUserLog(
+    param: InsertCreateUserLogParam,
+  ): Promise<void> {
+    const activityLogs = new ActivityLog();
+    activityLogs.type = ActivityLogType.CREATE_ROOT_USER;
+    activityLogs.description = param.username;
+    activityLogs.loggedBy = param.createdBy;
+    activityLogs.loggedAt = param.createdAt;
+    await this.manager.save(activityLogs);
+  }
+
   async insertCreateUserLog(param: InsertCreateUserLogParam): Promise<void> {
     const activityLogs = new ActivityLog();
     activityLogs.type = ActivityLogType.ADD_USER;

@@ -25,11 +25,12 @@ import {
   CreatedResponse,
   GetAzureUser,
 } from 'src/core';
-import { User } from 'src/entities';
+import { User, Role } from 'src/entities';
 import { UserRepository, ActivityLogRepository } from 'src/repositories';
 import { ExcelService, ExcelColumn } from 'src/excel-service';
 import { FilenameUtil } from 'src/utils';
 import {
+  CreateRootUserDto,
   GetUsersDto,
   CreateUserAccountDto,
   UserIsExistDto,
@@ -46,6 +47,14 @@ export class UserController {
   ) {}
 
   @ApiOkResponse({
+    type: Boolean,
+  })
+  @Get('/is-root-exist')
+  async checkRootUserExist(): Promise<boolean> {
+    return (await this.userRepository.count([Role.ADMIN])) > 0;
+  }
+
+  @ApiOkResponse({
     type: User,
     isArray: true,
   })
@@ -53,6 +62,37 @@ export class UserController {
   @UseGuards(AzureADGuard)
   async getUsers(@Query() dto: GetUsersDto): Promise<User[]> {
     return await this.userRepository.getUsers(dto);
+  }
+
+  @ApiCreatedResponse({
+    type: CreatedResponse,
+  })
+  @ApiConflictResponse({
+    description: 'User already exist.',
+  })
+  @Post('/root')
+  async createRootUser(
+    @Body() dto: CreateRootUserDto,
+  ): Promise<CreatedResponse> {
+    const user = await this.userRepository.getUserByEmail(dto.email);
+    if (user) throw new ConflictException();
+
+    const response = new CreatedResponse();
+    const rightNow = new Date();
+    response.id = await this.userRepository.createUser({
+      email: dto.email,
+      firstName: dto.firstName,
+      lastName: dto.lastName,
+      role: Role.ADMIN,
+      objectId: dto.objectId,
+      createdDate: rightNow,
+    });
+    await this.activityLogRepository.insertCreateRootUserLog({
+      username: dto.email,
+      createdBy: 'RIS',
+      createdAt: rightNow,
+    });
+    return response;
   }
 
   @UseGuards(AzureADGuard)
