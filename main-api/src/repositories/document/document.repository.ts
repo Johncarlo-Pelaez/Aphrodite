@@ -13,7 +13,7 @@ import {
   GetDocumentsParam,
   BeginDocProcessParam,
   QrDocumentParam,
-  FailDocProcessParam,
+  FailQrDocumentParam,
   DoneIndexingParam,
   MigrateDocumentParam,
   FailDocMigrateParam,
@@ -28,7 +28,6 @@ import {
   UpdateToCancelledParam,
   DeleteFileParam,
 } from './document.params';
-import { DEFAULT_DATE_FORMAT } from 'src/core/constants';
 
 @EntityRepository()
 export class DocumentRepository {
@@ -60,7 +59,7 @@ export class DocumentRepository {
     }
 
     if (from) {
-      const dateTo = moment(!!to ? to : from, DEFAULT_DATE_FORMAT)
+      const dateTo = moment(!!to ? to : from)
         .add(1, 'day')
         .add(-1, 'millisecond')
         .toDate();
@@ -220,8 +219,7 @@ export class DocumentRepository {
     history.documentStatus = customValue?.documentStatus ?? document.status;
     history.userUsername = customValue?.userUsername ?? 'RIS';
     history.documentId = document.id;
-    history.salesforceResponse = customValue?.salesforceResponse;
-    history.springcmResponse = customValue?.springcmResponse;
+    history.note = customValue?.note;
     history.document = document;
     return history;
   }
@@ -290,7 +288,7 @@ export class DocumentRepository {
     });
   }
 
-  async failQrDocument(param: FailDocProcessParam): Promise<void> {
+  async failQrDocument(param: FailQrDocumentParam): Promise<void> {
     await this.manager.transaction(async (transaction): Promise<void> => {
       const document = await this.manager.findOneOrFail(
         Document,
@@ -301,7 +299,9 @@ export class DocumentRepository {
       document.description = 'Failed QR Code.';
       await transaction.save(document);
 
-      const history = this.genarateDocumentHistory(document);
+      const history = this.genarateDocumentHistory(document, {
+        note: param.note,
+      });
       await transaction.save(history);
     });
   }
@@ -339,7 +339,7 @@ export class DocumentRepository {
       await transaction.save(document);
 
       const history = this.genarateDocumentHistory(document, {
-        salesforceResponse: param.documentType ?? param.contractDetails,
+        note: param.documentType ?? param.contractDetails,
         userUsername: document.encoder,
       });
       await transaction.save(history);
@@ -361,7 +361,7 @@ export class DocumentRepository {
       await transaction.save(document);
 
       const history = this.genarateDocumentHistory(document, {
-        salesforceResponse: param.salesforceResponse,
+        note: param.salesforceResponse,
       });
       await transaction.save(history);
     });
@@ -397,7 +397,7 @@ export class DocumentRepository {
       await transaction.save(document);
 
       const history = this.genarateDocumentHistory(document, {
-        springcmResponse: param.springcmResponse,
+        note: param.springcmResponse,
         userUsername: document.approver ?? document.checker,
       });
       await transaction.save(history);
@@ -418,7 +418,7 @@ export class DocumentRepository {
       await transaction.save(document);
 
       const history = this.genarateDocumentHistory(document, {
-        springcmResponse: document.springResponse,
+        note: document.springResponse,
       });
       await transaction.save(history);
     });

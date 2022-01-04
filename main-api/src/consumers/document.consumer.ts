@@ -171,10 +171,24 @@ export class DocumentConsumer {
     } catch (error) {
       await this.documentRepository.failQrDocument({
         documentId,
+        note: error,
         failedAt: this.datesUtil.getDateNow(),
       });
       this.logger.error(error);
       throw error;
+    }
+
+    if (
+      typeof qrCode === 'string' &&
+      (qrCode.includes('exceptionCode') || qrCode.includes('Attention'))
+    ) {
+      const note = 'The license for QR Code module is invalid';
+      await this.documentRepository.failQrDocument({
+        documentId,
+        note,
+        failedAt: this.datesUtil.getDateNow(),
+      });
+      throw new Error(note);
     }
 
     if (qrCode?.match(/^ecr/i) || qrCode?.match(/^ecp/i)) {
@@ -355,7 +369,6 @@ export class DocumentConsumer {
         uploadParams,
       );
     } catch (error) {
-      console.log(error);
       await this.documentRepository.failMigrate({
         documentId,
         springcmReqParams: strUploadParams,
@@ -374,9 +387,9 @@ export class DocumentConsumer {
       +response?.SpringCMAccessToken?.Code === 200 &&
       +response?.SpringCMGetFolder?.Code === 200 &&
       +response?.SpringCMUploadResponse?.Code === 201 &&
-      !!response?.SalesForce.length &&
-      response?.SalesForce[0].created === 'true' &&
-      response?.SalesForce[0].success === 'true'
+      !!response?.SalesForce?.length &&
+      response?.SalesForce[0]?.created === 'true' &&
+      response?.SalesForce[0]?.success === 'true'
     ) {
       await this.documentRepository.migrateDocument({
         documentId,

@@ -1,4 +1,5 @@
 import { ReactElement, useState, useEffect, useMemo } from 'react';
+import Badge from 'react-bootstrap/Badge';
 import { useUsers } from 'hooks';
 import { Table, TableColumnProps } from 'core/ui';
 import { User } from 'models';
@@ -24,6 +25,16 @@ const columns: TableColumnProps<User>[] = [
   {
     title: 'Email',
     dataIndex: 'username',
+  },
+  {
+    title: 'Status',
+    render: (user: User) => {
+      return (
+        <Badge pill bg={user?.isActive ? 'success' : 'danger'}>
+          {user?.isActive ? 'Active' : 'Deactivated'}
+        </Badge>
+      );
+    },
   },
 ];
 

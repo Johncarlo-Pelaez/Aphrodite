@@ -178,9 +178,5 @@ export class DocumentHistory {
 
   @ApiPropertyOptional()
   @Column({ nullable: true })
-  salesforceResponse?: string;
-
-  @ApiPropertyOptional()
-  @Column({ nullable: true })
-  springcmResponse?: string;
+  note?: string;
 }
