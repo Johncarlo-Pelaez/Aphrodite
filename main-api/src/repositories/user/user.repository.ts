@@ -14,7 +14,6 @@ import {
   UpdateUserParam,
   DeleteUserParam,
 } from './user.params';
-import { DEFAULT_DATE_FORMAT } from 'src/core/constants';
 
 @EntityRepository()
 export class UserRepository {
@@ -32,10 +31,7 @@ export class UserRepository {
     }
 
     if (!!param.from) {
-      const dateTo = moment(
-        !!param.to ? param.to : param.from,
-        DEFAULT_DATE_FORMAT,
-      )
+      const dateTo = moment(!!param.to ? param.to : param.from)
         .add(1, 'day')
         .add(-1, 'millisecond')
         .toDate();

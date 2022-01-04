@@ -34,7 +34,6 @@ import {
   ImportReport,
   RISReport,
 } from './report.schemas';
-import { DEFAULT_DATE_FORMAT } from 'src/core/constants';
 
 @EntityRepository()
 export class ReportRepository {
@@ -51,7 +50,7 @@ export class ReportRepository {
     }
 
     if (from) {
-      const dateTo = moment(!!to ? to : from, DEFAULT_DATE_FORMAT)
+      const dateTo = moment(!!to ? to : from)
         .add(1, 'day')
         .add(-1, 'millisecond')
         .toDate();
@@ -76,7 +75,7 @@ export class ReportRepository {
     }
 
     if (from) {
-      const dateTo = moment(!!to ? to : from, DEFAULT_DATE_FORMAT)
+      const dateTo = moment(!!to ? to : from)
         .add(1, 'day')
         .add(-1, 'millisecond')
         .toDate();
@@ -105,10 +104,7 @@ export class ReportRepository {
           queryParams.length + 1
         }`,
       );
-      const dateTo = moment(
-        !!param.to ? param.to : param.from,
-        DEFAULT_DATE_FORMAT,
-      )
+      const dateTo = moment(!!param.to ? param.to : param.from)
         .add(1, 'day')
         .add(-1, 'millisecond')
         .toDate();
@@ -152,10 +148,7 @@ export class ReportRepository {
           queryParams.length + 1
         }`,
       );
-      const dateTo = moment(
-        !!param.to ? param.to : param.from,
-        DEFAULT_DATE_FORMAT,
-      )
+      const dateTo = moment(!!param.to ? param.to : param.from)
         .add(1, 'day')
         .add(-1, 'millisecond')
         .toDate();
@@ -195,10 +188,7 @@ export class ReportRepository {
           queryParams.length + 1
         }`,
       );
-      const dateTo = moment(
-        !!param.to ? param.to : param.from,
-        DEFAULT_DATE_FORMAT,
-      )
+      const dateTo = moment(!!param.to ? param.to : param.from)
         .add(1, 'day')
         .add(-1, 'millisecond')
         .toDate();
@@ -242,10 +232,7 @@ export class ReportRepository {
           queryParams.length + 1
         }`,
       );
-      const dateTo = moment(
-        !!param.to ? param.to : param.from,
-        DEFAULT_DATE_FORMAT,
-      )
+      const dateTo = moment(!!param.to ? param.to : param.from)
         .add(1, 'day')
         .add(-1, 'millisecond')
         .toDate();
@@ -285,10 +272,7 @@ export class ReportRepository {
           queryParams.length + 1
         }`,
       );
-      const dateTo = moment(
-        !!param.to ? param.to : param.from,
-        DEFAULT_DATE_FORMAT,
-      )
+      const dateTo = moment(!!param.to ? param.to : param.from)
         .add(1, 'day')
         .add(-1, 'millisecond')
         .toDate();
@@ -330,10 +314,7 @@ export class ReportRepository {
           queryParams.length + 1
         }`,
       );
-      const dateTo = moment(
-        !!param.to ? param.to : param.from,
-        DEFAULT_DATE_FORMAT,
-      )
+      const dateTo = moment(!!param.to ? param.to : param.from)
         .add(1, 'day')
         .add(-1, 'millisecond')
         .toDate();
@@ -371,10 +352,7 @@ export class ReportRepository {
           queryParams.length + 1
         }`,
       );
-      const dateTo = moment(
-        !!param.to ? param.to : param.from,
-        DEFAULT_DATE_FORMAT,
-      )
+      const dateTo = moment(!!param.to ? param.to : param.from)
         .add(1, 'day')
         .add(-1, 'millisecond')
         .toDate();
@@ -416,10 +394,7 @@ export class ReportRepository {
           queryParams.length + 1
         }`,
       );
-      const dateTo = moment(
-        !!param.to ? param.to : param.from,
-        DEFAULT_DATE_FORMAT,
-      )
+      const dateTo = moment(!!param.to ? param.to : param.from)
         .add(1, 'day')
         .add(-1, 'millisecond')
         .toDate();
@@ -481,10 +456,7 @@ export class ReportRepository {
           queryParams.length + 1
         }`,
       );
-      const dateTo = moment(
-        !!param.to ? param.to : param.from,
-        DEFAULT_DATE_FORMAT,
-      )
+      const dateTo = moment(!!param.to ? param.to : param.from)
         .add(1, 'day')
         .add(-1, 'millisecond')
         .toDate();
@@ -550,10 +522,7 @@ export class ReportRepository {
           queryParams.length + 1
         }`,
       );
-      const dateTo = moment(
-        !!param.to ? param.to : param.from,
-        DEFAULT_DATE_FORMAT,
-      )
+      const dateTo = moment(!!param.to ? param.to : param.from)
         .add(1, 'day')
         .add(-1, 'millisecond')
         .toDate();

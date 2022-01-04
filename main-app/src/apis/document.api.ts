@@ -2,7 +2,7 @@ import moment from 'moment';
 import { CancelTokenSource, request } from './request';
 import { Document, DocumentHistory } from 'models';
 import { DocumentStatus } from 'core/enum';
-import { DEFAULT_DATE_FORMAT } from 'core/constants';
+import { DEFAULT_DATE_PARAMS_FORMAT } from 'core/constants';
 import {
   createQueryString,
   createTablePaginationQuery,
@@ -29,10 +29,10 @@ export const getDocumentsApi = async (
   const paginationQuery = createTablePaginationQuery(params);
 
   const dateFromFilter = params.dateFrom
-    ? moment(params.dateFrom).format(DEFAULT_DATE_FORMAT)
+    ? moment(params.dateFrom).format(DEFAULT_DATE_PARAMS_FORMAT)
     : undefined;
   const dateToFilter = params.dateFrom
-    ? moment(params.dateTo).format(DEFAULT_DATE_FORMAT)
+    ? moment(params.dateTo).format(DEFAULT_DATE_PARAMS_FORMAT)
     : undefined;
 
   const filterQuery = createQueryString({
