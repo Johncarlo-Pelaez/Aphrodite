@@ -246,10 +246,14 @@ export class UserController {
     @GetAzureUser() azureUser: AzureUser,
     @Param('id', ParseIntPipe) id: number,
   ): Promise<void> {
-    if ((await this.userRepository.count([Role.ADMIN])) <= 1)
+    const user = await this.userRepository.getUser(id);
+
+    if (
+      (await this.userRepository.count([Role.ADMIN])) <= 1 &&
+      user.role === Role.ADMIN
+    )
       throw new NotAcceptableException();
 
-    const user = await this.userRepository.getUser(id);
     await this.userRepository.deleteUser({
       id,
       modifiedDate: new Date(),

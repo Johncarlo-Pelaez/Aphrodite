@@ -24,7 +24,6 @@ export const Users = (): ReactElement => {
   const {
     isLoading: isDeleteLoading,
     isError: hasDeleteError,
-    error: deleteError,
     mutateAsync: deleteAsync,
     reset: resetDelete,
   } = useDeleteUser();
@@ -37,6 +36,8 @@ export const Users = (): ReactElement => {
 
     if (!isDeleteLoading) {
       await deleteAsync(selectedUser.id);
+      setIsDeleteModalOpen(false);
+      setSelectedUser(undefined);
       resetDelete();
     }
   };
@@ -86,7 +87,7 @@ export const Users = (): ReactElement => {
   return (
     <Fragment>
       <Alert variant="danger" show={hasDeleteError}>
-        {deleteError}
+        Failed to delete user
       </Alert>
       <div className="d-flex justify-content-between align-items-center flex-wrap position-relative my-1">
         <ButtonGroup className="m-2">
@@ -141,7 +142,7 @@ export const Users = (): ReactElement => {
         isVisible={isViewModalOpen}
         onClose={() => setIsViewModalOpen(false)}
       />
-      {hasSelectUser && (
+      {selectedUser && (
         <DeleteModal
           isVisible={isDeleteModalOpen}
           title={selectedUser?.username}

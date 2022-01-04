@@ -23,7 +23,6 @@ import {
   DownloadActivityLogsDto,
 } from './activity-log.dto';
 import { GetActivityLogsIntPipe } from './activity-log.pipe';
-import * as moment from 'moment';
 
 @Controller('/activity-logs')
 @UseGuards(AzureADGuard)
