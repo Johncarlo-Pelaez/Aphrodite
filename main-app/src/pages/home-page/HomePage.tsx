@@ -190,16 +190,16 @@ export const HomePage = (): ReactElement => {
           <DateSelect
             value={dateFrom}
             onChange={setDateFrom}
-            label="Date from"
-            floatLabel
+            label="From:"
+            horizontal
           />
         </Col>
         <Col className="mb-2" xs={12} lg={2}>
           <DateSelect
             value={dateTo}
             onChange={setDateTo}
-            label="Date to"
-            floatLabel
+            label="To:"
+            horizontal
           />
         </Col>
         <Col xs={12} lg={4}>

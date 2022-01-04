@@ -1,7 +1,8 @@
 import { ReactElement } from 'react';
 import moment from 'moment';
 import Form from 'react-bootstrap/Form';
-import FloatingLabel from 'react-bootstrap/FloatingLabel';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 import styles from './DateSelect.module.css';
 
 export interface DateSelectProps {
@@ -9,7 +10,7 @@ export interface DateSelectProps {
   label?: string;
   isInvalid?: boolean;
   error?: string;
-  floatLabel?: boolean;
+  horizontal?: boolean;
   onChange: (date?: Date) => void;
 }
 
@@ -19,7 +20,7 @@ export const DateSelect = (props: DateSelectProps): ReactElement => {
     error,
     isInvalid,
     value,
-    floatLabel = false,
+    horizontal = false,
     onChange: triggerChange,
   } = props;
   const strValue = value ? moment(value).format('yyyy-MM-DD') : '';
@@ -29,17 +30,28 @@ export const DateSelect = (props: DateSelectProps): ReactElement => {
     triggerChange(strDate !== '' ? new Date(strDate) : undefined);
   };
 
-  if (floatLabel) {
+  if (horizontal) {
     return (
-      <FloatingLabel className={styles.formSelect} label={label}>
-        <Form.Control
-          type="date"
-          value={strValue}
-          onChange={handleChange}
-          isInvalid={isInvalid}
-        />
-        <Form.Control.Feedback type="invalid">{error}</Form.Control.Feedback>
-      </FloatingLabel>
+      <Form>
+        <Form.Group as={Row} className="mb-3">
+          {label && (
+            <Form.Label column sm={2}>
+              <b>{label}</b>
+            </Form.Label>
+          )}
+          <Col sm={10}>
+            <Form.Control
+              type="date"
+              value={strValue}
+              onChange={handleChange}
+              isInvalid={isInvalid}
+            />
+            <Form.Control.Feedback type="invalid">
+              {error}
+            </Form.Control.Feedback>
+          </Col>
+        </Form.Group>
+      </Form>
     );
   }
 
