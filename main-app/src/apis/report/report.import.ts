@@ -50,3 +50,29 @@ export const getReportImportApi = async (
   );
   return res.data;
 };
+
+export const getDownloadReportImport = async (
+  params: UseReportImportFilterParams,
+): Promise<Blob> => {
+  const dateFromFilter = params.from
+    ? moment(params.from).format(DEFAULT_DATE_FORMAT)
+    : undefined;
+  const dateToFilter = params.to
+    ? moment(params.to).format(DEFAULT_DATE_FORMAT)
+    : undefined;
+
+  const filterQuery = createQueryString({
+    username: params.username,
+    from: dateFromFilter,
+    to: dateToFilter,
+  });
+
+  const res = await request.get<Blob>(
+    `/api/reports/import/download?${filterQuery}`,
+    {
+      responseType: 'blob',
+    },
+  );
+
+  return res.data;
+};

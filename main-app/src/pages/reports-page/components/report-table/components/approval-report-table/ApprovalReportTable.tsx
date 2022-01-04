@@ -2,12 +2,13 @@ import { ReactElement, useState, useMemo } from 'react';
 import fileSize from 'filesize';
 import moment from 'moment';
 import { DEFAULT_DATE_FORMAT } from 'core/constants';
-import { useReportApproval } from 'hooks';
+import { useReportApproval, useDownloadReportApproval } from 'hooks';
 import { Table, TableColumnProps, SorterResult, SortOrder } from 'core/ui';
 import { ApprovalReport } from 'models';
 import { sortDateTime } from 'utils/sort';
-import { Button } from 'react-bootstrap';
+import { Button, Toast } from 'react-bootstrap';
 import styles from './ApprovalReportTable.module.css';
+import { downloadFile } from 'utils';
 
 const DEFAULT_SORT_ORDER_APPROVAL_REPORT: SorterResult = {
   field: 'approvalDate',
@@ -31,9 +32,49 @@ export const ApprovalReportTable = ({
     SorterResult | undefined
   >(DEFAULT_SORT_ORDER_APPROVAL_REPORT);
 
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [displayErrorMessage, setDisplayErrorMessage] =
+    useState<boolean>(false);
+
+  const {
+    isLoading: isDownloadLoading,
+    mutateAsync: downloadApprovalReportAsync,
+  } = useDownloadReportApproval();
+
   const changeSortApproval = (sorterResult?: SorterResult): void => {
     setSorterApproval(sorterResult ?? DEFAULT_SORT_ORDER_APPROVAL_REPORT);
   };
+
+  const downloadReportApproval = async (): Promise<void> => {
+    if (!from || !to) {
+      setErrorMessage('Date range of date approved must be selected');
+      setDisplayErrorMessage(true);
+    }
+
+    if (from && to) {
+      if (from > to) {
+        setErrorMessage('Incorrect date range of date approved');
+        setDisplayErrorMessage(true);
+        return;
+      }
+
+      const approvalParams = await downloadApprovalReportAsync({
+        username,
+        from,
+        to,
+      });
+
+      downloadFile({
+        file: approvalParams,
+        filename: `Approval_Report_${getCurrentDate()}.xlsx`,
+      });
+    }
+  };
+
+  const getCurrentDate = (): string => {
+    return moment().format(DEFAULT_DATE_FORMAT);
+  };
+
   const renderColumnsUpload = (): TableColumnProps<ApprovalReport>[] => [
     {
       title: 'Date Approved',
@@ -83,7 +124,24 @@ export const ApprovalReportTable = ({
 
   return (
     <div>
-      <Button variant="outline-secondary" className={styles.prop} disabled>
+      <Toast
+        className="error-date-range d-inline-block m-1"
+        bg="light"
+        autohide
+        show={displayErrorMessage}
+        onClose={() => setDisplayErrorMessage(false)}
+      >
+        <Toast.Header>
+          <strong className="me-auto">Download warning</strong>
+        </Toast.Header>
+        <Toast.Body className="light text-dark">{errorMessage}</Toast.Body>
+      </Toast>
+      <Button
+        disabled={isDownloadLoading}
+        variant="outline-secondary"
+        onClick={downloadReportApproval}
+        className={styles.prop}
+      >
         Download
       </Button>
       <Table<ApprovalReport>

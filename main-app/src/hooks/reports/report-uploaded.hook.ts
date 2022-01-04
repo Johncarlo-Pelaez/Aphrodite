@@ -2,7 +2,7 @@ import {
   getDocumentReportApiUploaded,
   GetDocumentReportApiResponse,
   UseDocumentReport,
-  DownloadDocumentReportUploadedParams,
+  UseDocumentReportFilterParams,
   getDownloadDocumentReportUploaded,
 } from 'apis';
 import {
@@ -25,9 +25,9 @@ export const useDocumentReportUploaded = (
 export const useDownloadDocumentReportUploaded = (): UseMutationResult<
   Blob,
   ApiError,
-  DownloadDocumentReportUploadedParams
+  UseDocumentReportFilterParams
 > => {
-  return useMutation<Blob, ApiError, DownloadDocumentReportUploadedParams>(
+  return useMutation<Blob, ApiError, UseDocumentReportFilterParams>(
     getDownloadDocumentReportUploaded,
     {
       onError: () => {},

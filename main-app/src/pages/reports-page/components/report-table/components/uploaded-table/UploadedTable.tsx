@@ -64,8 +64,6 @@ export const UploadedTable = ({
         username,
         from,
         to,
-        currentPage: currentPageUploaded,
-        pageSize: pageSizeUploaded,
       });
 
       downloadFile({
