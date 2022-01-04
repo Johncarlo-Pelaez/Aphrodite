@@ -22,14 +22,14 @@ export const DateRange = ({
           <DateSelect
             value={dateFrom}
             onChange={setDateFrom}
-            label="Date Logged Start"
-            floatLabel
+            label="From:"
+            horizontal
           />
           <DateSelect
             value={dateTo}
             onChange={setDateTo}
-            label="Date Logged End"
-            floatLabel
+            label="To:"
+            horizontal
           />
         </Stack>
       </Form>

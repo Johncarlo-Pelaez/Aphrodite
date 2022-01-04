@@ -31,10 +31,10 @@ export const concatDocumentStatuses = (
     switch (status) {
       case StatusOption.WAITING:
       case StatusOption.BEGIN:
-        strDocumentStatuses += `${DocumentStatus.CHECKING}, `;
+        strDocumentStatuses += `${DocumentStatus.CHECKING}, ${DocumentStatus.CHECKING_DISAPPROVED}, `;
         break;
       case StatusOption.DONE:
-        strDocumentStatuses += `${DocumentStatus.CHECKING_APPROVED}, ${DocumentStatus.CHECKING_DISAPPROVED}, `;
+        strDocumentStatuses += `${DocumentStatus.CHECKING_APPROVED}, ${DocumentStatus.APPROVED}, `;
         break;
       default:
         strDocumentStatuses += documentStatus;
@@ -109,6 +109,7 @@ export const getDocStatusFilter = (
   const statusesFilter = strStatusesFilter
     .split(',')
     .filter((value, index, self) => self.indexOf(value) === index)
+    .filter((value) => value !== ' ')
     .map((status) => status.trim()) as DocumentStatus[];
 
   return !!statusesFilter.length ? statusesFilter : [];

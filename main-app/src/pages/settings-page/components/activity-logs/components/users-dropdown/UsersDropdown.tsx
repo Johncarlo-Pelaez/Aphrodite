@@ -2,13 +2,11 @@ import { ReactElement } from 'react';
 import { useUsers } from 'hooks';
 import Form from 'react-bootstrap/Form';
 import styles from './UsersDropdown.module.css';
-import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import { DEFAULT_ALL_USER_SELECTED } from 'core/constants';
 
 export interface UserDropdownProps {
   onChange: (username: string) => void;
 }
-export const AllUsers = [{ label: DEFAULT_ALL_USER_SELECTED }];
 
 export const UsersDropdown = ({
   onChange,
@@ -20,22 +18,20 @@ export const UsersDropdown = ({
   };
 
   return (
-    <div>
-      <FloatingLabel label="Email Accounts">
+    <Form>
+      <Form.Group className="mb-3">
         <Form.Select className={styles.select} onChange={onChangeUser}>
-          {AllUsers.map((op, index) => (
-            <option className={styles.prop} key={index} value={op.label}>
-              {op.label}
-            </option>
-          ))}
+          <option className={styles.prop} value={DEFAULT_ALL_USER_SELECTED}>
+            {DEFAULT_ALL_USER_SELECTED}
+          </option>
           {users.map((op, index) => (
             <option className={styles.prop} key={index} value={op.username}>
               {op.username}
             </option>
           ))}
         </Form.Select>
-      </FloatingLabel>
-    </div>
+      </Form.Group>
+    </Form>
   );
 };
 
