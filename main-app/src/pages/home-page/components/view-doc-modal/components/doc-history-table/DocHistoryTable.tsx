@@ -10,6 +10,7 @@ import {
 } from 'core/ui/table';
 import { sortDateTime } from 'utils/sort';
 import { DocumentHistory } from 'models';
+import { DocumentStatus } from 'core/enum';
 
 export interface DocHistoryTableProps {
   documentId?: number;
@@ -51,10 +52,57 @@ export const DocHistoryTable = ({
       dataIndex: 'description',
     },
     {
+      title: 'Note',
+      dataIndex: 'note',
+      render: (docHistory: DocumentHistory) => {
+        if (
+          docHistory.documentStatus === DocumentStatus.MIGRATE_FAILED &&
+          docHistory.note !== undefined &&
+          docHistory.note !== ''
+        ) {
+          const springcmRes = JSON.parse(docHistory.note);
+
+          console.log(springcmRes);
+
+          if (
+            !!springcmRes?.SalesForce?.length &&
+            springcmRes?.SalesForce[0]?.success === 'false' &&
+            !!springcmRes?.SalesForce[0]?.errors?.length &&
+            springcmRes?.SalesForce[0]?.errors[0]?.statusCode ===
+              'CANNOT_INSERT_UPDATE_ACTIVATE_ENTITY'
+          ) {
+            return 'Successfully uploaded document to SpringCM but error in updating Checklist line item status';
+          } else if (
+            !!springcmRes?.SalesForce?.length &&
+            springcmRes?.SalesForce[0]?.success === 'false' &&
+            !!springcmRes?.SalesForce[0]?.errors?.length &&
+            springcmRes?.SalesForce[0]?.errors[0]?.statusCode !==
+              'CANNOT_INSERT_UPDATE_ACTIVATE_ENTITY'
+          ) {
+            return springcmRes?.SalesForce[0]?.errors[0]?.message;
+          }
+
+          const activityName = springcmRes?.faultInfo?.activityName;
+          if (activityName === 'Set SpringCM Attributes') {
+            return 'With incomplete attributes';
+          } else if (activityName === 'Get Folder Access') {
+            return 'Get Folder Access error';
+          } else {
+            return (
+              springcmRes?.faultInfo?.message ??
+              springcmRes?.faultInfo?.activityName
+            );
+          }
+        } else {
+          return docHistory.note ?? '';
+        }
+      },
+    },
+    {
       title: 'Date and Time',
       dataIndex: 'createdDate',
-      render: (document: DocumentHistory) =>
-        moment(document.createdDate).format(DEFAULT_DATE_FORMAT),
+      render: (docHistory: DocumentHistory) =>
+        moment(docHistory.createdDate).format(DEFAULT_DATE_FORMAT),
       sorter: sortDateTime('createdDate'),
       sortOrder: sorter?.field === 'createdDate' ? sorter.order : undefined,
     },

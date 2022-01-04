@@ -9,7 +9,7 @@ SELECT
     document.documentSize,
     document.pageTotal,
     document_history.documentStatus,
-    document_history.salesforceResponse AS note
+    document_history.note
 
     FROM (
 		SELECT 

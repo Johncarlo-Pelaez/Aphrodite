@@ -27,15 +27,19 @@ export interface BeginDocProcessParam {
   processAt: Date;
 }
 
+export interface FailDocProcessParam {
+  documentId: number;
+  failedAt: Date;
+}
+
 export interface QrDocumentParam {
   documentId: number;
   qrCode: string;
   qrAt: Date;
 }
 
-export interface FailDocProcessParam {
-  documentId: number;
-  failedAt: Date;
+export interface FailQrDocumentParam extends FailDocProcessParam {
+  note: string;
 }
 
 export interface DoneIndexingParam {

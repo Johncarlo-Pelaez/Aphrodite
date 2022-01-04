@@ -13,6 +13,7 @@ import {
   GetDocumentsParam,
   BeginDocProcessParam,
   QrDocumentParam,
+  FailQrDocumentParam,
   FailDocProcessParam,
   DoneIndexingParam,
   MigrateDocumentParam,
@@ -220,8 +221,7 @@ export class DocumentRepository {
     history.documentStatus = customValue?.documentStatus ?? document.status;
     history.userUsername = customValue?.userUsername ?? 'RIS';
     history.documentId = document.id;
-    history.salesforceResponse = customValue?.salesforceResponse;
-    history.springcmResponse = customValue?.springcmResponse;
+    history.note = customValue?.note;
     history.document = document;
     return history;
   }
@@ -290,7 +290,7 @@ export class DocumentRepository {
     });
   }
 
-  async failQrDocument(param: FailDocProcessParam): Promise<void> {
+  async failQrDocument(param: FailQrDocumentParam): Promise<void> {
     await this.manager.transaction(async (transaction): Promise<void> => {
       const document = await this.manager.findOneOrFail(
         Document,
@@ -301,7 +301,9 @@ export class DocumentRepository {
       document.description = 'Failed QR Code.';
       await transaction.save(document);
 
-      const history = this.genarateDocumentHistory(document);
+      const history = this.genarateDocumentHistory(document, {
+        note: param.note,
+      });
       await transaction.save(history);
     });
   }
@@ -339,7 +341,7 @@ export class DocumentRepository {
       await transaction.save(document);
 
       const history = this.genarateDocumentHistory(document, {
-        salesforceResponse: param.documentType ?? param.contractDetails,
+        note: param.documentType ?? param.contractDetails,
         userUsername: document.encoder,
       });
       await transaction.save(history);
@@ -361,7 +363,7 @@ export class DocumentRepository {
       await transaction.save(document);
 
       const history = this.genarateDocumentHistory(document, {
-        salesforceResponse: param.salesforceResponse,
+        note: param.salesforceResponse,
       });
       await transaction.save(history);
     });
@@ -397,7 +399,7 @@ export class DocumentRepository {
       await transaction.save(document);
 
       const history = this.genarateDocumentHistory(document, {
-        springcmResponse: param.springcmResponse,
+        note: param.springcmResponse,
         userUsername: document.approver ?? document.checker,
       });
       await transaction.save(history);
@@ -418,7 +420,7 @@ export class DocumentRepository {
       await transaction.save(document);
 
       const history = this.genarateDocumentHistory(document, {
-        springcmResponse: document.springResponse,
+        note: document.springResponse,
       });
       await transaction.save(history);
     });
