@@ -18,7 +18,7 @@ export const generateOperationText = (status: DocumentStatus): string => {
         return 'Document Import';
       case 'UPLOADED':
       case 'QR':
-        return 'QR code';
+        return 'QR code/ Barcode Scanning';
     }
   }
 

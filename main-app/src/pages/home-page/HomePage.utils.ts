@@ -8,7 +8,16 @@ export const concatDocumentStatuses = (
 ): string => {
   const documentStatus = `${operation}_${status}, `;
   let strDocumentStatuses = '';
-  if (operation === OperationOption.ENCODING) {
+  if (operation === OperationOption.QR) {
+    switch (status) {
+      case StatusOption.WAITING:
+        strDocumentStatuses += `${DocumentStatus.UPLOADED}, `;
+        break;
+      default:
+        strDocumentStatuses += documentStatus;
+        break;
+    }
+  } else if (operation === OperationOption.ENCODING) {
     switch (status) {
       case StatusOption.WAITING:
       case StatusOption.BEGIN:

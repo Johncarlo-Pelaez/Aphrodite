@@ -14,6 +14,7 @@ export interface IOperationDropdownOptions {
 
 export enum OperationOption {
   ALL = 'ALL',
+  QR = 'QR',
   ENCODING = 'ENCODING',
   INDEXING = 'INDEXING',
   CHECKING = 'CHECKING',
@@ -24,6 +25,10 @@ export const OperationDropdownOptions: IOperationDropdownOptions[] = [
   {
     label: 'All Operations',
     value: OperationOption.ALL,
+  },
+  {
+    label: 'QR code/ Barcode Scanning',
+    value: OperationOption.QR,
   },
   {
     label: 'Manual Encoding',
