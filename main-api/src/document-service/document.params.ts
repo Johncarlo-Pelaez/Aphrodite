@@ -1,6 +1,12 @@
-export interface UploadDocuments {
+export interface UploadDocument {
   file: Express.Multer.File;
   uploadedBy: string;
+}
+
+export interface ReplaceDocumentFile {
+  documentId: number;
+  file: Express.Multer.File;
+  replacedBy: string;
 }
 
 export interface EncodeDocDetails {
@@ -41,4 +47,9 @@ export interface RetryDocuments {
 export interface CancelDocuments {
   documentIds: number[];
   cancelledBy: string;
+}
+
+export interface DeleteDocuments {
+  documentIds: number[];
+  deletedBy: string;
 }
