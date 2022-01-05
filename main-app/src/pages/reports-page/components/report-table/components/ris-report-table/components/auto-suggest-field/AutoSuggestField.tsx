@@ -29,7 +29,7 @@ export const AutoSuggestField = (
   } = props;
 
   return (
-    <Form.Group>
+    <Form.Group className={styles.nomenclature}>
       {label && (
         <Form.Label>
           <b>{label}</b>

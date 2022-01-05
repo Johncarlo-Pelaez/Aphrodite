@@ -5,8 +5,7 @@ import {
   createTablePaginationQuery,
 } from 'utils/query-string';
 import moment from 'moment';
-import { DEFAULT_ALL_DOCUMNET_STATUS } from 'core/constants';
-
+import { DocumentStatus } from 'core/enum';
 import { DEFAULT_DATE_PARAMS_FORMAT } from 'core/constants';
 
 export interface GetReportRISApiResponse {
@@ -18,7 +17,7 @@ export interface UseReportRISFilterParams {
   username?: string;
   from?: Date;
   to?: Date;
-  statuses?: string;
+  statuses?: DocumentStatus[];
   nomenclature?: string;
 }
 
@@ -30,11 +29,6 @@ export interface UseReportRIS extends UseReportRISFilterParams {
 export const geReportRISApi = async (
   params: UseReportRIS,
 ): Promise<GetReportRISApiResponse> => {
-  const status =
-    params.statuses === DEFAULT_ALL_DOCUMNET_STATUS
-      ? undefined
-      : params.statuses;
-
   const dateFromFilter = params.from
     ? moment(params.from).format(DEFAULT_DATE_PARAMS_FORMAT)
     : undefined;
@@ -51,7 +45,7 @@ export const geReportRISApi = async (
     scannerUsername: params.username,
     from: dateFromFilter,
     to: dateToFilter,
-    statuses: status,
+    statuses: params.statuses,
     nomenclature: params.nomenclature,
   });
 
@@ -66,11 +60,6 @@ export type DownloadReportRISParams = UseReportRIS;
 export const getDownloadReportRIS = async (
   params: DownloadReportRISParams,
 ): Promise<Blob> => {
-  const status =
-    params.statuses === DEFAULT_ALL_DOCUMNET_STATUS
-      ? undefined
-      : params.statuses;
-
   const dateFromFilter = params.from
     ? moment(params.from).format(DEFAULT_DATE_PARAMS_FORMAT)
     : undefined;
@@ -84,7 +73,7 @@ export const getDownloadReportRIS = async (
     scannerUsername: params.username,
     from: dateFromFilter,
     to: dateToFilter,
-    statuses: status,
+    statuses: params.statuses,
     nomenclature: params.nomenclature,
   });
 

@@ -8,13 +8,16 @@ import { RISReport } from 'models';
 import { sortDateTime } from 'utils/sort';
 import { Button, Toast } from 'react-bootstrap';
 import {
-  DocumentStatusDropdown,
   NomenclatureDropdown,
   DocTypeRIS,
+  StatusDropdown,
+  OperationDropdown,
 } from './components';
 import { Stack } from 'react-bootstrap';
-import { DEFAULT_ALL_DOCUMNET_STATUS } from 'core/constants';
 import { downloadFile } from 'utils';
+import { OperationOption } from './components/operation-dropdown';
+import { StatusOption } from './components/status-dropdown';
+import { getDocStatusFilter } from './RISReportTable.utils';
 
 const DEFAULT_SORT_ORDER_RIS_REPORT: SorterResult = {
   field: 'dateIndexed',
@@ -25,6 +28,10 @@ export interface RISReportTableProps {
   username?: string;
   from?: Date;
   to?: Date;
+}
+
+export interface GetIndexesResult {
+  response: DocTypeRIS[];
 }
 
 export const RISReportTable = ({
@@ -40,10 +47,21 @@ export const RISReportTable = ({
   const [nomenclature, setNomenclature] = useState<string | undefined>(
     undefined,
   );
-  const [status, setStatus] = useState<string>(DEFAULT_ALL_DOCUMNET_STATUS);
+  // const [status, setStatus] = useState<string>(DEFAULT_ALL_DOCUMNET_STATUS);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [displayErrorMessage, setDisplayErrorMessage] =
     useState<boolean>(false);
+  const [selectedStatus, setSelectedStatus] = useState<StatusOption>(
+    StatusOption.ALL,
+  );
+  const [selectedOperation, setSelectedOperation] = useState<OperationOption>(
+    OperationOption.ALL,
+  );
+
+  const documentStatusFilter = getDocStatusFilter(
+    selectedStatus,
+    selectedOperation,
+  );
 
   const { isLoading: isDownloadLoading, mutateAsync: downloadRISReportAsync } =
     useDownloadReportRIS();
@@ -67,6 +85,7 @@ export const RISReportTable = ({
         to,
         currentPage,
         pageSize,
+        statuses: documentStatusFilter,
       });
 
       downloadFile({
@@ -108,8 +127,14 @@ export const RISReportTable = ({
     },
   ];
 
-  const parseDocumentType = (strDocumentType: string): DocTypeRIS => {
-    return JSON.parse(strDocumentType).response[0] as DocTypeRIS;
+  const parseDocumentType = (
+    strDocumentType: string,
+  ): DocTypeRIS | undefined => {
+    const sample: GetIndexesResult | undefined =
+      !!strDocumentType && strDocumentType !== ''
+        ? JSON.parse(strDocumentType)
+        : undefined;
+    return !!sample?.response?.length ? sample.response[0] : undefined;
   };
 
   const {
@@ -123,7 +148,7 @@ export const RISReportTable = ({
     from,
     to,
     username,
-    statuses: status,
+    statuses: documentStatusFilter,
     nomenclature,
   });
 
@@ -151,8 +176,15 @@ export const RISReportTable = ({
         <Toast.Body className="light text-dark">{errorMessage}</Toast.Body>
       </Toast>
       <div className="d-flex justify-content-between align-items-center flex-wrap my-1">
-        <Stack direction="horizontal" gap={3} className="m-1">
-          <DocumentStatusDropdown onChange={setStatus} />
+        <Stack direction="horizontal" gap={3}>
+          <StatusDropdown
+            selected={selectedStatus}
+            onChange={setSelectedStatus}
+          />
+          <OperationDropdown
+            selected={selectedOperation}
+            onChange={setSelectedOperation}
+          />
           <NomenclatureDropdown
             onChange={setNomenclature}
             indexes={risIndexes}
