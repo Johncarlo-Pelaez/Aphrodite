@@ -118,7 +118,7 @@ export const DocumentsTable = forwardRef(
         render: (document: Document) => {
           const statusText = generateStatusText(document.status);
           return (
-            <span style={{ color: statusText === 'Error' ? 'red' : 'black' }}>
+            <span style={{ color: statusText === 'Error' ? 'red' : '' }}>
               {statusText}
             </span>
           );
