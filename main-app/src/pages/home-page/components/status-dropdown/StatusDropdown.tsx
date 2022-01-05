@@ -1,10 +1,12 @@
 import { ReactElement } from 'react';
 import Form from 'react-bootstrap/Form';
 import styles from './StatusDropdown.module.css';
+import { OperationOption } from '../operation-dropdown';
 
 export interface StatusDropdownProps {
-  onChange: (selected: StatusOption) => void;
+  selectedOperation?: OperationOption;
   selected: StatusOption;
+  onChange: (selected: StatusOption) => void;
 }
 
 export interface IStatusDropdownOptions {
@@ -18,6 +20,7 @@ export enum StatusOption {
   BEGIN = 'BEGIN',
   WAITING = 'WAITING',
   DONE = 'DONE',
+  DISAPPROVED = 'DISAPPROVED',
 }
 
 export const StatusDropdownOptions: IStatusDropdownOptions[] = [
@@ -44,6 +47,7 @@ export const StatusDropdownOptions: IStatusDropdownOptions[] = [
 ];
 
 export const StatusDropdown = ({
+  selectedOperation,
   selected,
   onChange,
 }: StatusDropdownProps): ReactElement => {
@@ -62,6 +66,9 @@ export const StatusDropdown = ({
           {op.label}
         </option>
       ))}
+      {selectedOperation === OperationOption.CHECKING && (
+        <option value={StatusOption.DISAPPROVED}>Disapproved</option>
+      )}
     </Form.Select>
   );
 };

@@ -36,18 +36,27 @@ export const generateStatusText = (status: DocumentStatus): string => {
         return 'Error';
       case 'DONE':
         return 'Success';
-      default:
-        return 'Waiting';
+      case 'APPROVED':
+        return 'Approved';
+      case 'DISAPPROVED':
+        return 'Disapproved';
     }
   } else {
     const status = arrStatus[0];
     switch (status) {
+      case DocumentStatus.UPLOADED:
+        return 'Success';
       case DocumentStatus.CANCELLED:
         return 'Cancelled';
       case DocumentStatus.RETRYING:
         return 'Retrying';
+      case DocumentStatus.APPROVED:
+        return 'Approved';
+      case DocumentStatus.DISAPPROVED:
+        return 'Disapproved';
       default:
         return 'Waiting';
     }
   }
+  return '';
 };

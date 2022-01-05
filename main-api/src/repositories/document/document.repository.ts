@@ -543,6 +543,7 @@ export class DocumentRepository {
 
       const history = this.genarateDocumentHistory(document, {
         userUsername: document.checker,
+        note: param.remarks,
       });
       await transaction.save(history);
     });

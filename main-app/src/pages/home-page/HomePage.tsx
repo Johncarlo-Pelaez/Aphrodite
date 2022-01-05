@@ -176,6 +176,7 @@ export const HomePage = (): ReactElement => {
       <Row className="my-2">
         <Col className="mb-2" xs={12} lg={2}>
           <StatusDropdown
+            selectedOperation={selectedOperation}
             selected={selectedStatus}
             onChange={setSelectedStatus}
           />
@@ -227,7 +228,7 @@ export const HomePage = (): ReactElement => {
         onClose={() => setUploadModalShow(false)}
       />
       <ViewDocModal
-        isVisible={viewDocModalShow}
+        isVisible={viewDocModalShow && hasSelected1Doc}
         documentId={selected1Doc?.id}
         onClose={() => setViewDocModalShow(false)}
         onFormSubmitted={selectNextDocument}

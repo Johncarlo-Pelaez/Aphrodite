@@ -177,6 +177,7 @@ export const RISReportTable = ({
       <div className="d-flex justify-content-between align-items-center flex-wrap my-1">
         <Stack direction="horizontal" gap={3}>
           <StatusDropdown
+            selectedOperation={selectedOperation}
             selected={selectedStatus}
             onChange={setSelectedStatus}
           />
