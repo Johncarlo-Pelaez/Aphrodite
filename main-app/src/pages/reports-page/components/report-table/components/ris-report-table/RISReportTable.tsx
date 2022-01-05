@@ -1,23 +1,22 @@
 import { ReactElement, useState, useMemo } from 'react';
 import fileSize from 'filesize';
 import moment from 'moment';
+import { Button, Toast } from 'react-bootstrap';
+import { Stack } from 'react-bootstrap';
 import { DEFAULT_DATE_FORMAT } from 'core/constants';
 import { useReportRIS, useDownloadReportRIS } from 'hooks';
 import { Table, TableColumnProps, SorterResult, SortOrder } from 'core/ui';
 import { RISReport } from 'models';
-import { sortDateTime } from 'utils/sort';
-import { Button, Toast } from 'react-bootstrap';
-import {
-  NomenclatureDropdown,
-  DocTypeRIS,
-  StatusDropdown,
-  OperationDropdown,
-} from './components';
-import { Stack } from 'react-bootstrap';
 import { downloadFile } from 'utils';
-import { OperationOption } from './components/operation-dropdown';
-import { StatusOption } from './components/status-dropdown';
-import { getDocStatusFilter } from './RISReportTable.utils';
+import { sortDateTime } from 'utils/sort';
+import { NomenclatureDropdown, DocTypeRIS } from './components';
+import { getDocStatusFilter } from 'pages/home-page';
+import {
+  StatusDropdown,
+  OperationOption,
+  OperationDropdown,
+  StatusOption,
+} from 'pages/home-page/components';
 
 const DEFAULT_SORT_ORDER_RIS_REPORT: SorterResult = {
   field: 'dateIndexed',
