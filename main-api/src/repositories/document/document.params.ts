@@ -83,11 +83,6 @@ export interface EncodeAccountDetailsParam extends EncodeProcessParam {
   encodeValues: string;
 }
 
-export interface FailEncodeParam extends FailDocProcessParam {
-  contractDetailsReqParams: string;
-  encodeValues: string;
-}
-
 export interface CheckerApproveDocParam {
   documentId: number;
   documentDate: string;

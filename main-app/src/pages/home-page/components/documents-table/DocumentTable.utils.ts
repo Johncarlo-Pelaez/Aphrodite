@@ -19,15 +19,6 @@ export const generateOperationText = (status: DocumentStatus): string => {
       case 'UPLOADED':
       case 'QR':
         return 'QR code';
-      default:
-        const statuses = Object.values(DocumentStatus);
-        const prevStatusIndex =
-          statuses.indexOf(operation as DocumentStatus) - 1;
-
-        if (prevStatusIndex < statuses.length) {
-          const prevStatus = statuses[prevStatusIndex];
-          return generateOperationText(prevStatus);
-        }
     }
   }
 

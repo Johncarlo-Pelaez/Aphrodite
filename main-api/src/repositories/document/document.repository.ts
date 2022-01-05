@@ -20,7 +20,6 @@ import {
   FailIndexingParam,
   EncodeQrBarcodeParam,
   EncodeAccountDetailsParam,
-  FailEncodeParam,
   CheckerApproveDocParam,
   CheckerDispproveDocParam,
   ApproverApproveDisapproveDocParam,
@@ -71,7 +70,7 @@ export class DocumentRepository {
     }
 
     return await this.manager.find(Document, {
-      relations: ['user'],
+      relations: ['user', 'documentHistories'],
       where: [
         {
           documentName: ILike(`%${search}%`),

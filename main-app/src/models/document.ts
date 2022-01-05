@@ -16,6 +16,7 @@ export interface Document {
   documentDate: string;
   remarks: string;
   encodeValues: string;
+  documentHistories: DocumentHistory[];
 }
 
 export interface DocumentType {
