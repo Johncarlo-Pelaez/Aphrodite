@@ -1,6 +1,5 @@
 import { ReactElement } from 'react';
 import { DocumentStatus } from 'core/enum';
-import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import Form from 'react-bootstrap/Form';
 import { DEFAULT_ALL_DOCUMNET_STATUS } from 'core/constants';
 import styles from './DocumentStatusDropdown.module.css';
@@ -28,23 +27,18 @@ export const DocumentStatusDropdown = ({
   };
   return (
     <div>
-      <FloatingLabel label="Document Status">
-        <Form.Select
-          className={styles.select}
-          onChange={onChangeDocumentStatus}
-        >
-          {AllStatus.map((opt, index) => (
-            <option className={styles.prop} key={index} value={opt.label}>
-              {opt.label}
-            </option>
-          ))}
-          {statuses.map((opt, index) => (
-            <option className={styles.prop} key={index} value={opt}>
-              {opt}
-            </option>
-          ))}
-        </Form.Select>
-      </FloatingLabel>
+      <Form.Select className={styles.select} onChange={onChangeDocumentStatus}>
+        {AllStatus.map((opt, index) => (
+          <option className={styles.prop} key={index} value={opt.label}>
+            {opt.label}
+          </option>
+        ))}
+        {statuses.map((opt, index) => (
+          <option className={styles.prop} key={index} value={opt}>
+            {opt}
+          </option>
+        ))}
+      </Form.Select>
     </div>
   );
 };

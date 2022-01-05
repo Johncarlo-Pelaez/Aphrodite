@@ -11,8 +11,6 @@ export const ActivityLogs = (): ReactElement => {
   const [username, setUsername] = useState<string>(DEFAULT_ALL_USER_SELECTED);
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
-  const [pageSize, setPageSize] = useState<number>(15);
-  const [currentPage, setCurrentPage] = useState<number>(1);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [displayErrorMessage, setDisplayErrorMessage] =
     useState<boolean>(false);
@@ -43,8 +41,6 @@ export const ActivityLogs = (): ReactElement => {
         loggedBy: username,
         loggedAtFrom: dateFrom,
         loggedAtTo: dateTo,
-        currentPage,
-        pageSize,
       });
 
       downloadFile({
@@ -90,8 +86,6 @@ export const ActivityLogs = (): ReactElement => {
         loggedBy={username}
         loggedAtFrom={dateFrom}
         loggedAtTo={dateTo}
-        setTablePageSize={setPageSize}
-        setTableCurrentPage={setCurrentPage}
       />
     </Fragment>
   );

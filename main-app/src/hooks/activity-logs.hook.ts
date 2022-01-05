@@ -2,8 +2,8 @@ import {
   getActivityLogApi,
   GetActivityLogsApiResponse,
   getDownloadActivityLogs,
-  DownloadActivityLogsParams,
   UseActivityLog,
+  UseActivityLogsFilterParams,
 } from 'apis';
 import {
   useMutation,
@@ -25,9 +25,9 @@ export const useActivityLog = (
 export const useDownloadActivityLogs = (): UseMutationResult<
   Blob,
   ApiError,
-  DownloadActivityLogsParams
+  UseActivityLogsFilterParams
 > => {
-  return useMutation<Blob, ApiError, DownloadActivityLogsParams>(
+  return useMutation<Blob, ApiError, UseActivityLogsFilterParams>(
     getDownloadActivityLogs,
     {
       onError: () => {},

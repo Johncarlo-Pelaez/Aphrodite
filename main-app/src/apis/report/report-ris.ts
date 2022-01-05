@@ -7,7 +7,7 @@ import {
 import moment from 'moment';
 import { DEFAULT_ALL_DOCUMNET_STATUS } from 'core/constants';
 
-import { DEFAULT_DATE_FORMAT } from 'core/constants';
+import { DEFAULT_DATE_PARAMS_FORMAT } from 'core/constants';
 
 export interface GetReportRISApiResponse {
   count: number;
@@ -36,10 +36,10 @@ export const geReportRISApi = async (
       : params.statuses;
 
   const dateFromFilter = params.from
-    ? moment(params.from).format(DEFAULT_DATE_FORMAT)
+    ? moment(params.from).format(DEFAULT_DATE_PARAMS_FORMAT)
     : undefined;
   const dateToFilter = params.to
-    ? moment(params.to).format(DEFAULT_DATE_FORMAT)
+    ? moment(params.to).format(DEFAULT_DATE_PARAMS_FORMAT)
     : undefined;
 
   const paginationQuery = createTablePaginationQuery({
@@ -72,10 +72,10 @@ export const getDownloadReportRIS = async (
       : params.statuses;
 
   const dateFromFilter = params.from
-    ? moment(params.from).format(DEFAULT_DATE_FORMAT)
+    ? moment(params.from).format(DEFAULT_DATE_PARAMS_FORMAT)
     : undefined;
   const dateToFilter = params.to
-    ? moment(params.to).format(DEFAULT_DATE_FORMAT)
+    ? moment(params.to).format(DEFAULT_DATE_PARAMS_FORMAT)
     : undefined;
 
   const paginationQuery = createTablePaginationQuery(params);

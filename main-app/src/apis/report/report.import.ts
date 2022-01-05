@@ -6,7 +6,7 @@ import {
 } from 'utils/query-string';
 import moment from 'moment';
 
-import { DEFAULT_DATE_FORMAT } from 'core/constants';
+import { DEFAULT_DATE_PARAMS_FORMAT } from 'core/constants';
 
 export interface GetReportImportApiResponse {
   count: number;
@@ -33,10 +33,10 @@ export const getReportImportApi = async (
   });
 
   const dateFromFilter = params.from
-    ? moment(params.from).format(DEFAULT_DATE_FORMAT)
+    ? moment(params.from).format(DEFAULT_DATE_PARAMS_FORMAT)
     : undefined;
   const dateToFilter = params.to
-    ? moment(params.to).format(DEFAULT_DATE_FORMAT)
+    ? moment(params.to).format(DEFAULT_DATE_PARAMS_FORMAT)
     : undefined;
 
   const filterQuery = createQueryString({
@@ -55,10 +55,10 @@ export const getDownloadReportImport = async (
   params: UseReportImportFilterParams,
 ): Promise<Blob> => {
   const dateFromFilter = params.from
-    ? moment(params.from).format(DEFAULT_DATE_FORMAT)
+    ? moment(params.from).format(DEFAULT_DATE_PARAMS_FORMAT)
     : undefined;
   const dateToFilter = params.to
-    ? moment(params.to).format(DEFAULT_DATE_FORMAT)
+    ? moment(params.to).format(DEFAULT_DATE_PARAMS_FORMAT)
     : undefined;
 
   const filterQuery = createQueryString({

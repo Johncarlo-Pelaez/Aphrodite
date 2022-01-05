@@ -59,10 +59,8 @@ export const getActivityLogApi = async (
 export type DownloadActivityLogsParams = UseActivityLog;
 
 export const getDownloadActivityLogs = async (
-  params: DownloadActivityLogsParams,
+  params: UseActivityLogsFilterParams,
 ): Promise<Blob> => {
-  const paginationQuery = createTablePaginationQuery(params);
-
   const dateFromFilter = params.loggedAtFrom
     ? moment(params.loggedAtFrom).format(DEFAULT_DATE_PARAMS_FORMAT)
     : undefined;
@@ -80,7 +78,7 @@ export const getDownloadActivityLogs = async (
   });
 
   const res = await request.get<Blob>(
-    `/api/activity-logs/download?${paginationQuery}&${filterQuery}`,
+    `/api/activity-logs/download?${filterQuery}`,
     {
       responseType: 'blob',
     },

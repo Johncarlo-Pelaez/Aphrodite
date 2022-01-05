@@ -6,7 +6,7 @@ import {
 } from 'utils/query-string';
 import moment from 'moment';
 
-import { DEFAULT_DATE_FORMAT } from 'core/constants';
+import { DEFAULT_DATE_PARAMS_FORMAT } from 'core/constants';
 
 export interface GetDocumentReportInfoRequestApiResponse {
   count: number;
@@ -29,10 +29,10 @@ export const getDocumentReportApiInfoRequest = async (
   params: UseInfoRequest,
 ): Promise<GetDocumentReportInfoRequestApiResponse> => {
   const dateFromFilter = params.from
-    ? moment(params.from).format(DEFAULT_DATE_FORMAT)
+    ? moment(params.from).format(DEFAULT_DATE_PARAMS_FORMAT)
     : undefined;
   const dateToFilter = params.to
-    ? moment(params.to).format(DEFAULT_DATE_FORMAT)
+    ? moment(params.to).format(DEFAULT_DATE_PARAMS_FORMAT)
     : undefined;
 
   const paginationQuery = createTablePaginationQuery({
@@ -58,10 +58,10 @@ export const getDownloadDocumentReportInfoRequest = async (
   params: UseDocumentReportInfoRequestFilterParams,
 ): Promise<Blob> => {
   const dateFromFilter = params.from
-    ? moment(params.from).format(DEFAULT_DATE_FORMAT)
+    ? moment(params.from).format(DEFAULT_DATE_PARAMS_FORMAT)
     : undefined;
   const dateToFilter = params.to
-    ? moment(params.to).format(DEFAULT_DATE_FORMAT)
+    ? moment(params.to).format(DEFAULT_DATE_PARAMS_FORMAT)
     : undefined;
 
   const filterQuery = createQueryString({

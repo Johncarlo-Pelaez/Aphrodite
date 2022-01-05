@@ -1,12 +1,4 @@
-import {
-  ReactElement,
-  useState,
-  useMemo,
-  useEffect,
-  useCallback,
-  SetStateAction,
-  Dispatch,
-} from 'react';
+import { ReactElement, useState, useMemo, useEffect, useCallback } from 'react';
 import { SorterResult, SortOrder, Table, TableColumnProps } from 'core/ui';
 import { useActivityLog } from 'hooks';
 import { DEFAULT_DATE_FORMAT } from 'core/constants';
@@ -18,8 +10,6 @@ export interface ActivityLogTableProps {
   loggedBy: string;
   loggedAtFrom: Date | undefined;
   loggedAtTo: Date | undefined;
-  setTablePageSize: Dispatch<SetStateAction<number>>;
-  setTableCurrentPage: Dispatch<SetStateAction<number>>;
 }
 
 const DEFAULT_SORT_ORDER: SorterResult = {
@@ -31,8 +21,6 @@ export const ActivityLogsTable = ({
   loggedBy,
   loggedAtFrom,
   loggedAtTo,
-  setTablePageSize,
-  setTableCurrentPage,
 }: ActivityLogTableProps): ReactElement => {
   const [sorter, setSorter] = useState<SorterResult | undefined>(
     DEFAULT_SORT_ORDER,
@@ -119,11 +107,9 @@ export const ActivityLogsTable = ({
         pageNumber: 5,
         onChange: (page) => {
           setCurrentPage(page);
-          setTableCurrentPage(page);
         },
         onSizeChange: (page) => {
           setPageSize(page);
-          setTablePageSize(page);
         },
       }}
       onChange={changeSort}

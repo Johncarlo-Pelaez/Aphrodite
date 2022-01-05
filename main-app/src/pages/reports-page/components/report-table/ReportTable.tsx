@@ -8,7 +8,7 @@ import {
   RISReportTable,
 } from './components';
 import moment from 'moment';
-import { DEFAULT_DATE_FORMAT } from 'core/constants';
+import { DEFAULT_DATE_PARAMS_FORMAT } from 'core/constants';
 import { StatusOption } from '../report-status-dropdown';
 
 export interface DocumentsTableProps {
@@ -45,8 +45,8 @@ export const ReportTable = ({
 
   useEffect(() => {
     if (dateFrom && dateTo) {
-      setStart(new Date(moment(dateFrom).format(DEFAULT_DATE_FORMAT)));
-      setEnd(new Date(moment(dateTo).format(DEFAULT_DATE_FORMAT)));
+      setStart(new Date(moment(dateFrom).format(DEFAULT_DATE_PARAMS_FORMAT)));
+      setEnd(new Date(moment(dateTo).format(DEFAULT_DATE_PARAMS_FORMAT)));
     }
 
     return () => {

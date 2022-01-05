@@ -1,6 +1,5 @@
 import { ReactElement } from 'react';
 import Form from 'react-bootstrap/Form';
-import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import styles from './ReportStatusDropdown.module.css';
 
 export interface StatusDropdownProps {
@@ -59,19 +58,17 @@ export const ReportStatusDropdown = ({
 
   return (
     <div>
-      <FloatingLabel label="Report Types">
-        <Form.Select
-          className={styles.select}
-          onChange={handleOnChange}
-          value={selected}
-        >
-          {StatusDropdownOptions.map((op, index) => (
-            <option key={index} value={op.value}>
-              {op.label}
-            </option>
-          ))}
-        </Form.Select>
-      </FloatingLabel>
+      <Form.Select
+        className={styles.select}
+        onChange={handleOnChange}
+        value={selected}
+      >
+        {StatusDropdownOptions.map((op, index) => (
+          <option key={index} value={op.value}>
+            {op.label}
+          </option>
+        ))}
+      </Form.Select>
     </div>
   );
 };
