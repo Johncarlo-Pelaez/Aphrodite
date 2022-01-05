@@ -118,3 +118,14 @@ export interface DeleteFileParam {
   deletedAt: Date;
   deletedBy?: string;
 }
+
+export interface ReplaceFileParam {
+  documentId: number;
+  documentName: string;
+  documentSize: number;
+  mimeType: string;
+  pageTotal: number;
+  qrCode?: string;
+  replacedAt: Date;
+  replacedBy: string;
+}

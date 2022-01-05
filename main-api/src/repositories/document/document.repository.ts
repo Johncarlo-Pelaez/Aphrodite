@@ -27,6 +27,7 @@ import {
   UpdateForRetryParam,
   UpdateToCancelledParam,
   DeleteFileParam,
+  ReplaceFileParam,
 } from './document.params';
 
 @EntityRepository()
@@ -657,6 +658,25 @@ export class DocumentRepository {
       document.modifiedBy = param.deletedBy ?? document.modifiedBy;
       document.isFileDeleted = true;
       document.description = 'Delete file from system directory.';
+      await transaction.save(document);
+
+      const history = this.genarateDocumentHistory(document, {
+        documentStatus: '',
+      });
+      await transaction.save(history);
+    });
+  }
+
+  async replaceFile(param: ReplaceFileParam): Promise<void> {
+    await this.manager.transaction(async (transaction): Promise<void> => {
+      const document = await this.manager.findOneOrFail(
+        Document,
+        param.documentId,
+      );
+      document.modifiedDate = param.replacedAt;
+      document.modifiedBy = param.replacedBy;
+      document.isFileDeleted = false;
+      document.description = 'Replace file from system directory.';
       await transaction.save(document);
 
       const history = this.genarateDocumentHistory(document, {

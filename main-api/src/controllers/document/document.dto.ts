@@ -110,3 +110,5 @@ export class GetDocumentsProcessCountDto {
 }
 
 export class CancelDocumentsDto extends RetryDocumentsDto {}
+
+export class DeleteDocumentsDto extends RetryDocumentsDto {}

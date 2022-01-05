@@ -1,4 +1,9 @@
-import { Injectable, ConflictException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import * as fs from 'fs';
 import * as pdfParse from 'pdf-parse';
 import { v4 as uuidv4 } from 'uuid';
@@ -10,7 +15,8 @@ import { DocumentProducer } from 'src/producers';
 import { CreatedResponse } from 'src/core';
 import { Document, DocumentStatus } from 'src/entities';
 import {
-  UploadDocuments,
+  UploadDocument,
+  ReplaceDocumentFile,
   EncodeDocDetails,
   EncodeDocQRBarCode,
   CheckerApproveDoc,
@@ -18,8 +24,9 @@ import {
   DocumentApprover,
   RetryDocuments,
   CancelDocuments,
+  DeleteDocuments,
 } from './document.params';
-const { readFile, writeFile } = fs.promises;
+const { readFile, writeFile, unlink, stat } = fs.promises;
 
 @Injectable()
 export class DocumentService {
@@ -32,7 +39,7 @@ export class DocumentService {
     private readonly appConfigService: AppConfigService,
   ) {}
 
-  async uploadDocument(data: UploadDocuments): Promise<CreatedResponse> {
+  async uploadDocument(data: UploadDocument): Promise<CreatedResponse> {
     const dateRightNow = this.datesUtil.getDateNow();
     const { buffer, size, mimetype, originalname } = data.file;
     const uuid = uuidv4();
@@ -79,6 +86,64 @@ export class DocumentService {
     await this.documentProducer.migrate(response.id);
 
     return response;
+  }
+
+  async replaceDocumentFile(data: ReplaceDocumentFile): Promise<void> {
+    const document = await this.documentRepository.getDocument(data.documentId);
+    if (!document) throw new NotFoundException();
+
+    const { buffer, size, mimetype, originalname } = data.file;
+
+    const fileFullPath = this.filenameUtil.buildFullPath(
+      this.appConfigService.filePath,
+      document.uuid,
+    );
+    const filename = this.filenameUtil
+      .getFilenameWithoutExtension(originalname)
+      .replace(/\.$/, '');
+    let qrCode: string;
+
+    if (filename.match(/^ecr/i) || filename.match(/^ecp/i)) {
+      qrCode = filename;
+    }
+
+    if (filename.match(/_/g)) {
+      qrCode = filename.replace(/_/g, '|');
+    }
+
+    if (filename.length >= 18) {
+      qrCode = filename.substr(0, 15);
+    }
+
+    if (qrCode && !!(await this.documentRepository.getDocumentByQRCode(qrCode)))
+      throw new ConflictException();
+
+    try {
+      await stat(fileFullPath);
+      await unlink(fileFullPath);
+      await writeFile(fileFullPath, buffer);
+    } catch (err) {
+      if (err?.code === 'ENOENT') {
+        throw new NotFoundException();
+      } else {
+        throw err;
+      }
+    }
+
+    const pdfData = await pdfParse(buffer);
+
+    await this.documentRepository.replaceFile({
+      documentId: document.id,
+      documentName: originalname,
+      documentSize: size,
+      mimeType: mimetype,
+      pageTotal: pdfData?.numpages,
+      qrCode: qrCode,
+      replacedAt: this.datesUtil.getDateNow(),
+      replacedBy: data.replacedBy,
+    });
+
+    await this.documentProducer.migrate(document.id);
   }
 
   async getDocumentFile(documentId: number): Promise<[Document, Buffer]> {
@@ -224,5 +289,34 @@ export class DocumentService {
       })
     ).map((doc) => doc.id);
     await this.cancelDocuments({ documentIds, cancelledBy });
+  }
+
+  async deleteDocuments(data: DeleteDocuments): Promise<void> {
+    for await (const documentId of data.documentIds) {
+      const document = await this.documentRepository.getDocument(documentId);
+      if (!document) throw new NotFoundException();
+
+      const fileFullPath = this.filenameUtil.buildFullPath(
+        this.appConfigService.filePath,
+        document.uuid,
+      );
+
+      try {
+        await stat(fileFullPath);
+        await unlink(fileFullPath);
+      } catch (err) {
+        if (err?.code === 'ENOENT') {
+          throw new NotFoundException();
+        } else {
+          throw err;
+        }
+      }
+
+      await this.documentRepository.deleteFile({
+        documentId,
+        deletedBy: data.deletedBy,
+        deletedAt: this.datesUtil.getDateNow(),
+      });
+    }
   }
 }

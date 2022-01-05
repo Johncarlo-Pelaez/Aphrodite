@@ -12,6 +12,7 @@ import {
   Res,
   UseGuards,
   BadRequestException,
+  Delete,
 } from '@nestjs/common';
 import {
   ApiCreatedResponse,
@@ -42,6 +43,7 @@ import {
   RetryDocumentsDto,
   GetDocumentsProcessCountDto,
   CancelDocumentsDto,
+  DeleteDocumentsDto,
 } from './document.dto';
 import {
   GetDocumentsIntPipe,
@@ -106,6 +108,33 @@ export class DocumentController {
     return response;
   }
 
+  @ApiCreatedResponse({
+    type: CreatedResponse,
+  })
+  @Post('/')
+  @ApiFile('file', true, { fileFilter: fileMimetypeFilter('pdf') })
+  async uploadDocument(
+    @UploadedFile() file: Express.Multer.File,
+    @GetAzureUsername() username: string,
+  ): Promise<CreatedResponse> {
+    return await this.documentsService.uploadDocument({
+      file,
+      uploadedBy: username,
+    });
+  }
+
+  @ApiOkResponse()
+  @Delete('/')
+  async deleteDocuments(
+    @Body(RetryDocumentsIntPipe) dto: DeleteDocumentsDto,
+    @GetAzureUsername() username: string,
+  ): Promise<void> {
+    await this.documentsService.deleteDocuments({
+      documentIds: dto.documentIds,
+      deletedBy: username,
+    });
+  }
+
   @ApiOkResponse({
     type: Document,
   })
@@ -123,21 +152,6 @@ export class DocumentController {
     @Param('id', ParseIntPipe) id: number,
   ): Promise<DocumentHistory[]> {
     return await this.documentRepository.getHistory(id);
-  }
-
-  @ApiCreatedResponse({
-    type: CreatedResponse,
-  })
-  @Post('/')
-  @ApiFile('file', true, { fileFilter: fileMimetypeFilter('pdf') })
-  async uploadDocument(
-    @UploadedFile() file: Express.Multer.File,
-    @GetAzureUsername() username: string,
-  ): Promise<CreatedResponse> {
-    return await this.documentsService.uploadDocument({
-      file,
-      uploadedBy: username,
-    });
   }
 
   @ApiOkResponse({
@@ -159,6 +173,22 @@ export class DocumentController {
     res.setHeader('Content-Length', buffer.length);
     res.setHeader('Content-Type', 'application/octet-stream');
     res.send(buffer);
+  }
+
+  @ApiOkResponse()
+  @Put('/:id/file')
+  @ApiFile('file', true, { fileFilter: fileMimetypeFilter('pdf') })
+  async replaceDocumentFile(
+    @Param('id', ParseIntPipe)
+    documentId: number,
+    @UploadedFile() file: Express.Multer.File,
+    @GetAzureUsername() username: string,
+  ): Promise<void> {
+    return await this.documentsService.replaceDocumentFile({
+      documentId,
+      file,
+      replacedBy: username,
+    });
   }
 
   @ApiOkResponse()
