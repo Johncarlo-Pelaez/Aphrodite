@@ -5,7 +5,10 @@ import {
   createTablePaginationQuery,
 } from 'utils/query-string';
 import moment from 'moment';
-import { DEFAULT_DATE_FORMAT, DEFAULT_ALL_USER_SELECTED } from 'core/constants';
+import {
+  DEFAULT_DATE_PARAMS_FORMAT,
+  DEFAULT_ALL_USER_SELECTED,
+} from 'core/constants';
 
 export interface GetActivityLogsApiResponse {
   count: number;
@@ -32,10 +35,10 @@ export const getActivityLogApi = async (
   });
 
   const dateFromFilter = params.loggedAtFrom
-    ? moment(params.loggedAtFrom).format(DEFAULT_DATE_FORMAT)
+    ? moment(params.loggedAtFrom).format(DEFAULT_DATE_PARAMS_FORMAT)
     : undefined;
   const dateToFilter = params.loggedAtTo
-    ? moment(params.loggedAtTo).format(DEFAULT_DATE_FORMAT)
+    ? moment(params.loggedAtTo).format(DEFAULT_DATE_PARAMS_FORMAT)
     : undefined;
 
   const filterQuery = createQueryString({
@@ -61,10 +64,10 @@ export const getDownloadActivityLogs = async (
   const paginationQuery = createTablePaginationQuery(params);
 
   const dateFromFilter = params.loggedAtFrom
-    ? moment(params.loggedAtFrom).format(DEFAULT_DATE_FORMAT)
+    ? moment(params.loggedAtFrom).format(DEFAULT_DATE_PARAMS_FORMAT)
     : undefined;
   const dateToFilter = params.loggedAtTo
-    ? moment(params.loggedAtTo).format(DEFAULT_DATE_FORMAT)
+    ? moment(params.loggedAtTo).format(DEFAULT_DATE_PARAMS_FORMAT)
     : undefined;
 
   const filterQuery = createQueryString({

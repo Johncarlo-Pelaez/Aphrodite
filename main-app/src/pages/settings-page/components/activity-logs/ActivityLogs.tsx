@@ -39,16 +39,10 @@ export const ActivityLogs = (): ReactElement => {
         return;
       }
 
-      const start = new Date(moment(dateFrom).format(DEFAULT_DATE_FORMAT));
-      start.setDate(start.getDate() - 1);
-
-      const end = new Date(moment(dateTo).format(DEFAULT_DATE_FORMAT));
-      end.setDate(end.getDate() - 1);
-
       const activityParams = await downloadActivityLogsAsync({
         loggedBy: username,
-        loggedAtFrom: start,
-        loggedAtTo: end,
+        loggedAtFrom: dateFrom,
+        loggedAtTo: dateTo,
         currentPage,
         pageSize,
       });
