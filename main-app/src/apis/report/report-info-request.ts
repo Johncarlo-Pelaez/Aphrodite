@@ -55,10 +55,8 @@ export const getDocumentReportApiInfoRequest = async (
 export type DownloadReportInfoRequestParams = UseInfoRequest;
 
 export const getDownloadDocumentReportInfoRequest = async (
-  params: DownloadReportInfoRequestParams,
+  params: UseDocumentReportInfoRequestFilterParams,
 ): Promise<Blob> => {
-  const paginationQuery = createTablePaginationQuery(params);
-
   const dateFromFilter = params.from
     ? moment(params.from).format(DEFAULT_DATE_FORMAT)
     : undefined;
@@ -73,7 +71,7 @@ export const getDownloadDocumentReportInfoRequest = async (
   });
 
   const res = await request.get<Blob>(
-    `/api/reports/information-request/download?${paginationQuery}&${filterQuery}`,
+    `/api/reports/information-request/download?${filterQuery}`,
     {
       responseType: 'blob',
     },

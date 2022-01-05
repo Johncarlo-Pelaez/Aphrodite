@@ -50,3 +50,29 @@ export const getReportApprovalApi = async (
   );
   return res.data;
 };
+
+export const getDownloadDocumentReportApproval = async (
+  params: UseReportApprovalFilterParams,
+): Promise<Blob> => {
+  const dateFromFilter = params.from
+    ? moment(params.from).format(DEFAULT_DATE_FORMAT)
+    : undefined;
+  const dateToFilter = params.to
+    ? moment(params.to).format(DEFAULT_DATE_FORMAT)
+    : undefined;
+
+  const filterQuery = createQueryString({
+    approver: params.username,
+    from: dateFromFilter,
+    to: dateToFilter,
+  });
+
+  const res = await request.get<Blob>(
+    `/api/reports/approval/download?${filterQuery}`,
+    {
+      responseType: 'blob',
+    },
+  );
+
+  return res.data;
+};

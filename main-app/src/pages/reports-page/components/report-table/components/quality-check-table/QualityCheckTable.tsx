@@ -2,12 +2,13 @@ import { ReactElement, useState, useMemo } from 'react';
 import fileSize from 'filesize';
 import moment from 'moment';
 import { DEFAULT_DATE_FORMAT } from 'core/constants';
-import { useDocumentReportQC } from 'hooks';
+import { useDocumentReportQC, useDownloadQualityCheck } from 'hooks';
 import { Table, TableColumnProps, SorterResult, SortOrder } from 'core/ui';
 import { QualityCheckReport } from 'models';
 import { sortDateTime } from 'utils/sort';
-import { Button } from 'react-bootstrap';
+import { Button, Toast } from 'react-bootstrap';
 import styles from './QualityCheckTable.module.css';
+import { downloadFile } from 'utils';
 
 const DEFAULT_SORT_ORDER_QUALITY_CHECK: SorterResult = {
   field: 'checkedDate',
@@ -32,8 +33,47 @@ export const QualityCheckTable = ({
     SorterResult | undefined
   >(DEFAULT_SORT_ORDER_QUALITY_CHECK);
 
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [displayErrorMessage, setDisplayErrorMessage] =
+    useState<boolean>(false);
+
+  const {
+    isLoading: isDownloadLoading,
+    mutateAsync: downloadQualityCheckReportAsync,
+  } = useDownloadQualityCheck();
+
   const changeSortQualityCheck = (sorterResult?: SorterResult): void => {
     setSorterQualityCheck(sorterResult ?? DEFAULT_SORT_ORDER_QUALITY_CHECK);
+  };
+
+  const downloadReportQualityCheck = async (): Promise<void> => {
+    if (!from || !to) {
+      setErrorMessage('Date range of date checked must be selected');
+      setDisplayErrorMessage(true);
+    }
+
+    if (from && to) {
+      if (from > to) {
+        setErrorMessage('Incorrect date range of date checked');
+        setDisplayErrorMessage(true);
+        return;
+      }
+
+      const qualityCheckParams = await downloadQualityCheckReportAsync({
+        username,
+        from,
+        to,
+      });
+
+      downloadFile({
+        file: qualityCheckParams,
+        filename: `Quality_Check_Report_${getCurrentDate()}.xlsx`,
+      });
+    }
+  };
+
+  const getCurrentDate = (): string => {
+    return moment().format(DEFAULT_DATE_FORMAT);
   };
   const renderColumnsQualityChecked =
     (): TableColumnProps<QualityCheckReport>[] => [
@@ -89,7 +129,24 @@ export const QualityCheckTable = ({
 
   return (
     <div>
-      <Button variant="outline-secondary" className={styles.prop} disabled>
+      <Toast
+        className="error-date-range d-inline-block m-1"
+        bg="light"
+        autohide
+        show={displayErrorMessage}
+        onClose={() => setDisplayErrorMessage(false)}
+      >
+        <Toast.Header>
+          <strong className="me-auto">Download warning</strong>
+        </Toast.Header>
+        <Toast.Body className="light text-dark">{errorMessage}</Toast.Body>
+      </Toast>
+      <Button
+        disabled={isDownloadLoading}
+        variant="outline-secondary"
+        onClick={downloadReportQualityCheck}
+        className={styles.prop}
+      >
         Download
       </Button>
       <Table<QualityCheckReport>

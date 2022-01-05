@@ -53,11 +53,9 @@ export const getReportQCApi = async (
 
 export type DownloadReportQCParams = UseDocumentReportQC;
 
-export const getDownloadQCReportInfoRequest = async (
-  params: DownloadReportQCParams,
+export const getDownloadQualityCheck = async (
+  params: UseDocumentReportQCFilterParams,
 ): Promise<Blob> => {
-  const paginationQuery = createTablePaginationQuery(params);
-
   const dateFromFilter = params.from
     ? moment(params.from).format(DEFAULT_DATE_FORMAT)
     : undefined;
@@ -72,7 +70,7 @@ export const getDownloadQCReportInfoRequest = async (
   });
 
   const res = await request.get<Blob>(
-    `/api/reports/quality-check/download?${paginationQuery}&${filterQuery}`,
+    `/api/reports/quality-check/download?${filterQuery}`,
     {
       responseType: 'blob',
     },

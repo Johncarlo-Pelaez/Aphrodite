@@ -4,7 +4,7 @@ import moment from 'moment';
 import { DEFAULT_DATE_FORMAT } from 'core/constants';
 import {
   useDocumentReportUploaded,
-  useDownloadDocumentReportInfoRequest,
+  useDownloadDocumentReportUploaded,
 } from 'hooks';
 import { Table, TableColumnProps, SorterResult, SortOrder } from 'core/ui';
 import { DocumentReport } from 'models';
@@ -41,7 +41,7 @@ export const UploadedTable = ({
   const {
     isLoading: isDownloadLoading,
     mutateAsync: downloadUploadedReportAsync,
-  } = useDownloadDocumentReportInfoRequest();
+  } = useDownloadDocumentReportUploaded();
 
   const changeSortUploaded = (sorterResult?: SorterResult): void => {
     setSorterUploaded(sorterResult ?? DEFAULT_SORT_ORDER_UPLOADED);
@@ -64,8 +64,6 @@ export const UploadedTable = ({
         username,
         from,
         to,
-        currentPage: currentPageUploaded,
-        pageSize: pageSizeUploaded,
       });
 
       downloadFile({

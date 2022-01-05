@@ -1,13 +1,17 @@
 import { ReactElement, useState, useMemo } from 'react';
 import moment from 'moment';
 import { DEFAULT_DATE_FORMAT } from 'core/constants';
-import { useDocumentReportInfoRequest } from 'hooks';
+import {
+  useDocumentReportInfoRequest,
+  useDownloadDocumentReportInfoRequest,
+} from 'hooks';
 import { Table, TableColumnProps, SorterResult, SortOrder } from 'core/ui';
 import { InformationRequestReport } from 'models';
 import { sortDateTime } from 'utils/sort';
-import { Button } from 'react-bootstrap';
+import { Button, Toast } from 'react-bootstrap';
 import fileSize from 'filesize';
 import styles from './InformationRequestTable.module.css';
+import { downloadFile } from 'utils';
 
 const DEFAULT_SORT_ORDER_INFO_REQUEST: SorterResult = {
   field: 'requestedDate',
@@ -30,9 +34,47 @@ export const InformationRequestTable = ({
   const [sorterInfoReq, setSorterInfoReq] = useState<SorterResult | undefined>(
     DEFAULT_SORT_ORDER_INFO_REQUEST,
   );
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [displayErrorMessage, setDisplayErrorMessage] =
+    useState<boolean>(false);
+
+  const {
+    isLoading: isDownloadLoading,
+    mutateAsync: downloadInfoRequestReportAsync,
+  } = useDownloadDocumentReportInfoRequest();
 
   const changeSortInfoRequest = (sorterResult?: SorterResult): void => {
     setSorterInfoReq(sorterResult ?? DEFAULT_SORT_ORDER_INFO_REQUEST);
+  };
+
+  const downloadReportInfoRequest = async (): Promise<void> => {
+    if (!from || !to) {
+      setErrorMessage('Date range of date checked must be selected');
+      setDisplayErrorMessage(true);
+    }
+
+    if (from && to) {
+      if (from > to) {
+        setErrorMessage('Incorrect date range of date checked');
+        setDisplayErrorMessage(true);
+        return;
+      }
+
+      const infoRequestParams = await downloadInfoRequestReportAsync({
+        username,
+        from,
+        to,
+      });
+
+      downloadFile({
+        file: infoRequestParams,
+        filename: `Information_Request_Report_${getCurrentDate()}.xlsx`,
+      });
+    }
+  };
+
+  const getCurrentDate = (): string => {
+    return moment().format(DEFAULT_DATE_FORMAT);
   };
   const renderColumnsInfoRequest =
     (): TableColumnProps<InformationRequestReport>[] => [
@@ -86,7 +128,24 @@ export const InformationRequestTable = ({
 
   return (
     <div>
-      <Button variant="outline-secondary" className={styles.prop} disabled>
+      <Toast
+        className="error-date-range d-inline-block m-1"
+        bg="light"
+        autohide
+        show={displayErrorMessage}
+        onClose={() => setDisplayErrorMessage(false)}
+      >
+        <Toast.Header>
+          <strong className="me-auto">Download warning</strong>
+        </Toast.Header>
+        <Toast.Body className="light text-dark">{errorMessage}</Toast.Body>
+      </Toast>
+      <Button
+        variant="outline-secondary"
+        className={styles.prop}
+        disabled={isDownloadLoading}
+        onClick={downloadReportInfoRequest}
+      >
         Download
       </Button>
       <Table<InformationRequestReport>
