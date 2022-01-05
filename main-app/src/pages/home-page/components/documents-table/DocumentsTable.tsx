@@ -16,6 +16,10 @@ import { Table, TableColumnProps, SorterResult, SortOrder } from 'core/ui';
 import { Document } from 'models';
 import { sortDateTime, sortText } from 'utils/sort';
 import { parseDocumentType } from '../view-doc-modal/components';
+import {
+  generateOperationText,
+  generateStatusText,
+} from './DocumentTable.utils';
 
 const DEFAULT_SORT_ORDER: SorterResult = {
   field: 'modifiedDate',
@@ -112,39 +116,19 @@ export const DocumentsTable = forwardRef(
         title: 'Status',
         dataIndex: 'status',
         render: (document: Document) => {
-          const arrStatus = document.status.split('_');
-          if (arrStatus.length === 2) {
-            const status = arrStatus[1];
-            switch (status) {
-              case 'BEGIN':
-                return 'Processing';
-              case 'FAILED':
-                return <span style={{ color: 'red' }}>Error</span>;
-              case 'DONE':
-                return 'Success';
-            }
-          } else if (arrStatus[0] === DocumentStatus.CANCELLED)
-            return 'Cancelled';
-          else return 'Waiting';
+          const statusText = generateStatusText(document.status);
+          return (
+            <span style={{ color: statusText === 'Error' ? 'red' : 'black' }}>
+              {statusText}
+            </span>
+          );
         },
       },
       {
         title: 'Operation',
         dataIndex: 'status',
         render: (document: Document) => {
-          const arrStatus = document.status.split('_');
-          const operation = arrStatus[0];
-          switch (operation) {
-            case 'INDEXING':
-              return 'Index';
-            case DocumentStatus.CANCELLED:
-              return '';
-            default:
-              return (
-                operation.charAt(0).toUpperCase() +
-                operation.slice(1).toLowerCase()
-              );
-          }
+          return generateOperationText(document.status);
         },
       },
       {
