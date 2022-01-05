@@ -161,7 +161,7 @@ export const ViewDocModal = (props: ViewDocModalProps): ReactElement => {
       ];
     } else if (
       documentStatus === DocumentStatus.CHECKING &&
-      currentUserRole === Role.REVIEWER
+      currentUserRole === Role.ENCODER
     ) {
       formActionButtons = [
         <Button
