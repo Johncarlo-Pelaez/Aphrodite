@@ -301,7 +301,7 @@ export class DocumentRepository {
       await transaction.save(document);
 
       const history = this.genarateDocumentHistory(document, {
-        note: param.note,
+        note: param.errorMessage,
       });
       await transaction.save(history);
     });
@@ -475,6 +475,7 @@ export class DocumentRepository {
 
       const history = this.genarateDocumentHistory(document, {
         userUsername: document.encoder,
+        note: param.qrBarCode,
       });
       await transaction.save(history);
     });
@@ -497,26 +498,8 @@ export class DocumentRepository {
 
       const history = this.genarateDocumentHistory(document, {
         userUsername: document.encoder,
+        note: param.encodeValues,
       });
-      await transaction.save(history);
-    });
-  }
-
-  async failEncode(param: FailEncodeParam): Promise<void> {
-    await this.manager.transaction(async (transaction): Promise<void> => {
-      const document = await this.manager.findOneOrFail(
-        Document,
-        param.documentId,
-      );
-      document.status = DocumentStatus.ENCODING_FAILED;
-      document.contractDetailsReqParams = param.contractDetailsReqParams;
-      document.encodeValues = param.encodeValues;
-      document.modifiedDate = param.failedAt;
-      document.description =
-        'Failed to retrieve account details from sales force.';
-      await transaction.save(document);
-
-      const history = this.genarateDocumentHistory(document);
       await transaction.save(history);
     });
   }
@@ -673,6 +656,15 @@ export class DocumentRepository {
         Document,
         param.documentId,
       );
+      document.documentName = param.documentName;
+      document.documentSize = param.documentSize;
+      document.mimeType = param.mimeType;
+      document.pageTotal = param.pageTotal;
+      document.qrCode = param.qrCode;
+      document.qrAt = param.replacedAt;
+      document.documentType = null;
+      document.contractDetails = null;
+      document.encodeValues = null;
       document.modifiedDate = param.replacedAt;
       document.modifiedBy = param.replacedBy;
       document.isFileDeleted = false;

@@ -39,7 +39,7 @@ export interface QrDocumentParam {
 }
 
 export interface FailQrDocumentParam extends FailDocProcessParam {
-  note: string;
+  errorMessage: string;
 }
 
 export interface DoneIndexingParam {

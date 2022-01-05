@@ -171,7 +171,7 @@ export class DocumentConsumer {
     } catch (error) {
       await this.documentRepository.failQrDocument({
         documentId,
-        note: error,
+        errorMessage: error,
         failedAt: this.datesUtil.getDateNow(),
       });
       this.logger.error(error);
@@ -185,7 +185,7 @@ export class DocumentConsumer {
       const note = 'The license for QR Code module is invalid';
       await this.documentRepository.failQrDocument({
         documentId,
-        note,
+        errorMessage: note,
         failedAt: this.datesUtil.getDateNow(),
       });
       throw new Error(note);
