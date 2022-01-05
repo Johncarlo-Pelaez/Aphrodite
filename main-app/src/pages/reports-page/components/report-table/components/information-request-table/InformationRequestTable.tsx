@@ -100,8 +100,8 @@ export const InformationRequestTable = ({
           fileSize(documentSize),
       },
       {
-        title: 'Status',
-        dataIndex: 'documentStatus',
+        title: 'Encoder',
+        dataIndex: 'encoder',
       },
     ];
 

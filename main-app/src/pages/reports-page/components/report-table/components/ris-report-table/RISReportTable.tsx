@@ -162,6 +162,7 @@ export const RISReportTable = ({
           />
         </Stack>
         <Button
+          className="mb-1"
           disabled={isDownloadLoading}
           variant="outline-secondary"
           onClick={downloadReportRIS}
