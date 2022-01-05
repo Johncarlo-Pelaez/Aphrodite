@@ -26,7 +26,7 @@ import {
   CancelDocuments,
   DeleteDocuments,
 } from './document.params';
-const { readFile, writeFile, unlink, stat } = fs.promises;
+const { readFile, writeFile, unlink } = fs.promises;
 
 @Injectable()
 export class DocumentService {
@@ -119,7 +119,6 @@ export class DocumentService {
       throw new ConflictException();
 
     try {
-      await stat(fileFullPath);
       await unlink(fileFullPath);
       await writeFile(fileFullPath, buffer);
     } catch (err) {
@@ -152,7 +151,16 @@ export class DocumentService {
       this.appConfigService.filePath,
       document.uuid,
     );
-    const buffer = await readFile(fileFullPath);
+    let buffer: Buffer;
+    try {
+      buffer = await readFile(fileFullPath);
+    } catch (error) {
+      if (error?.code === 'ENOENT') {
+        buffer = await readFile('./public/deleted-file.pdf');
+      } else {
+        throw error;
+      }
+    }
     return [document, buffer];
   }
 
@@ -302,7 +310,6 @@ export class DocumentService {
       );
 
       try {
-        await stat(fileFullPath);
         await unlink(fileFullPath);
       } catch (err) {
         if (err?.code === 'ENOENT') {

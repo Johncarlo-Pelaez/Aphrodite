@@ -36,7 +36,6 @@ export const PdfViewer = (props: PdfViewerProps): ReactElement => {
       },
     }).catch((error: Object) => {
       PDFViewerApplication.loadingBar.hide();
-      alert(error.toString());
     });
   };
 
