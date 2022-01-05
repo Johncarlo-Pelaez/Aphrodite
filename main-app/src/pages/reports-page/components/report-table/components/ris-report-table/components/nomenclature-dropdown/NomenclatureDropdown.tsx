@@ -1,5 +1,5 @@
 import { ReactElement, useEffect, useState } from 'react';
-import { AutoSuggestField } from 'core/ui';
+import { AutoSuggestField } from '../auto-suggest-field';
 
 export interface DocTypeRIS {
   CompanyCode: string;
@@ -18,7 +18,7 @@ export interface DocTypeRIS {
 
 export interface NomenclatureDropdownProps {
   onChange: (nomenclature?: string) => void;
-  indexes?: DocTypeRIS[];
+  indexes: (DocTypeRIS | undefined)[] | undefined;
   value?: string;
   isLoading: boolean;
   isError: boolean;

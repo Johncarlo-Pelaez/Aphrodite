@@ -19,17 +19,17 @@ export const ReportsPage = (): ReactElement => {
   return (
     <Container className="my-4" fluid>
       <h4 className="fw-normal py-3">Reports</h4>
-      <Row className="my-2">
-        <Col className="mb-2" xs={12} lg={2}>
+      <Row>
+        <Col className="mb-0" xs={12} lg={2}>
           <ReportStatusDropdown
             selected={reportType}
             onChange={setReportType}
           />
         </Col>
-        <Col className="mb-2" xs={12} lg={2}>
+        <Col className="mb-0" xs={12} lg={2}>
           <UserDropdown value={username} onChange={setUsername} />
         </Col>
-        <Col className="mb-2" xs={12} lg={2}>
+        <Col className="mb-0" xs={12} lg={2}>
           <DateSelect
             value={dateFrom}
             onChange={setDateFrom}
@@ -37,7 +37,7 @@ export const ReportsPage = (): ReactElement => {
             horizontal
           />
         </Col>
-        <Col className="mb-2" xs={12} lg={2}>
+        <Col className="mb-0" xs={12} lg={2}>
           <DateSelect
             value={dateTo}
             onChange={setDateTo}
