@@ -1,5 +1,5 @@
 import { Process, Processor } from '@nestjs/bull';
-import { Logger, NotFoundException } from '@nestjs/common';
+import { ConflictException, Logger, NotFoundException } from '@nestjs/common';
 import { Job } from 'bull';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -168,6 +168,19 @@ export class DocumentConsumer {
 
     if (qrCode && qrCode.length >= 18) {
       qrCode = qrCode.substr(0, 15);
+    }
+
+    if (
+      qrCode &&
+      !!(await this.documentRepository.getDocumentByQRCode(qrCode))
+    ) {
+      const note = 'QR code or Barcode is already exist.';
+      await this.documentRepository.failQrDocument({
+        documentId,
+        errorMessage: note,
+        failedAt: this.datesUtil.getDateNow(),
+      });
+      throw new ConflictException();
     }
 
     await this.documentRepository.qrDocument({

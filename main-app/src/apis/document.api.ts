@@ -230,7 +230,7 @@ export const replaceDocumentFileApi = async (
   const formData = new FormData();
   formData.append('file', file, file.name);
 
-  await request.post<void>(
+  await request.put<void>(
     `/api/documents/${params.documentId}/file`,
     formData,
     {
