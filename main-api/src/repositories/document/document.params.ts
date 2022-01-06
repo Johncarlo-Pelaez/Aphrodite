@@ -29,6 +29,7 @@ export interface BeginDocProcessParam {
 
 export interface FailDocProcessParam {
   documentId: number;
+  errorMessage: string;
   failedAt: Date;
 }
 
@@ -36,10 +37,6 @@ export interface QrDocumentParam {
   documentId: number;
   qrCode: string;
   qrAt: Date;
-}
-
-export interface FailQrDocumentParam extends FailDocProcessParam {
-  errorMessage: string;
 }
 
 export interface DoneIndexingParam {
@@ -65,7 +62,7 @@ export interface MigrateDocumentParam {
 }
 
 export interface FailDocMigrateParam extends FailDocProcessParam {
-  springcmReqParams: string;
+  springcmReqParams?: string;
   springcmResponse?: string;
 }
 

@@ -60,9 +60,12 @@ export const DocHistoryTable = ({
           docHistory.note !== undefined &&
           docHistory.note !== ''
         ) {
-          const springcmRes = JSON.parse(docHistory.note);
-
-          console.log(springcmRes);
+          let springcmRes: any;
+          try {
+            springcmRes = JSON.parse(docHistory.note);
+          } catch (err) {
+            return docHistory.note ?? '';
+          }
 
           if (
             !!springcmRes?.SalesForce?.length &&
@@ -93,9 +96,7 @@ export const DocHistoryTable = ({
               springcmRes?.faultInfo?.activityName
             );
           }
-        } else {
-          return docHistory.note ?? '';
-        }
+        } else return docHistory.note ?? '';
       },
     },
     {

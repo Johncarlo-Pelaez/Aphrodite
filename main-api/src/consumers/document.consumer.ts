@@ -1,5 +1,5 @@
 import { Process, Processor } from '@nestjs/bull';
-import { Logger } from '@nestjs/common';
+import { Logger, NotFoundException } from '@nestjs/common';
 import { Job } from 'bull';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -47,29 +47,17 @@ export class DocumentConsumer {
       uuid: sysSrcFileName,
       qrCode: docQrCode,
       documentType: strGetDocTypeReqRes,
-      contractDetails: strGetContDetailsReqRes,
       encodeValues: strEncodeValues,
       documentHistories,
     } = document;
 
     let qrCode = docQrCode;
-    const buffer = await this.readFile(sysSrcFileName);
-
-    let documentType: DocumentType,
-      contractDetail: ContractDetail,
-      encodeValues: EncodeValues;
+    let documentType: DocumentType, encodeValues: EncodeValues;
 
     if (strGetDocTypeReqRes && strGetDocTypeReqRes !== '') {
       const getDocTypeReqResult = JSON.parse(strGetDocTypeReqRes);
       documentType = !!getDocTypeReqResult.response.length
         ? getDocTypeReqResult.response[0]
-        : undefined;
-    }
-
-    if (strGetContDetailsReqRes && strGetContDetailsReqRes !== '') {
-      const getContDetailsReqRes = JSON.parse(strGetContDetailsReqRes);
-      contractDetail = !!getContDetailsReqRes?.reponse?.items.length
-        ? getContDetailsReqRes.reponse.items[0]
         : undefined;
     }
 
@@ -80,7 +68,7 @@ export class DocumentConsumer {
       documentType = await this.runGetContractDetails(documentId, encodeValues);
 
     if (!documentType && (!qrCode || qrCode === ''))
-      qrCode = await this.runQr(documentId, buffer, sysSrcFileName);
+      qrCode = await this.runQr(documentId, sysSrcFileName);
 
     if (!documentType && qrCode && qrCode !== '')
       documentType = await this.runGetDocumentType(qrCode, documentId);
@@ -113,58 +101,37 @@ export class DocumentConsumer {
     }
 
     if (!isWhiteListed || isApproved) {
-      const empty = '';
-      const uploadParams = {
-        Brand: documentType?.Brand ?? empty,
-        CompanyCode: documentType?.CompanyCode ?? empty,
-        ContractNo: documentType?.ContractNumber ?? empty,
-        ProjectCode: documentType?.ProjectCode ?? empty,
-        Tower_Phase: documentType?.TowerPhase ?? empty,
-        CustomerCode: documentType?.CustomerCode ?? empty,
-        ProjectName: documentType?.ProjectName ?? empty,
-        CustomerName:
-          (documentType?.AccountName ?? contractDetail?.CustomerName) || empty,
-        UnitDescription: documentType?.UnitDetails ?? empty,
-        DocumentGroupID: empty,
-        DocumentGroupDescription: documentType?.DocumentGroup ?? empty,
-        DocumentGroupShortDescription: empty,
-        DocumentTypeID: empty,
-        DocumentTypeDescription: documentType?.Nomenclature ?? empty,
-        DocumentTypeShortDescription: empty,
-        DocumentName: documentType?.Nomenclature ?? empty,
-        ExternalSourceCaptureDate:
-          this.datesUtil.getTimestamp('M/D/YYYY h:mm:ss A'),
-        FileName: `${documentType?.Nomenclature}${path.extname(
-          document.documentName,
-        )}`,
-        MIMEType: document.mimeType,
-        DocumentDate: document.documentDate
-          ? this.datesUtil.formatDateString(document.documentDate, 'MMDDYYYY')
-          : empty,
-        ExternalSourceUserID: document.user.username.split('@')[0],
-        SourceSystem: 'RIS',
-        DataCapDocSource: 'RIS',
-        DataCapRemarks: document.remarks ?? empty,
-        FileSize: document.documentSize.toString(),
-        Remarks: document.remarks ?? empty,
-        B64Attachment: buffer.toString('base64'),
-      };
-
-      await this.runUploadToSpringCM(documentId, uploadParams, sysSrcFileName);
+      await this.runUploadToSpringCM(documentId);
     }
   }
 
-  private async runQr(
-    documentId: number,
-    buffer: Buffer,
-    filename: string,
-  ): Promise<string> {
+  private async runQr(documentId: number, filename: string): Promise<string> {
     await this.documentRepository.beginQrDocument({
       documentId,
       processAt: this.datesUtil.getDateNow(),
     });
 
-    let qrCode;
+    let buffer: Buffer, qrCode: string;
+
+    try {
+      buffer = await this.readFile(filename);
+    } catch (err) {
+      if (err?.code === 'ENOENT') {
+        await this.documentRepository.failQrDocument({
+          documentId,
+          errorMessage: 'File not found or missing file, It may be deleted.',
+          failedAt: this.datesUtil.getDateNow(),
+        });
+        throw new NotFoundException();
+      } else {
+        await this.documentRepository.failQrDocument({
+          documentId,
+          errorMessage: `Error: ${err}`,
+          failedAt: this.datesUtil.getDateNow(),
+        });
+        throw err;
+      }
+    }
 
     try {
       qrCode = await this.qrService.readPdfQrCode(buffer, filename);
@@ -231,20 +198,21 @@ export class DocumentConsumer {
       getDocTypeResult = await this.salesForceService.getDocumentType(
         getDocTypeReqParams,
       );
-    } catch (error) {
+    } catch (err) {
       await this.documentRepository.failIndexing({
         documentId,
         docTypeReqParams: JSON.stringify(getDocTypeReqParams),
         salesforceResponse: !!getDocTypeResult
           ? JSON.stringify(getDocTypeResult)
-          : error,
+          : null,
+        errorMessage: err,
         failedAt: this.datesUtil.getDateNow(),
       });
-      this.logger.error(error);
-      throw error;
+      this.logger.error(err);
+      throw err;
     }
 
-    documentType = !!getDocTypeResult.response.length
+    documentType = !!getDocTypeResult?.response?.length
       ? getDocTypeResult.response[0]
       : undefined;
 
@@ -252,7 +220,10 @@ export class DocumentConsumer {
       await this.documentRepository.failIndexing({
         documentId,
         docTypeReqParams: JSON.stringify(getDocTypeReqParams),
-        salesforceResponse: JSON.stringify(getDocTypeResult),
+        salesforceResponse: getDocTypeResult
+          ? JSON.stringify(getDocTypeResult)
+          : null,
+        errorMessage: 'Document details is empty.',
         failedAt: this.datesUtil.getDateNow(),
       });
     }
@@ -288,17 +259,18 @@ export class DocumentConsumer {
         await this.salesForceService.getContractDetails(
           getContractDetailsReqParams,
         );
-    } catch (error) {
+    } catch (err) {
       await this.documentRepository.failIndexing({
         documentId,
         contractDetailsReqParams: JSON.stringify(getContractDetailsReqParams),
         salesforceResponse: !!getContractDetailsResult
           ? JSON.stringify(getContractDetailsResult)
-          : error,
+          : null,
+        errorMessage: err,
         failedAt: this.datesUtil.getDateNow(),
       });
-      this.logger.error(error);
-      throw error;
+      this.logger.error(err);
+      throw err;
     }
 
     contractDetail =
@@ -311,7 +283,10 @@ export class DocumentConsumer {
       await this.documentRepository.failIndexing({
         documentId,
         contractDetailsReqParams: JSON.stringify(getContractDetailsReqParams),
-        salesforceResponse: JSON.stringify(getContractDetailsResult),
+        salesforceResponse: getContractDetailsResult
+          ? JSON.stringify(getContractDetailsResult)
+          : null,
+        errorMessage: 'Document details is empty.',
         failedAt: this.datesUtil.getDateNow(),
       });
     }
@@ -349,11 +324,89 @@ export class DocumentConsumer {
     return contractDetail ? documentType : undefined;
   }
 
-  private async runUploadToSpringCM(
-    documentId: number,
-    uploadParams: UploadDocToSpringParams,
-    sysSrcFileName: string,
-  ): Promise<void> {
+  private async runUploadToSpringCM(documentId: number): Promise<void> {
+    const document = await this.documentRepository.getDocument(documentId);
+    const {
+      uuid: sysSrcFileName,
+      documentType: strGetDocTypeReqRes,
+      contractDetails: strGetContDetailsReqRes,
+    } = document;
+
+    const empty = '';
+    let buffer: Buffer,
+      documentType: DocumentType,
+      contractDetail: ContractDetail;
+
+    if (strGetDocTypeReqRes && strGetDocTypeReqRes !== '') {
+      const getDocTypeReqResult = JSON.parse(strGetDocTypeReqRes);
+      documentType = !!getDocTypeReqResult.response.length
+        ? getDocTypeReqResult.response[0]
+        : undefined;
+    }
+
+    if (strGetContDetailsReqRes && strGetContDetailsReqRes !== '') {
+      const getContDetailsReqRes = JSON.parse(strGetContDetailsReqRes);
+      contractDetail = !!getContDetailsReqRes?.reponse?.items.length
+        ? getContDetailsReqRes.reponse.items[0]
+        : undefined;
+    }
+
+    try {
+      buffer = await this.readFile(sysSrcFileName);
+    } catch (err) {
+      if (err?.code === 'ENOENT') {
+        await this.documentRepository.failMigrate({
+          documentId,
+          errorMessage: 'File not found or missing file, It may be deleted.',
+          failedAt: this.datesUtil.getDateNow(),
+        });
+        throw new NotFoundException();
+      } else {
+        await this.documentRepository.failMigrate({
+          documentId,
+          errorMessage: err,
+          failedAt: this.datesUtil.getDateNow(),
+        });
+        throw err;
+      }
+    }
+
+    let uploadParams = {
+      Brand: documentType?.Brand ?? empty,
+      CompanyCode: documentType?.CompanyCode ?? empty,
+      ContractNo: documentType?.ContractNumber ?? empty,
+      ProjectCode: documentType?.ProjectCode ?? empty,
+      Tower_Phase: documentType?.TowerPhase ?? empty,
+      CustomerCode: documentType?.CustomerCode ?? empty,
+      ProjectName: documentType?.ProjectName ?? empty,
+      CustomerName:
+        (documentType?.AccountName ?? contractDetail?.CustomerName) || empty,
+      UnitDescription: documentType?.UnitDetails ?? empty,
+      DocumentGroupID: empty,
+      DocumentGroupDescription: documentType?.DocumentGroup ?? empty,
+      DocumentGroupShortDescription: empty,
+      DocumentTypeID: empty,
+      DocumentTypeDescription: documentType?.Nomenclature ?? empty,
+      DocumentTypeShortDescription: empty,
+      DocumentName: documentType?.Nomenclature ?? empty,
+      ExternalSourceCaptureDate:
+        this.datesUtil.getTimestamp('M/D/YYYY h:mm:ss A'),
+      FileName: `${documentType?.Nomenclature}${path.extname(
+        document.documentName,
+      )}`,
+      MIMEType: document.mimeType,
+      DocumentDate: document.documentDate
+        ? this.datesUtil.formatDateString(document.documentDate, 'MMDDYYYY')
+        : empty,
+      ExternalSourceUserID: document.user.username.split('@')[0],
+      SourceSystem: 'RIS',
+      DataCapDocSource: 'RIS',
+      DataCapRemarks: document.remarks ?? empty,
+      FileSize: document.documentSize.toString(),
+      Remarks: document.remarks ?? empty,
+      B64Attachment: buffer.toString('base64'),
+    };
+
     const { B64Attachment, ...forStrUploadParams } = uploadParams;
     const strUploadParams = JSON.stringify(forStrUploadParams);
 
@@ -363,22 +416,22 @@ export class DocumentConsumer {
     });
 
     let uploadDocToSpringResult;
-
     try {
       uploadDocToSpringResult = await this.springCMService.uploadDocToSpring(
         uploadParams,
       );
-    } catch (error) {
+    } catch (err) {
       await this.documentRepository.failMigrate({
         documentId,
         springcmReqParams: strUploadParams,
         springcmResponse: !!uploadDocToSpringResult
           ? JSON.stringify(uploadDocToSpringResult)
-          : error,
+          : null,
         failedAt: this.datesUtil.getDateNow(),
+        errorMessage: err,
       });
-      this.logger.error(error);
-      throw error;
+      this.logger.error(err);
+      throw err;
     }
 
     const { data: response }: any = uploadDocToSpringResult;
@@ -403,10 +456,12 @@ export class DocumentConsumer {
         deletedAt: this.datesUtil.getDateNow(),
       });
     } else {
+      const strResponse = JSON.stringify(response);
       await this.documentRepository.failMigrate({
         documentId,
         springcmReqParams: strUploadParams,
-        springcmResponse: JSON.stringify(response),
+        springcmResponse: strResponse,
+        errorMessage: strResponse,
         failedAt: this.datesUtil.getDateNow(),
       });
       throw new Error(response?.faultInfo?.message);

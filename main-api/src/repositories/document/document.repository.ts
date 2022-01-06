@@ -13,7 +13,7 @@ import {
   GetDocumentsParam,
   BeginDocProcessParam,
   QrDocumentParam,
-  FailQrDocumentParam,
+  FailDocProcessParam,
   DoneIndexingParam,
   MigrateDocumentParam,
   FailDocMigrateParam,
@@ -244,6 +244,7 @@ export class DocumentRepository {
 
         const history = this.genarateDocumentHistory(document, {
           userUsername: document.modifiedBy,
+          note: `Filename: ${document.documentName}, Size: ${document.documentSize}, Total page: ${document.pageTotal}, Type: ${document.mimeType}`,
         });
         await transaction.save(history);
 
@@ -283,12 +284,14 @@ export class DocumentRepository {
       document.description = 'Successfully done QR Code.';
       await transaction.save(document);
 
-      const history = this.genarateDocumentHistory(document);
+      const history = this.genarateDocumentHistory(document, {
+        note: param.qrCode,
+      });
       await transaction.save(history);
     });
   }
 
-  async failQrDocument(param: FailQrDocumentParam): Promise<void> {
+  async failQrDocument(param: FailDocProcessParam): Promise<void> {
     await this.manager.transaction(async (transaction): Promise<void> => {
       const document = await this.manager.findOneOrFail(
         Document,
@@ -361,7 +364,7 @@ export class DocumentRepository {
       await transaction.save(document);
 
       const history = this.genarateDocumentHistory(document, {
-        note: param.salesforceResponse,
+        note: param.salesforceResponse ?? param.errorMessage,
       });
       await transaction.save(history);
     });
@@ -418,7 +421,7 @@ export class DocumentRepository {
       await transaction.save(document);
 
       const history = this.genarateDocumentHistory(document, {
-        note: document.springResponse,
+        note: param.springcmResponse ?? param.errorMessage,
       });
       await transaction.save(history);
     });
@@ -637,8 +640,15 @@ export class DocumentRepository {
         Document,
         param.documentId,
       );
-      const documentFilename = document.documentName;
+      const docFilename = document.documentName;
+      const docFileSize = document.documentSize;
+      const docPageTotal = document.pageTotal;
+      const docFileMimeType = document.mimeType;
+
       document.documentName = 'deleted-file.pdf';
+      document.documentSize = 0;
+      document.pageTotal = 0;
+      document.mimeType = '';
       document.modifiedDate = param.deletedAt;
       document.modifiedBy = param.deletedBy ?? document.modifiedBy;
       document.isFileDeleted = true;
@@ -648,7 +658,7 @@ export class DocumentRepository {
       const history = this.genarateDocumentHistory(document, {
         documentStatus: '',
         userUsername: param.deletedBy,
-        note: `Filename: ${documentFilename}`,
+        note: `Filename: ${docFilename}, Size: ${docFileSize}, Total page: ${docPageTotal}, Type: ${docFileMimeType}`,
       });
       await transaction.save(history);
     });
