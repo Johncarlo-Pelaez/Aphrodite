@@ -5,7 +5,11 @@ import Stack from 'react-bootstrap/Stack';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { Document } from 'models';
-import { useRetryDocuments, useCancelDocuments } from 'hooks';
+import {
+  useRetryDocuments,
+  useCancelDocuments,
+  useDeleteDocumentsFile,
+} from 'hooks';
 import { SearchField, DateSelect } from 'core/ui';
 import {
   UploadFilesModal,
@@ -22,6 +26,7 @@ import {
   getDocStatusFilter,
   getForRetryDocStatuses,
   getForCancelDocStatuses,
+  getForDeleteDocsFileStatuses,
 } from './HomePage.utils';
 
 export const HomePage = (): ReactElement => {
@@ -55,6 +60,13 @@ export const HomePage = (): ReactElement => {
     selectedDocuments.every((doc) =>
       getForCancelDocStatuses().some((s) => s === doc.status),
     );
+  const enableDeleteButton =
+    !!selectedDocuments.length &&
+    selectedDocuments.every(
+      (doc) =>
+        getForDeleteDocsFileStatuses().some((s) => s === doc.status) &&
+        !doc.isFileDeleted,
+    );
   const documentStatusFilter = getDocStatusFilter(
     selectedStatus,
     selectedOperation,
@@ -73,6 +85,13 @@ export const HomePage = (): ReactElement => {
     mutateAsync: cancelDocumentsAsync,
     reset: resetCancelDoc,
   } = useCancelDocuments();
+
+  const {
+    isLoading: isDeleteDocsFileSaving,
+    isError: hasDeleteDocsFileError,
+    mutateAsync: deleteDocumentsFileAsync,
+    reset: resetDeleteDocsFile,
+  } = useDeleteDocumentsFile();
 
   const resetTableSelection = (): void => {
     setSelectedDocuments([]);
@@ -98,6 +117,14 @@ export const HomePage = (): ReactElement => {
     }
   };
 
+  const handleDeleteDocsFile = async (): Promise<void> => {
+    if (!isDeleteDocsFileSaving && enableDeleteButton) {
+      await deleteDocumentsFileAsync(selectedDocumentKeys);
+      alert('Success.');
+      resetTableSelection();
+    }
+  };
+
   const refreshDocumentslist = (): void => {
     documentsTableRef.current?.refresh();
     processDetailsRef.current?.refresh();
@@ -111,12 +138,14 @@ export const HomePage = (): ReactElement => {
   useEffect(() => {
     if (hasRetryDocError) alert('Failed to retry documents.');
     if (hasCancelDocError) alert('Failed to cancel documents.');
-  }, [hasRetryDocError, hasCancelDocError]);
+    if (hasDeleteDocsFileError) alert('Failed to delete documents file.');
+  }, [hasRetryDocError, hasCancelDocError, hasDeleteDocsFileError]);
 
   useEffect(() => {
     return function componentCleanUp() {
       resetRetryDoc();
       resetCancelDoc();
+      resetDeleteDocsFile();
     };
     // eslint-disable-next-line
   }, []);
@@ -170,6 +199,16 @@ export const HomePage = (): ReactElement => {
             onClick={handleCancelDocs}
           >
             Cancel
+          </Button>
+        )}
+        {enableDeleteButton && (
+          <Button
+            className="px-4"
+            variant="outline-danger"
+            disabled={!hasSelectedRows}
+            onClick={handleDeleteDocsFile}
+          >
+            Delete
           </Button>
         )}
       </Stack>

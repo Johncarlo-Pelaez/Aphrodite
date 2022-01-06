@@ -26,6 +26,9 @@ import {
   cancelDocumentsApi,
   cancelWaitingDocumentsApi,
   retryErrorDocumentsApi,
+  deleteDocumentsFileApi,
+  ReplaceDocumentFileApi,
+  replaceDocumentFileApi,
 } from 'apis';
 import { QueryKey } from 'utils';
 import { DocumentStatus } from 'core/enum';
@@ -319,4 +322,40 @@ export const useCancelWaitingDocuments = (): UseMutationResult<
       queryClient.invalidateQueries(QueryKey.paginatedDocuments);
     },
   });
+};
+
+export interface UseDeleteDocumentsFileContext
+  extends UseRetryDocumentsContext {}
+
+export const useDeleteDocumentsFile = (): UseMutationResult<
+  void,
+  ApiError,
+  number[],
+  UseDeleteDocumentsFileContext
+> => {
+  const queryClient = useQueryClient();
+  return useMutation<void, ApiError, number[], UseDeleteDocumentsFileContext>(
+    deleteDocumentsFileApi,
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(QueryKey.paginatedDocuments);
+      },
+    },
+  );
+};
+
+export const useReplaceDocument = (): UseMutationResult<
+  void,
+  ApiError,
+  ReplaceDocumentFileApi
+> => {
+  const queryClient = useQueryClient();
+  return useMutation<void, ApiError, ReplaceDocumentFileApi>(
+    replaceDocumentFileApi,
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(QueryKey.paginatedDocuments);
+      },
+    },
+  );
 };

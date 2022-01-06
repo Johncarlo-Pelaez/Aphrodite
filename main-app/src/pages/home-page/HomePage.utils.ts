@@ -66,19 +66,22 @@ export const concatDocumentStatuses = (
 };
 
 export const getForRetryDocStatuses = (): DocumentStatus[] =>
-  Object.values(DocumentStatus).filter((s) => {
-    const arrStattmp = s.split('_');
-    if (arrStattmp.length === 2) return arrStattmp[1] === 'FAILED';
-    else return arrStattmp[0] === DocumentStatus.CANCELLED;
-  });
+  Object.values(DocumentStatus).filter(
+    (s) => s.includes('FAILED') || s.includes('CANCELLED'),
+  );
 
 export const getForCancelDocStatuses = (): DocumentStatus[] =>
-  Object.values(DocumentStatus).filter((s) => {
-    const arrStattmp = s.split('_');
-    if (arrStattmp.length === 2)
-      return arrStattmp[1] !== 'DONE' && arrStattmp[1] !== 'FAILED';
-    else return arrStattmp[0] !== DocumentStatus.CANCELLED;
-  });
+  Object.values(DocumentStatus).filter(
+    (s) =>
+      !s.includes('DONE') &&
+      !s.includes('FAILED') &&
+      s !== DocumentStatus.CANCELLED,
+  );
+
+export const getForDeleteDocsFileStatuses = (): DocumentStatus[] =>
+  Object.values(DocumentStatus).filter(
+    (s) => s.includes('FAILED') || s === DocumentStatus.CANCELLED,
+  );
 
 export const getDocStatusFilter = (
   cmbStatusValue: StatusOption,

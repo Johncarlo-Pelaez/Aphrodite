@@ -17,6 +17,7 @@ export interface Document {
   remarks: string;
   encodeValues: string;
   documentHistories: DocumentHistory[];
+  isFileDeleted: boolean;
 }
 
 export interface DocumentType {

@@ -204,3 +204,47 @@ export const cancelWaitingDocumentsApi = async (): Promise<void> => {
 export const retryErrorDocumentsApi = async (): Promise<void> => {
   await request.put('/api/documents/retry/error');
 };
+
+export const deleteDocumentsFileApi = async (
+  documentIds: number[],
+): Promise<void> => {
+  await request.delete('/api/documents', {
+    data: {
+      documentIds,
+    },
+  });
+};
+
+export interface ReplaceDocumentFileApi {
+  documentId: number;
+  file: File;
+  onUploadProgress: (completedInPercent: number) => void;
+  cancelToken?: CancelTokenSource;
+}
+
+export const replaceDocumentFileApi = async (
+  params: ReplaceDocumentFileApi,
+): Promise<void> => {
+  const { file, onUploadProgress, cancelToken } = params;
+
+  const formData = new FormData();
+  formData.append('file', file, file.name);
+
+  await request.post<void>(
+    `/api/documents/${params.documentId}/file`,
+    formData,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      cancelToken: cancelToken?.token,
+      onUploadProgress: (progressEvent: ProgressEvent) => {
+        const percent = Math.floor(
+          (progressEvent.loaded * 100) / progressEvent.total,
+        );
+
+        onUploadProgress(percent);
+      },
+    },
+  );
+};

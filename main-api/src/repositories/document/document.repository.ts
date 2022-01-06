@@ -637,6 +637,8 @@ export class DocumentRepository {
         Document,
         param.documentId,
       );
+      const documentFilename = document.documentName;
+      document.documentName = 'deleted-file.pdf';
       document.modifiedDate = param.deletedAt;
       document.modifiedBy = param.deletedBy ?? document.modifiedBy;
       document.isFileDeleted = true;
@@ -645,6 +647,8 @@ export class DocumentRepository {
 
       const history = this.genarateDocumentHistory(document, {
         documentStatus: '',
+        userUsername: param.deletedBy,
+        note: `Filename: ${documentFilename}`,
       });
       await transaction.save(history);
     });
