@@ -90,7 +90,7 @@ export const ImportReportTable = ({
       dataIndex: 'filename',
     },
     {
-      title: 'Username',
+      title: 'User',
       dataIndex: 'username',
     },
     {
