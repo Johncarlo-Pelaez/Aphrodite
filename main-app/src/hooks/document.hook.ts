@@ -344,7 +344,7 @@ export const useDeleteDocumentsFile = (): UseMutationResult<
   );
 };
 
-export const useReplaceDocument = (): UseMutationResult<
+export const useReplaceDocumentFile = (): UseMutationResult<
   void,
   ApiError,
   ReplaceDocumentFileApi

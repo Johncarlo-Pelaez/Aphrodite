@@ -4,3 +4,4 @@ export * from './doc-history-table';
 export * from './encoder-form';
 export * from './indexes-form';
 export * from './approver-form';
+export * from './replace-file-modal';

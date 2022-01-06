@@ -1,4 +1,4 @@
-import { ReactElement, useState, useRef } from 'react';
+import { ReactElement, useState, useRef, Fragment } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Spinner from 'react-bootstrap/Spinner';
@@ -14,6 +14,7 @@ import {
   EncoderForm,
   CheckerForm,
   AppoverForm,
+  ReplaceFileModal,
 } from './components';
 import styles from './ViewDocModal.module.scss';
 
@@ -40,6 +41,8 @@ export const ViewDocModal = (props: ViewDocModalProps): ReactElement => {
     onDeleteFileAsync: triggerDeleteFileAsync,
   } = props;
   const [key, setKey] = useState<TabKey>(TabKey.File);
+  const [replaceFileModalShow, setReplaceFileModalShow] =
+    useState<boolean>(false);
   const encoderFormRef = useRef<any>(null);
   const checkerFormRef = useRef<any>(null);
   const approverFormRef = useRef<any>(null);
@@ -50,49 +53,56 @@ export const ViewDocModal = (props: ViewDocModalProps): ReactElement => {
   const currentUserRole = user?.role;
 
   const renderModal = (): ReactElement => (
-    <Modal
-      backdrop="static"
-      keyboard={false}
-      show={isVisible}
-      onHide={triggerClose}
-      centered
-      dialogClassName={styles.viewModal}
-    >
-      <Modal.Header closeButton>
-        <Modal.Title as="h6">
-          <b>{document?.documentName}</b>
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body className={styles.modalBody}>
-        <Tabs
-          activeKey={key}
-          onSelect={(k: any) => setKey(k as TabKey)}
-          className={styles.viewDocMainTab}
-        >
-          <Tab eventKey={TabKey.File} title={TabKey.File}>
-            <div className={styles.tabContent}>
-              <div className={styles.pdfViewerWrapper}>
-                <PdfViewer documentId={documentId} />
+    <Fragment>
+      <ReplaceFileModal
+        documentId={documentId}
+        isVisible={replaceFileModalShow}
+        onClose={() => setReplaceFileModalShow(false)}
+      />
+      <Modal
+        backdrop="static"
+        keyboard={false}
+        show={isVisible}
+        onHide={triggerClose}
+        centered
+        dialogClassName={styles.viewModal}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title as="h6">
+            <b>{document?.documentName}</b>
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body className={styles.modalBody}>
+          <Tabs
+            activeKey={key}
+            onSelect={(k: any) => setKey(k as TabKey)}
+            className={styles.viewDocMainTab}
+          >
+            <Tab eventKey={TabKey.File} title={TabKey.File}>
+              <div className={styles.tabContent}>
+                <div className={styles.pdfViewerWrapper}>
+                  <PdfViewer documentId={documentId} />
+                </div>
+                <div className={styles.indexesCardWrapper}>
+                  {isDocsLoading ? spinner : renderForm()}
+                </div>
               </div>
-              <div className={styles.indexesCardWrapper}>
-                {isDocsLoading ? spinner : renderForm()}
+            </Tab>
+            <Tab eventKey={TabKey.Properties} title={TabKey.Properties}>
+              <div className={styles.tabContent}>
+                <FileProperties document={document} />
               </div>
-            </div>
-          </Tab>
-          <Tab eventKey={TabKey.Properties} title={TabKey.Properties}>
-            <div className={styles.tabContent}>
-              <FileProperties document={document} />
-            </div>
-          </Tab>
-          <Tab eventKey={TabKey.History} title={TabKey.History}>
-            <div className={styles.tabContent}>
-              <DocHistoryTable documentId={document?.id} />
-            </div>
-          </Tab>
-        </Tabs>
-      </Modal.Body>
-      {renderModalFooter()}
-    </Modal>
+            </Tab>
+            <Tab eventKey={TabKey.History} title={TabKey.History}>
+              <div className={styles.tabContent}>
+                <DocHistoryTable documentId={document?.id} />
+              </div>
+            </Tab>
+          </Tabs>
+        </Modal.Body>
+        {renderModalFooter()}
+      </Modal>
+    </Fragment>
   );
 
   const spinner: ReactElement = (
@@ -217,7 +227,7 @@ export const ViewDocModal = (props: ViewDocModalProps): ReactElement => {
         <Button
           key="btn-replace-file"
           variant="dark"
-          onClick={triggerApproverFormSubmitApprove}
+          onClick={() => setReplaceFileModalShow(true)}
         >
           Replace File
         </Button>,

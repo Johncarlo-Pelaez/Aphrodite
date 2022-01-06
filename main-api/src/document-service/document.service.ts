@@ -26,7 +26,7 @@ import {
   CancelDocuments,
   DeleteDocuments,
 } from './document.params';
-const { readFile, writeFile, unlink } = fs.promises;
+const { readFile, writeFile, unlink, stat } = fs.promises;
 
 @Injectable()
 export class DocumentService {
@@ -38,6 +38,17 @@ export class DocumentService {
     private readonly filenameUtil: FilenameUtil,
     private readonly appConfigService: AppConfigService,
   ) {}
+
+  private async checkIfFileExist(fileFullPath: string): Promise<boolean> {
+    try {
+      await stat(fileFullPath);
+      return true;
+    } catch (err) {
+      if (err?.code === 'ENOENT') {
+        return false;
+      }
+    }
+  }
 
   async uploadDocument(data: UploadDocument): Promise<CreatedResponse> {
     const dateRightNow = this.datesUtil.getDateNow();
@@ -118,15 +129,14 @@ export class DocumentService {
     if (qrCode && !!(await this.documentRepository.getDocumentByQRCode(qrCode)))
       throw new ConflictException();
 
-    try {
+    if (await this.checkIfFileExist(fileFullPath)) {
       await unlink(fileFullPath);
+    }
+
+    try {
       await writeFile(fileFullPath, buffer);
     } catch (err) {
-      if (err?.code === 'ENOENT') {
-        throw new NotFoundException();
-      } else {
-        throw err;
-      }
+      throw err;
     }
 
     const pdfData = await pdfParse(buffer);

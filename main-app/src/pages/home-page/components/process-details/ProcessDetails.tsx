@@ -102,13 +102,13 @@ export const ProcessDetails = forwardRef(
 
     return (
       <div className="d-flex justify-content-center flex-wrap my-1">
-        <Card className="shadow-sm m-3" style={cardStyle}>
+        <Card className="shadow m-3" style={cardStyle}>
           <Card.Body>
             <Card.Title as="h6">Success</Card.Title>
             <Card.Text className="text-center p-3 fs-4">{success}</Card.Text>
           </Card.Body>
         </Card>
-        <Card className="shadow-sm m-3" style={cardStyle}>
+        <Card className="shadow m-3" style={cardStyle}>
           <Card.Body>
             <Card.Title as="h6">Processing / Waiting</Card.Title>
             <Card.Text className="text-center p-3 fs-4">
@@ -125,7 +125,7 @@ export const ProcessDetails = forwardRef(
             </div>
           </Card.Body>
         </Card>
-        <Card className="shadow-sm m-3" style={cardStyle}>
+        <Card className="shadow m-3" style={cardStyle}>
           <Card.Body>
             <Card.Title as="h6">Cancelled / Error</Card.Title>
             <Card.Text className="text-center p-3 fs-4">
