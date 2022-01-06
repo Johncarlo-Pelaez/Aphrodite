@@ -36,10 +36,8 @@ export const generateStatusText = (status: DocumentStatus): string => {
         return 'Error';
       case 'DONE':
         return 'Success';
-      case 'APPROVED':
-        return 'Approved';
-      case 'DISAPPROVED':
-        return 'Disapproved';
+      default:
+        return 'Waiting';
     }
   } else {
     const status = arrStatus[0];
@@ -50,13 +48,10 @@ export const generateStatusText = (status: DocumentStatus): string => {
         return 'Cancelled';
       case DocumentStatus.RETRYING:
         return 'Retrying';
-      case DocumentStatus.APPROVED:
-        return 'Approved';
       case DocumentStatus.DISAPPROVED:
         return 'Disapproved';
       default:
         return 'Waiting';
     }
   }
-  return '';
 };

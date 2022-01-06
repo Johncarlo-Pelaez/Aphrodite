@@ -117,6 +117,13 @@ export const HomePage = (): ReactElement => {
     }
   };
 
+  const handleDeleteDocFile = async (documentId: number): Promise<void> => {
+    if (!isDeleteDocsFileSaving) {
+      await deleteDocumentsFileAsync([documentId]);
+      alert('Success.');
+    }
+  };
+
   const handleDeleteDocsFile = async (): Promise<void> => {
     if (!isDeleteDocsFileSaving && enableDeleteButton) {
       await deleteDocumentsFileAsync(selectedDocumentKeys);
@@ -205,7 +212,7 @@ export const HomePage = (): ReactElement => {
           <Button
             className="px-4"
             variant="outline-danger"
-            disabled={!hasSelectedRows}
+            disabled={!hasSelected1Doc || selected1Doc.isFileDeleted}
             onClick={handleDeleteDocsFile}
           >
             Delete
@@ -266,12 +273,15 @@ export const HomePage = (): ReactElement => {
         isVisible={uploadModalShow}
         onClose={() => setUploadModalShow(false)}
       />
-      <ViewDocModal
-        isVisible={viewDocModalShow && hasSelected1Doc}
-        documentId={selected1Doc?.id}
-        onClose={() => setViewDocModalShow(false)}
-        onFormSubmitted={selectNextDocument}
-      />
+      {hasSelected1Doc && (
+        <ViewDocModal
+          isVisible={viewDocModalShow && hasSelected1Doc}
+          documentId={selected1Doc?.id}
+          onClose={() => setViewDocModalShow(false)}
+          onFormSubmitted={selectNextDocument}
+          onDeleteFileAsync={handleDeleteDocFile}
+        />
+      )}
     </Container>
   );
 };

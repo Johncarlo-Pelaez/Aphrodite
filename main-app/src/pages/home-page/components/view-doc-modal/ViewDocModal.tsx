@@ -18,10 +18,11 @@ import {
 import styles from './ViewDocModal.module.scss';
 
 export interface ViewDocModalProps {
-  documentId?: number;
+  documentId: number;
   isVisible: boolean;
   onClose: () => void;
   onFormSubmitted: () => void;
+  onDeleteFileAsync: (documentId: number) => Promise<void>;
 }
 
 enum TabKey {
@@ -36,6 +37,7 @@ export const ViewDocModal = (props: ViewDocModalProps): ReactElement => {
     isVisible,
     onClose: triggerClose,
     onFormSubmitted: triggerFormSubmitted,
+    onDeleteFileAsync: triggerDeleteFileAsync,
   } = props;
   const [key, setKey] = useState<TabKey>(TabKey.File);
   const encoderFormRef = useRef<any>(null);
@@ -199,6 +201,27 @@ export const ViewDocModal = (props: ViewDocModalProps): ReactElement => {
           Approve
         </Button>,
       ];
+    } else if (
+      documentStatus === DocumentStatus.DISAPPROVED &&
+      currentUserRole === Role.REVIEWER
+    ) {
+      formActionButtons = [
+        <Button
+          disabled={document?.isFileDeleted}
+          key="btn-delete-file"
+          variant="outline-danger"
+          onClick={handleDeleteFile}
+        >
+          Delete File
+        </Button>,
+        <Button
+          key="btn-replace-file"
+          variant="dark"
+          onClick={triggerApproverFormSubmitApprove}
+        >
+          Replace File
+        </Button>,
+      ];
     } else {
       formActionButtons = [
         <Button key="btn-close" variant="outline-danger" onClick={triggerClose}>
@@ -228,6 +251,11 @@ export const ViewDocModal = (props: ViewDocModalProps): ReactElement => {
 
   const triggerApproverFormSubmitDispprove = (): void => {
     approverFormRef.current?.disapproveDocument();
+  };
+
+  const handleDeleteFile = async (): Promise<void> => {
+    await triggerDeleteFileAsync(documentId);
+    triggerFormSubmitted();
   };
 
   return renderModal();
