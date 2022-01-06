@@ -16,6 +16,12 @@ import {
 } from './ReplaceFileModal.types';
 import styles from './ReplaceFileModal.module.css';
 
+const useForceUpdate = (): (() => void) => {
+  // eslint-disable-next-line
+  const [value, setValue] = useState(0);
+  return () => setValue((value) => value + 1);
+};
+
 export const ReplaceFileModal = ({
   documentId,
   isVisible,
@@ -39,6 +45,8 @@ export const ReplaceFileModal = ({
 
   const { reset: resetReplaceDocumentFile, mutateAsync: replaceDocumentFile } =
     useReplaceDocumentFile();
+
+  const forceUpdate = useForceUpdate();
 
   const retryUpload = () => {
     if (hasFiles && itemFile) {
@@ -81,6 +89,9 @@ export const ReplaceFileModal = ({
       }
       return prevItemFile;
     });
+    if (hasFiles && itemFile) {
+      uploadFile(itemFile.file, itemFile.cancelToken);
+    }
   };
 
   const uploadFile = async (
@@ -138,6 +149,7 @@ export const ReplaceFileModal = ({
       }
     } finally {
       if (onComplete && typeof onComplete === 'function') onComplete();
+      forceUpdate();
     }
   };
 
