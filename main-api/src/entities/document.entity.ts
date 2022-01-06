@@ -179,4 +179,8 @@ export class DocumentHistory {
   @ApiPropertyOptional()
   @Column({ nullable: true })
   note?: string;
+
+  @ApiPropertyOptional()
+  @Column({ nullable: true })
+  filename?: string;
 }

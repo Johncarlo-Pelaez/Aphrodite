@@ -36,8 +36,7 @@ export const DocHistoryTable = ({
   const renderColumns = (): TableColumnProps<DocumentHistory>[] => [
     {
       title: 'Filename',
-      render: (docHistory: DocumentHistory) =>
-        `${docHistory.document.documentName}`,
+      dataIndex: 'filename',
     },
     {
       title: 'Version',

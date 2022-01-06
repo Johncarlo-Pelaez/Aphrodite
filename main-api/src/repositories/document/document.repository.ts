@@ -213,6 +213,7 @@ export class DocumentRepository {
     },
   ): DocumentHistory {
     let history = new DocumentHistory();
+    history.filename = document.documentName;
     history.description = document.description;
     history.documentSize = document.documentSize;
     history.createdDate = document.modifiedDate;

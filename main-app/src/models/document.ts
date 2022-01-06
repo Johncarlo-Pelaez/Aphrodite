@@ -53,6 +53,7 @@ export interface DocumentHistory {
   userUsername: string;
   documentStatus: DocumentStatus;
   note?: string;
+  filename?: string;
 }
 
 export interface NomenclatureWhitelist {
