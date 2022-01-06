@@ -688,6 +688,7 @@ export class DocumentRepository {
 
       const history = this.genarateDocumentHistory(document, {
         documentStatus: '',
+        note: `Filename: ${document.documentName}, Size: ${document.documentSize}, Total page: ${document.pageTotal}, Type: ${document.mimeType}`,
       });
       await transaction.save(history);
     });
