@@ -17,6 +17,7 @@ import {
   ViewDocModal,
   ProcessDetails,
   StatusDropdown,
+  UserOption,
   OperationDropdown,
   UserDropdown,
 } from './components';
@@ -43,7 +44,9 @@ export const HomePage = (): ReactElement => {
   const [viewDocModalShow, setViewDocModalShow] = useState<boolean>(false);
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
-  const [username, setUsername] = useState<string | undefined>(undefined);
+  const [selectedUserFilter, setSelectedUserFilter] = useState<
+    UserOption | undefined
+  >(undefined);
   const processDetailsRef = useRef<any>(null);
   const documentsTableRef = useRef<any>(null);
   const hasSelectedRows = !!selectedDocuments.length;
@@ -250,7 +253,10 @@ export const HomePage = (): ReactElement => {
           />
         </Col>
         <Col xs={12} lg={4}>
-          <UserDropdown value={username} onChange={setUsername} />
+          <UserDropdown
+            value={selectedUserFilter}
+            onChange={setSelectedUserFilter}
+          />
         </Col>
       </Row>
       <div className="d-flex justify-content-end mb-2">
@@ -264,7 +270,7 @@ export const HomePage = (): ReactElement => {
           dateFrom,
           dateTo,
           statuses: documentStatusFilter,
-          username,
+          username: selectedUserFilter?.username,
         }}
         setSelectedDocuments={setSelectedDocuments}
         onDoubleClickRow={handleOpen}

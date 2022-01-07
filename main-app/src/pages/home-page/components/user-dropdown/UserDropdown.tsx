@@ -1,16 +1,30 @@
-import { ReactElement } from 'react';
+import { ReactElement, useMemo } from 'react';
 import { AutoSuggestField } from 'core/ui';
 import { useUsers } from 'hooks';
 
+export interface UserOption extends Record<string, unknown> {
+  id: number;
+  label: string;
+  username: string;
+}
+
 export interface UserDropdownProps {
-  value?: string;
-  onChange: (username?: string) => void;
+  value?: UserOption;
+  onChange: (value?: UserOption) => void;
 }
 
 export const UserDropdown = (props: UserDropdownProps): ReactElement => {
   const { value, onChange: triggerChange } = props;
   const { data: users, isLoading, isError } = useUsers();
-  const options = users?.map((u) => u.username) ?? [];
+  const options: UserOption[] = useMemo(
+    () =>
+      users?.map((u) => ({
+        id: u.id,
+        label: `${u.firstName} ${u.lastName}`,
+        username: u.username,
+      })) ?? [],
+    [users],
+  );
 
   return (
     <AutoSuggestField
@@ -19,11 +33,9 @@ export const UserDropdown = (props: UserDropdownProps): ReactElement => {
       isInvalid={isError}
       options={options}
       value={value ? [value] : []}
-      onChange={(options) => {
+      onChange={(options: unknown[]) => {
         triggerChange(
-          !!options.length && typeof options[0] === 'string'
-            ? options[0]
-            : undefined,
+          (!!options?.length ? options[0] : undefined) as UserOption,
         );
       }}
     />
