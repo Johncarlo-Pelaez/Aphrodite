@@ -1,3 +1,4 @@
+CREATE VIEW ris_report AS
 SELECT 
     document.id as documentId,
     document.modifiedDate,
