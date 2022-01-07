@@ -53,19 +53,19 @@ export const HomePage = (): ReactElement => {
   const selected1Doc =
     selectedDocuments.length === 1 ? selectedDocuments[0] : undefined;
   const hasSelected1Doc = !!selected1Doc;
-  const enableRetryButton =
+  const showRetryButton =
     !!selectedDocuments.length &&
     selectedDocuments.every(
       (doc) =>
         getForRetryDocStatuses().some((s) => s === doc.status) &&
         !doc.isFileDeleted,
     );
-  const enableCancelButton =
+  const showCancelButton =
     !!selectedDocuments.length &&
     selectedDocuments.every((doc) =>
       getForCancelDocStatuses().some((s) => s === doc.status),
     );
-  const enableDeleteButton =
+  const showDeleteButton =
     !!selectedDocuments.length &&
     selectedDocuments.every(
       (doc) =>
@@ -107,7 +107,7 @@ export const HomePage = (): ReactElement => {
   };
 
   const handleRetryDocs = async (): Promise<void> => {
-    if (!isRetryDocSaving && enableRetryButton) {
+    if (!isRetryDocSaving && showRetryButton) {
       await retryDocumentsAsync(selectedDocumentKeys);
       alert('Success.');
       resetTableSelection();
@@ -115,7 +115,7 @@ export const HomePage = (): ReactElement => {
   };
 
   const handleCancelDocs = async (): Promise<void> => {
-    if (!isCancelDocSaving && enableCancelButton) {
+    if (!isCancelDocSaving && showCancelButton) {
       await cancelDocumentsAsync(selectedDocumentKeys);
       alert('Success.');
       resetTableSelection();
@@ -130,7 +130,7 @@ export const HomePage = (): ReactElement => {
   };
 
   const handleDeleteDocsFile = async (): Promise<void> => {
-    if (!isDeleteDocsFileSaving && enableDeleteButton) {
+    if (!isDeleteDocsFileSaving && showDeleteButton) {
       await deleteDocumentsFileAsync(selectedDocumentKeys);
       alert('Success.');
       resetTableSelection();
@@ -193,7 +193,7 @@ export const HomePage = (): ReactElement => {
         >
           Open
         </Button>
-        {enableRetryButton && (
+        {showRetryButton && (
           <Button
             className="px-4"
             variant="outline-dark"
@@ -203,7 +203,7 @@ export const HomePage = (): ReactElement => {
             Retry
           </Button>
         )}
-        {enableCancelButton && (
+        {showCancelButton && (
           <Button
             className="px-4"
             variant="outline-dark"
@@ -213,11 +213,11 @@ export const HomePage = (): ReactElement => {
             Cancel
           </Button>
         )}
-        {enableDeleteButton && (
+        {showDeleteButton && (
           <Button
             className="px-4"
             variant="outline-danger"
-            disabled={!hasSelected1Doc || selected1Doc.isFileDeleted}
+            disabled={!hasSelectedRows}
             onClick={handleDeleteDocsFile}
           >
             Delete
