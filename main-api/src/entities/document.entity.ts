@@ -183,4 +183,12 @@ export class DocumentHistory {
   @ApiPropertyOptional()
   @Column({ nullable: true })
   filename?: string;
+
+  @ApiPropertyOptional()
+  @Column({ nullable: true })
+  mimeType: string;
+
+  @ApiPropertyOptional()
+  @Column({ nullable: true })
+  pageTotal: number;
 }

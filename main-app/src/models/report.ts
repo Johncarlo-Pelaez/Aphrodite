@@ -7,7 +7,7 @@ export interface DocumentReport {
   documentSize: number;
   createdDate: Date;
   documentId: number;
-  document: Document;
+  filename: string;
   userUsername: string;
   documentStatus: DocumentStatus;
   salesforceResponse: string;

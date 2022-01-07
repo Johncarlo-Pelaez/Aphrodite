@@ -6,8 +6,8 @@ SELECT
     document_history.userUsername AS encoder,
     document.qrCode,
     document.documentType,
-    document.documentSize,
-    document.pageTotal,
+    document_history.documentSize,
+    document_history.pageTotal,
     document_history.documentStatus,
     document_history.note
 

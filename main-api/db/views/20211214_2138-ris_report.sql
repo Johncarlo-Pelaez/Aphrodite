@@ -4,10 +4,10 @@ SELECT
     document.modifiedDate,
     upload.uploader AS scannerUsername,
     upload.name AS scannerName,
-    latest_uploaded_filename.fileName, 
-    document.pageTotal,
-    document.documentSize AS fileSize,
-    document.mimeType AS fileType,
+    latest_uploaded_file.fileName, 
+    latest_uploaded_file.pageTotal,
+    latest_uploaded_file.documentSize AS fileSize,
+    latest_uploaded_file.mimeType AS fileType,
     upload.dateUploaded AS dateScanned,
     document.documentType AS indexes,
     document.documentDate,
@@ -33,9 +33,12 @@ SELECT
     
     INNER JOIN (    
       SELECT 
-      document_history.id,
       document_history.documentId,
-      document_history.filename
+      document_history.id,
+      document_history.filename,
+      document_history.mimeType,
+      document_history.pageTotal,
+      document_history.documentSize
       FROM (
         SELECT document_history.documentId,
         MAX(document_history.id) as historyId
@@ -48,8 +51,8 @@ SELECT
       ) AS t
       INNER JOIN document_history 
       ON t.historyId = document_history.id   
-    ) AS latest_uploaded_filename
-    ON document.id = latest_uploaded_filename.documentId
+    ) AS latest_uploaded_file
+    ON document.id = latest_uploaded_file.documentId
 
     LEFT JOIN (
       select documentId,

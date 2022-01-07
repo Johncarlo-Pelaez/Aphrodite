@@ -95,8 +95,7 @@ export const UploadedTable = ({
     },
     {
       title: 'Document Name',
-      dataIndex: 'document',
-      render: ({ document }: DocumentReport) => document.documentName,
+      dataIndex: 'filename',
     },
     {
       title: 'Uploader',
