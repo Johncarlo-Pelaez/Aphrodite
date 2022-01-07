@@ -90,6 +90,8 @@ export class DocumentController {
             status !== DocumentStatus.CHECKING,
         );
         break;
+      default:
+        statusesFilter = dto.statuses;
     }
 
     response.count = await this.documentRepository.count({
