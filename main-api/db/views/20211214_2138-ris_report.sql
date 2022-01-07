@@ -1,10 +1,9 @@
-CREATE VIEW ris_report AS
 SELECT 
     document.id as documentId,
     document.modifiedDate,
     upload.uploader AS scannerUsername,
     upload.name AS scannerName,
-    document.documentName AS fileName, 
+    latest_filename.fileName, 
     document.pageTotal,
     document.documentSize AS fileSize,
     document.mimeType AS fileType,
@@ -30,6 +29,18 @@ SELECT
     END AS errorDate
 
     FROM document
+    
+    INNER JOIN (
+      SELECT document_history.documentId,
+      document_history.filename
+      FROM document_latest_distinct_status
+      INNER JOIN document_history
+      ON document_latest_distinct_status.historyId = document_history.id
+      WHERE document_history.documentStatus = 'UPLOADED' 
+      OR document_history.description = 'Replace file from system directory.'
+    ) AS latest_filename
+    ON document.id = latest_filename.documentId
+
     LEFT JOIN (
       select documentId,
       document_history.documentStatus AS upload_status,
@@ -42,6 +53,7 @@ SELECT
       WHERE documentStatus = 'UPLOADED'
     ) AS upload
     ON document.id = upload.documentId
+
     LEFT JOIN (
       SELECT document_latest_info_request.documentId,
       document_latest_info_request.documentStatus AS request_status,
@@ -51,6 +63,7 @@ SELECT
       FROM document_latest_info_request
     ) AS indexing
     ON document.id = indexing.documentId
+
     LEFT JOIN (
       SELECT document_latest_import.documentId,
       document_latest_import.documentStatus AS import_status,

@@ -2,7 +2,7 @@ CREATE VIEW document_latest_approval AS
 SELECT 
 	document.id AS documentId,
     document_history.createdDate AS approvalDate,
-    document.documentName AS filename,
+    document_history.filename,
     document_history.userUsername AS approver,
     document.qrCode,
     document.documentType,

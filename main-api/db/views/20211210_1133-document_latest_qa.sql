@@ -2,7 +2,7 @@ CREATE VIEW document_latest_qa AS
 SELECT 
 	document.id AS documentId,
     document_history.createdDate AS checkedDate,
-    document.documentName AS filename,
+    document_history.filename,
     document_history.userUsername AS checker,
     document.qrCode,
     document.documentType,

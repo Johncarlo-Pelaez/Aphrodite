@@ -2,7 +2,7 @@ CREATE VIEW document_latest_info_request AS
 SELECT 
 	document.id AS documentId,
     document_history.createdDate AS requestedDate,
-    document.documentName AS filename,
+    document_history.filename,
     document_history.userUsername AS encoder,
     document.qrCode,
     document.documentType,
