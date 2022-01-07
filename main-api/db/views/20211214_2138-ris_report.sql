@@ -4,7 +4,7 @@ SELECT
     document.modifiedDate,
     upload.uploader AS scannerUsername,
     upload.name AS scannerName,
-    latest_filename.fileName, 
+    latest_uploaded_filename.fileName, 
     document.pageTotal,
     document.documentSize AS fileSize,
     document.mimeType AS fileType,
@@ -31,16 +31,25 @@ SELECT
 
     FROM document
     
-    INNER JOIN (
-      SELECT document_history.documentId,
+    INNER JOIN (    
+      SELECT 
+      document_history.id,
+      document_history.documentId,
       document_history.filename
-      FROM document_latest_distinct_status
-      INNER JOIN document_history
-      ON document_latest_distinct_status.historyId = document_history.id
-      WHERE document_history.documentStatus = 'UPLOADED' 
-      OR document_history.description = 'Replace file from system directory.'
-    ) AS latest_filename
-    ON document.id = latest_filename.documentId
+      FROM (
+        SELECT document_history.documentId,
+        MAX(document_history.id) as historyId
+        FROM document_latest_distinct_status
+        INNER JOIN document_history
+        ON document_latest_distinct_status.historyId = document_history.id
+        WHERE document_history.documentStatus = 'UPLOADED' 
+        OR document_history.description = 'Replace file from system directory.'
+        GROUP BY document_history.documentId
+      ) AS t
+      INNER JOIN document_history 
+      ON t.historyId = document_history.id   
+    ) AS latest_uploaded_filename
+    ON document.id = latest_uploaded_filename.documentId
 
     LEFT JOIN (
       select documentId,
