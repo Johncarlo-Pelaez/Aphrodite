@@ -642,14 +642,7 @@ export class DocumentRepository {
         param.documentId,
       );
       const docFilename = document.documentName;
-      const docFileSize = document.documentSize;
-      const docPageTotal = document.pageTotal;
-      const docFileMimeType = document.mimeType;
-
       document.documentName = 'deleted-file.pdf';
-      document.documentSize = 0;
-      document.pageTotal = 0;
-      document.mimeType = '';
       document.modifiedDate = param.deletedAt;
       document.modifiedBy = param.deletedBy ?? document.modifiedBy;
       document.isFileDeleted = true;
@@ -659,7 +652,7 @@ export class DocumentRepository {
       const history = this.genarateDocumentHistory(document, {
         documentStatus: '',
         userUsername: param.deletedBy,
-        note: `Filename: ${docFilename}, Size: ${docFileSize}, Total page: ${docPageTotal}, Type: ${docFileMimeType}`,
+        note: `Filename: ${docFilename}`,
       });
       await transaction.save(history);
     });
