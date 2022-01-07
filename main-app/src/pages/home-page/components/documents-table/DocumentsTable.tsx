@@ -100,6 +100,10 @@ export const DocumentsTable = forwardRef(
         sortOrder: sorter?.field === 'documentName' ? sorter.order : undefined,
       },
       {
+        title: 'Barcode / QR Code',
+        dataIndex: 'qrCode',
+      },
+      {
         title: 'Size',
         dataIndex: 'documentSize',
         render: (document: Document) => fileSize(document.documentSize),
