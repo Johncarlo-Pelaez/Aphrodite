@@ -55,8 +55,10 @@ export const HomePage = (): ReactElement => {
   const hasSelected1Doc = !!selected1Doc;
   const enableRetryButton =
     !!selectedDocuments.length &&
-    selectedDocuments.every((doc) =>
-      getForRetryDocStatuses().some((s) => s === doc.status),
+    selectedDocuments.every(
+      (doc) =>
+        getForRetryDocStatuses().some((s) => s === doc.status) &&
+        !doc.isFileDeleted,
     );
   const enableCancelButton =
     !!selectedDocuments.length &&
