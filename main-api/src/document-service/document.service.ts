@@ -9,11 +9,12 @@ import * as pdfParse from 'pdf-parse';
 import { v4 as uuidv4 } from 'uuid';
 import { DatesUtil, FilenameUtil } from 'src/utils';
 import { AppConfigService } from 'src/app-config';
-import { DocumentRepository } from 'src/repositories';
+import { DocumentRepository, UserRepository } from 'src/repositories';
 import { EncodeValues } from 'src/repositories/document';
 import { DocumentProducer } from 'src/producers';
 import { CreatedResponse } from 'src/core';
-import { Document, DocumentStatus } from 'src/entities';
+import { Document, DocumentStatus, Role } from 'src/entities';
+import { MailService } from 'src/mail/';
 import {
   UploadDocument,
   ReplaceDocumentFile,
@@ -32,11 +33,13 @@ const { readFile, writeFile, unlink, stat } = fs.promises;
 export class DocumentService {
   private readonly logger = new Logger(DocumentService.name);
   constructor(
+    private readonly userRepository: UserRepository,
     private readonly documentRepository: DocumentRepository,
     private readonly documentProducer: DocumentProducer,
     private readonly datesUtil: DatesUtil,
     private readonly filenameUtil: FilenameUtil,
     private readonly appConfigService: AppConfigService,
+    private readonly mailService: MailService,
   ) {}
 
   private async checkIfFileExist(fileFullPath: string): Promise<boolean> {
@@ -232,6 +235,20 @@ export class DocumentService {
       checkedBy,
       checkedAt: this.datesUtil.getDateNow(),
     });
+
+    const totalDocsForReview = await this.documentRepository.count({
+      statuses: [DocumentStatus.CHECKING_DISAPPROVED],
+    });
+
+    for (const user of await this.userRepository.getUsers({
+      roles: [Role.REVIEWER],
+    })) {
+      this.mailService.sendReviewerNotification({
+        email: user.username,
+        name: `${user.firstName} ${user.lastName}`,
+        documentsNumber: totalDocsForReview,
+      });
+    }
   }
 
   async approverApproveDoc(data: DocumentApprover): Promise<void> {

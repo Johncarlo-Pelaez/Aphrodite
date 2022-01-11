@@ -13,6 +13,7 @@ import {
   ReportController,
 } from './controllers';
 import { UtilsModule } from './utils/utils.module';
+import { MailModule } from './mail/mail.module';
 import { DocumentProducer } from './producers';
 import {
   DocumentRepository,
@@ -75,6 +76,7 @@ const logger = new Logger('AppModule');
       name: 'document',
     }),
     PassportModule,
+    MailModule,
   ],
   controllers: [
     DocumentController,

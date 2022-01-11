@@ -140,7 +140,7 @@ export class DocumentRepository {
   }
 
   async count(param: GetDocumentsParam): Promise<number> {
-    const { search = '', documentType, statuses, username, from, to } = param;
+    const { search = '', documentType, statuses, username } = param;
     let whereDocumentType: { documentType: FindOperator<string> };
     let whereStatusIn: { status: FindOperator<DocumentStatus> };
     let whereUsername: { username: string };

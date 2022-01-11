@@ -63,4 +63,28 @@ export class AppConfigService {
   get azureAdTenantId(): string {
     return this.configService.get('AZURE_AD_TENANT_ID');
   }
+
+  get mailHost(): string {
+    return this.configService.get('MAIL_HOST');
+  }
+
+  get mailPort(): string {
+    return this.configService.get('MAIL_PORT');
+  }
+
+  get mailUser(): string {
+    return this.configService.get('MAIL_USER');
+  }
+
+  get mailPassword(): string {
+    return this.configService.get('MAIL_PASSWORD');
+  }
+
+  get mailFrom(): string {
+    return this.configService.get('MAIL_FROM');
+  }
+
+  get baseURL(): string {
+    return this.configService.get('BASE_URL');
+  }
 }

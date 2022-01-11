@@ -21,6 +21,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@nestjs-modules/mailer": "^1.6.1",
     "@nestjs/bull": "^0.4.1",
     "@nestjs/common": "^8.0.0",
     "@nestjs/config": "^1.0.1",
@@ -38,7 +39,9 @@
     "filenamify": "^4.3.0",
     "filesize": "^8.0.6",
     "gm": "^1.23.1",
+    "handlebars": "^4.7.7",
     "mssql": "^7.2.1",
+    "nodemailer": "^6.7.2",
     "passport-azure-ad": "^4.3.1",
     "pdf-parse": "^1.1.1",
     "reflect-metadata": "^0.1.13",
