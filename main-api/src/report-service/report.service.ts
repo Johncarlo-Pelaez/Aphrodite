@@ -371,11 +371,6 @@ export class ReportService {
         dataIndex: 'documentsCount',
       },
       {
-        key: 'documentsNumber',
-        title: 'Number of Documents',
-        dataIndex: 'documentsNumber',
-      },
-      {
         key: 'fileSize',
         title: 'File Size',
         render: (report) => fileSize(report.fileSize),
@@ -422,7 +417,7 @@ export class ReportService {
       },
       {
         key: 'projectName',
-        title: 'Proect Name',
+        title: 'Project Name',
         render: (report) =>
           this.parseDocumentType(report.indexes)?.ProjectName ?? '',
       },
@@ -436,7 +431,7 @@ export class ReportService {
         key: 'dateIndexed',
         title: 'Date Indexed',
         render: (report) =>
-          moment(report.dateIndexed).format(DEFAULT_DATE_FORMAT),
+          moment(report.dateIndexed).format(DEFAULT_DATE_FORMAT) ?? '',
       },
       {
         key: 'indexedBy',
@@ -469,7 +464,7 @@ export class ReportService {
         key: 'dateUploaded',
         title: 'Date Uploaded',
         render: (report) =>
-          moment(report.dateUploaded).format(DEFAULT_DATE_FORMAT),
+          moment(report.dateUploaded).format(DEFAULT_DATE_FORMAT) ?? '',
       },
       {
         key: 'uploadedBy',
@@ -495,7 +490,7 @@ export class ReportService {
         key: 'errorDate',
         title: 'Date of Error Processing',
         render: (report) =>
-          moment(report.errorDate).format(DEFAULT_DATE_FORMAT),
+          moment(report.errorDate).format(DEFAULT_DATE_FORMAT) ?? '',
       },
     ];
     return await this.excelService.create({
