@@ -264,6 +264,18 @@ export const ViewDocModal = (props: ViewDocModalProps): ReactElement => {
   };
 
   const handleDeleteFile = async (): Promise<void> => {
+    if (!document) {
+      alert('No document selected.');
+      return;
+    }
+
+    if (
+      !window.confirm(
+        `Are you sure you want to delete ${document?.documentName}`,
+      )
+    )
+      return;
+
     await triggerDeleteFileAsync(documentId);
     triggerFormSubmitted();
   };

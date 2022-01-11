@@ -130,6 +130,16 @@ export const HomePage = (): ReactElement => {
   };
 
   const handleDeleteDocsFile = async (): Promise<void> => {
+    if (!hasSelectedRows) {
+      alert('No documents selected.');
+      return;
+    }
+
+    if (
+      !window.confirm('Are you sure you want to delete selected document(s)?')
+    )
+      return;
+
     if (!isDeleteDocsFileSaving && showDeleteButton) {
       await deleteDocumentsFileAsync(selectedDocumentKeys);
       alert('Success.');
