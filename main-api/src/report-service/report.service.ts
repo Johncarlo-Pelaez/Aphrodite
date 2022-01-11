@@ -3,6 +3,7 @@ import * as moment from 'moment';
 import * as fileSize from 'filesize';
 import { DocumentHistory } from 'src/entities';
 import { ReportRepository } from 'src/repositories';
+import { DatesUtil } from 'src/utils';
 import {
   InformationRequestReport,
   QualityCheckReport,
@@ -27,6 +28,7 @@ export class ReportService {
   constructor(
     private readonly reportRepository: ReportRepository,
     private readonly excelService: ExcelService,
+    private readonly dateUtil: DatesUtil,
   ) {}
 
   private parseDocumentType(
@@ -340,6 +342,7 @@ export class ReportService {
       from: param.from,
       to: param.to,
     });
+
     const columns: ExcelColumn<RISReport>[] = [
       {
         key: 'scannerName',
@@ -431,7 +434,7 @@ export class ReportService {
         key: 'dateIndexed',
         title: 'Date Indexed',
         render: (report) =>
-          moment(report.dateIndexed).format(DEFAULT_DATE_FORMAT) ?? '',
+          this.dateUtil.excelDateResult(report.dateIndexed, DEFAULT_DATE_FORMAT),
       },
       {
         key: 'indexedBy',
@@ -464,7 +467,7 @@ export class ReportService {
         key: 'dateUploaded',
         title: 'Date Uploaded',
         render: (report) =>
-          moment(report.dateUploaded).format(DEFAULT_DATE_FORMAT) ?? '',
+          this.dateUtil.excelDateResult(report.dateUploaded, DEFAULT_DATE_FORMAT),
       },
       {
         key: 'uploadedBy',
@@ -490,7 +493,7 @@ export class ReportService {
         key: 'errorDate',
         title: 'Date of Error Processing',
         render: (report) =>
-          moment(report.errorDate).format(DEFAULT_DATE_FORMAT) ?? '',
+          this.dateUtil.excelDateResult(report.errorDate, DEFAULT_DATE_FORMAT),
       },
     ];
     return await this.excelService.create({

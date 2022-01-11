@@ -1,4 +1,4 @@
-import { ReactElement, useState, useMemo } from 'react';
+import { ReactElement, useState, useMemo, useEffect } from 'react';
 import fileSize from 'filesize';
 import moment from 'moment';
 import { Button, Toast } from 'react-bootstrap';
@@ -46,7 +46,6 @@ export const RISReportTable = ({
   const [nomenclature, setNomenclature] = useState<string | undefined>(
     undefined,
   );
-  // const [status, setStatus] = useState<string>(DEFAULT_ALL_DOCUMNET_STATUS);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [displayErrorMessage, setDisplayErrorMessage] =
     useState<boolean>(false);
@@ -82,9 +81,8 @@ export const RISReportTable = ({
         username,
         from,
         to,
-        currentPage,
-        pageSize,
         statuses: documentStatusFilter,
+        nomenclature,
       });
 
       downloadFile({
@@ -159,6 +157,19 @@ export const RISReportTable = ({
     }),
     [result?.data, result?.count],
   );
+
+  useEffect(() => {
+    return () => {
+      setCurrentPage(1);
+      setPageSize(15);
+      setSorter(DEFAULT_SORT_ORDER_RIS_REPORT);
+      setNomenclature(undefined);
+      setErrorMessage('');
+      setDisplayErrorMessage(false);
+      setSelectedStatus(StatusOption.ALL);
+      setSelectedOperation(OperationOption.ALL);
+    };
+  }, []);
 
   return (
     <div>

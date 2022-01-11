@@ -18,4 +18,9 @@ export class DatesUtil {
   formatDateString(date: string, format: string): string {
     return moment(date).format(format);
   }
+
+  excelDateResult (date: Date, format: string): string {
+    let dateResult = moment(date).format(format);
+    return dateResult.toLowerCase() === "invalid date" ? '' : dateResult;
+  }
 }

@@ -55,10 +55,8 @@ export const geReportRISApi = async (
   return res.data;
 };
 
-export type DownloadReportRISParams = UseReportRIS;
-
 export const getDownloadReportRIS = async (
-  params: DownloadReportRISParams,
+  params: UseReportRISFilterParams,
 ): Promise<Blob> => {
   const dateFromFilter = params.from
     ? moment(params.from).format(DEFAULT_DATE_PARAMS_FORMAT)
@@ -66,8 +64,6 @@ export const getDownloadReportRIS = async (
   const dateToFilter = params.to
     ? moment(params.to).format(DEFAULT_DATE_PARAMS_FORMAT)
     : undefined;
-
-  const paginationQuery = createTablePaginationQuery(params);
 
   const filterQuery = createQueryString({
     scannerUsername: params.username,
@@ -78,7 +74,7 @@ export const getDownloadReportRIS = async (
   });
 
   const res = await request.get<Blob>(
-    `/api/reports/ris/download?${paginationQuery}&${filterQuery}`,
+    `/api/reports/ris/download?${filterQuery}`,
     {
       responseType: 'blob',
     },

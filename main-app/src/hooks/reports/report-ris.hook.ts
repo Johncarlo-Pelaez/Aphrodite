@@ -3,7 +3,7 @@ import {
   getDownloadReportRIS,
   UseReportRIS,
   geReportRISApi,
-  DownloadReportRISParams,
+  UseReportRISFilterParams,
 } from 'apis';
 
 import {
@@ -26,9 +26,9 @@ export const useReportRIS = (
 export const useDownloadReportRIS = (): UseMutationResult<
   Blob,
   ApiError,
-  DownloadReportRISParams
+  UseReportRISFilterParams
 > => {
-  return useMutation<Blob, ApiError, DownloadReportRISParams>(
+  return useMutation<Blob, ApiError, UseReportRISFilterParams>(
     getDownloadReportRIS,
     {
       onError: () => {},
