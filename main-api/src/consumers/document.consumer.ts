@@ -1,9 +1,7 @@
 import { Process, Processor } from '@nestjs/bull';
 import { ConflictException, Logger, NotFoundException } from '@nestjs/common';
 import { Job } from 'bull';
-import * as fs from 'fs';
 import * as path from 'path';
-import { AppConfigService } from 'src/app-config';
 import { DatesUtil } from 'src/utils';
 import {
   DocumentRepository,
@@ -18,25 +16,22 @@ import {
   DocumentType,
   ContractDetail,
 } from 'src/sales-force-service';
-import {
-  SpringCMService,
-  UploadDocToSpringParams,
-} from 'src/spring-cm-service';
+import { SpringCMService } from 'src/spring-cm-service';
+import { FileStorageService } from 'src/file-storage-service';
 import { DocumentStatus } from 'src/entities';
 import { DOCUMENT_QUEUE, MIGRATE_JOB } from './document.constants';
-const { readFile, unlink } = fs.promises;
 
 @Processor(DOCUMENT_QUEUE)
 export class DocumentConsumer {
   private readonly logger = new Logger(DocumentConsumer.name);
   constructor(
-    private readonly appConfigService: AppConfigService,
     private readonly documentRepository: DocumentRepository,
     private readonly nomenClatureRepository: NomenclatureWhitelistRepository,
     private readonly qrService: QRService,
     private readonly salesForceService: SalesForceService,
     private readonly springCMService: SpringCMService,
     private readonly datesUtil: DatesUtil,
+    private readonly fileStorageService: FileStorageService,
   ) {}
 
   @Process(MIGRATE_JOB)
@@ -114,23 +109,22 @@ export class DocumentConsumer {
     let buffer: Buffer, qrCode: string;
 
     try {
-      buffer = await this.readFile(filename);
+      buffer = await this.fileStorageService.getFile(filename);
     } catch (err) {
-      if (err?.code === 'ENOENT') {
+      if (err instanceof NotFoundException) {
         await this.documentRepository.failQrDocument({
           documentId,
           errorMessage: 'File not found or missing file, It may be deleted.',
           failedAt: this.datesUtil.getDateNow(),
         });
-        throw new NotFoundException();
       } else {
         await this.documentRepository.failQrDocument({
           documentId,
           errorMessage: `Error: ${err}`,
           failedAt: this.datesUtil.getDateNow(),
         });
-        throw err;
       }
+      throw err;
     }
 
     try {
@@ -177,6 +171,7 @@ export class DocumentConsumer {
 
     if (
       qrCode &&
+      !!dupDoc &&
       (!dupDoc?.isFileDeleted || dupDoc?.status === DocumentStatus.MIGRATE_DONE)
     ) {
       const note = 'QR code or Barcode is already exist.';
@@ -185,7 +180,7 @@ export class DocumentConsumer {
         errorMessage: note,
         failedAt: this.datesUtil.getDateNow(),
       });
-      throw new ConflictException();
+      throw new ConflictException(note);
     }
 
     await this.documentRepository.qrDocument({
@@ -370,23 +365,22 @@ export class DocumentConsumer {
     }
 
     try {
-      buffer = await this.readFile(sysSrcFileName);
+      buffer = await this.fileStorageService.getFile(sysSrcFileName);
     } catch (err) {
-      if (err?.code === 'ENOENT') {
+      if (err instanceof NotFoundException) {
         await this.documentRepository.failMigrate({
           documentId,
           errorMessage: 'File not found or missing file, It may be deleted.',
           failedAt: this.datesUtil.getDateNow(),
         });
-        throw new NotFoundException();
       } else {
         await this.documentRepository.failMigrate({
           documentId,
           errorMessage: err,
           failedAt: this.datesUtil.getDateNow(),
         });
-        throw err;
       }
+      throw err;
     }
 
     let uploadParams = {
@@ -468,7 +462,7 @@ export class DocumentConsumer {
         springcmResponse: JSON.stringify(response),
         migratedAt: this.datesUtil.getDateNow(),
       });
-      await unlink(path.join(this.appConfigService.filePath, sysSrcFileName));
+      await this.fileStorageService.deleteFile(sysSrcFileName);
       await this.documentRepository.deleteFile({
         documentId,
         deletedAt: this.datesUtil.getDateNow(),
@@ -484,11 +478,5 @@ export class DocumentConsumer {
       });
       throw new Error(response?.faultInfo?.message);
     }
-  }
-
-  private async readFile(sysSrcFileName: string): Promise<Buffer> {
-    const location = path.join(this.appConfigService.filePath, sysSrcFileName);
-    const buffer = await readFile(location);
-    return buffer;
   }
 }

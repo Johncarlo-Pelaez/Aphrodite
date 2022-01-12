@@ -78,7 +78,7 @@ export class UserController {
   ): Promise<CreatedResponse> {
     const user = await this.userRepository.getUserByEmail(dto.email);
     if (user || (await this.checkRootUserExist()))
-      throw new ConflictException();
+      throw new ConflictException('User already exist.');
 
     const response = new CreatedResponse();
     const rightNow = new Date();
@@ -183,7 +183,7 @@ export class UserController {
     @Body(ValidationPipe) dto: CreateUserAccountDto,
   ): Promise<CreatedResponse> {
     const user = await this.userRepository.getUserByEmail(dto.email);
-    if (user) throw new ConflictException();
+    if (user) throw new ConflictException('User already exist.');
 
     const response = new CreatedResponse();
     const rightNow = new Date();

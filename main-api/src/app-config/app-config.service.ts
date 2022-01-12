@@ -87,4 +87,20 @@ export class AppConfigService {
   get baseURL(): string {
     return this.configService.get('BASE_URL');
   }
+
+  get fileStorage(): string {
+    return this.configService.get('FILE_STORAGE');
+  }
+
+  get s3AccessKeyId(): string {
+    return this.configService.get('S3_ACCESS_KEY_ID');
+  }
+
+  get s3SecretAccessKey(): string {
+    return this.configService.get('S3_SECRET_ACCESS_KEY');
+  }
+
+  get s3BucketName(): string {
+    return this.configService.get('S3_BUCKET_NAME');
+  }
 }

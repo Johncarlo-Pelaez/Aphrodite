@@ -8,7 +8,7 @@ import * as fs from 'fs';
 import * as pdfParse from 'pdf-parse';
 import { v4 as uuidv4 } from 'uuid';
 import { DatesUtil, FilenameUtil } from 'src/utils';
-import { AppConfigService } from 'src/app-config';
+import { FileStorageService } from 'src/file-storage-service';
 import { DocumentRepository, UserRepository } from 'src/repositories';
 import { EncodeValues } from 'src/repositories/document';
 import { DocumentProducer } from 'src/producers';
@@ -27,7 +27,7 @@ import {
   CancelDocuments,
   DeleteDocuments,
 } from './document.params';
-const { readFile, writeFile, unlink, stat } = fs.promises;
+const { readFile } = fs.promises;
 
 @Injectable()
 export class DocumentService {
@@ -38,29 +38,15 @@ export class DocumentService {
     private readonly documentProducer: DocumentProducer,
     private readonly datesUtil: DatesUtil,
     private readonly filenameUtil: FilenameUtil,
-    private readonly appConfigService: AppConfigService,
     private readonly mailService: MailService,
+    private readonly fileStorageService: FileStorageService,
   ) {}
-
-  private async checkIfFileExist(fileFullPath: string): Promise<boolean> {
-    try {
-      await stat(fileFullPath);
-      return true;
-    } catch (err) {
-      if (err?.code === 'ENOENT') {
-        return false;
-      }
-    }
-  }
 
   async uploadDocument(data: UploadDocument): Promise<CreatedResponse> {
     const dateRightNow = this.datesUtil.getDateNow();
     const { buffer, size, mimetype, originalname } = data.file;
     const uuid = uuidv4();
-    const fileFullPath = this.filenameUtil.buildFullPath(
-      this.appConfigService.filePath,
-      uuid.toUpperCase(),
-    );
+    const fileFullPath = uuid.toUpperCase();
     const filename = this.filenameUtil
       .getFilenameWithoutExtension(originalname)
       .replace(/\.$/, '');
@@ -82,11 +68,12 @@ export class DocumentService {
 
     if (
       qrCode &&
+      !!dupDoc &&
       (!dupDoc?.isFileDeleted || dupDoc?.status === DocumentStatus.MIGRATE_DONE)
     )
-      throw new ConflictException();
+      throw new ConflictException('QR code or Barcode already exist.');
 
-    await writeFile(fileFullPath, buffer);
+    await this.fileStorageService.createFile(fileFullPath, buffer);
 
     const pdfData = await pdfParse(buffer);
     const response = new CreatedResponse();
@@ -111,14 +98,11 @@ export class DocumentService {
     const currentDocument = await this.documentRepository.getDocument(
       data.documentId,
     );
+
     if (!currentDocument) throw new NotFoundException();
 
     const { buffer, size, mimetype, originalname } = data.file;
-
-    const fileFullPath = this.filenameUtil.buildFullPath(
-      this.appConfigService.filePath,
-      currentDocument.uuid,
-    );
+    const fileFullPath = currentDocument.uuid;
     const filename = this.filenameUtil
       .getFilenameWithoutExtension(originalname)
       .replace(/\.$/, '');
@@ -143,16 +127,17 @@ export class DocumentService {
 
     if (
       qrCode &&
+      !!dupDoc &&
       (!dupDoc?.isFileDeleted || dupDoc?.status === DocumentStatus.MIGRATE_DONE)
     )
-      throw new ConflictException();
+      throw new ConflictException('QR code or Barcode already exist.');
 
-    if (await this.checkIfFileExist(fileFullPath)) {
-      await unlink(fileFullPath);
+    if (await this.fileStorageService.checkIfFileExist(fileFullPath)) {
+      await this.fileStorageService.deleteFile(fileFullPath);
     }
 
     try {
-      await writeFile(fileFullPath, buffer);
+      await this.fileStorageService.createFile(fileFullPath, buffer);
     } catch (err) {
       throw err;
     }
@@ -175,20 +160,17 @@ export class DocumentService {
 
   async getDocumentFile(documentId: number): Promise<[Document, Buffer]> {
     const document = await this.documentRepository.getDocument(documentId);
-    const fileFullPath = this.filenameUtil.buildFullPath(
-      this.appConfigService.filePath,
-      document.uuid,
-    );
+    const fileFullPath = document.uuid;
     let buffer: Buffer;
+
     try {
-      buffer = await readFile(fileFullPath);
-    } catch (error) {
-      if (error?.code === 'ENOENT') {
+      buffer = await this.fileStorageService.getFile(fileFullPath);
+    } catch (err) {
+      if (err instanceof NotFoundException) {
         buffer = await readFile('./public/deleted-file.pdf');
-      } else {
-        throw error;
-      }
+      } else throw err;
     }
+
     return [document, buffer];
   }
 
@@ -343,22 +325,7 @@ export class DocumentService {
     for await (const documentId of data.documentIds) {
       const document = await this.documentRepository.getDocument(documentId);
       if (!document) throw new NotFoundException();
-
-      const fileFullPath = this.filenameUtil.buildFullPath(
-        this.appConfigService.filePath,
-        document.uuid,
-      );
-
-      try {
-        await unlink(fileFullPath);
-      } catch (err) {
-        if (err?.code === 'ENOENT') {
-          throw new NotFoundException();
-        } else {
-          throw err;
-        }
-      }
-
+      await this.fileStorageService.deleteFile(document.uuid);
       await this.documentRepository.deleteFile({
         documentId,
         deletedBy: data.deletedBy,

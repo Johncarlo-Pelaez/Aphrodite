@@ -32,6 +32,7 @@ import { AzureADStrategy } from './core';
 import { AzureAdService } from './azure-ad-service';
 import { ExcelService } from './excel-service';
 import { ReportService } from './report-service';
+import { FileStorageService } from './file-storage-service';
 
 const logger = new Logger('AppModule');
 
@@ -103,6 +104,7 @@ const logger = new Logger('AppModule');
     ExcelService,
     ReportRepository,
     ReportService,
+    FileStorageService,
   ],
 })
 export class AppModule {}
