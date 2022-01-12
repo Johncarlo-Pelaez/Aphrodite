@@ -7,6 +7,7 @@ import {
   In,
   Between,
   FindOperator,
+  Not,
 } from 'typeorm';
 import {
   CreateDocumentParam,
@@ -133,7 +134,16 @@ export class DocumentRepository {
     });
   }
 
-  async getDocumentByQRCode(qrCode: string): Promise<Document> {
+  async getDocumentByQRCode(
+    qrCode: string,
+    exceptDocId?: number,
+  ): Promise<Document> {
+    if (exceptDocId) {
+      return await this.manager.findOne(Document, {
+        where: { qrCode, id: Not(exceptDocId) },
+      });
+    }
+
     return await this.manager.findOne(Document, {
       where: { qrCode },
     });

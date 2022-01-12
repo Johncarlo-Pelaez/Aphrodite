@@ -136,11 +136,13 @@ export class DocumentService {
       qrCode = filename.substr(0, 15);
     }
 
-    const dupDoc = await this.documentRepository.getDocumentByQRCode(qrCode);
+    const dupDoc = await this.documentRepository.getDocumentByQRCode(
+      qrCode,
+      currentDocument.id,
+    );
 
     if (
       qrCode &&
-      currentDocument.id !== dupDoc.id &&
       (!dupDoc?.isFileDeleted || dupDoc?.status === DocumentStatus.MIGRATE_DONE)
     )
       throw new ConflictException();

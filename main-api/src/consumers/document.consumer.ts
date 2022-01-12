@@ -170,11 +170,13 @@ export class DocumentConsumer {
       qrCode = qrCode.substr(0, 15);
     }
 
-    const dupDoc = await this.documentRepository.getDocumentByQRCode(qrCode);
+    const dupDoc = await this.documentRepository.getDocumentByQRCode(
+      qrCode,
+      documentId,
+    );
 
     if (
       qrCode &&
-      documentId !== dupDoc.id &&
       (!dupDoc?.isFileDeleted || dupDoc?.status === DocumentStatus.MIGRATE_DONE)
     ) {
       const note = 'QR code or Barcode is already exist.';
