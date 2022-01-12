@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import * as moment from 'moment';
 import * as fileSize from 'filesize';
 import { DocumentHistory } from 'src/entities';
 import { ReportRepository } from 'src/repositories';
@@ -55,7 +54,8 @@ export class ReportService {
       {
         key: 'createdDate',
         title: 'Date and Time',
-        render: (dh) => moment(dh.createdDate).format(DEFAULT_DATE_FORMAT),
+        render: (dh) =>
+          this.dateUtil.formatDate(dh.createdDate, DEFAULT_DATE_FORMAT),
       },
       {
         key: 'documentName',
@@ -97,7 +97,7 @@ export class ReportService {
         key: 'requestedDate',
         title: 'Date and Time',
         render: (report) =>
-          moment(report.requestedDate).format(DEFAULT_DATE_FORMAT),
+          this.dateUtil.formatDate(report.requestedDate, DEFAULT_DATE_FORMAT),
       },
       {
         key: 'filename',
@@ -160,7 +160,7 @@ export class ReportService {
         key: 'checkedDate',
         title: 'Date and Time',
         render: (report) =>
-          moment(report.checkedDate).format(DEFAULT_DATE_FORMAT),
+          this.dateUtil.formatDate(report.checkedDate, DEFAULT_DATE_FORMAT),
       },
       {
         key: 'filename',
@@ -223,7 +223,7 @@ export class ReportService {
         key: 'approvalDate',
         title: 'Date and Time',
         render: (report) =>
-          moment(report.approvalDate).format(DEFAULT_DATE_FORMAT),
+          this.dateUtil.formatDate(report.approvalDate, DEFAULT_DATE_FORMAT),
       },
       {
         key: 'filename',
@@ -284,7 +284,7 @@ export class ReportService {
         key: 'importedDate',
         title: 'Date and Time',
         render: (report) =>
-          moment(report.importedDate).format(DEFAULT_DATE_FORMAT),
+          this.dateUtil.formatDate(report.importedDate, DEFAULT_DATE_FORMAT),
       },
       {
         key: 'filename',
@@ -387,7 +387,7 @@ export class ReportService {
         key: 'dateScanned',
         title: 'Date Scanned',
         render: (report) =>
-          moment(report.dateScanned).format(DEFAULT_DATE_FORMAT),
+          this.dateUtil.formatDate(report.dateScanned, DEFAULT_DATE_FORMAT),
       },
       {
         key: 'brand',
@@ -434,7 +434,7 @@ export class ReportService {
         key: 'dateIndexed',
         title: 'Date Indexed',
         render: (report) =>
-          this.dateUtil.excelDateResult(report.dateIndexed, DEFAULT_DATE_FORMAT),
+          this.dateUtil.formatDate(report.dateIndexed, DEFAULT_DATE_FORMAT),
       },
       {
         key: 'indexedBy',
@@ -467,7 +467,7 @@ export class ReportService {
         key: 'dateUploaded',
         title: 'Date Uploaded',
         render: (report) =>
-          this.dateUtil.excelDateResult(report.dateUploaded, DEFAULT_DATE_FORMAT),
+          this.dateUtil.formatDate(report.dateUploaded, DEFAULT_DATE_FORMAT),
       },
       {
         key: 'uploadedBy',
@@ -493,7 +493,7 @@ export class ReportService {
         key: 'errorDate',
         title: 'Date of Error Processing',
         render: (report) =>
-          this.dateUtil.excelDateResult(report.errorDate, DEFAULT_DATE_FORMAT),
+          this.dateUtil.formatDate(report.errorDate, DEFAULT_DATE_FORMAT),
       },
     ];
     return await this.excelService.create({
