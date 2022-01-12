@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { FileStorage } from 'src/file-storage-service';
 import { Environment } from './env.validate';
 
 @Injectable()
@@ -90,7 +89,7 @@ export class AppConfigService {
   }
 
   get fileStorage(): string {
-    return this.configService.get('FILE_STORAGE') || FileStorage.LOCAL;
+    return this.configService.get('FILE_STORAGE') || 'Local';
   }
 
   get s3AccessKeyId(): string {
