@@ -73,14 +73,12 @@ export const getForRetryDocStatuses = (): DocumentStatus[] =>
 export const getForCancelDocStatuses = (): DocumentStatus[] =>
   Object.values(DocumentStatus).filter(
     (s) =>
-      !s.includes('DONE') &&
-      !s.includes('FAILED') &&
-      s !== DocumentStatus.CANCELLED,
+      !s.includes('DONE') && !s.includes('FAILED') && !s.includes('CANCELLED'),
   );
 
 export const getForDeleteDocsFileStatuses = (): DocumentStatus[] =>
   Object.values(DocumentStatus).filter(
-    (s) => s.includes('FAILED') || s === DocumentStatus.CANCELLED,
+    (s) => s.includes('FAILED') || s.includes('CANCELLED'),
   );
 
 export const getDocStatusFilter = (

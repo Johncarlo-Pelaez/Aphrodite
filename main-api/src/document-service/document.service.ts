@@ -78,7 +78,12 @@ export class DocumentService {
       qrCode = filename.substr(0, 15);
     }
 
-    if (qrCode && !!(await this.documentRepository.getDocumentByQRCode(qrCode)))
+    const dupDoc = await this.documentRepository.getDocumentByQRCode(qrCode);
+
+    if (
+      qrCode &&
+      (!dupDoc?.isFileDeleted || dupDoc?.status === DocumentStatus.MIGRATE_DONE)
+    )
       throw new ConflictException();
 
     await writeFile(fileFullPath, buffer);
@@ -103,14 +108,16 @@ export class DocumentService {
   }
 
   async replaceDocumentFile(data: ReplaceDocumentFile): Promise<void> {
-    const document = await this.documentRepository.getDocument(data.documentId);
-    if (!document) throw new NotFoundException();
+    const currentDocument = await this.documentRepository.getDocument(
+      data.documentId,
+    );
+    if (!currentDocument) throw new NotFoundException();
 
     const { buffer, size, mimetype, originalname } = data.file;
 
     const fileFullPath = this.filenameUtil.buildFullPath(
       this.appConfigService.filePath,
-      document.uuid,
+      currentDocument.uuid,
     );
     const filename = this.filenameUtil
       .getFilenameWithoutExtension(originalname)
@@ -129,7 +136,13 @@ export class DocumentService {
       qrCode = filename.substr(0, 15);
     }
 
-    if (qrCode && !!(await this.documentRepository.getDocumentByQRCode(qrCode)))
+    const dupDoc = await this.documentRepository.getDocumentByQRCode(qrCode);
+
+    if (
+      qrCode &&
+      currentDocument.id !== dupDoc.id &&
+      (!dupDoc?.isFileDeleted || dupDoc?.status === DocumentStatus.MIGRATE_DONE)
+    )
       throw new ConflictException();
 
     if (await this.checkIfFileExist(fileFullPath)) {
@@ -145,7 +158,7 @@ export class DocumentService {
     const pdfData = await pdfParse(buffer);
 
     await this.documentRepository.replaceFile({
-      documentId: document.id,
+      documentId: currentDocument.id,
       documentName: originalname,
       documentSize: size,
       mimeType: mimetype,
@@ -155,7 +168,7 @@ export class DocumentService {
       replacedBy: data.replacedBy,
     });
 
-    await this.documentProducer.migrate(document.id);
+    await this.documentProducer.migrate(currentDocument.id);
   }
 
   async getDocumentFile(documentId: number): Promise<[Document, Buffer]> {
@@ -300,11 +313,9 @@ export class DocumentService {
   async retryErrorDocuments(retriedBy: string): Promise<void> {
     const documentIds = (
       await this.documentRepository.getDocuments({
-        statuses: Object.values(DocumentStatus).filter((s) => {
-          const arrStattmp = s.split('_');
-          if (arrStattmp.length === 2) return arrStattmp[1] === 'FAILED';
-          else return arrStattmp[0] === DocumentStatus.CANCELLED;
-        }),
+        statuses: Object.values(DocumentStatus).filter(
+          (s) => s.includes('FAILED') || s.includes('CANCELLED'),
+        ),
       })
     ).map((doc) => doc.id);
     await this.retryDocuments({ documentIds, retriedBy });
