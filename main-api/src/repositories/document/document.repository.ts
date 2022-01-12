@@ -1,4 +1,5 @@
 import * as moment from 'moment';
+import * as fileSize from 'filesize';
 import { Document, DocumentStatus, DocumentHistory } from 'src/entities';
 import {
   EntityManager,
@@ -257,7 +258,9 @@ export class DocumentRepository {
 
         const history = this.genarateDocumentHistory(document, {
           userUsername: document.modifiedBy,
-          note: `Filename: ${document.documentName}, Size: ${document.documentSize}, Total page: ${document.pageTotal}, Type: ${document.mimeType}`,
+          note: `Filename: ${document.documentName}, Size: ${fileSize(
+            document.documentSize,
+          )}, Total page: ${document.pageTotal}, Type: ${document.mimeType}`,
         });
         await transaction.save(history);
 
@@ -653,11 +656,6 @@ export class DocumentRepository {
         Document,
         param.documentId,
       );
-      const docFilename = document.documentName;
-      const docFileSize = document.documentSize;
-      const docPageTotal = document.pageTotal;
-      const docFileMimeType = document.mimeType;
-
       document.documentName = 'deleted-file.pdf';
       document.documentSize = 0;
       document.pageTotal = 0;
@@ -671,7 +669,9 @@ export class DocumentRepository {
       const history = this.genarateDocumentHistory(document, {
         documentStatus: '',
         userUsername: param.deletedBy,
-        note: `Filename: ${docFilename}, Size: ${docFileSize}, Total page: ${docPageTotal}, Type: ${docFileMimeType}`,
+        note: `Filename: ${document.documentName}, Size: ${fileSize(
+          document.documentSize,
+        )}, Total page: ${document.pageTotal}, Type: ${document.mimeType}`,
       });
       await transaction.save(history);
     });
@@ -700,7 +700,10 @@ export class DocumentRepository {
 
       const history = this.genarateDocumentHistory(document, {
         documentStatus: '',
-        note: `Filename: ${document.documentName}, Size: ${document.documentSize}, Total page: ${document.pageTotal}, Type: ${document.mimeType}`,
+        userUsername: param.replacedBy,
+        note: `Filename: ${document.documentName}, Size: ${fileSize(
+          document.documentSize,
+        )}, Total page: ${document.pageTotal}, Type: ${document.mimeType}`,
       });
       await transaction.save(history);
     });
