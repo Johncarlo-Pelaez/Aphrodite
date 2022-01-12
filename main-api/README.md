@@ -47,6 +47,7 @@ It will access the variables from the runtime environment else it will load from
 | DB_NAME            | Database name to connect to         | string                                |                                     |
 | REDIS_HOST         | Redis host                          | string                                | `'localhost'`                       |
 | REDIS_PORT         | Redis host port                     | number                                | `6379`                              |
+| FILE_STORAGE       | File storage protocol               | string                                | `Local`                             |
 | FILE_PATH          | Staging files folder location       | string                                | `../files`                          |
 | BARCODE_LICENSE    | Dynamsoft License                   | string                                |                                     |
 | SALESFORCE_URL     | Sales Force API Base URl            | string                                | `http://alicas201.ayalaland.com.ph` |
