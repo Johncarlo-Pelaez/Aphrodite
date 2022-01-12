@@ -2,7 +2,6 @@ import { DocumentStatus } from 'core/enum';
 
 export const generateOperationText = (status: DocumentStatus): string => {
   const arrStatus = status.split('_');
-
   if (!!arrStatus?.length) {
     const operation = arrStatus[0];
     switch (operation) {
@@ -17,11 +16,11 @@ export const generateOperationText = (status: DocumentStatus): string => {
       case 'MIGRATE':
         return 'Document Import';
       case 'UPLOADED':
+        return 'Upload Document';
       case 'QR':
         return 'QR code/ Barcode Scanning';
     }
   }
-
   return '';
 };
 
