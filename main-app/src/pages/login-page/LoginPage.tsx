@@ -32,7 +32,7 @@ export const LoginPage = (): ReactElement => {
 
   return (
     <div className={styles.loginContainer}>
-      <div>
+      <div className={styles.boxWrappper}>
         <Figure>
           <Figure.Image width={350} height={60} alt="logo" src="/logo.png" />
         </Figure>
@@ -77,6 +77,11 @@ export const LoginPage = (): ReactElement => {
             </Alert>
           </div>
         </Form>
+      </div>
+      <div className={styles.footerWrappper}>
+        <p>
+          Powered By <img width={100} alt="logo" src="/epds-logo.png"></img>
+        </p>
       </div>
     </div>
   );
