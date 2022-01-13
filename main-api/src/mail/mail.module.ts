@@ -21,7 +21,9 @@ import { join } from 'path';
           },
         },
         defaults: {
-          from: `"No Reply" <${appConfigService.mailFrom}>`,
+          from: `"No Reply" <${
+            appConfigService.mailFrom ?? appConfigService.mailUser
+          }>`,
         },
         template: {
           dir: join(__dirname, 'templates'),
