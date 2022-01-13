@@ -40,9 +40,9 @@ It will access the variables from the runtime environment else it will load from
 | ------------------ | ---------------------------------- | ------------------------------------- | ----------------------------------- |
 | NODE_ENV           | App environment                    | `'development'` &#124; `'production'` | `'development'`                     |
 | PORT               | App port                           | number                                | `3000`                              |
+| DOMAIN             | Domain name ex. https://ris.com.ph | string                                | `http://localhost:8080`             |
 | DB_HOST            | Database host                      | string                                | `'localhost'`                       |
 | DB_PORT            | Database host port                 | number                                | `1433`                              |
-| DOMAIN             | Domain name ex. https://ris.com.ph | string                                | `http://localhost:8080`             |
 | DB_USER            | Database username                  | string                                | `'sa'`                              |
 | DB_PASSWORD        | Database password                  | string                                |                                     |
 | DB_NAME            | Database name to connect to        | string                                |                                     |
