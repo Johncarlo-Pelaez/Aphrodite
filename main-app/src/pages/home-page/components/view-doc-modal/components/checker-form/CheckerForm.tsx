@@ -36,7 +36,12 @@ export const CheckerForm = forwardRef(
     } = useCheckerDocument();
 
     const { control, reset, handleSubmit, setError, setFocus } =
-      useForm<ICheckerFormValues>();
+      useForm<ICheckerFormValues>({
+        defaultValues: {
+          documentDate: document?.documentDate,
+          remarks: document?.remarks,
+        },
+      });
 
     const approveDocumentSubmit = async (
       data: ICheckerFormValues,
