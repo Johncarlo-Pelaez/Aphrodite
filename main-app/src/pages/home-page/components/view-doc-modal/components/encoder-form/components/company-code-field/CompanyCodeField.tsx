@@ -26,6 +26,7 @@ export const CompanyCodeField = ({
       </Form.Label>
       <Form.Control
         {...field}
+        maxLength={4}
         placeholder="Enter company code"
         onFocus={(event) => event.target.select()}
         isInvalid={!!error}

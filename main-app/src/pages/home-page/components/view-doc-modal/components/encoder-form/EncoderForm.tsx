@@ -93,6 +93,22 @@ export const EncoderForm = forwardRef(
         return;
       }
 
+      if (companyCode?.length > 4) {
+        setError('companyCode', {
+          type: 'maxLength',
+          message: 'Maximum of 4 digits only.',
+        });
+        return;
+      }
+
+      if (contractNumber?.length > 13) {
+        setError('contractNumber', {
+          type: 'maxLength',
+          message: 'Maximum of 13 digits only.',
+        });
+        return;
+      }
+
       const isQRBarCodeInputEmpty = !qrBarCode || qrBarCode === '';
       const isNomenclatureInputEmpty =
         !arrNomenclature || arrNomenclature?.length < 1;

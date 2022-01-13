@@ -656,10 +656,6 @@ export class DocumentRepository {
         Document,
         param.documentId,
       );
-      document.documentName = 'deleted-file.pdf';
-      document.documentSize = 0;
-      document.pageTotal = 0;
-      document.mimeType = '';
       document.modifiedDate = param.deletedAt;
       document.modifiedBy = param.deletedBy ?? document.modifiedBy;
       document.isFileDeleted = true;
