@@ -34,7 +34,7 @@ export class MailService {
         name: param.name,
         day: dayText,
         documentsNumber: param.documentsNumber,
-        url: `${this.appConfigService.baseURL}/auth`,
+        url: `${this.appConfigService.domain}/auth`,
       },
     });
   }

@@ -84,23 +84,11 @@ export class AppConfigService {
     return this.configService.get('MAIL_FROM');
   }
 
-  get baseURL(): string {
-    return this.configService.get('BASE_URL');
+  get domain(): string {
+    return this.configService.get('DOMAIN');
   }
 
   get fileStorage(): string {
     return this.configService.get('FILE_STORAGE') || 'Local';
-  }
-
-  get s3AccessKeyId(): string {
-    return this.configService.get('S3_ACCESS_KEY_ID');
-  }
-
-  get s3SecretAccessKey(): string {
-    return this.configService.get('S3_SECRET_ACCESS_KEY');
-  }
-
-  get s3BucketName(): string {
-    return this.configService.get('S3_BUCKET_NAME');
   }
 }
