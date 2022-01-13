@@ -55,10 +55,8 @@ export const HomePage = (): ReactElement => {
   const hasSelected1Doc = !!selected1Doc;
   const showRetryButton =
     !!selectedDocuments.length &&
-    selectedDocuments.every(
-      (doc) =>
-        getForRetryDocStatuses().some((s) => s === doc.status) &&
-        !doc.isFileDeleted,
+    selectedDocuments.every((doc) =>
+      getForRetryDocStatuses().some((s) => s === doc.status),
     );
   const showCancelButton =
     !!selectedDocuments.length &&
@@ -67,10 +65,8 @@ export const HomePage = (): ReactElement => {
     );
   const showDeleteButton =
     !!selectedDocuments.length &&
-    selectedDocuments.every(
-      (doc) =>
-        getForDeleteDocsFileStatuses().some((s) => s === doc.status) &&
-        !doc.isFileDeleted,
+    selectedDocuments.every((doc) =>
+      getForDeleteDocsFileStatuses().some((s) => s === doc.status),
     );
   const documentStatusFilter = getDocStatusFilter(
     selectedStatus,

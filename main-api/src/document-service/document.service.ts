@@ -325,12 +325,15 @@ export class DocumentService {
     for await (const documentId of data.documentIds) {
       const document = await this.documentRepository.getDocument(documentId);
       if (!document) throw new NotFoundException();
-      await this.fileStorageService.deleteFile(document.uuid);
-      await this.documentRepository.deleteFile({
-        documentId,
-        deletedBy: data.deletedBy,
-        deletedAt: this.datesUtil.getDateNow(),
-      });
+      if (!document.isFileDeleted) {
+        const fileFullPath = document.uuid;
+        await this.fileStorageService.deleteFile(fileFullPath);
+        await this.documentRepository.deleteFile({
+          documentId,
+          deletedBy: data.deletedBy,
+          deletedAt: this.datesUtil.getDateNow(),
+        });
+      }
     }
   }
 }
