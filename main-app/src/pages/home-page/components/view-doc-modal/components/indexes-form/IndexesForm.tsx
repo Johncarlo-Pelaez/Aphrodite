@@ -40,74 +40,93 @@ export const ReadOnlyIndexFields = ({
   document,
 }: IndexesFormProps): ReactElement => {
   const documentType = parseDocumentType(document?.documentType ?? '');
+  const indexes: { label: string; value?: string | number }[] = [
+    {
+      label: 'Barcode / QR code',
+      value: document?.qrCode,
+    },
+    {
+      label: 'Brand',
+      value: documentType?.Brand,
+    },
+    {
+      label: 'Company Code',
+      value: documentType?.CompanyCode,
+    },
+    {
+      label: 'Contract Number',
+      value: documentType?.ContractNumber,
+    },
+    {
+      label: 'Account Name',
+      value: documentType?.AccountName,
+    },
+    {
+      label: 'Customer Code',
+      value: documentType?.CustomerCode,
+    },
+    {
+      label: 'Project Name',
+      value: documentType?.ProjectName,
+    },
+    {
+      label: 'Unit Details',
+      value: documentType?.UnitDetails,
+    },
+    {
+      label: 'Project Code',
+      value: documentType?.ProjectCode,
+    },
+    {
+      label: 'Nomenclature',
+      value: documentType?.Nomenclature,
+    },
+    {
+      label: 'Document Group',
+      value: documentType?.DocumentGroup,
+    },
+    {
+      label: 'Transmittal Form ID',
+      value: documentType?.Transmittal,
+    },
+    {
+      label: 'Number of Pages',
+      value: document?.pageTotal,
+    },
+    {
+      label: 'Document Date',
+      value: document?.documentDate,
+    },
+    {
+      label: 'File Name',
+      value: document?.documentName,
+    },
+    {
+      label: 'Remarks',
+      value: document?.remarks,
+    },
+  ];
+
+  const renderField = (
+    label: string,
+    value?: string | number,
+  ): ReactElement => (
+    <Form.Group>
+      <Form.Label>
+        <b>{label}</b>
+      </Form.Label>
+      <Form.Control
+        readOnly
+        type="text"
+        placeholder={label}
+        value={value ?? ''}
+      />
+    </Form.Group>
+  );
+
   return (
     <React.Fragment>
-      <Form.Group>
-        <Form.Label>
-          <b>Brand</b>
-        </Form.Label>
-        <Form.Control
-          readOnly
-          type="text"
-          placeholder="Brand"
-          value={documentType?.Brand ?? ''}
-        />
-      </Form.Group>
-      <Form.Group>
-        <Form.Label>
-          <b>Company Code</b>
-        </Form.Label>
-        <Form.Control
-          readOnly
-          type="text"
-          placeholder="Company Code"
-          value={documentType?.CompanyCode ?? ''}
-        />
-      </Form.Group>
-      <Form.Group>
-        <Form.Label>
-          <b>Contract Number</b>
-        </Form.Label>
-        <Form.Control
-          readOnly
-          type="text"
-          placeholder="Contract Number"
-          value={documentType?.ContractNumber ?? ''}
-        />
-      </Form.Group>
-      <Form.Group>
-        <Form.Label>
-          <b>Nomenclature</b>
-        </Form.Label>
-        <Form.Control
-          readOnly
-          type="text"
-          placeholder="Nomenclature"
-          value={documentType?.Nomenclature ?? ''}
-        />
-      </Form.Group>
-      <Form.Group>
-        <Form.Label>
-          <b>Document Group</b>
-        </Form.Label>
-        <Form.Control
-          readOnly
-          type="text"
-          placeholder="Document Group"
-          value={documentType?.DocumentGroup ?? ''}
-        />
-      </Form.Group>
-      <Form.Group>
-        <Form.Label>
-          <b>Account Name</b>
-        </Form.Label>
-        <Form.Control
-          readOnly
-          type="text"
-          placeholder="Account Name"
-          value={documentType?.AccountName ?? ''}
-        />
-      </Form.Group>
+      {indexes.map((i) => renderField(i.label, i.value))}
     </React.Fragment>
   );
 };

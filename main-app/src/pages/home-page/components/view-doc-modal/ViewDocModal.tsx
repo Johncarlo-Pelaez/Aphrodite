@@ -61,7 +61,6 @@ export const ViewDocModal = (props: ViewDocModalProps): ReactElement => {
       />
       <Modal
         backdrop="static"
-        keyboard={false}
         show={isVisible}
         onHide={triggerClose}
         centered
@@ -115,7 +114,7 @@ export const ViewDocModal = (props: ViewDocModalProps): ReactElement => {
     const documentStatus = document?.status;
     if (
       documentStatus === DocumentStatus.ENCODING &&
-      currentUserRole === Role.ENCODER
+      (currentUserRole === Role.ENCODER || currentUserRole === Role.ADMIN)
     ) {
       return (
         <EncoderForm
@@ -126,7 +125,7 @@ export const ViewDocModal = (props: ViewDocModalProps): ReactElement => {
       );
     } else if (
       documentStatus === DocumentStatus.CHECKING &&
-      currentUserRole === Role.ENCODER
+      (currentUserRole === Role.ENCODER || currentUserRole === Role.ADMIN)
     ) {
       return (
         <CheckerForm
@@ -137,7 +136,7 @@ export const ViewDocModal = (props: ViewDocModalProps): ReactElement => {
       );
     } else if (
       documentStatus === DocumentStatus.CHECKING_DISAPPROVED &&
-      currentUserRole === Role.REVIEWER
+      (currentUserRole === Role.REVIEWER || currentUserRole === Role.ADMIN)
     ) {
       return (
         <AppoverForm
@@ -157,7 +156,7 @@ export const ViewDocModal = (props: ViewDocModalProps): ReactElement => {
     const documentStatus = document?.status;
     if (
       documentStatus === DocumentStatus.ENCODING &&
-      currentUserRole === Role.ENCODER
+      (currentUserRole === Role.ENCODER || currentUserRole === Role.ADMIN)
     ) {
       formActionButtons = [
         <Button key="btn-close" variant="outline-danger" onClick={triggerClose}>
@@ -173,7 +172,7 @@ export const ViewDocModal = (props: ViewDocModalProps): ReactElement => {
       ];
     } else if (
       documentStatus === DocumentStatus.CHECKING &&
-      currentUserRole === Role.ENCODER
+      (currentUserRole === Role.ENCODER || currentUserRole === Role.ADMIN)
     ) {
       formActionButtons = [
         <Button
@@ -193,7 +192,7 @@ export const ViewDocModal = (props: ViewDocModalProps): ReactElement => {
       ];
     } else if (
       documentStatus === DocumentStatus.CHECKING_DISAPPROVED &&
-      currentUserRole === Role.REVIEWER
+      (currentUserRole === Role.REVIEWER || currentUserRole === Role.ADMIN)
     ) {
       formActionButtons = [
         <Button
@@ -213,7 +212,7 @@ export const ViewDocModal = (props: ViewDocModalProps): ReactElement => {
       ];
     } else if (
       documentStatus === DocumentStatus.DISAPPROVED &&
-      currentUserRole === Role.REVIEWER
+      (currentUserRole === Role.REVIEWER || currentUserRole === Role.ADMIN)
     ) {
       formActionButtons = [
         <Button

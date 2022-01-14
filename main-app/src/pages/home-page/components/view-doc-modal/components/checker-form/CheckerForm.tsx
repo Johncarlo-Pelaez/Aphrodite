@@ -13,6 +13,7 @@ import { Document } from 'models';
 import { useCheckerDocument } from 'hooks';
 import { FileInfo, ReadOnlyIndexFields } from '../indexes-form';
 import { DocumentDateField, RemarksField } from './components';
+import styles from './CheckerForm.module.css';
 
 export interface ICheckerFormValues {
   documentDate: string;
@@ -134,7 +135,7 @@ export const CheckerForm = forwardRef(
           <Card.Body>
             <FileInfo document={document} />
             <hr />
-            <Form>
+            <Form className={styles.form}>
               <fieldset disabled={isCheckDocSaving}>
                 <ReadOnlyIndexFields document={document} />
                 <DocumentDateField control={control} />

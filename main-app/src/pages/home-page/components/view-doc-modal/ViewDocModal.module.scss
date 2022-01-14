@@ -2,7 +2,8 @@
 
 .viewModal {
   max-width: 100vw !important;
-  width: 95vw !important;
+  width: 98vw !important;
+  height: 90vh !important;
 }
 
 .viewDocMainTab {
@@ -17,7 +18,7 @@
 
   .pdfViewerWrapper {
     width: 100%;
-    height: 90vh;
+    height: 70vh;
     margin-bottom: 1rem;
   }
 
@@ -28,7 +29,6 @@
 
   @include breakpoint-up(lg) {
     height: 72vh;
-    overflow: auto;
     display: flex;
     flex-flow: row nowrap;
     gap: 1rem;

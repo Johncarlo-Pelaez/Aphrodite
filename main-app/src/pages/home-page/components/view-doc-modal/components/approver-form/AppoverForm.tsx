@@ -3,6 +3,7 @@ import {
   useImperativeHandle,
   forwardRef,
   useEffect,
+  Fragment,
 } from 'react';
 import Card from 'react-bootstrap/Card';
 import Form from 'react-bootstrap/Form';
@@ -10,6 +11,7 @@ import Alert from 'react-bootstrap/Alert';
 import { Document } from 'models';
 import { useApproverDocoment } from 'hooks';
 import { FileInfo, ReadOnlyIndexFields } from '../indexes-form';
+import styles from './AppoverForm.module.css';
 
 export interface AppoverFormProps {
   document?: Document;
@@ -73,7 +75,7 @@ export const AppoverForm = forwardRef(
     }, []);
 
     return (
-      <>
+      <Fragment>
         <Alert variant="danger" show={hasApproveDocError}>
           Failed to save.
         </Alert>
@@ -82,7 +84,7 @@ export const AppoverForm = forwardRef(
           <Card.Body>
             <FileInfo document={document} />
             <hr />
-            <Form>
+            <Form className={styles.form}>
               <ReadOnlyIndexFields document={document} />
               <Form.Group className="mb-3">
                 <Form.Label>
@@ -107,7 +109,7 @@ export const AppoverForm = forwardRef(
             </Form>
           </Card.Body>
         </Card>
-      </>
+      </Fragment>
     );
   },
 );

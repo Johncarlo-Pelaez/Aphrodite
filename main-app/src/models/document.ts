@@ -18,6 +18,7 @@ export interface Document {
   encodeValues: string;
   documentHistories: DocumentHistory[];
   isFileDeleted: boolean;
+  pageTotal: number;
 }
 
 export interface DocumentType {
