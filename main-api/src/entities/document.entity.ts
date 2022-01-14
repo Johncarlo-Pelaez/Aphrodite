@@ -180,15 +180,15 @@ export class DocumentHistory {
   @Column({ nullable: true })
   note?: string;
 
-  @ApiPropertyOptional()
-  @Column({ nullable: true })
+  @ApiProperty()
+  @Column()
   filename?: string;
 
-  @ApiPropertyOptional()
-  @Column({ nullable: true })
+  @ApiProperty()
+  @Column()
   mimeType: string;
 
-  @ApiPropertyOptional()
-  @Column({ nullable: true })
+  @ApiProperty()
+  @Column()
   pageTotal: number;
 }
