@@ -23,4 +23,8 @@ export class FilenameUtil {
   buildFullPath(filePath: string, fileName: string): string {
     return path.join(filePath, fileName);
   }
+
+  removeNotAllowedChar(filaname: string): string {
+    return filaname?.replace(/\\|\*|\/|\?|"|:|<|>|\|/g, '');
+  }
 }

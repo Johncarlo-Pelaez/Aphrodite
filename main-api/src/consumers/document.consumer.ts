@@ -2,7 +2,7 @@ import { Process, Processor } from '@nestjs/bull';
 import { ConflictException, Logger, NotFoundException } from '@nestjs/common';
 import { Job } from 'bull';
 import * as path from 'path';
-import { DatesUtil } from 'src/utils';
+import { DatesUtil, FilenameUtil } from 'src/utils';
 import {
   DocumentRepository,
   NomenclatureWhitelistRepository,
@@ -31,6 +31,7 @@ export class DocumentConsumer {
     private readonly salesForceService: SalesForceService,
     private readonly springCMService: SpringCMService,
     private readonly datesUtil: DatesUtil,
+    private readonly filenameUtil: FilenameUtil,
     private readonly fileStorageService: FileStorageService,
   ) {}
 
@@ -403,9 +404,9 @@ export class DocumentConsumer {
       DocumentName: documentType?.Nomenclature ?? empty,
       ExternalSourceCaptureDate:
         this.datesUtil.getTimestamp('M/D/YYYY h:mm:ss A'),
-      FileName: `${documentType?.Nomenclature}${path.extname(
-        document.documentName,
-      )}`,
+      FileName: `${this.filenameUtil.removeNotAllowedChar(
+        documentType?.Nomenclature?.replace(/\/|\\|\|/g, '_'),
+      )}${path.extname(document.documentName)}`,
       MIMEType: document.mimeType,
       DocumentDate: document.documentDate
         ? this.datesUtil.formatDateString(document.documentDate, 'MMDDYYYY')
