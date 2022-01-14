@@ -2,6 +2,10 @@
 
 ---
 
+### Database setup
+
+1. Run the database script `/update.sql`.
+
 ### Main API setup
 
 1. Copy the `/main-api` directory.
@@ -40,12 +44,6 @@ _Please refer to [pm2 documentation](https://pm2.keymetrics.io/docs/usage/quick-
 main-api$ pm2 list
 ```
 
-or
-
-```
-main-api$ pm2 monit
-```
-
 7. Save the instance(s) to automatically start on server startup.
 
 ```
@@ -54,19 +52,7 @@ main-api$ pm2 save
 
 ### Main App setup
 
-1. Copy the `/main-app` directory.
-
-2. Go to `/main-app` directory.
-
-```
-$ cd main-app
-```
-
-3. Install node modules.
-
-```
-main-app$ npm install
-```
+1. Just copy the `/main-app` directory.
 
 _Note: The app is not yet running, let's go to the [Nginx setup](#nginx-setup)._
 
@@ -74,13 +60,15 @@ _Note: The app is not yet running, let's go to the [Nginx setup](#nginx-setup)._
 
 1. Just copy the `/pdfjs` directory.
 
+_Note: The app is not yet running, let's go to the [Nginx setup](#nginx-setup)._
+
 ### Nginx setup
 
 1. Create a server for the Main App.
 
 ```
 server {
-  listen 3000;
+  listen 5000;
 
   location / {
     root [BASE_PATH]/main-app/build;
@@ -94,7 +82,7 @@ server {
 
 ```
 server {
-  listen 3001;
+  listen 5001;
 
   location / {
     root [BASE_PATH]/pdfjs;
@@ -108,19 +96,17 @@ server {
 
 ```
 location / {
-    proxy_pass http://localhost:3000;
+    proxy_pass http://localhost:5000;
 }
 
 location /pdfjs {
     rewrite /pdfjs/(.*) /$1 break;
 
-    proxy_pass http://localhost:3001;
+    proxy_pass http://localhost:5001;
 }
 
 location /api {
-    #rewrite /api/(.*) /$1 break;
-
-    proxy_pass http://localhost:3002;
+    proxy_pass http://localhost:5002;
 }
 ```
 
