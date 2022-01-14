@@ -1,5 +1,5 @@
 import { ReactElement, useEffect } from 'react';
-import { useForm, SubmitHandler, FieldValues } from 'react-hook-form';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Form from 'react-bootstrap/Form';
 import Alert from 'react-bootstrap/Alert';
@@ -11,7 +11,7 @@ import * as yup from 'yup';
 import { CreateNomenclatureLookupApi } from 'apis';
 import { NomenclatureField, DocumentGroupField } from './components';
 
-interface CreateLookupForm extends CreateNomenclatureLookupApi, FieldValues {}
+export interface CreateLookupForm extends CreateNomenclatureLookupApi {}
 
 const addLookupSchema = yup.object().shape({
   nomenclature: yup.string().required('Nomenclature is required.'),

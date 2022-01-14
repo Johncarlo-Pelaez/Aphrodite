@@ -1,5 +1,5 @@
 import { ReactElement, useEffect } from 'react';
-import { useForm, SubmitHandler, FieldValues } from 'react-hook-form';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Form from 'react-bootstrap/Form';
 import Alert from 'react-bootstrap/Alert';
@@ -9,10 +9,12 @@ import Button from 'react-bootstrap/Button';
 import { useUpdateNomenclatureLookup } from 'hooks';
 import { nomenclatureLookup } from 'models';
 import * as yup from 'yup';
-import { UpdateNomenclatureLookupApi } from 'apis';
 import { NomenclatureField, DocumentGroupField } from '../add-modal/components';
+import { CreateLookupForm } from '../';
 
-interface UpdateLookupForm extends UpdateNomenclatureLookupApi, FieldValues {}
+interface UpdateLookupForm extends CreateLookupForm {
+  id: number;
+}
 
 const editLookupSchema = yup.object().shape({
   nomenclature: yup.string().required('Nomenclature is required.'),

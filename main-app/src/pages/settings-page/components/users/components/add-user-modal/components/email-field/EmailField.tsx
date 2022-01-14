@@ -1,9 +1,9 @@
 import { ReactElement } from 'react';
-import { Controller, Control, FieldValues } from 'react-hook-form';
+import { Controller, Control } from 'react-hook-form';
 import Form from 'react-bootstrap/Form';
 
 export interface EmailFieldProps {
-  control: Control<FieldValues>;
+  control: Control<any>;
 }
 
 export const EmailField = ({ control }: EmailFieldProps): ReactElement => (

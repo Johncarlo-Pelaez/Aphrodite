@@ -1,10 +1,10 @@
 import { ReactElement } from 'react';
-import { Controller, Control, FieldValues } from 'react-hook-form';
+import { Controller, Control } from 'react-hook-form';
 import Form from 'react-bootstrap/Form';
 import { Role } from 'core/enum';
 
 export interface RoleFieldProps {
-  control: Control<FieldValues>;
+  control: Control<any>;
 }
 
 export const RoleField = ({ control }: RoleFieldProps): ReactElement => (
