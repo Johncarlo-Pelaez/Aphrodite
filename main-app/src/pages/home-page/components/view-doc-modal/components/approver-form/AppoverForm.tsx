@@ -12,6 +12,7 @@ import { Document } from 'models';
 import { useApproverDocoment } from 'hooks';
 import { FileInfo, ReadOnlyIndexFields } from '../indexes-form';
 import styles from './AppoverForm.module.css';
+import { checkIfForbidden } from 'utils';
 
 export interface AppoverFormProps {
   document?: Document;
@@ -23,6 +24,7 @@ export const AppoverForm = forwardRef(
     const { document, onSubmitted: triggerSubmitted } = props;
     const {
       isLoading: isApproveDocSaving,
+      error,
       isError: hasApproveDocError,
       mutateAsync: approveDocumentAsync,
       reset,
@@ -77,7 +79,9 @@ export const AppoverForm = forwardRef(
     return (
       <Fragment>
         <Alert variant="danger" show={hasApproveDocError}>
-          Failed to save.
+          {!!error && checkIfForbidden(error)
+            ? 'Permission denied or access not allowed, You may have no permission to approve or disapprove documents.'
+            : 'Failed to save.'}
         </Alert>
         <Card>
           <Card.Header className="text-center">INDEXES</Card.Header>

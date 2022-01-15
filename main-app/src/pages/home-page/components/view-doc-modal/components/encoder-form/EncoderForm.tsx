@@ -21,6 +21,7 @@ import {
 } from './components';
 import { LookupOption } from './components/nomen-clature-field';
 import { FileInfo } from '../indexes-form';
+import { checkIfForbidden } from 'utils';
 
 export interface IEncoderFormValues {
   qrBarCode: string;
@@ -46,6 +47,7 @@ export const EncoderForm = forwardRef(
     const {
       isLoading: isEncodeDocSaving,
       isError: hasEncodeDocError,
+      error,
       mutateAsync: encodeDocumentAsync,
       reset: resetEncodeDocument,
     } = useEncodeDocument();
@@ -60,9 +62,9 @@ export const EncoderForm = forwardRef(
       setFocus,
     } = useForm<IEncoderFormValues>({
       defaultValues: {
-        qrBarCode: document?.qrCode,
-        companyCode: envodeValues?.companyCode,
-        contractNumber: envodeValues?.contractNumber,
+        qrBarCode: document?.qrCode ?? '',
+        companyCode: envodeValues?.companyCode ?? '',
+        contractNumber: envodeValues?.contractNumber ?? '',
         nomenclature:
           envodeValues?.nomenclature && envodeValues?.documentGroup
             ? [
@@ -210,7 +212,9 @@ export const EncoderForm = forwardRef(
 
     useImperativeHandle(ref, () => ({
       encodeDocument: () => {
-        handleSubmit(encodeDocumentSubmit)();
+        handleSubmit(encodeDocumentSubmit)().catch(() => {
+          alert('Failed to encode.');
+        });
       },
     }));
 
@@ -233,7 +237,9 @@ export const EncoderForm = forwardRef(
     return (
       <Fragment>
         <Alert variant="danger" show={hasEncodeDocError}>
-          Failed to encode.
+          {!!error && checkIfForbidden(error)
+            ? 'Permission denied or access not allowed, You may have no permission to encode documents.'
+            : 'Failed to encode.'}
         </Alert>
         <Card>
           <Card.Header className="text-center">BARCODE / QR CODE</Card.Header>

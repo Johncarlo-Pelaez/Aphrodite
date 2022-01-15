@@ -5,3 +5,9 @@
 .fileInfoTable > tbody > tr > td {
   padding-right: 1rem;
 }
+
+.form {
+  max-height: 50vh;
+  overflow: auto;
+  padding-right: 5px;
+}

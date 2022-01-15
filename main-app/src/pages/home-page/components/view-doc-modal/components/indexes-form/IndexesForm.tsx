@@ -107,26 +107,21 @@ export const ReadOnlyIndexFields = ({
     },
   ];
 
-  const renderField = (
-    label: string,
-    value?: string | number,
-  ): ReactElement => (
-    <Form.Group>
-      <Form.Label>
-        <b>{label}</b>
-      </Form.Label>
-      <Form.Control
-        readOnly
-        type="text"
-        placeholder={label}
-        value={value ?? ''}
-      />
-    </Form.Group>
-  );
-
   return (
     <React.Fragment>
-      {indexes.map((i) => renderField(i.label, i.value))}
+      {indexes.map((i, index) => (
+        <Form.Group key={index}>
+          <Form.Label>
+            <b>{i.label}</b>
+          </Form.Label>
+          <Form.Control
+            readOnly
+            type="text"
+            placeholder={i.label}
+            value={i.value ?? ''}
+          />
+        </Form.Group>
+      ))}
     </React.Fragment>
   );
 };
@@ -137,7 +132,7 @@ export const IndexesForm = ({ document }: IndexesFormProps): ReactElement => (
     <Card.Body>
       <FileInfo document={document} />
       <hr />
-      <Form>
+      <Form className={styles.form}>
         <ReadOnlyIndexFields document={document} />
       </Form>
     </Card.Body>

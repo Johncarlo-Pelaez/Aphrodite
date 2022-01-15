@@ -14,6 +14,7 @@ import { useCheckerDocument } from 'hooks';
 import { FileInfo, ReadOnlyIndexFields } from '../indexes-form';
 import { DocumentDateField, RemarksField } from './components';
 import styles from './CheckerForm.module.css';
+import { checkIfForbidden } from 'utils';
 
 export interface ICheckerFormValues {
   documentDate: string;
@@ -32,6 +33,7 @@ export const CheckerForm = forwardRef(
     const {
       isLoading: isCheckDocSaving,
       isError: hasCheckDocError,
+      error,
       mutateAsync: checkDocumentAsync,
       reset: resetCheckDocument,
     } = useCheckerDocument();
@@ -39,8 +41,8 @@ export const CheckerForm = forwardRef(
     const { control, reset, handleSubmit, setError, setFocus } =
       useForm<ICheckerFormValues>({
         defaultValues: {
-          documentDate: document?.documentDate,
-          remarks: document?.remarks,
+          documentDate: document?.documentDate ?? '',
+          remarks: document?.remarks ?? '',
         },
       });
 
@@ -94,17 +96,15 @@ export const CheckerForm = forwardRef(
     };
 
     const approveDocument = () => {
-      handleSubmit((data) => approveDocumentSubmit(data))().catch((error) => {
-        alert(error);
+      handleSubmit((data) => approveDocumentSubmit(data))().catch(() => {
+        alert('Failed to approve.');
       });
     };
 
     const disapproveDocument = () => {
-      handleSubmit((data) => approveDocumentSubmit(data, false))().catch(
-        (error) => {
-          alert(error);
-        },
-      );
+      handleSubmit((data) => approveDocumentSubmit(data, false))().catch(() => {
+        alert('Failed to disapprove.');
+      });
     };
 
     useImperativeHandle(ref, () => ({
@@ -128,7 +128,9 @@ export const CheckerForm = forwardRef(
     return (
       <Fragment>
         <Alert variant="danger" show={hasCheckDocError}>
-          Failed to check.
+          {!!error && checkIfForbidden(error)
+            ? 'Permission denied or access not allowed, You may have no permission to check documents.'
+            : 'Failed to check.'}
         </Alert>
         <Card>
           <Card.Header className="text-center">INDEXES</Card.Header>

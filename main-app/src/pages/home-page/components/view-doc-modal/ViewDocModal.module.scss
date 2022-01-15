@@ -15,20 +15,19 @@
   width: 100%;
   display: block;
   padding: 1rem;
+  overflow: auto;
 
   .pdfViewerWrapper {
     width: 100%;
     height: 70vh;
-    margin-bottom: 1rem;
   }
 
   .indexesCardWrapper {
     width: 100%;
-    height: fit-content;
+    height: 70vh;
   }
 
   @include breakpoint-up(lg) {
-    height: 72vh;
     display: flex;
     flex-flow: row nowrap;
     gap: 1rem;

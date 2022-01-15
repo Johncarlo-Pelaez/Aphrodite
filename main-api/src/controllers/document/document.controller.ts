@@ -177,7 +177,7 @@ export class DocumentController {
     res.send(buffer);
   }
 
-  @Roles(Role.REVIEWER)
+  @Roles(Role.REVIEWER, Role.ADMIN)
   @ApiOkResponse()
   @Put('/:id/file')
   @ApiFile('file', true, { fileFilter: fileMimetypeFilter('pdf') })
@@ -194,7 +194,7 @@ export class DocumentController {
     });
   }
 
-  @Roles(Role.ENCODER)
+  @Roles(Role.ENCODER, Role.ADMIN)
   @ApiOkResponse()
   @Put('/:id/encode/qrbarcode')
   async encodeDocQRBarCode(
@@ -210,7 +210,7 @@ export class DocumentController {
     });
   }
 
-  @Roles(Role.ENCODER)
+  @Roles(Role.ENCODER, Role.ADMIN)
   @ApiOkResponse()
   @Put('/:id/encode/details')
   async encodeDocDetails(
@@ -229,7 +229,7 @@ export class DocumentController {
     });
   }
 
-  @Roles(Role.ENCODER)
+  @Roles(Role.ENCODER, Role.ADMIN)
   @ApiOkResponse()
   @Put('/:id/checker/approve')
   async checkerApproveDoc(
@@ -245,7 +245,7 @@ export class DocumentController {
     });
   }
 
-  @Roles(Role.ENCODER)
+  @Roles(Role.ENCODER, Role.ADMIN)
   @ApiOkResponse()
   @Put('/:id/checker/disapprove')
   async checkerDisApproveDoc(
@@ -262,7 +262,7 @@ export class DocumentController {
     });
   }
 
-  @Roles(Role.REVIEWER)
+  @Roles(Role.REVIEWER, Role.ADMIN)
   @ApiOkResponse()
   @Put('/:id/approver/approve')
   async approverApproveDoc(
@@ -276,7 +276,7 @@ export class DocumentController {
     });
   }
 
-  @Roles(Role.REVIEWER)
+  @Roles(Role.REVIEWER, Role.ADMIN)
   @ApiOkResponse()
   @Put('/:id/approver/disapprove')
   async approverDisapproveDoc(
