@@ -3,11 +3,24 @@ import {
   createParamDecorator,
   Type,
   UseInterceptors,
+  SetMetadata,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiOkResponse, getSchemaPath } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { Role } from 'src/entities';
+import { ROLES_KEY } from 'src/core/constants';
+import { AzureADGuard, RolesGuard } from '.';
+
+export const Auth = (...roles: Role[]) => {
+  return applyDecorators(
+    SetMetadata(ROLES_KEY, roles),
+    UseGuards(AzureADGuard),
+    UseGuards(RolesGuard),
+  );
+};
 
 export const GetAzureUsername = createParamDecorator((_data, req) => {
   return req.args[0].user.preferred_username;
@@ -85,3 +98,5 @@ export const GetAzureUser = createParamDecorator((_data, req) => {
 export const GetAccessToken = createParamDecorator((_data, req) => {
   return req.args[0].headers['access-token'];
 });
+
+export const Roles = (...roles: Role[]) => SetMetadata(ROLES_KEY, roles);

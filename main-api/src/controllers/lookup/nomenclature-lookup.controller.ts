@@ -8,16 +8,10 @@ import {
   Param,
   ParseIntPipe,
   ValidationPipe,
-  UseGuards,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiCreatedResponse } from '@nestjs/swagger';
-import {
-  AzureADGuard,
-  GetAzureUser,
-  AzureUser,
-  CreatedResponse,
-} from 'src/core';
-import { NomenclatureLookup } from 'src/entities';
+import { GetAzureUser, AzureUser, CreatedResponse, Auth } from 'src/core';
+import { NomenclatureLookup, Role } from 'src/entities';
 import {
   NomenclatureLookupRepository,
   ActivityLogRepository,
@@ -27,8 +21,8 @@ import {
   UpdateNomenclatureLookupDto,
 } from './nomenclature-lookup.dto';
 
+@Auth(Role.ADMIN)
 @Controller('/nomenclatures/lookups')
-@UseGuards(AzureADGuard)
 export class NomenclatureLookupController {
   constructor(
     private readonly lookupRepository: NomenclatureLookupRepository,

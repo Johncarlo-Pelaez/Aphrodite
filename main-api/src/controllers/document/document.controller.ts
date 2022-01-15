@@ -10,7 +10,6 @@ import {
   Query,
   UploadedFile,
   Res,
-  UseGuards,
   BadRequestException,
   Delete,
 } from '@nestjs/common';
@@ -27,7 +26,8 @@ import {
   PaginatedResponse,
   ApiFile,
   fileMimetypeFilter,
-  AzureADGuard,
+  Roles,
+  Auth,
 } from 'src/core';
 import { DocumentStatus } from 'src/entities/document.enum';
 import { Role } from 'src/entities/user.entity';
@@ -51,8 +51,8 @@ import {
   CancelDocumentsIntPipe,
 } from './document.pipe';
 
+@Auth()
 @Controller('/documents')
-@UseGuards(AzureADGuard)
 export class DocumentController {
   constructor(
     private readonly documentsService: DocumentService,
@@ -177,6 +177,7 @@ export class DocumentController {
     res.send(buffer);
   }
 
+  @Roles(Role.REVIEWER)
   @ApiOkResponse()
   @Put('/:id/file')
   @ApiFile('file', true, { fileFilter: fileMimetypeFilter('pdf') })
@@ -193,6 +194,7 @@ export class DocumentController {
     });
   }
 
+  @Roles(Role.ENCODER)
   @ApiOkResponse()
   @Put('/:id/encode/qrbarcode')
   async encodeDocQRBarCode(
@@ -208,6 +210,7 @@ export class DocumentController {
     });
   }
 
+  @Roles(Role.ENCODER)
   @ApiOkResponse()
   @Put('/:id/encode/details')
   async encodeDocDetails(
@@ -226,6 +229,7 @@ export class DocumentController {
     });
   }
 
+  @Roles(Role.ENCODER)
   @ApiOkResponse()
   @Put('/:id/checker/approve')
   async checkerApproveDoc(
@@ -241,6 +245,7 @@ export class DocumentController {
     });
   }
 
+  @Roles(Role.ENCODER)
   @ApiOkResponse()
   @Put('/:id/checker/disapprove')
   async checkerDisApproveDoc(
@@ -257,6 +262,7 @@ export class DocumentController {
     });
   }
 
+  @Roles(Role.REVIEWER)
   @ApiOkResponse()
   @Put('/:id/approver/approve')
   async approverApproveDoc(
@@ -270,6 +276,7 @@ export class DocumentController {
     });
   }
 
+  @Roles(Role.REVIEWER)
   @ApiOkResponse()
   @Put('/:id/approver/disapprove')
   async approverDisapproveDoc(

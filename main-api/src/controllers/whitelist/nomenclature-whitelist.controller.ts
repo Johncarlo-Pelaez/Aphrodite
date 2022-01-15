@@ -8,16 +8,10 @@ import {
   Param,
   ParseIntPipe,
   ValidationPipe,
-  UseGuards,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
-import {
-  AzureADGuard,
-  GetAzureUser,
-  AzureUser,
-  CreatedResponse,
-} from 'src/core';
-import { NomenclatureWhitelist } from 'src/entities';
+import { GetAzureUser, AzureUser, CreatedResponse, Auth } from 'src/core';
+import { NomenclatureWhitelist, Role } from 'src/entities';
 import {
   NomenclatureWhitelistRepository,
   ActivityLogRepository,
@@ -27,8 +21,8 @@ import {
   UpdateNomenclatureWhitelistDto,
 } from './nomenclature-whitelist.dto';
 
+@Auth(Role.ADMIN)
 @Controller('/nomenclatures/whitelist')
-@UseGuards(AzureADGuard)
 export class NomenclatureWhitelistController {
   constructor(
     private readonly whitelistRepository: NomenclatureWhitelistRepository,

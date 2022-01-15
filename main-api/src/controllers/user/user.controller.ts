@@ -10,7 +10,6 @@ import {
   ValidationPipe,
   Query,
   Param,
-  UseGuards,
   ParseIntPipe,
   Res,
 } from '@nestjs/common';
@@ -22,6 +21,7 @@ import {
   ApiNotAcceptableResponse,
 } from '@nestjs/swagger';
 import {
+  Auth,
   AzureADGuard,
   AzureUser,
   CreatedResponse,
@@ -56,12 +56,12 @@ export class UserController {
     return (await this.userRepository.count()) > 0;
   }
 
+  @Auth(Role.ADMIN)
   @ApiOkResponse({
     type: User,
     isArray: true,
   })
   @Get('/')
-  @UseGuards(AzureADGuard)
   async getUsers(@Query() dto: GetUsersDto): Promise<User[]> {
     return await this.userRepository.getUsers(dto);
   }
@@ -98,7 +98,7 @@ export class UserController {
     return response;
   }
 
-  @UseGuards(AzureADGuard)
+  @Auth(Role.ADMIN)
   @Get('/download')
   async downloadUsersReport(
     @Query() dto: GetUsersDto,
@@ -161,15 +161,16 @@ export class UserController {
     return !!(await this.userRepository.getAuthUserByEmail(dto.email));
   }
 
+  @Auth()
   @ApiOkResponse({
     type: User,
   })
   @Get('/current')
-  @UseGuards(AzureADGuard)
   async getCurrentUser(@GetAzureUser() azureUser: AzureUser): Promise<User> {
     return this.userRepository.getAuthUserByEmail(azureUser.preferred_username);
   }
 
+  @Auth(Role.ADMIN)
   @ApiCreatedResponse({
     type: CreatedResponse,
   })
@@ -177,7 +178,6 @@ export class UserController {
     description: 'User already exist.',
   })
   @Post('/create')
-  @UseGuards(AzureADGuard)
   async createUser(
     @GetAzureUser() azureUser: AzureUser,
     @Body(ValidationPipe) dto: CreateUserAccountDto,
@@ -199,9 +199,9 @@ export class UserController {
     return response;
   }
 
+  @Auth(Role.ADMIN)
   @ApiOkResponse()
   @Put('/:id')
-  @UseGuards(AzureADGuard)
   async updateUser(
     @GetAzureUser() azureUser: AzureUser,
     @Param('id', ParseIntPipe) id: number,
@@ -238,10 +238,10 @@ export class UserController {
     });
   }
 
+  @Auth(Role.ADMIN)
   @ApiNotAcceptableResponse()
   @ApiOkResponse()
   @Delete('/:id')
-  @UseGuards(AzureADGuard)
   async deleteUser(
     @GetAzureUser() azureUser: AzureUser,
     @Param('id', ParseIntPipe) id: number,

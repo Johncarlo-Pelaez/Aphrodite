@@ -4,17 +4,12 @@ import {
   Query,
   Param,
   ParseIntPipe,
-  UseGuards,
   Res,
 } from '@nestjs/common';
 import { ApiOkResponse } from '@nestjs/swagger';
 import { Response } from 'express';
-import {
-  ApiPaginatedResponse,
-  PaginatedResponse,
-  AzureADGuard,
-} from 'src/core';
-import { ActivityLog } from 'src/entities';
+import { ApiPaginatedResponse, Auth, PaginatedResponse } from 'src/core';
+import { ActivityLog, Role } from 'src/entities';
 import { ActivityLogRepository } from 'src/repositories';
 import { ExcelService, ExcelColumn } from 'src/excel-service';
 import { FilenameUtil } from 'src/utils';
@@ -24,8 +19,8 @@ import {
 } from './activity-log.dto';
 import { GetActivityLogsIntPipe } from './activity-log.pipe';
 
+@Auth(Role.ADMIN)
 @Controller('/activity-logs')
-@UseGuards(AzureADGuard)
 export class ActivityLogController {
   constructor(
     private readonly activityLogRepository: ActivityLogRepository,

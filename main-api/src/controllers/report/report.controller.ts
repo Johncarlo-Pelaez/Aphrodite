@@ -1,11 +1,7 @@
-import { Controller, Get, Query, UseGuards, Res } from '@nestjs/common';
+import { Controller, Get, Query, Res } from '@nestjs/common';
 import { ApiExtraModels } from '@nestjs/swagger';
 import { Response } from 'express';
-import {
-  ApiPaginatedResponse,
-  PaginatedResponse,
-  AzureADGuard,
-} from 'src/core';
+import { ApiPaginatedResponse, PaginatedResponse, Auth } from 'src/core';
 import { DocumentHistory } from 'src/entities';
 import { ReportRepository } from 'src/repositories';
 import {
@@ -33,8 +29,8 @@ import {
 } from './report.dto';
 import { GetDocumentsReportIntPipe } from './report.pipe';
 
+@Auth()
 @Controller('/reports')
-@UseGuards(AzureADGuard)
 export class ReportController {
   constructor(
     private readonly reportRepository: ReportRepository,
