@@ -5,7 +5,7 @@ import { AppConfigService } from './app-config';
 export class AppController {
   constructor(private readonly appConfigService: AppConfigService) {}
 
-  @Get('/msal')
+  @Get('/api/msal')
   getMsal(): { azureAdClientId: string; azureAdTenantId: string } {
     return {
       azureAdClientId: this.appConfigService.azureAdClientId,
