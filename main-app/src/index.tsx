@@ -11,7 +11,7 @@ import axios from 'axios';
   const res = await axios.get<{
     azureAdClientId: string;
     azureAdTenantId: string;
-  }>('/app/msal');
+  }>('/api/app/msal');
   const msalConfig = buildMsalConfig(
     res.data.azureAdClientId,
     res.data.azureAdTenantId,
