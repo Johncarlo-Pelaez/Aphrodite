@@ -31,14 +31,39 @@ services:
     build:
       context: ./main-api
       dockerfile: Dockerfile
+    environment:
+      - DOMAIN=http://localhost:7070
+      - DB_HOST=main-db
+      - DB_PASSWORD=Mbisla@18
+      - DB_NAME=aphrodite
+      - REDIS_HOST=queue-redis
+      - FILE_PATH=/usr/src/files
+      - BARCODE_LICENSE=t0068NQAAAEsnp86A2NZdml4Heh3CIwJq3m/tenO5/NDZl6zGcnHzTRrV722gnmfPwjY2xwxagR/xQJZIMxRb3DwxnbpFAJg=
+      - AZURE_AD_CLIENT_ID=a
+      - AZURE_AD_TENANT_ID=a
+      - MAIL_HOST=a
+      - MAIL_PORT=1
+      - MAIL_USER=a
+      - MAIL_PASSWORD=a
+      - MAIL_FROM=a
     volumes:
       - /usr/src/app/node_modules
       - ./main-api:/usr/src/app
       - ./files:/usr/src/files
-    environment:
-      - REDIS_HOST=queue-redis
-      - FILE_PATH=/usr/src/files
-      - BARCODE_LICENSE=t0068NQAAAEsnp86A2NZdml4Heh3CIwJq3m/tenO5/NDZl6zGcnHzTRrV722gnmfPwjY2xwxagR/xQJZIMxRb3DwxnbpFAJg=
   queue-redis:
     container_name: epds-aphrodite_queue-redis
     image: redis:6-alpine
+  main-db:
+    container_name: epds-aphrodite_main-db
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    ports:
+      - 1433:1433
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Mbisla@18
+    volumes:
+      - epds-aphrodite_main-db_volume:/var/opt/mssql
+
+volumes:
+  epds-aphrodite_main-db_volume:
+    external: true
