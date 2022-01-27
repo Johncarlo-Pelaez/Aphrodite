@@ -33,6 +33,7 @@ import { AzureAdService } from './azure-ad-service';
 import { ExcelService } from './excel-service';
 import { ReportService } from './report-service';
 import { FileStorageService } from './file-storage-service';
+import { AppController } from './app.controller';
 
 const logger = new Logger('AppModule');
 
@@ -80,6 +81,7 @@ const logger = new Logger('AppModule');
     MailModule,
   ],
   controllers: [
+    AppController,
     DocumentController,
     UserController,
     NomenclatureWhitelistController,
