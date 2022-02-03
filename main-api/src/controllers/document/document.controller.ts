@@ -12,6 +12,7 @@ import {
   Res,
   BadRequestException,
   Delete,
+  Logger,
 } from '@nestjs/common';
 import {
   ApiCreatedResponse,
@@ -51,6 +52,8 @@ import {
   CancelDocumentsIntPipe,
 } from './document.pipe';
 
+const logger = new Logger('DocumentController');
+
 @Auth()
 @Controller('/documents')
 export class DocumentController {
@@ -67,47 +70,56 @@ export class DocumentController {
     @Query(GetDocumentsIntPipe) dto: GetDocumentsDto,
     @GetAzureUsername() username: string,
   ): Promise<PaginatedResponse<Document>> {
-    const response = new PaginatedResponse<Document>();
+    try {
+      logger.log('getDocuments');
+      const response = new PaginatedResponse<Document>();
 
-    const currentUserRole = (
-      await this.userRepository.getAuthUserByEmail(username)
-    )?.role;
+      const currentUserRole = (
+        await this.userRepository.getAuthUserByEmail(username)
+      )?.role;
+      logger.log('Success: getAuthUserByEmail');
 
-    if (!currentUserRole) throw new BadRequestException();
+      if (!currentUserRole) throw new BadRequestException();
 
-    let statusesFilter: DocumentStatus[] = [];
+      let statusesFilter: DocumentStatus[] = [];
 
-    switch (currentUserRole) {
-      case Role.ENCODER:
-        statusesFilter = dto.statuses.filter(
-          (status) => status !== DocumentStatus.CHECKING_DISAPPROVED,
-        );
-        break;
-      case Role.REVIEWER:
-        statusesFilter = dto.statuses.filter(
-          (status) =>
-            status !== DocumentStatus.ENCODING &&
-            status !== DocumentStatus.CHECKING,
-        );
-        break;
-      default:
-        statusesFilter = dto.statuses;
+      switch (currentUserRole) {
+        case Role.ENCODER:
+          statusesFilter = dto.statuses.filter(
+            (status) => status !== DocumentStatus.CHECKING_DISAPPROVED,
+          );
+          break;
+        case Role.REVIEWER:
+          statusesFilter = dto.statuses.filter(
+            (status) =>
+              status !== DocumentStatus.ENCODING &&
+              status !== DocumentStatus.CHECKING,
+          );
+          break;
+        default:
+          statusesFilter = dto.statuses;
+      }
+
+      response.count = await this.documentRepository.count({
+        search: dto.search,
+        documentType: dto.documentType,
+        statuses: statusesFilter,
+        username: dto.username,
+        from: dto.from,
+        to: dto.to,
+      });
+      logger.log('Success: count');
+      response.data = await this.documentRepository.getDocuments({
+        ...dto,
+        statuses: statusesFilter,
+      });
+      logger.log('Success: getDocuments');
+
+      return response;
+    } catch (error) {
+      logger.error('Error: getDocuments', error);
+      throw new BadRequestException();
     }
-
-    response.count = await this.documentRepository.count({
-      search: dto.search,
-      documentType: dto.documentType,
-      statuses: statusesFilter,
-      username: dto.username,
-      from: dto.from,
-      to: dto.to,
-    });
-    response.data = await this.documentRepository.getDocuments({
-      ...dto,
-      statuses: statusesFilter,
-    });
-
-    return response;
   }
 
   @ApiCreatedResponse({
