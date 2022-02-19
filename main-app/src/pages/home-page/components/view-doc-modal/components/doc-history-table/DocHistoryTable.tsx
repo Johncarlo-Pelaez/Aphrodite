@@ -47,10 +47,6 @@ export const DocHistoryTable = ({
       dataIndex: 'filename',
     },
     {
-      title: 'Version',
-      render: () => '1.0',
-    },
-    {
       title: 'User',
       dataIndex: 'userUsername',
     },
