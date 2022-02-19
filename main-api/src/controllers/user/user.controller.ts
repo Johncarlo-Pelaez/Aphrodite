@@ -20,13 +20,7 @@ import {
   ApiOkResponse,
   ApiNotAcceptableResponse,
 } from '@nestjs/swagger';
-import {
-  Auth,
-  AzureADGuard,
-  AzureUser,
-  CreatedResponse,
-  GetAzureUser,
-} from 'src/core';
+import { Auth, AzureUser, CreatedResponse, GetAzureUser } from 'src/core';
 import { User, Role } from 'src/entities';
 import { UserRepository, ActivityLogRepository } from 'src/repositories';
 import { ExcelService, ExcelColumn } from 'src/excel-service';
@@ -56,7 +50,7 @@ export class UserController {
     return (await this.userRepository.count()) > 0;
   }
 
-  @Auth(Role.ADMIN)
+  @Auth()
   @ApiOkResponse({
     type: User,
     isArray: true,
