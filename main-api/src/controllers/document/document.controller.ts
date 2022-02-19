@@ -10,7 +10,6 @@ import {
   Query,
   UploadedFile,
   Res,
-  BadRequestException,
   Delete,
 } from '@nestjs/common';
 import {
@@ -29,10 +28,9 @@ import {
   Roles,
   Auth,
 } from 'src/core';
-import { DocumentStatus } from 'src/entities/document.enum';
 import { Role } from 'src/entities/user.entity';
 import { Document, DocumentHistory } from 'src/entities';
-import { DocumentRepository, UserRepository } from 'src/repositories';
+import { DocumentRepository } from 'src/repositories';
 import { DocumentService } from 'src/document-service';
 import {
   GetDocumentsDto,
@@ -57,7 +55,6 @@ export class DocumentController {
   constructor(
     private readonly documentsService: DocumentService,
     private readonly documentRepository: DocumentRepository,
-    private readonly userRepository: UserRepository,
   ) {}
 
   @ApiBadRequestResponse()
@@ -65,47 +62,11 @@ export class DocumentController {
   @Get('/')
   async getDocuments(
     @Query(GetDocumentsIntPipe) dto: GetDocumentsDto,
-    @GetAzureUsername() username: string,
   ): Promise<PaginatedResponse<Document>> {
     const response = new PaginatedResponse<Document>();
 
-    const currentUserRole = (
-      await this.userRepository.getAuthUserByEmail(username)
-    )?.role;
-
-    if (!currentUserRole) throw new BadRequestException();
-
-    let statusesFilter: DocumentStatus[] = [];
-
-    switch (currentUserRole) {
-      case Role.ENCODER:
-        statusesFilter = dto.statuses.filter(
-          (status) => status !== DocumentStatus.CHECKING_DISAPPROVED,
-        );
-        break;
-      case Role.REVIEWER:
-        statusesFilter = dto.statuses.filter(
-          (status) =>
-            status !== DocumentStatus.ENCODING &&
-            status !== DocumentStatus.CHECKING,
-        );
-        break;
-      default:
-        statusesFilter = dto.statuses;
-    }
-
-    response.count = await this.documentRepository.count({
-      search: dto.search,
-      documentType: dto.documentType,
-      statuses: statusesFilter,
-      username: dto.username,
-      from: dto.from,
-      to: dto.to,
-    });
-    response.data = await this.documentRepository.getDocuments({
-      ...dto,
-      statuses: statusesFilter,
-    });
+    response.count = await this.documentRepository.count(dto);
+    response.data = await this.documentRepository.getDocuments(dto);
 
     return response;
   }
