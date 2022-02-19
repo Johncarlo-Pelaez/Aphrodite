@@ -10,7 +10,13 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiCreatedResponse } from '@nestjs/swagger';
-import { GetAzureUser, AzureUser, CreatedResponse, Auth } from 'src/core';
+import {
+  GetAzureUser,
+  AzureUser,
+  CreatedResponse,
+  Auth,
+  Roles,
+} from 'src/core';
 import { NomenclatureLookup, Role } from 'src/entities';
 import {
   NomenclatureLookupRepository,
@@ -21,7 +27,7 @@ import {
   UpdateNomenclatureLookupDto,
 } from './nomenclature-lookup.dto';
 
-@Auth(Role.ADMIN)
+@Auth()
 @Controller('/nomenclatures/lookups')
 export class NomenclatureLookupController {
   constructor(
@@ -38,6 +44,7 @@ export class NomenclatureLookupController {
     return this.lookupRepository.getNomenclatureLookups();
   }
 
+  @Roles(Role.ADMIN)
   @ApiCreatedResponse({
     type: CreatedResponse,
   })
@@ -58,6 +65,7 @@ export class NomenclatureLookupController {
     return response;
   }
 
+  @Roles(Role.ADMIN)
   @ApiOkResponse()
   @Put('/:id')
   async updateNomenclatureLookup(
@@ -89,6 +97,7 @@ export class NomenclatureLookupController {
     });
   }
 
+  @Roles(Role.ADMIN)
   @ApiOkResponse()
   @Delete('/:id')
   async deleteNomenclatureLookup(
