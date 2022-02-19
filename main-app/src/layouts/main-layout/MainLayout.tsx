@@ -69,7 +69,7 @@ export const MainLayout = (props: MainLayoutProps): ReactElement => {
               ))}
             </Nav>
             <Nav>
-              <NavDropdown title={account?.username}>
+              <NavDropdown title={`${account?.username} (${user?.role})`}>
                 <NavDropdown.Item onClick={signOut}>Log out</NavDropdown.Item>
               </NavDropdown>
               <span className="nav-link__avatar">
