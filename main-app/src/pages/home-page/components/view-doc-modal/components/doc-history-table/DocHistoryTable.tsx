@@ -35,6 +35,14 @@ export const DocHistoryTable = ({
 
   const renderColumns = (): TableColumnProps<DocumentHistory>[] => [
     {
+      title: 'Date and Time',
+      dataIndex: 'createdDate',
+      render: (docHistory: DocumentHistory) =>
+        moment(docHistory.createdDate).format(DEFAULT_DATE_FORMAT),
+      sorter: sortDateTime('createdDate'),
+      sortOrder: sorter?.field === 'createdDate' ? sorter.order : undefined,
+    },
+    {
       title: 'Filename',
       dataIndex: 'filename',
     },
@@ -97,14 +105,6 @@ export const DocHistoryTable = ({
           }
         } else return docHistory.note ?? '';
       },
-    },
-    {
-      title: 'Date and Time',
-      dataIndex: 'createdDate',
-      render: (docHistory: DocumentHistory) =>
-        moment(docHistory.createdDate).format(DEFAULT_DATE_FORMAT),
-      sorter: sortDateTime('createdDate'),
-      sortOrder: sorter?.field === 'createdDate' ? sorter.order : undefined,
     },
   ];
 
