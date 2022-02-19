@@ -155,7 +155,6 @@ export class DocumentController {
     });
   }
 
-  @Roles(Role.ENCODER, Role.ADMIN)
   @ApiOkResponse()
   @Put('/:id/encode/qrbarcode')
   async encodeDocQRBarCode(
@@ -171,7 +170,6 @@ export class DocumentController {
     });
   }
 
-  @Roles(Role.ENCODER, Role.ADMIN)
   @ApiOkResponse()
   @Put('/:id/encode/details')
   async encodeDocDetails(
@@ -190,7 +188,6 @@ export class DocumentController {
     });
   }
 
-  @Roles(Role.ENCODER, Role.ADMIN)
   @ApiOkResponse()
   @Put('/:id/checker/approve')
   async checkerApproveDoc(
@@ -206,7 +203,6 @@ export class DocumentController {
     });
   }
 
-  @Roles(Role.ENCODER, Role.ADMIN)
   @ApiOkResponse()
   @Put('/:id/checker/disapprove')
   async checkerDisApproveDoc(

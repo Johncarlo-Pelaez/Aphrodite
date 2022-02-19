@@ -112,10 +112,7 @@ export const ViewDocModal = (props: ViewDocModalProps): ReactElement => {
 
   const renderForm = (): ReactElement => {
     const documentStatus = document?.status;
-    if (
-      documentStatus === DocumentStatus.ENCODING &&
-      (currentUserRole === Role.ENCODER || currentUserRole === Role.ADMIN)
-    ) {
+    if (documentStatus === DocumentStatus.ENCODING) {
       return (
         <EncoderForm
           ref={encoderFormRef}
@@ -123,10 +120,7 @@ export const ViewDocModal = (props: ViewDocModalProps): ReactElement => {
           onSubmitted={triggerFormSubmitted}
         />
       );
-    } else if (
-      documentStatus === DocumentStatus.CHECKING &&
-      (currentUserRole === Role.ENCODER || currentUserRole === Role.ADMIN)
-    ) {
+    } else if (documentStatus === DocumentStatus.CHECKING) {
       return (
         <CheckerForm
           ref={checkerFormRef}
@@ -154,10 +148,7 @@ export const ViewDocModal = (props: ViewDocModalProps): ReactElement => {
     let formActionButtons: ReactElement[];
 
     const documentStatus = document?.status;
-    if (
-      documentStatus === DocumentStatus.ENCODING &&
-      (currentUserRole === Role.ENCODER || currentUserRole === Role.ADMIN)
-    ) {
+    if (documentStatus === DocumentStatus.ENCODING) {
       formActionButtons = [
         <Button key="btn-close" variant="outline-danger" onClick={triggerClose}>
           Close
@@ -170,10 +161,7 @@ export const ViewDocModal = (props: ViewDocModalProps): ReactElement => {
           Save
         </Button>,
       ];
-    } else if (
-      documentStatus === DocumentStatus.CHECKING &&
-      (currentUserRole === Role.ENCODER || currentUserRole === Role.ADMIN)
-    ) {
+    } else if (documentStatus === DocumentStatus.CHECKING) {
       formActionButtons = [
         <Button
           key="btn-disapprove"
