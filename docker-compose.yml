@@ -39,8 +39,8 @@ services:
       - REDIS_HOST=queue-redis
       - FILE_PATH=/usr/src/files
       - BARCODE_LICENSE=t0068NQAAAEsnp86A2NZdml4Heh3CIwJq3m/tenO5/NDZl6zGcnHzTRrV722gnmfPwjY2xwxagR/xQJZIMxRb3DwxnbpFAJg=
-      - AZURE_AD_CLIENT_ID=a
-      - AZURE_AD_TENANT_ID=a
+      - AZURE_AD_CLIENT_ID=13bd7dbf-1e35-4dc2-b5f7-e8c26d6f8a3d
+      - AZURE_AD_TENANT_ID=f5fd42b7-4db5-4b3e-aaa6-f2e5542f7357
       - MAIL_HOST=a
       - MAIL_PORT=1
       - MAIL_USER=a
