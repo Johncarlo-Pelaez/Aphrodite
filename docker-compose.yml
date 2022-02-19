@@ -33,7 +33,7 @@ services:
       dockerfile: Dockerfile
     environment:
       - DOMAIN=http://localhost:7070
-      - DB_HOST=main-db
+      - DB_HOST=host.docker.internal
       - DB_PASSWORD=Mbisla@18
       - DB_NAME=aphrodite
       - REDIS_HOST=queue-redis
@@ -53,17 +53,17 @@ services:
   queue-redis:
     container_name: epds-aphrodite_queue-redis
     image: redis:6-alpine
-  main-db:
-    container_name: epds-aphrodite_main-db
-    image: mcr.microsoft.com/mssql/server:2019-latest
-    ports:
-      - 1433:1433
-    environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=Mbisla@18
-    volumes:
-      - epds-aphrodite_main-db_volume:/var/opt/mssql
+  # main-db:
+  #   container_name: epds-aphrodite_main-db
+  #   image: mcr.microsoft.com/mssql/server:2019-latest
+  #   ports:
+  #     - 1433:1433
+  #   environment:
+  #     - ACCEPT_EULA=Y
+  #     - SA_PASSWORD=Mbisla@18
+  #   volumes:
+  #     - epds-aphrodite_main-db_volume:/var/opt/mssql
 
-volumes:
-  epds-aphrodite_main-db_volume:
-    external: true
+# volumes:
+#   epds-aphrodite_main-db_volume:
+#     external: true
