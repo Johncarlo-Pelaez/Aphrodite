@@ -27,6 +27,11 @@ export const CompanyCodeField = ({
       <Form.Control
         {...field}
         maxLength={4}
+        onKeyPress={(event) => {
+          if (!/[0-9]/.test(event.key)) {
+            event.preventDefault();
+          }
+        }}
         placeholder="Enter company code"
         onFocus={(event) => event.target.select()}
         isInvalid={!!error}

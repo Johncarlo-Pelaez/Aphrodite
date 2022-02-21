@@ -27,6 +27,11 @@ export const ContractNumberField = ({
       <Form.Control
         {...field}
         maxLength={13}
+        onKeyPress={(event) => {
+          if (!/[0-9]/.test(event.key)) {
+            event.preventDefault();
+          }
+        }}
         placeholder="Enter contract number"
         onFocus={(event) => event.target.select()}
         isInvalid={!!error}
