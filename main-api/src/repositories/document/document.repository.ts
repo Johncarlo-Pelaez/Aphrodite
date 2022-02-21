@@ -416,7 +416,7 @@ export class DocumentRepository {
       await transaction.save(document);
 
       const history = this.genarateDocumentHistory(document, {
-        note: param.springcmResponse,
+        note: `Request: ${param.springcmReqParams}, Response: ${param.springcmResponse}`,
         userUsername: document.approver ?? document.checker,
       });
       await transaction.save(history);
@@ -437,7 +437,7 @@ export class DocumentRepository {
       await transaction.save(document);
 
       const history = this.genarateDocumentHistory(document, {
-        note: param.springcmResponse ?? param.errorMessage,
+        note: `Request: ${param.springcmReqParams}, Response: ${param.springcmResponse}, Error: ${param.errorMessage}`,
       });
       await transaction.save(history);
     });
