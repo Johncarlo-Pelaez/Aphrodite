@@ -20,6 +20,7 @@ import { SpringCMService } from 'src/spring-cm-service';
 import { FileStorageService } from 'src/file-storage-service';
 import { DocumentStatus } from 'src/entities';
 import { DOCUMENT_QUEUE, MIGRATE_JOB } from './document.constants';
+import * as moment from 'moment';
 
 @Processor(DOCUMENT_QUEUE)
 export class DocumentConsumer {
@@ -404,9 +405,7 @@ export class DocumentConsumer {
       DocumentName: documentType?.Nomenclature ?? empty,
       ExternalSourceCaptureDate:
         this.datesUtil.getTimestamp('M/D/YYYY h:mm:ss A'),
-      FileName: `${this.filenameUtil.removeNotAllowedChar(
-        documentType?.Nomenclature?.replace(/\/|\\|\|/g, '_'),
-      )}${path.extname(document.documentName)}`,
+      FileName: empty,
       MIMEType: document.mimeType,
       DocumentDate: document.documentDate
         ? this.datesUtil.formatDateString(document.documentDate, 'MMDDYYYY')
@@ -419,6 +418,22 @@ export class DocumentConsumer {
       Remarks: document.remarks ?? empty,
       B64Attachment: buffer.toString('base64'),
     };
+
+    if (
+      documentType?.Nomenclature.toLocaleLowerCase() ===
+      "developer's official receipts"
+    ) {
+      uploadParams.FileName = `${uploadParams.CompanyCode}_${
+        uploadParams.ContractNo
+      }_${uploadParams.Remarks}_${moment(
+        uploadParams.DocumentDate,
+        '2022-02-14',
+      ).format('MMDDYYYY')}`;
+    } else {
+      uploadParams.FileName = `${this.filenameUtil.removeNotAllowedChar(
+        documentType?.Nomenclature?.replace(/\/|\\|\|/g, '_'),
+      )}${path.extname(document.documentName)}`;
+    }
 
     const { B64Attachment, ...forStrUploadParams } = uploadParams;
     const strUploadParams = JSON.stringify(forStrUploadParams);
