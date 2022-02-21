@@ -139,7 +139,11 @@ export const CheckerForm = forwardRef(
             <hr />
             <Form className={styles.form}>
               <fieldset disabled={isCheckDocSaving}>
-                <ReadOnlyIndexFields document={document} />
+                <ReadOnlyIndexFields
+                  document={document}
+                  hideDocumentDate
+                  hideRemarks
+                />
                 <DocumentDateField control={control} />
                 <RemarksField control={control} />
               </fieldset>

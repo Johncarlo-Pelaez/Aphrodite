@@ -89,7 +89,11 @@ export const AppoverForm = forwardRef(
             <FileInfo document={document} />
             <hr />
             <Form className={styles.form}>
-              <ReadOnlyIndexFields document={document} />
+              <ReadOnlyIndexFields
+                document={document}
+                hideDocumentDate
+                hideRemarks
+              />
               <Form.Group className="mb-3">
                 <Form.Label>
                   <b>Document Date</b>

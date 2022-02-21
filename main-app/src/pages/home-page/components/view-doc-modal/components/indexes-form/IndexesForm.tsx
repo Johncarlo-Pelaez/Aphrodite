@@ -7,6 +7,8 @@ import styles from './IndexesForm.module.css';
 
 export interface IndexesFormProps {
   document?: Document;
+  hideDocumentDate?: boolean;
+  hideRemarks?: boolean;
 }
 
 export const FileInfo = ({ document }: IndexesFormProps): ReactElement => (
@@ -38,6 +40,8 @@ export const parseDocumentType = (
 
 export const ReadOnlyIndexFields = ({
   document,
+  hideDocumentDate = false,
+  hideRemarks = false,
 }: IndexesFormProps): ReactElement => {
   const documentType = parseDocumentType(document?.documentType ?? '');
   const indexes: { label: string; value?: string | number }[] = [
@@ -93,19 +97,26 @@ export const ReadOnlyIndexFields = ({
       label: 'Number of Pages',
       value: document?.pageTotal,
     },
-    {
+  ];
+
+  if (!hideDocumentDate) {
+    indexes.push({
       label: 'Document Date',
       value: document?.documentDate,
-    },
-    {
-      label: 'File Name',
-      value: document?.documentName,
-    },
-    {
+    });
+  }
+
+  indexes.push({
+    label: 'File Name',
+    value: document?.documentName,
+  });
+
+  if (!hideRemarks) {
+    indexes.push({
       label: 'Remarks',
       value: document?.remarks,
-    },
-  ];
+    });
+  }
 
   return (
     <React.Fragment>
