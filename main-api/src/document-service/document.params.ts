@@ -27,12 +27,11 @@ export interface EncodeDocQRBarCode {
 export interface CheckerApproveDoc {
   documentId: number;
   documentDate: string;
+  remarks: string;
   checkedBy: string;
 }
 
-export interface CheckerDisApproveDoc extends CheckerApproveDoc {
-  remarks: string;
-}
+export interface CheckerDisApproveDoc extends CheckerApproveDoc {}
 
 export interface DocumentApprover {
   documentId: number;

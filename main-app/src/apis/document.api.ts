@@ -131,6 +131,7 @@ export const encodeDocDetailsApi = async (
 
 export interface CheckerApproveDocApi {
   documentDate: string;
+  remarks: string;
   documentId: number;
 }
 
@@ -141,9 +142,7 @@ export const checkerApproveDocApi = async (
   await request.put(`/api/documents/${documentId}/checker/approve`, rest);
 };
 
-export interface CheckerDisapproveDocApi extends CheckerApproveDocApi {
-  remarks: string;
-}
+export interface CheckerDisapproveDocApi extends CheckerApproveDocApi {}
 
 export const checkerDisapproveDocApi = async (
   params: CheckerDisapproveDocApi,

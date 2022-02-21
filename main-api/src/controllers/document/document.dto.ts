@@ -86,14 +86,14 @@ export class CheckerApproveDocDto {
   @IsNotEmpty({ message: 'Document date is required.' })
   @IsDateString()
   documentDate: string;
-}
 
-export class CheckerDisApproveDocDto extends CheckerApproveDocDto {
   @ApiProperty()
   @IsNotEmpty({ message: 'Remarks is required.' })
   @IsString()
   remarks: string;
 }
+
+export class CheckerDisApproveDocDto extends CheckerApproveDocDto {}
 
 export class RetryDocumentsDto {
   @ApiProperty({ type: [Number] })

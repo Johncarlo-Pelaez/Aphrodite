@@ -151,8 +151,7 @@ export const useCheckerDocument = (): UseMutationResult<
   return useMutation<void, ApiError, UseCheckerDocument>(
     async ({ approve = true, ...rest }) => {
       if (approve) {
-        const { remarks, ...approveParams } = rest;
-        await checkerApproveDocApi(approveParams);
+        await checkerApproveDocApi(rest);
       } else {
         await checkerDisapproveDocApi(rest);
       }
