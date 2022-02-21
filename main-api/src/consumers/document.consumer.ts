@@ -408,7 +408,7 @@ export class DocumentConsumer {
       FileName: empty,
       MIMEType: document.mimeType,
       DocumentDate: document.documentDate
-        ? this.datesUtil.formatDateString(document.documentDate, 'MMDDYYYY')
+        ? this.datesUtil.formatDateString(document.documentDate, 'MM/DD/YYYY')
         : empty,
       ExternalSourceUserID: document.user.username.split('@')[0],
       SourceSystem: 'RIS',
@@ -425,10 +425,7 @@ export class DocumentConsumer {
     ) {
       uploadParams.FileName = `${uploadParams.CompanyCode}_${
         uploadParams.ContractNo
-      }_${uploadParams.Remarks}_${moment(
-        uploadParams.DocumentDate,
-        '2022-02-14',
-      ).format('MMDDYYYY')}`;
+      }_${uploadParams.Remarks}_${document.documentDate ?? empty}`;
     } else {
       uploadParams.FileName = `${this.filenameUtil.removeNotAllowedChar(
         documentType?.Nomenclature?.replace(/\/|\\|\|/g, '_'),
