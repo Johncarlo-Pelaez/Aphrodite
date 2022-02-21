@@ -562,7 +562,7 @@ export class DocumentRepository {
 
       const history = this.genarateDocumentHistory(document, {
         userUsername: document.checker,
-        note: param.remarks,
+        note: `Document Date: ${param.documentDate}, Remarks: ${param.remarks}`,
       });
       await transaction.save(history);
     });
