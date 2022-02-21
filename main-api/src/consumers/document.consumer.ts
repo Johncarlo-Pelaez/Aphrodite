@@ -425,7 +425,11 @@ export class DocumentConsumer {
     ) {
       uploadParams.FileName = `${uploadParams.CompanyCode}_${
         uploadParams.ContractNo
-      }_${uploadParams.Remarks}_${document.documentDate ?? empty}`;
+      }_${uploadParams.Remarks}_${
+        document.documentDate
+          ? this.datesUtil.formatDateString(document.documentDate, 'MMDDYYYY')
+          : empty
+      }`;
     } else {
       uploadParams.FileName = `${this.filenameUtil.removeNotAllowedChar(
         documentType?.Nomenclature?.replace(/\/|\\|\|/g, '_'),
