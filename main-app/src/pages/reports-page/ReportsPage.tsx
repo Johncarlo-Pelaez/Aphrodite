@@ -1,20 +1,29 @@
 import { ReactElement, useState } from 'react';
-import { Container, Row, Col } from 'react-bootstrap';
+import { Container, Row, Col, Button } from 'react-bootstrap';
 import {
   ReportStatusDropdown,
   UserDropdown,
-  StatusOption,
+  ReportOption,
   ReportTable,
 } from './components';
 import { DateSelect } from 'core/ui';
 
 export const ReportsPage = (): ReactElement => {
-  const [reportType, setReportType] = useState<StatusOption>(
-    StatusOption.UPLOADED,
+  const [reportType, setReportType] = useState<ReportOption>(
+    ReportOption.UPLOADED,
   );
   const [username, setUsername] = useState<string | undefined>(undefined);
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
+  const [start, setStart] = useState<Date | undefined>(undefined);
+  const [end, setEnd] = useState<Date | undefined>(undefined);
+  const [user, setUser] = useState<string | undefined>(undefined);
+
+  const collectFilter = () => {
+    setStart(dateFrom);
+    setEnd(dateTo);
+    setUser(username);
+  };
 
   return (
     <Container className="my-4" fluid>
@@ -45,11 +54,16 @@ export const ReportsPage = (): ReactElement => {
             horizontal
           />
         </Col>
+        <Col>
+          <Button variant="outline-secondary" onClick={collectFilter}>
+            Fetch
+          </Button>
+        </Col>
       </Row>
       <ReportTable
-        username={username}
-        dateFrom={dateFrom}
-        dateTo={dateTo}
+        username={user}
+        dateFrom={start}
+        dateTo={end}
         reportType={reportType}
       />
     </Container>
