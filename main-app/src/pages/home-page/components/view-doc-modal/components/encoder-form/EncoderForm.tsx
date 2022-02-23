@@ -62,7 +62,7 @@ export const EncoderForm = forwardRef(
       setFocus,
     } = useForm<IEncoderFormValues>({
       defaultValues: {
-        qrBarCode: document?.qrCode ?? '',
+        qrBarCode: '',
         companyCode: envodeValues?.companyCode ?? '',
         contractNumber: envodeValues?.contractNumber ?? '',
         nomenclature:
