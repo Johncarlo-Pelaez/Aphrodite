@@ -428,7 +428,7 @@ export class DocumentConsumer {
       }_${uploadParams.Remarks}_${moment(
         uploadParams.DocumentDate,
         '2022-02-14',
-      ).format('MMDDYYYY')}`;
+      ).format('MMDDYYYY')}${path.extname(document.documentName)}`;
     } else {
       uploadParams.FileName = `${this.filenameUtil.removeNotAllowedChar(
         documentType?.Nomenclature?.replace(/\/|\\|\|/g, '_'),
