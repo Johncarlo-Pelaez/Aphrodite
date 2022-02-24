@@ -19,6 +19,12 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
+## Dependencies
+
+### Imagemagick
+
+- Add this line `<policy domain="coder" rights="read|write" pattern="PDF" />` in `/etc/ImageMagick-6/policy.xml` inside `<policymap>` section.
+
 ## Test
 
 ```bash
