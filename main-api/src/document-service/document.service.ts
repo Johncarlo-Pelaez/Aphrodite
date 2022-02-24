@@ -60,7 +60,7 @@ export class DocumentService {
       qrCode = filename.replace(/_/g, '|');
     }
 
-    if (filename.length >= 18) {
+    if (filename.length === 18) {
       qrCode = filename.substr(0, 15);
     }
 
