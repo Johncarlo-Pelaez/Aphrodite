@@ -9,6 +9,8 @@ export class SpringCMService {
   constructor(private readonly appConfigService: AppConfigService) {
     this.request = axios.create({
       baseURL: this.appConfigService.salesForceURl,
+      maxBodyLength: Infinity,
+      maxContentLength: Infinity,
     });
   }
 
