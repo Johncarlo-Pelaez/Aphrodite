@@ -1,15 +1,15 @@
 import {
   ReactElement,
-  useEffect,
+  // useEffect,
   useImperativeHandle,
   forwardRef,
 } from 'react';
 import Card from 'react-bootstrap/Card';
-import Button from 'react-bootstrap/Button';
+// import Button from 'react-bootstrap/Button';
 import {
   useDocumentsProcessCount,
-  useCancelWaitingDocuments,
-  useRetryErrorDocuments,
+  // useCancelWaitingDocuments,
+  // useRetryErrorDocuments,
 } from 'hooks';
 import { DocumentStatus } from 'core/enum';
 import {
@@ -61,36 +61,36 @@ export const ProcessDetails = forwardRef(
     const { success, processing_waiting, cancelled_error, refresh } =
       useDocsProcessDetails();
 
-    const {
-      isLoading: isCancelling,
-      isError: hasCancelError,
-      mutateAsync: cancelWaitingDocuments,
-    } = useCancelWaitingDocuments();
+    // const {
+    //   isLoading: isCancelling,
+    //   isError: hasCancelError,
+    //   mutateAsync: cancelWaitingDocuments,
+    // } = useCancelWaitingDocuments();
 
-    const {
-      isLoading: isRetrying,
-      isError: hasRetryError,
-      mutateAsync: retryWaitingDocuments,
-    } = useRetryErrorDocuments();
+    // const {
+    //   isLoading: isRetrying,
+    //   isError: hasRetryError,
+    //   mutateAsync: retryWaitingDocuments,
+    // } = useRetryErrorDocuments();
 
-    const handleCancel = async (): Promise<void> => {
-      if (!isCancelling) {
-        await cancelWaitingDocuments(null);
-        refresh();
-      }
-    };
+    // const handleCancel = async (): Promise<void> => {
+    //   if (!isCancelling) {
+    //     await cancelWaitingDocuments(null);
+    //     refresh();
+    //   }
+    // };
 
-    const handleRetry = async (): Promise<void> => {
-      if (!isRetrying) {
-        await retryWaitingDocuments(null);
-        refresh();
-      }
-    };
+    // const handleRetry = async (): Promise<void> => {
+    //   if (!isRetrying) {
+    //     await retryWaitingDocuments(null);
+    //     refresh();
+    //   }
+    // };
 
-    useEffect(() => {
-      if (hasRetryError) alert('Failed to retry documents.');
-      if (hasCancelError) alert('Failed to cancel documents.');
-    }, [hasCancelError, hasRetryError]);
+    // useEffect(() => {
+    //   if (hasRetryError) alert('Failed to retry documents.');
+    //   if (hasCancelError) alert('Failed to cancel documents.');
+    // }, [hasCancelError, hasRetryError]);
 
     useImperativeHandle(
       ref,
@@ -114,7 +114,7 @@ export const ProcessDetails = forwardRef(
             <Card.Text className="text-center p-3 fs-4">
               {processing_waiting}
             </Card.Text>
-            <div className="d-flex justify-content-center">
+            {/* <div className="d-flex justify-content-center">
               <Button
                 disabled={processing_waiting === 0}
                 variant="outline-dark"
@@ -122,7 +122,7 @@ export const ProcessDetails = forwardRef(
               >
                 Cancel
               </Button>
-            </div>
+            </div> */}
           </Card.Body>
         </Card>
         <Card className="shadow m-3" style={cardStyle}>
@@ -131,7 +131,7 @@ export const ProcessDetails = forwardRef(
             <Card.Text className="text-center p-3 fs-4">
               {cancelled_error}
             </Card.Text>
-            <div className="d-flex justify-content-center">
+            {/* <div className="d-flex justify-content-center">
               <Button
                 disabled={cancelled_error === 0}
                 variant="outline-dark"
@@ -139,7 +139,7 @@ export const ProcessDetails = forwardRef(
               >
                 Retry
               </Button>
-            </div>
+            </div> */}
           </Card.Body>
         </Card>
       </div>

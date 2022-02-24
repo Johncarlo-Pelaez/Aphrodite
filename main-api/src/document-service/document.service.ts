@@ -213,10 +213,11 @@ export class DocumentService {
   }
 
   async checkerApproveDoc(data: CheckerApproveDoc): Promise<void> {
-    const { documentId, documentDate, checkedBy } = data;
+    const { documentId, documentDate, remarks, checkedBy } = data;
     await this.documentRepository.checkerApproveDoc({
       documentId,
       documentDate,
+      remarks,
       checkedBy,
       checkedAt: this.datesUtil.getDateNow(),
     });
@@ -224,7 +225,7 @@ export class DocumentService {
   }
 
   async checkerDisapproveDoc(data: CheckerDisApproveDoc): Promise<void> {
-    const { documentId, documentDate, checkedBy, remarks } = data;
+    const { documentId, documentDate, remarks, checkedBy } = data;
     await this.documentRepository.checkerDisapproveDoc({
       documentId,
       documentDate,

@@ -199,6 +199,7 @@ export class DocumentController {
     await this.documentsService.checkerApproveDoc({
       documentId,
       documentDate: dto.documentDate,
+      remarks: dto.remarks,
       checkedBy: username,
     });
   }

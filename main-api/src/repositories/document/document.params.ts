@@ -83,13 +83,12 @@ export interface EncodeAccountDetailsParam extends EncodeProcessParam {
 export interface CheckerApproveDocParam {
   documentId: number;
   documentDate: string;
+  remarks: string;
   checkedAt: Date;
   checkedBy: string;
 }
 
-export interface CheckerDispproveDocParam extends CheckerApproveDocParam {
-  remarks: string;
-}
+export interface CheckerDispproveDocParam extends CheckerApproveDocParam {}
 
 export interface ApproverApproveDisapproveDocParam {
   documentId: number;

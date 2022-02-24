@@ -531,6 +531,7 @@ export class DocumentRepository {
       document.status = DocumentStatus.CHECKING_APPROVED;
       document.description = 'Checker approved.';
       document.documentDate = param.documentDate;
+      document.remarks = param.remarks;
       document.checkedAt = param.checkedAt;
       document.checker = param.checkedBy;
       document.modifiedDate = param.checkedAt;
@@ -539,6 +540,7 @@ export class DocumentRepository {
 
       const history = this.genarateDocumentHistory(document, {
         userUsername: document.checker,
+        note: `Document Date: ${param.documentDate}, Remarks: ${param.remarks}`,
       });
       await transaction.save(history);
     });
