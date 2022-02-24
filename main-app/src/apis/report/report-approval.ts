@@ -34,10 +34,10 @@ export const getReportApprovalApi = async (
 
   const dateFromFilter = params.from
     ? moment(params.from).format(DEFAULT_DATE_PARAMS_FORMAT)
-    : undefined;
+    : moment(new Date()).format(DEFAULT_DATE_PARAMS_FORMAT);
   const dateToFilter = params.to
     ? moment(params.to).format(DEFAULT_DATE_PARAMS_FORMAT)
-    : undefined;
+    : moment(new Date()).format(DEFAULT_DATE_PARAMS_FORMAT);
 
   const filterQuery = createQueryString({
     approver: params.username,
@@ -56,10 +56,10 @@ export const getDownloadDocumentReportApproval = async (
 ): Promise<Blob> => {
   const dateFromFilter = params.from
     ? moment(params.from).format(DEFAULT_DATE_PARAMS_FORMAT)
-    : undefined;
+    : moment(new Date()).format(DEFAULT_DATE_PARAMS_FORMAT);
   const dateToFilter = params.to
     ? moment(params.to).format(DEFAULT_DATE_PARAMS_FORMAT)
-    : undefined;
+    : moment(new Date()).format(DEFAULT_DATE_PARAMS_FORMAT);
 
   const filterQuery = createQueryString({
     approver: params.username,

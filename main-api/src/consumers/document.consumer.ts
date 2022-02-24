@@ -429,7 +429,7 @@ export class DocumentConsumer {
         document.documentDate
           ? this.datesUtil.formatDateString(document.documentDate, 'MMDDYYYY')
           : empty
-      }`;
+      }${path.extname(document.documentName)}`;
     } else {
       uploadParams.FileName = `${this.filenameUtil.removeNotAllowedChar(
         documentType?.Nomenclature?.replace(/\/|\\|\|/g, '_'),

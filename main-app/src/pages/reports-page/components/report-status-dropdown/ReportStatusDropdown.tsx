@@ -3,16 +3,16 @@ import Form from 'react-bootstrap/Form';
 import styles from './ReportStatusDropdown.module.css';
 
 export interface StatusDropdownProps {
-  onChange: (selected: StatusOption) => void;
-  selected: StatusOption;
+  onChange: (selected: ReportOption) => void;
+  selected: ReportOption;
 }
 
 export interface IStatusDropdownOptions {
   label: string;
-  value: StatusOption;
+  value: ReportOption;
 }
 
-export enum StatusOption {
+export enum ReportOption {
   UPLOADED = 'UPLOADED',
   INFORMATION_REQUEST = 'INFORMATION REQUEST',
   QUALITY_CHECKED = 'QUALITY CHECKED',
@@ -24,27 +24,27 @@ export enum StatusOption {
 export const StatusDropdownOptions: IStatusDropdownOptions[] = [
   {
     label: 'Uploaded',
-    value: StatusOption.UPLOADED,
+    value: ReportOption.UPLOADED,
   },
   {
     label: 'Information Request',
-    value: StatusOption.INFORMATION_REQUEST,
+    value: ReportOption.INFORMATION_REQUEST,
   },
   {
     label: 'Quality Checked',
-    value: StatusOption.QUALITY_CHECKED,
+    value: ReportOption.QUALITY_CHECKED,
   },
   {
     label: 'Approval',
-    value: StatusOption.APPROVAL,
+    value: ReportOption.APPROVAL,
   },
   {
     label: 'Import',
-    value: StatusOption.IMPORT,
+    value: ReportOption.IMPORT,
   },
   {
     label: 'RIS',
-    value: StatusOption.RIS,
+    value: ReportOption.RIS,
   },
 ];
 
@@ -53,7 +53,7 @@ export const ReportStatusDropdown = ({
   onChange,
 }: StatusDropdownProps): ReactElement => {
   const handleOnChange = (event: React.FormEvent<HTMLSelectElement>): void => {
-    onChange(event.currentTarget.value as StatusOption);
+    onChange(event.currentTarget.value as ReportOption);
   };
 
   return (
