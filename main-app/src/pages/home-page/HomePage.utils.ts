@@ -3,8 +3,8 @@ import { OperationOption } from './components/operation-dropdown';
 import { StatusOption } from './components/status-dropdown';
 
 export const concatDocumentStatuses = (
-  operation: OperationOption,
-  status: StatusOption,
+  operation: OperationOption | undefined,
+  status: StatusOption | undefined,
 ): string => {
   const documentStatus = `${operation}_${status}, `;
   let strDocumentStatuses = '';
@@ -82,8 +82,8 @@ export const getForDeleteDocsFileStatuses = (): DocumentStatus[] =>
   );
 
 export const getDocStatusFilter = (
-  cmbStatusValue: StatusOption,
-  cmbOperationValue: OperationOption,
+  cmbStatusValue: StatusOption | undefined,
+  cmbOperationValue: OperationOption | undefined,
 ): DocumentStatus[] => {
   const allOperation = Object.values(OperationOption).filter(
     (o) => o !== OperationOption.ALL,
