@@ -108,7 +108,7 @@ export const RISReportTable = ({
       title: 'Date Indexed',
       dataIndex: 'dateIndexed',
       render: ({ dateIndexed }: RISReport) =>
-        moment(dateIndexed).format(DEFAULT_DATE_FORMAT),
+        dateIndexed ? moment(dateIndexed).format(DEFAULT_DATE_FORMAT) : '',
       sorter: sortDateTime('dateIndexed'),
       sortOrder: sorter?.field === 'dateIndexed' ? sorter.order : undefined,
     },
@@ -126,16 +126,6 @@ export const RISReportTable = ({
       render: (document: RISReport) => fileSize(document.fileSize),
     },
   ];
-
-  const parseDocumentType = (
-    strDocumentType: string,
-  ): DocTypeRIS | undefined => {
-    const sample: GetIndexesResult | undefined =
-      !!strDocumentType && strDocumentType !== ''
-        ? JSON.parse(strDocumentType)
-        : undefined;
-    return !!sample?.response?.length ? sample.response[0] : undefined;
-  };
 
   const collectFilters = () => {
     setStatus(selectedStatus);
@@ -162,7 +152,15 @@ export const RISReportTable = ({
     () => ({
       ris: result?.data ?? [],
       risTotal: result?.count ?? 0,
-      risIndexes: result?.data.map(({ indexes }) => parseDocumentType(indexes)),
+      risIndexes: !!result?.data
+        ? result.data.map(({ indexes }) => {
+            const docType: GetIndexesResult =
+              !!indexes && indexes !== '' ? JSON.parse(indexes) : undefined;
+            return !!docType?.response?.length
+              ? docType.response[0]
+              : undefined;
+          })
+        : undefined,
     }),
     [result?.data, result?.count],
   );
