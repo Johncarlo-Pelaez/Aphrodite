@@ -296,17 +296,27 @@ export class DocumentService {
   }
 
   async retryErrorDocuments(retriedBy: string): Promise<void> {
+    const userRole = await (
+      await this.userRepository.getUserByEmail(retriedBy)
+    ).role;
+
     const documentIds = (
       await this.documentRepository.getDocuments({
         statuses: Object.values(DocumentStatus).filter(
           (s) => s.includes('FAILED') || s.includes('CANCELLED'),
         ),
+        role: userRole,
+        username: retriedBy,
       })
     ).map((doc) => doc.id);
     await this.retryDocuments({ documentIds, retriedBy });
   }
 
   async cancelWaitingDocumentsInQueue(cancelledBy: string): Promise<void> {
+    const userRole = await (
+      await this.userRepository.getUserByEmail(cancelledBy)
+    ).role;
+
     const documentIds = (
       await this.documentRepository.getDocuments({
         statuses: [
@@ -317,6 +327,8 @@ export class DocumentService {
           DocumentStatus.APPROVED,
           DocumentStatus.CHECKING_APPROVED,
         ],
+        role: userRole,
+        username: cancelledBy,
       })
     ).map((doc) => doc.id);
     await this.cancelDocuments({ documentIds, cancelledBy });
