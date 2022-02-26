@@ -38,7 +38,6 @@ export interface UseDocuments {
   currentPage: number;
   pageSize: number;
   statuses: DocumentStatus[];
-  // username?: string;
   dateFrom?: Date;
   dateTo?: Date;
 }

@@ -75,17 +75,6 @@ export class DocumentController {
       await this.userRepository.getUserByEmail(currentUser)
     )?.role;
 
-    const documentStatus = DocumentStatus;
-    let reviewerDocStatus: DocumentStatus[] = Object.values(
-      DocumentStatus,
-    ).filter(
-      (s) =>
-        s.includes(documentStatus.CHECKING_DISAPPROVED) ||
-        s.includes(documentStatus.DISAPPROVED),
-    );
-
-    reviewerDocStatus = [...new Set(dto.statuses.concat(reviewerDocStatus))];
-
     const documentsDto: GetDocumentsParam = {
       skip: dto.skip,
       take: dto.take,
@@ -94,7 +83,7 @@ export class DocumentController {
       documentType: dto.documentType,
       search: dto.search,
       username: currentUser,
-      statuses: userRole === Role.REVIEWER ? reviewerDocStatus : dto.statuses,
+      statuses: dto.statuses,
       role: userRole,
     };
 

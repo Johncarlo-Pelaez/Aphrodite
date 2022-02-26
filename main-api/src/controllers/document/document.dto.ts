@@ -36,11 +36,6 @@ export class GetDocumentsDto {
   @IsString({ each: true })
   statuses?: DocumentStatus[];
 
-  // @ApiPropertyOptional()
-  // @IsOptional()
-  // @IsEmail()
-  // username?: string;
-
   @ApiPropertyOptional()
   @IsOptional()
   @IsDateString()
