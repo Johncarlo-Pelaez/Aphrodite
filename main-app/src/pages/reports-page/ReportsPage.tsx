@@ -1,4 +1,4 @@
-import { ReactElement, useState } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import {
   ReportStatusDropdown,
@@ -24,6 +24,17 @@ export const ReportsPage = (): ReactElement => {
     setEnd(dateTo);
     setUser(username);
   };
+
+  useEffect(() => {
+    if (reportType) {
+      setStart(undefined);
+      setEnd(undefined);
+      setUser(undefined);
+      setUsername(undefined);
+      setDateFrom(undefined);
+      setDateTo(undefined);
+    }
+  }, [reportType]);
 
   return (
     <Container className="my-4" fluid>
@@ -56,7 +67,7 @@ export const ReportsPage = (): ReactElement => {
         </Col>
         <Col>
           <Button variant="outline-secondary" onClick={collectFilter}>
-            Fetch
+            Find
           </Button>
         </Col>
       </Row>

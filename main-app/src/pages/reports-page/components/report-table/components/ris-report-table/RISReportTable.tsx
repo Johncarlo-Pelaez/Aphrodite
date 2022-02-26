@@ -56,10 +56,13 @@ export const RISReportTable = ({
     OperationOption.ALL,
   );
 
-  const documentStatusFilter = getDocStatusFilter(
-    selectedStatus,
-    selectedOperation,
+  const [status, setStatus] = useState<StatusOption | undefined>(undefined);
+  const [operation, setOperation] = useState<OperationOption | undefined>(
+    undefined,
   );
+  const [docType, setDocType] = useState<string | undefined>(undefined);
+
+  let documentStatusFilter = getDocStatusFilter(status, operation);
 
   const { isLoading: isDownloadLoading, mutateAsync: downloadRISReportAsync } =
     useDownloadReportRIS();
@@ -134,6 +137,12 @@ export const RISReportTable = ({
     return !!sample?.response?.length ? sample.response[0] : undefined;
   };
 
+  const collectFilters = () => {
+    setStatus(selectedStatus);
+    setOperation(selectedOperation);
+    setDocType(nomenclature);
+  };
+
   const {
     isFetching,
     isLoading,
@@ -146,7 +155,7 @@ export const RISReportTable = ({
     to,
     username,
     statuses: documentStatusFilter,
-    nomenclature,
+    nomenclature: docType,
   });
 
   const { ris, risTotal, risIndexes } = useMemo(
@@ -168,8 +177,14 @@ export const RISReportTable = ({
       setDisplayErrorMessage(false);
       setSelectedStatus(StatusOption.ALL);
       setSelectedOperation(OperationOption.ALL);
+
+      if (username || from || to) {
+        setStatus(undefined);
+        setOperation(undefined);
+        setDocType(undefined);
+      }
     };
-  }, []);
+  }, [from, to, username]);
 
   return (
     <div>
@@ -203,6 +218,9 @@ export const RISReportTable = ({
             isLoading={isLoading}
             isError={hasDocsError}
           />
+          <Button variant="outline-secondary" onClick={collectFilters}>
+            Select
+          </Button>
         </Stack>
         <Button
           className="mb-1"
