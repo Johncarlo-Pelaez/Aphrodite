@@ -17,9 +17,9 @@ import {
   ViewDocModal,
   ProcessDetails,
   StatusDropdown,
-  UserOption,
+  // UserOption,
   OperationDropdown,
-  UserDropdown,
+  // UserDropdown,
 } from './components';
 import { OperationOption } from './components/operation-dropdown';
 import { StatusOption } from './components/status-dropdown';
@@ -44,9 +44,9 @@ export const HomePage = (): ReactElement => {
   const [viewDocModalShow, setViewDocModalShow] = useState<boolean>(false);
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
-  const [selectedUserFilter, setSelectedUserFilter] = useState<
-    UserOption | undefined
-  >(undefined);
+  // const [selectedUserFilter, setSelectedUserFilter] = useState<
+  //   UserOption | undefined
+  // >(undefined);
   const processDetailsRef = useRef<any>(null);
   const documentsTableRef = useRef<any>(null);
   const hasSelectedRows = !!selectedDocuments.length;
@@ -260,12 +260,12 @@ export const HomePage = (): ReactElement => {
             horizontal
           />
         </Col>
-        <Col xs={12} lg={4}>
+        {/* <Col xs={12} lg={4}>
           <UserDropdown
             value={selectedUserFilter}
             onChange={setSelectedUserFilter}
           />
-        </Col>
+        </Col> */}
       </Row>
       <div className="d-flex justify-content-end mb-2">
         <SearchField searchKey={searchKey} onSearchDocument={setSearchKey} />
@@ -278,7 +278,7 @@ export const HomePage = (): ReactElement => {
           dateFrom,
           dateTo,
           statuses: documentStatusFilter,
-          username: selectedUserFilter?.username,
+          // username: selectedUserFilter?.username,
         }}
         setSelectedDocuments={setSelectedDocuments}
         onDoubleClickRow={handleOpen}

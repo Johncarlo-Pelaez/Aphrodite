@@ -31,7 +31,7 @@ export interface DataFilterProps {
   statuses: DocumentStatus[];
   dateFrom?: Date;
   dateTo?: Date;
-  username?: string;
+  // username?: string;
 }
 
 export interface DocumentsTableProps {
@@ -59,7 +59,7 @@ export const DocumentsTable = forwardRef(
     const statuses = dataFilters?.statuses ?? [];
     const dateFrom = dataFilters?.dateFrom;
     const dateTo = dataFilters?.dateTo;
-    const username = dataFilters?.username;
+    // const username = dataFilters?.username;
     const debouncedSearch = useDebounce(searchKey);
 
     const {
@@ -75,7 +75,7 @@ export const DocumentsTable = forwardRef(
       statuses,
       dateFrom,
       dateTo,
-      username,
+      // username,
     });
 
     const { documents, total } = useMemo(
