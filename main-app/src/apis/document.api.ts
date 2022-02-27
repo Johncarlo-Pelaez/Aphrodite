@@ -30,10 +30,10 @@ export const getDocumentsApi = async (
 
   const dateFromFilter = params.dateFrom
     ? moment(params.dateFrom).format(DEFAULT_DATE_PARAMS_FORMAT)
-    : moment(new Date()).format(DEFAULT_DATE_PARAMS_FORMAT);
+    : undefined;
   const dateToFilter = params.dateFrom
     ? moment(params.dateTo).format(DEFAULT_DATE_PARAMS_FORMAT)
-    : moment(new Date()).format(DEFAULT_DATE_PARAMS_FORMAT);
+    : undefined;
 
   const filterQuery = createQueryString({
     search: params.search,
