@@ -29,7 +29,7 @@ import {
   Auth,
 } from 'src/core';
 import { Role } from 'src/entities/user.entity';
-import { Document, DocumentHistory, DocumentStatus } from 'src/entities';
+import { Document, DocumentHistory } from 'src/entities';
 import {
   DocumentRepository,
   GetDocumentsParam,
