@@ -43,16 +43,12 @@ export class DocumentRepository {
       username,
       from,
       to,
-      role,
+      currentUserRole,
     } = param;
     let whereDocumentType: { documentType: FindOperator<string> };
     let whereStatusIn: { status: FindOperator<DocumentStatus> };
+    let whereUsername: { username: string };
     let whereModifiedDate: { modifiedDate: FindOperator<Date> };
-
-    const reviewerDocsFilter: DocumentStatus[] = [
-      DocumentStatus.CHECKING_DISAPPROVED,
-      DocumentStatus.DISAPPROVED,
-    ];
 
     if (documentType && documentType !== '') {
       whereDocumentType = {
@@ -63,6 +59,12 @@ export class DocumentRepository {
     if (statuses && !!statuses.length) {
       whereStatusIn = {
         status: In(statuses),
+      };
+    }
+
+    if (username && username !== '') {
+      whereUsername = {
+        username: username,
       };
     }
 
@@ -77,57 +79,24 @@ export class DocumentRepository {
       };
     }
 
-    switch (role) {
-      case Role.REVIEWER:
+    switch (currentUserRole) {
+      case Role.ENCODER:
         return await this.manager.find(Document, {
           relations: ['user', 'documentHistories'],
           where: [
-            // Get All Documents For Review
             {
-              documentName: ILike(`%${search}%`),
-              ...whereDocumentType,
-              status: In(reviewerDocsFilter),
-              ...whereModifiedDate,
-            },
-            {
-              documentType: ILike(`%${search}%`),
-              ...whereDocumentType,
-              status: In(reviewerDocsFilter),
-              ...whereModifiedDate,
-            },
-            {
-              user: {
-                firstName: ILike(`%${search}%`),
-              },
-              ...whereDocumentType,
-              status: In(reviewerDocsFilter),
-              ...whereModifiedDate,
-            },
-            {
-              user: {
-                lastName: ILike(`%${search}%`),
-              },
-              ...whereDocumentType,
-              status: In(reviewerDocsFilter),
-              ...whereModifiedDate,
-            },
-            // OR  Get All Documents By Reviewer
-            {
-              userUsername: username,
               documentName: ILike(`%${search}%`),
               ...whereDocumentType,
               ...whereStatusIn,
               ...whereModifiedDate,
             },
             {
-              userUsername: username,
               documentType: ILike(`%${search}%`),
               ...whereDocumentType,
               ...whereStatusIn,
               ...whereModifiedDate,
             },
             {
-              userUsername: username,
               user: {
                 firstName: ILike(`%${search}%`),
               },
@@ -136,7 +105,6 @@ export class DocumentRepository {
               ...whereModifiedDate,
             },
             {
-              userUsername: username,
               user: {
                 lastName: ILike(`%${search}%`),
               },
@@ -149,38 +117,42 @@ export class DocumentRepository {
           skip: param.skip,
           take: param.take,
         });
+        break;
       default:
         return await this.manager.find(Document, {
           relations: ['user', 'documentHistories'],
           where: [
-            // Get All documents limited for User Role Admin, Encoder
             {
               documentName: ILike(`%${search}%`),
               ...whereDocumentType,
               ...whereStatusIn,
-              userUsername: username,
+              user: {
+                ...whereUsername,
+              },
               ...whereModifiedDate,
             },
             {
               documentType: ILike(`%${search}%`),
               ...whereDocumentType,
               ...whereStatusIn,
-              userUsername: username,
+              user: {
+                ...whereUsername,
+              },
               ...whereModifiedDate,
             },
             {
-              userUsername: username,
               user: {
                 firstName: ILike(`%${search}%`),
+                ...whereUsername,
               },
               ...whereDocumentType,
               ...whereStatusIn,
               ...whereModifiedDate,
             },
             {
-              userUsername: username,
               user: {
                 lastName: ILike(`%${search}%`),
+                ...whereUsername,
               },
               ...whereDocumentType,
               ...whereStatusIn,
@@ -191,6 +163,7 @@ export class DocumentRepository {
           skip: param.skip,
           take: param.take,
         });
+        break;
     }
   }
 
@@ -228,15 +201,17 @@ export class DocumentRepository {
   }
 
   async count(param: GetDocumentsParam): Promise<number> {
-    const { search = '', documentType, statuses, username, role } = param;
+    const {
+      search = '',
+      documentType,
+      statuses,
+      username,
+      currentUserRole,
+    } = param;
     let whereDocumentType: { documentType: FindOperator<string> };
     let whereStatusIn: { status: FindOperator<DocumentStatus> };
+    let whereUsername: { username: string };
     let whereModifiedDate: { modifiedDate: FindOperator<Date> };
-
-    const reviewerDocsFilter: DocumentStatus[] = [
-      DocumentStatus.CHECKING_DISAPPROVED,
-      DocumentStatus.DISAPPROVED,
-    ];
 
     if (documentType && documentType !== '') {
       whereDocumentType = {
@@ -250,58 +225,24 @@ export class DocumentRepository {
       };
     }
 
-    switch (role) {
-      case Role.REVIEWER:
+    if (username && username !== '') {
+      whereUsername = {
+        username: username,
+      };
+    }
+
+    switch (currentUserRole) {
+      case Role.ENCODER:
         return await this.manager.count(Document, {
           relations: ['user'],
           where: [
-            // Get All Documents For Review
             {
-              documentName: ILike(`%${search}%`),
-              ...whereDocumentType,
-              status: In(reviewerDocsFilter),
-              ...whereModifiedDate,
-            },
-            {
-              documentType: ILike(`%${search}%`),
-              ...whereDocumentType,
-              status: In(reviewerDocsFilter),
-              ...whereModifiedDate,
-            },
-            {
-              user: {
-                firstName: ILike(`%${search}%`),
-              },
-              ...whereDocumentType,
-              status: In(reviewerDocsFilter),
-              ...whereModifiedDate,
-            },
-            {
-              user: {
-                lastName: ILike(`%${search}%`),
-              },
-              ...whereDocumentType,
-              status: In(reviewerDocsFilter),
-              ...whereModifiedDate,
-            },
-
-            //OR Get Documents by Reviewer
-            {
-              userUsername: username,
               documentName: ILike(`%${search}%`),
               ...whereDocumentType,
               ...whereStatusIn,
               ...whereModifiedDate,
             },
             {
-              userUsername: username,
-              documentType: ILike(`%${search}%`),
-              ...whereDocumentType,
-              ...whereStatusIn,
-              ...whereModifiedDate,
-            },
-            {
-              userUsername: username,
               user: {
                 firstName: ILike(`%${search}%`),
               },
@@ -310,7 +251,6 @@ export class DocumentRepository {
               ...whereModifiedDate,
             },
             {
-              userUsername: username,
               user: {
                 lastName: ILike(`%${search}%`),
               },
@@ -320,38 +260,33 @@ export class DocumentRepository {
             },
           ],
         });
+        break;
       default:
         return await this.manager.count(Document, {
           relations: ['user'],
           where: [
-            // Get All documents limited for User Role Admin, Encoder
             {
               documentName: ILike(`%${search}%`),
               ...whereDocumentType,
               ...whereStatusIn,
-              userUsername: username,
+              user: {
+                ...whereUsername,
+              },
               ...whereModifiedDate,
             },
             {
-              documentType: ILike(`%${search}%`),
-              ...whereDocumentType,
-              ...whereStatusIn,
-              userUsername: username,
-              ...whereModifiedDate,
-            },
-            {
-              userUsername: username,
               user: {
                 firstName: ILike(`%${search}%`),
+                ...whereUsername,
               },
               ...whereDocumentType,
               ...whereStatusIn,
               ...whereModifiedDate,
             },
             {
-              userUsername: username,
               user: {
                 lastName: ILike(`%${search}%`),
+                ...whereUsername,
               },
               ...whereDocumentType,
               ...whereStatusIn,
@@ -359,6 +294,7 @@ export class DocumentRepository {
             },
           ],
         });
+        break;
     }
   }
 

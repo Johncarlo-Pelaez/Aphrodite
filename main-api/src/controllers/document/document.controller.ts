@@ -11,6 +11,7 @@ import {
   UploadedFile,
   Res,
   Delete,
+  BadRequestException,
 } from '@nestjs/common';
 import {
   ApiCreatedResponse,
@@ -29,7 +30,7 @@ import {
   Auth,
 } from 'src/core';
 import { Role } from 'src/entities/user.entity';
-import { Document, DocumentHistory } from 'src/entities';
+import { Document, DocumentHistory, DocumentStatus } from 'src/entities';
 import {
   DocumentRepository,
   GetDocumentsParam,
@@ -71,9 +72,44 @@ export class DocumentController {
   ): Promise<PaginatedResponse<Document>> {
     const response = new PaginatedResponse<Document>();
 
-    const userRole = await (
+    const currentUserRole = await (
       await this.userRepository.getUserByEmail(currentUser)
     )?.role;
+
+    if (!currentUserRole) throw new BadRequestException();
+
+    let statusesFilter: DocumentStatus[] = [];
+
+    switch (currentUserRole) {
+      case Role.ENCODER:
+        statusesFilter = dto.statuses.filter(
+          (status) =>
+            status !== DocumentStatus.CHECKING_DISAPPROVED &&
+            status !== DocumentStatus.CHECKING_APPROVED &&
+            status !== DocumentStatus.APPROVED &&
+            status !== DocumentStatus.DISAPPROVED &&
+            status !== DocumentStatus.CHECKING &&
+            status !== DocumentStatus.CHECKING_FAILED &&
+            status !== DocumentStatus.MIGRATE_FAILED &&
+            status !== DocumentStatus.MIGRATE_BEGIN &&
+            status !== DocumentStatus.INDEXING_DONE &&
+            status !== DocumentStatus.MIGRATE_DONE,
+        );
+        break;
+      case Role.REVIEWER:
+        statusesFilter = dto.statuses.filter(
+          (status) =>
+            status !== DocumentStatus.MIGRATE_FAILED &&
+            status !== DocumentStatus.MIGRATE_BEGIN &&
+            status !== DocumentStatus.CHECKING_APPROVED &&
+            status !== DocumentStatus.APPROVED,
+        );
+        break;
+      default:
+        statusesFilter = dto.statuses;
+    }
+
+    if (!statusesFilter.length) return response;
 
     const documentsDto: GetDocumentsParam = {
       skip: dto.skip,
@@ -82,9 +118,9 @@ export class DocumentController {
       to: dto.to,
       documentType: dto.documentType,
       search: dto.search,
-      username: currentUser,
-      statuses: dto.statuses,
-      role: userRole,
+      username: dto.username,
+      statuses: statusesFilter,
+      currentUserRole,
     };
 
     response.count = await this.documentRepository.count(documentsDto);
@@ -318,13 +354,46 @@ export class DocumentController {
     @Query() dto: GetDocumentsProcessCountDto,
     @GetAzureUsername() currentUser: string,
   ): Promise<number> {
-    const userRole = await (
+    const currentUserRole = await (
       await this.userRepository.getUserByEmail(currentUser)
     ).role;
+
+    let statusesFilter: DocumentStatus[] = [];
+
+    switch (currentUserRole) {
+      case Role.ENCODER:
+        statusesFilter = dto.statuses.filter(
+          (status) =>
+            status !== DocumentStatus.CHECKING_DISAPPROVED &&
+            status !== DocumentStatus.CHECKING_APPROVED &&
+            status !== DocumentStatus.APPROVED &&
+            status !== DocumentStatus.DISAPPROVED &&
+            status !== DocumentStatus.CHECKING &&
+            status !== DocumentStatus.CHECKING_FAILED &&
+            status !== DocumentStatus.MIGRATE_FAILED &&
+            status !== DocumentStatus.MIGRATE_BEGIN &&
+            status !== DocumentStatus.INDEXING_DONE &&
+            status !== DocumentStatus.MIGRATE_DONE,
+        );
+        break;
+      case Role.REVIEWER:
+        statusesFilter = dto.statuses.filter(
+          (status) =>
+            status !== DocumentStatus.MIGRATE_FAILED &&
+            status !== DocumentStatus.MIGRATE_BEGIN &&
+            status !== DocumentStatus.CHECKING_APPROVED &&
+            status !== DocumentStatus.APPROVED,
+        );
+        break;
+      default:
+        statusesFilter = dto.statuses;
+    }
+
+    if (!currentUserRole) throw new BadRequestException();
+
     return await this.documentRepository.count({
-      statuses: dto.statuses,
-      role: userRole,
-      username: currentUser,
+      statuses: statusesFilter,
+      currentUserRole,
     });
   }
 }
