@@ -9,6 +9,7 @@ import {
   useRetryDocuments,
   useCancelDocuments,
   useDeleteDocumentsFile,
+  useGetCurrentUser,
 } from 'hooks';
 import { SearchField, DateSelect } from 'core/ui';
 import {
@@ -17,7 +18,9 @@ import {
   ViewDocModal,
   ProcessDetails,
   StatusDropdown,
+  UserOption,
   OperationDropdown,
+  UserDropdown,
 } from './components';
 import { OperationOption } from './components/operation-dropdown';
 import { StatusOption } from './components/status-dropdown';
@@ -27,6 +30,7 @@ import {
   getForCancelDocStatuses,
   getForDeleteDocsFileStatuses,
 } from './HomePage.utils';
+import { Role } from 'core/enum';
 
 export const HomePage = (): ReactElement => {
   const [searchKey, setSearchKey] = useState<string>('');
@@ -42,6 +46,11 @@ export const HomePage = (): ReactElement => {
   const [viewDocModalShow, setViewDocModalShow] = useState<boolean>(false);
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
+  const [selectedUserFilter, setSelectedUserFilter] = useState<
+    UserOption | undefined
+  >(undefined);
+  const { data: user } = useGetCurrentUser();
+  const currentUserRole = user?.role;
   const processDetailsRef = useRef<any>(null);
   const documentsTableRef = useRef<any>(null);
   const hasSelectedRows = !!selectedDocuments.length;
@@ -255,6 +264,14 @@ export const HomePage = (): ReactElement => {
             horizontal
           />
         </Col>
+        {currentUserRole !== Role.ENCODER && (
+          <Col xs={12} lg={4}>
+            <UserDropdown
+              value={selectedUserFilter}
+              onChange={setSelectedUserFilter}
+            />
+          </Col>
+        )}
       </Row>
       <div className="d-flex justify-content-end mb-2">
         <SearchField searchKey={searchKey} onSearchDocument={setSearchKey} />
@@ -267,6 +284,7 @@ export const HomePage = (): ReactElement => {
           dateFrom,
           dateTo,
           statuses: documentStatusFilter,
+          username: selectedUserFilter?.username,
         }}
         setSelectedDocuments={setSelectedDocuments}
         onDoubleClickRow={handleOpen}

@@ -38,6 +38,7 @@ export const getDocumentsApi = async (
   const filterQuery = createQueryString({
     search: params.search,
     statuses: params.statuses,
+    username: params.username,
     from: dateFromFilter,
     to: dateToFilter,
   });
