@@ -39,8 +39,10 @@ export const concatDocumentStatuses = (
   } else if (operation === OperationOption.CHECKING) {
     switch (status) {
       case StatusOption.WAITING:
+        strDocumentStatuses += `${DocumentStatus.CHECKING}, `;
+        break;
       case StatusOption.BEGIN:
-        strDocumentStatuses += `${DocumentStatus.CHECKING}, ${DocumentStatus.CHECKING_DISAPPROVED}, `;
+        strDocumentStatuses += `${DocumentStatus.CHECKING_DISAPPROVED}, `;
         break;
       case StatusOption.DONE:
         strDocumentStatuses += `${DocumentStatus.CHECKING_APPROVED}, ${DocumentStatus.APPROVED}, `;
