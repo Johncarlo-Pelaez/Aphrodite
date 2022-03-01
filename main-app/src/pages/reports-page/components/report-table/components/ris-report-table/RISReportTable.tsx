@@ -56,13 +56,16 @@ export const RISReportTable = ({
     OperationOption.ALL,
   );
 
-  const [status, setStatus] = useState<StatusOption | undefined>(undefined);
-  const [operation, setOperation] = useState<OperationOption | undefined>(
-    undefined,
-  );
-  const [docType, setDocType] = useState<string | undefined>(undefined);
+  // const [status, setStatus] = useState<StatusOption | undefined>(undefined);
+  // const [operation, setOperation] = useState<OperationOption | undefined>(
+  //   undefined,
+  // );
+  // const [docType, setDocType] = useState<string | undefined>(undefined);
 
-  let documentStatusFilter = getDocStatusFilter(status, operation);
+  let documentStatusFilter = getDocStatusFilter(
+    selectedStatus,
+    selectedOperation,
+  );
 
   const { isLoading: isDownloadLoading, mutateAsync: downloadRISReportAsync } =
     useDownloadReportRIS();
@@ -127,11 +130,11 @@ export const RISReportTable = ({
     },
   ];
 
-  const collectFilters = () => {
-    setStatus(selectedStatus);
-    setOperation(selectedOperation);
-    setDocType(nomenclature);
-  };
+  // const collectFilters = () => {
+  //   setStatus(selectedStatus);
+  //   setOperation(selectedOperation);
+  //   setDocType(nomenclature);
+  // };
 
   const {
     isFetching,
@@ -145,7 +148,8 @@ export const RISReportTable = ({
     to,
     username,
     statuses: documentStatusFilter,
-    nomenclature: docType,
+    nomenclature: nomenclature,
+    // docType,
   });
 
   const { ris, risTotal, risIndexes } = useMemo(
@@ -165,24 +169,31 @@ export const RISReportTable = ({
     [result?.data, result?.count],
   );
 
-  useEffect(() => {
-    return () => {
-      setCurrentPage(1);
-      setPageSize(15);
-      setSorter(DEFAULT_SORT_ORDER_RIS_REPORT);
-      setNomenclature(undefined);
-      setErrorMessage('');
-      setDisplayErrorMessage(false);
-      setSelectedStatus(StatusOption.ALL);
-      setSelectedOperation(OperationOption.ALL);
+  useEffect(
+    () => {
+      return () => {
+        setCurrentPage(1);
+        setPageSize(15);
+        setSorter(DEFAULT_SORT_ORDER_RIS_REPORT);
+        setNomenclature(undefined);
+        setErrorMessage('');
+        setDisplayErrorMessage(false);
+        setSelectedStatus(StatusOption.ALL);
+        setSelectedOperation(OperationOption.ALL);
 
-      if (username || from || to) {
-        setStatus(undefined);
-        setOperation(undefined);
-        setDocType(undefined);
-      }
-    };
-  }, [from, to, username]);
+        // if (username || from || to) {
+        //   setStatus(undefined);
+        //   setOperation(undefined);
+        //   setDocType(undefined);
+        // }
+      };
+    },
+    [
+      // from,
+      // to,
+      // username
+    ],
+  );
 
   return (
     <div>
@@ -216,9 +227,9 @@ export const RISReportTable = ({
             isLoading={isLoading}
             isError={hasDocsError}
           />
-          <Button variant="outline-secondary" onClick={collectFilters}>
+          {/* <Button variant="outline-secondary" onClick={collectFilters}>
             Select
-          </Button>
+          </Button> */}
         </Stack>
         <Button
           className="mb-1"
