@@ -2,18 +2,18 @@ import { ReactElement, useEffect, useState } from 'react';
 import { AutoSuggestField } from '../auto-suggest-field';
 
 export interface DocTypeRIS {
-  CompanyCode: string;
-  ContractNumber: string;
-  Brand: string;
-  DocumentGroup: string;
-  Nomenclature: string;
-  AccountName: string;
-  ProjectName: string;
-  UnitDetails: string;
-  Transmittal: string;
-  CopyType: string;
-  ProjectCode: string;
-  TowerPhase: string;
+  CompanyCode?: string;
+  ContractNumber?: string;
+  Brand?: string;
+  DocumentGroup?: string;
+  Nomenclature?: string;
+  AccountName?: string;
+  ProjectName?: string;
+  UnitDetails?: string;
+  Transmittal?: string;
+  CopyType?: string;
+  ProjectCode?: string;
+  TowerPhase?: string;
 }
 
 export interface NomenclatureDropdownProps {

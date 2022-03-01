@@ -56,7 +56,13 @@ export const RISReportTable = ({
     OperationOption.ALL,
   );
 
-  const documentStatusFilter = getDocStatusFilter(
+  // const [status, setStatus] = useState<StatusOption | undefined>(undefined);
+  // const [operation, setOperation] = useState<OperationOption | undefined>(
+  //   undefined,
+  // );
+  // const [docType, setDocType] = useState<string | undefined>(undefined);
+
+  let documentStatusFilter = getDocStatusFilter(
     selectedStatus,
     selectedOperation,
   );
@@ -105,7 +111,7 @@ export const RISReportTable = ({
       title: 'Date Indexed',
       dataIndex: 'dateIndexed',
       render: ({ dateIndexed }: RISReport) =>
-        moment(dateIndexed).format(DEFAULT_DATE_FORMAT),
+        dateIndexed ? moment(dateIndexed).format(DEFAULT_DATE_FORMAT) : '',
       sorter: sortDateTime('dateIndexed'),
       sortOrder: sorter?.field === 'dateIndexed' ? sorter.order : undefined,
     },
@@ -124,15 +130,11 @@ export const RISReportTable = ({
     },
   ];
 
-  const parseDocumentType = (
-    strDocumentType: string,
-  ): DocTypeRIS | undefined => {
-    const sample: GetIndexesResult | undefined =
-      !!strDocumentType && strDocumentType !== ''
-        ? JSON.parse(strDocumentType)
-        : undefined;
-    return !!sample?.response?.length ? sample.response[0] : undefined;
-  };
+  // const collectFilters = () => {
+  //   setStatus(selectedStatus);
+  //   setOperation(selectedOperation);
+  //   setDocType(nomenclature);
+  // };
 
   const {
     isFetching,
@@ -146,30 +148,52 @@ export const RISReportTable = ({
     to,
     username,
     statuses: documentStatusFilter,
-    nomenclature,
+    nomenclature: nomenclature,
+    // docType,
   });
 
   const { ris, risTotal, risIndexes } = useMemo(
     () => ({
       ris: result?.data ?? [],
       risTotal: result?.count ?? 0,
-      risIndexes: result?.data.map(({ indexes }) => parseDocumentType(indexes)),
+      risIndexes: !!result?.data
+        ? result.data.map(({ indexes }) => {
+            const docType: GetIndexesResult =
+              !!indexes && indexes !== '' ? JSON.parse(indexes) : undefined;
+            return !!docType?.response?.length
+              ? docType.response[0]
+              : undefined;
+          })
+        : undefined,
     }),
     [result?.data, result?.count],
   );
 
-  useEffect(() => {
-    return () => {
-      setCurrentPage(1);
-      setPageSize(15);
-      setSorter(DEFAULT_SORT_ORDER_RIS_REPORT);
-      setNomenclature(undefined);
-      setErrorMessage('');
-      setDisplayErrorMessage(false);
-      setSelectedStatus(StatusOption.ALL);
-      setSelectedOperation(OperationOption.ALL);
-    };
-  }, []);
+  useEffect(
+    () => {
+      return () => {
+        setCurrentPage(1);
+        setPageSize(15);
+        setSorter(DEFAULT_SORT_ORDER_RIS_REPORT);
+        setNomenclature(undefined);
+        setErrorMessage('');
+        setDisplayErrorMessage(false);
+        setSelectedStatus(StatusOption.ALL);
+        setSelectedOperation(OperationOption.ALL);
+
+        // if (username || from || to) {
+        //   setStatus(undefined);
+        //   setOperation(undefined);
+        //   setDocType(undefined);
+        // }
+      };
+    },
+    [
+      // from,
+      // to,
+      // username
+    ],
+  );
 
   return (
     <div>
@@ -203,6 +227,9 @@ export const RISReportTable = ({
             isLoading={isLoading}
             isError={hasDocsError}
           />
+          {/* <Button variant="outline-secondary" onClick={collectFilters}>
+            Select
+          </Button> */}
         </Stack>
         <Button
           className="mb-1"

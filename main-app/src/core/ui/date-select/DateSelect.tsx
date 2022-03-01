@@ -23,9 +23,7 @@ export const DateSelect = (props: DateSelectProps): ReactElement => {
     horizontal = false,
     onChange: triggerChange,
   } = props;
-  const strValue = value
-    ? moment(value).format('yyyy-MM-DD')
-    : moment(new Date()).format('yyyy-MM-DD');
+  const strValue = value ? moment(value).format('yyyy-MM-DD') : '';
 
   const handleChange = (event: React.ChangeEvent<any>): void => {
     const strDate = event.target.value;

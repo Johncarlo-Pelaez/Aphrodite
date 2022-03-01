@@ -34,10 +34,10 @@ export const getReportQCApi = async (
 
   const dateFromFilter = params.from
     ? moment(params.from).format(DEFAULT_DATE_PARAMS_FORMAT)
-    : moment(new Date()).format(DEFAULT_DATE_PARAMS_FORMAT);
+    : undefined;
   const dateToFilter = params.to
     ? moment(params.to).format(DEFAULT_DATE_PARAMS_FORMAT)
-    : moment(new Date()).format(DEFAULT_DATE_PARAMS_FORMAT);
+    : undefined;
 
   const filterQuery = createQueryString({
     checker: params.username,
@@ -58,10 +58,10 @@ export const getDownloadQualityCheck = async (
 ): Promise<Blob> => {
   const dateFromFilter = params.from
     ? moment(params.from).format(DEFAULT_DATE_PARAMS_FORMAT)
-    : moment(new Date()).format(DEFAULT_DATE_PARAMS_FORMAT);
+    : undefined;
   const dateToFilter = params.to
     ? moment(params.to).format(DEFAULT_DATE_PARAMS_FORMAT)
-    : moment(new Date()).format(DEFAULT_DATE_PARAMS_FORMAT);
+    : undefined;
 
   const filterQuery = createQueryString({
     checker: params.username,

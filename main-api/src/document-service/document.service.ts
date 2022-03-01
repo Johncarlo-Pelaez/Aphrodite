@@ -301,6 +301,7 @@ export class DocumentService {
         statuses: Object.values(DocumentStatus).filter(
           (s) => s.includes('FAILED') || s.includes('CANCELLED'),
         ),
+        username: retriedBy,
       })
     ).map((doc) => doc.id);
     await this.retryDocuments({ documentIds, retriedBy });
@@ -317,6 +318,7 @@ export class DocumentService {
           DocumentStatus.APPROVED,
           DocumentStatus.CHECKING_APPROVED,
         ],
+        username: cancelledBy,
       })
     ).map((doc) => doc.id);
     await this.cancelDocuments({ documentIds, cancelledBy });

@@ -23,30 +23,42 @@ export const ReportTable = ({
   reportType,
 }: DocumentsTableProps): ReactElement => {
   const renderTable = (): ReactElement => {
-    if (reportType === ReportOption.UPLOADED)
-      return <UploadedTable username={username} from={dateFrom} to={dateTo} />;
-    if (reportType === ReportOption.INFORMATION_REQUEST)
-      return (
-        <InformationRequestTable
-          username={username}
-          from={dateFrom}
-          to={dateTo}
-        />
-      );
-    if (reportType === ReportOption.QUALITY_CHECKED)
-      return (
-        <QualityCheckTable username={username} from={dateFrom} to={dateTo} />
-      );
-    if (reportType === ReportOption.APPROVAL)
-      return (
-        <ApprovalReportTable username={username} from={dateFrom} to={dateTo} />
-      );
-    if (reportType === ReportOption.IMPORT)
-      return (
-        <ImportReportTable username={username} from={dateFrom} to={dateTo} />
-      );
-    else
-      return <RISReportTable username={username} from={dateFrom} to={dateTo} />;
+    switch (reportType) {
+      case ReportOption.UPLOADED:
+        return (
+          <UploadedTable username={username} from={dateFrom} to={dateTo} />
+        );
+      case ReportOption.INFORMATION_REQUEST:
+        return (
+          <InformationRequestTable
+            username={username}
+            from={dateFrom}
+            to={dateTo}
+          />
+        );
+      case ReportOption.QUALITY_CHECKED:
+        return (
+          <QualityCheckTable username={username} from={dateFrom} to={dateTo} />
+        );
+      case ReportOption.APPROVAL:
+        return (
+          <ApprovalReportTable
+            username={username}
+            from={dateFrom}
+            to={dateTo}
+          />
+        );
+      case ReportOption.IMPORT:
+        return (
+          <ImportReportTable username={username} from={dateFrom} to={dateTo} />
+        );
+      case ReportOption.RIS:
+        return (
+          <RISReportTable username={username} from={dateFrom} to={dateTo} />
+        );
+      default:
+        return <></>;
+    }
   };
   return renderTable();
 };

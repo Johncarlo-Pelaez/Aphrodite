@@ -1,4 +1,4 @@
-import { DocumentStatus } from 'src/entities';
+import { DocumentStatus, Role } from 'src/entities';
 
 export interface GetDocumentsParam {
   search?: string;
@@ -9,6 +9,7 @@ export interface GetDocumentsParam {
   to?: Date;
   skip?: number;
   take?: number;
+  currentUserRole?: Role;
 }
 
 export interface CreateDocumentParam {

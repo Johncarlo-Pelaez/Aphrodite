@@ -180,8 +180,7 @@ export const DocumentsTable = forwardRef(
       if (nextDocument) {
         setSelectedDocuments([nextDocument]);
       }
-      // eslint-disable-next-line
-    }, [selectedIndexes, documents]);
+    }, [selectedIndexes, documents, setSelectedDocuments]);
 
     useImperativeHandle(
       ref,
@@ -189,8 +188,7 @@ export const DocumentsTable = forwardRef(
         refresh: refetch,
         next: selectNextDocument,
       }),
-      // eslint-disable-next-line
-      [selectNextDocument],
+      [refetch, selectNextDocument],
     );
 
     useEffect(() => {

@@ -1,5 +1,10 @@
-import { ReactElement, useState } from 'react';
-import { Container, Row, Col, Button } from 'react-bootstrap';
+import { ReactElement, useEffect, useState } from 'react';
+import {
+  Container,
+  Row,
+  Col,
+  // Button
+} from 'react-bootstrap';
 import {
   ReportStatusDropdown,
   UserDropdown,
@@ -15,15 +20,26 @@ export const ReportsPage = (): ReactElement => {
   const [username, setUsername] = useState<string | undefined>(undefined);
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
-  const [start, setStart] = useState<Date | undefined>(undefined);
-  const [end, setEnd] = useState<Date | undefined>(undefined);
-  const [user, setUser] = useState<string | undefined>(undefined);
+  // const [start, setStart] = useState<Date | undefined>(undefined);
+  // const [end, setEnd] = useState<Date | undefined>(undefined);
+  // const [user, setUser] = useState<string | undefined>(undefined);
 
-  const collectFilter = () => {
-    setStart(dateFrom);
-    setEnd(dateTo);
-    setUser(username);
-  };
+  // const collectFilter = () => {
+  //   setStart(dateFrom);
+  //   setEnd(dateTo);
+  //   setUser(username);
+  // };
+
+  useEffect(() => {
+    if (reportType) {
+      // setStart(undefined);
+      // setEnd(undefined);
+      // setUser(undefined);
+      setUsername(undefined);
+      setDateFrom(undefined);
+      setDateTo(undefined);
+    }
+  }, [reportType]);
 
   return (
     <Container className="my-4" fluid>
@@ -54,16 +70,16 @@ export const ReportsPage = (): ReactElement => {
             horizontal
           />
         </Col>
-        <Col>
+        {/* <Col>
           <Button variant="outline-secondary" onClick={collectFilter}>
-            Fetch
+            Find
           </Button>
-        </Col>
+        </Col> */}
       </Row>
       <ReportTable
-        username={user}
-        dateFrom={start}
-        dateTo={end}
+        username={username}
+        dateFrom={dateFrom}
+        dateTo={dateTo}
         reportType={reportType}
       />
     </Container>
