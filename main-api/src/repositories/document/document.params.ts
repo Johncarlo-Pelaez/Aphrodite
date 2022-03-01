@@ -9,7 +9,6 @@ export interface GetDocumentsParam {
   to?: Date;
   skip?: number;
   take?: number;
-  currentUserRole?: Role;
 }
 
 export interface CreateDocumentParam {

@@ -9,7 +9,6 @@ import {
   useRetryDocuments,
   useCancelDocuments,
   useDeleteDocumentsFile,
-  useGetCurrentUser,
 } from 'hooks';
 import { SearchField, DateSelect } from 'core/ui';
 import {
@@ -30,7 +29,6 @@ import {
   getForCancelDocStatuses,
   getForDeleteDocsFileStatuses,
 } from './HomePage.utils';
-import { Role } from 'core/enum';
 
 export const HomePage = (): ReactElement => {
   const [searchKey, setSearchKey] = useState<string>('');
@@ -49,8 +47,6 @@ export const HomePage = (): ReactElement => {
   const [selectedUserFilter, setSelectedUserFilter] = useState<
     UserOption | undefined
   >(undefined);
-  const { data: user } = useGetCurrentUser();
-  const currentUserRole = user?.role;
   const processDetailsRef = useRef<any>(null);
   const documentsTableRef = useRef<any>(null);
   const hasSelectedRows = !!selectedDocuments.length;
@@ -264,14 +260,12 @@ export const HomePage = (): ReactElement => {
             horizontal
           />
         </Col>
-        {currentUserRole !== Role.ENCODER && (
-          <Col xs={12} lg={4}>
-            <UserDropdown
-              value={selectedUserFilter}
-              onChange={setSelectedUserFilter}
-            />
-          </Col>
-        )}
+        <Col xs={12} lg={4}>
+          <UserDropdown
+            value={selectedUserFilter}
+            onChange={setSelectedUserFilter}
+          />
+        </Col>
       </Row>
       <div className="d-flex justify-content-end mb-2">
         <SearchField searchKey={searchKey} onSearchDocument={setSearchKey} />

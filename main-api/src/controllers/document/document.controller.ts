@@ -30,12 +30,8 @@ import {
   Auth,
 } from 'src/core';
 import { Role } from 'src/entities/user.entity';
-import { Document, DocumentHistory, DocumentStatus } from 'src/entities';
-import {
-  DocumentRepository,
-  GetDocumentsParam,
-  UserRepository,
-} from 'src/repositories';
+import { Document, DocumentHistory } from 'src/entities';
+import { DocumentRepository } from 'src/repositories';
 import { DocumentService } from 'src/document-service';
 import {
   GetDocumentsDto,
@@ -60,7 +56,6 @@ export class DocumentController {
   constructor(
     private readonly documentsService: DocumentService,
     private readonly documentRepository: DocumentRepository,
-    private readonly userRepository: UserRepository,
   ) {}
 
   @ApiBadRequestResponse()
@@ -68,63 +63,11 @@ export class DocumentController {
   @Get('/')
   async getDocuments(
     @Query(GetDocumentsIntPipe) dto: GetDocumentsDto,
-    @GetAzureUsername() currentUser: string,
   ): Promise<PaginatedResponse<Document>> {
     const response = new PaginatedResponse<Document>();
 
-    const currentUserRole = await (
-      await this.userRepository.getUserByEmail(currentUser)
-    )?.role;
-
-    if (!currentUserRole) throw new BadRequestException();
-
-    let statusesFilter: DocumentStatus[] = [];
-
-    switch (currentUserRole) {
-      case Role.ENCODER:
-        statusesFilter = dto.statuses.filter(
-          (status) =>
-            status !== DocumentStatus.CHECKING_DISAPPROVED &&
-            status !== DocumentStatus.CHECKING_APPROVED &&
-            status !== DocumentStatus.APPROVED &&
-            status !== DocumentStatus.DISAPPROVED &&
-            status !== DocumentStatus.CHECKING &&
-            status !== DocumentStatus.CHECKING_FAILED &&
-            status !== DocumentStatus.MIGRATE_FAILED &&
-            status !== DocumentStatus.MIGRATE_BEGIN &&
-            status !== DocumentStatus.INDEXING_DONE &&
-            status !== DocumentStatus.MIGRATE_DONE,
-        );
-        break;
-      case Role.REVIEWER:
-        statusesFilter = dto.statuses.filter(
-          (status) =>
-            status !== DocumentStatus.MIGRATE_FAILED &&
-            status !== DocumentStatus.MIGRATE_BEGIN &&
-            status !== DocumentStatus.CHECKING_APPROVED &&
-            status !== DocumentStatus.APPROVED,
-        );
-        break;
-      default:
-        statusesFilter = dto.statuses;
-    }
-
-    if (!statusesFilter.length) return response;
-
-    const documentsDto: GetDocumentsParam = {
-      skip: dto.skip,
-      take: dto.take,
-      from: dto.from,
-      to: dto.to,
-      documentType: dto.documentType,
-      search: dto.search,
-      username: dto.username,
-      statuses: statusesFilter,
-      currentUserRole,
-    };
-
-    response.count = await this.documentRepository.count(documentsDto);
-    response.data = await this.documentRepository.getDocuments(documentsDto);
+    response.count = await this.documentRepository.count(dto);
+    response.data = await this.documentRepository.getDocuments(dto);
 
     return response;
   }
@@ -352,48 +295,9 @@ export class DocumentController {
   @Get('/process/count')
   async getDocumentsProcessCount(
     @Query() dto: GetDocumentsProcessCountDto,
-    @GetAzureUsername() currentUser: string,
   ): Promise<number> {
-    const currentUserRole = await (
-      await this.userRepository.getUserByEmail(currentUser)
-    ).role;
-
-    let statusesFilter: DocumentStatus[] = [];
-
-    switch (currentUserRole) {
-      case Role.ENCODER:
-        statusesFilter = dto.statuses.filter(
-          (status) =>
-            status !== DocumentStatus.CHECKING_DISAPPROVED &&
-            status !== DocumentStatus.CHECKING_APPROVED &&
-            status !== DocumentStatus.APPROVED &&
-            status !== DocumentStatus.DISAPPROVED &&
-            status !== DocumentStatus.CHECKING &&
-            status !== DocumentStatus.CHECKING_FAILED &&
-            status !== DocumentStatus.MIGRATE_FAILED &&
-            status !== DocumentStatus.MIGRATE_BEGIN &&
-            status !== DocumentStatus.INDEXING_DONE &&
-            status !== DocumentStatus.MIGRATE_DONE,
-        );
-        break;
-      case Role.REVIEWER:
-        statusesFilter = dto.statuses.filter(
-          (status) =>
-            status !== DocumentStatus.MIGRATE_FAILED &&
-            status !== DocumentStatus.MIGRATE_BEGIN &&
-            status !== DocumentStatus.CHECKING_APPROVED &&
-            status !== DocumentStatus.APPROVED,
-        );
-        break;
-      default:
-        statusesFilter = dto.statuses;
-    }
-
-    if (!currentUserRole) throw new BadRequestException();
-
     return await this.documentRepository.count({
-      statuses: statusesFilter,
-      currentUserRole,
+      statuses: dto.statuses,
     });
   }
 }

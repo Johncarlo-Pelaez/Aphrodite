@@ -36,15 +36,7 @@ export class DocumentRepository {
   constructor(private readonly manager: EntityManager) {}
 
   async getDocuments(param: GetDocumentsParam): Promise<Document[]> {
-    const {
-      search = '',
-      documentType,
-      statuses,
-      username,
-      from,
-      to,
-      currentUserRole,
-    } = param;
+    const { search = '', documentType, statuses, username, from, to } = param;
     let whereDocumentType: { documentType: FindOperator<string> };
     let whereStatusIn: { status: FindOperator<DocumentStatus> };
     let whereUsername: { username: string };
@@ -78,93 +70,50 @@ export class DocumentRepository {
         modifiedDate: Between(from, dateTo),
       };
     }
-
-    switch (currentUserRole) {
-      case Role.ENCODER:
-        return await this.manager.find(Document, {
-          relations: ['user', 'documentHistories'],
-          where: [
-            {
-              documentName: ILike(`%${search}%`),
-              ...whereDocumentType,
-              ...whereStatusIn,
-              ...whereModifiedDate,
-            },
-            {
-              documentType: ILike(`%${search}%`),
-              ...whereDocumentType,
-              ...whereStatusIn,
-              ...whereModifiedDate,
-            },
-            {
-              user: {
-                firstName: ILike(`%${search}%`),
-              },
-              ...whereDocumentType,
-              ...whereStatusIn,
-              ...whereModifiedDate,
-            },
-            {
-              user: {
-                lastName: ILike(`%${search}%`),
-              },
-              ...whereDocumentType,
-              ...whereStatusIn,
-              ...whereModifiedDate,
-            },
-          ],
-          order: { modifiedDate: 'DESC' },
-          skip: param.skip,
-          take: param.take,
-        });
-        break;
-      default:
-        return await this.manager.find(Document, {
-          relations: ['user', 'documentHistories'],
-          where: [
-            {
-              documentName: ILike(`%${search}%`),
-              ...whereDocumentType,
-              ...whereStatusIn,
-              user: {
-                ...whereUsername,
-              },
-              ...whereModifiedDate,
-            },
-            {
-              documentType: ILike(`%${search}%`),
-              ...whereDocumentType,
-              ...whereStatusIn,
-              user: {
-                ...whereUsername,
-              },
-              ...whereModifiedDate,
-            },
-            {
-              user: {
-                firstName: ILike(`%${search}%`),
-                ...whereUsername,
-              },
-              ...whereDocumentType,
-              ...whereStatusIn,
-              ...whereModifiedDate,
-            },
-            {
-              user: {
-                lastName: ILike(`%${search}%`),
-                ...whereUsername,
-              },
-              ...whereDocumentType,
-              ...whereStatusIn,
-              ...whereModifiedDate,
-            },
-          ],
-          order: { modifiedDate: 'DESC' },
-          skip: param.skip,
-          take: param.take,
-        });
-        break;
-    }
+    return await this.manager.find(Document, {
+      relations: ['user', 'documentHistories'],
+      where: [
+        {
+          documentName: ILike(`%${search}%`),
+          ...whereDocumentType,
+          ...whereStatusIn,
+          user: {
+            ...whereUsername,
+          },
+          ...whereModifiedDate,
+        },
+        {
+          documentType: ILike(`%${search}%`),
+          ...whereDocumentType,
+          ...whereStatusIn,
+          user: {
+            ...whereUsername,
+          },
+          ...whereModifiedDate,
+        },
+        {
+          user: {
+            firstName: ILike(`%${search}%`),
+            ...whereUsername,
+          },
+          ...whereDocumentType,
+          ...whereStatusIn,
+          ...whereModifiedDate,
+        },
+        {
+          user: {
+            lastName: ILike(`%${search}%`),
+            ...whereUsername,
+          },
+          ...whereDocumentType,
+          ...whereStatusIn,
+          ...whereModifiedDate,
+        },
+      ],
+      order: { modifiedDate: 'DESC' },
+      skip: param.skip,
+      take: param.take,
+    });
   }
 
   async findDocumentsByIds(documentIds: number[]): Promise<Document[]> {
@@ -201,13 +150,7 @@ export class DocumentRepository {
   }
 
   async count(param: GetDocumentsParam): Promise<number> {
-    const {
-      search = '',
-      documentType,
-      statuses,
-      username,
-      currentUserRole,
-    } = param;
+    const { search = '', documentType, statuses, username } = param;
     let whereDocumentType: { documentType: FindOperator<string> };
     let whereStatusIn: { status: FindOperator<DocumentStatus> };
     let whereUsername: { username: string };
@@ -231,71 +174,38 @@ export class DocumentRepository {
       };
     }
 
-    switch (currentUserRole) {
-      case Role.ENCODER:
-        return await this.manager.count(Document, {
-          relations: ['user'],
-          where: [
-            {
-              documentName: ILike(`%${search}%`),
-              ...whereDocumentType,
-              ...whereStatusIn,
-              ...whereModifiedDate,
-            },
-            {
-              user: {
-                firstName: ILike(`%${search}%`),
-              },
-              ...whereDocumentType,
-              ...whereStatusIn,
-              ...whereModifiedDate,
-            },
-            {
-              user: {
-                lastName: ILike(`%${search}%`),
-              },
-              ...whereDocumentType,
-              ...whereStatusIn,
-              ...whereModifiedDate,
-            },
-          ],
-        });
-        break;
-      default:
-        return await this.manager.count(Document, {
-          relations: ['user'],
-          where: [
-            {
-              documentName: ILike(`%${search}%`),
-              ...whereDocumentType,
-              ...whereStatusIn,
-              user: {
-                ...whereUsername,
-              },
-              ...whereModifiedDate,
-            },
-            {
-              user: {
-                firstName: ILike(`%${search}%`),
-                ...whereUsername,
-              },
-              ...whereDocumentType,
-              ...whereStatusIn,
-              ...whereModifiedDate,
-            },
-            {
-              user: {
-                lastName: ILike(`%${search}%`),
-                ...whereUsername,
-              },
-              ...whereDocumentType,
-              ...whereStatusIn,
-              ...whereModifiedDate,
-            },
-          ],
-        });
-        break;
-    }
+    return await this.manager.count(Document, {
+      relations: ['user'],
+      where: [
+        {
+          documentName: ILike(`%${search}%`),
+          ...whereDocumentType,
+          ...whereStatusIn,
+          user: {
+            ...whereUsername,
+          },
+          ...whereModifiedDate,
+        },
+        {
+          user: {
+            firstName: ILike(`%${search}%`),
+            ...whereUsername,
+          },
+          ...whereDocumentType,
+          ...whereStatusIn,
+          ...whereModifiedDate,
+        },
+        {
+          user: {
+            lastName: ILike(`%${search}%`),
+            ...whereUsername,
+          },
+          ...whereDocumentType,
+          ...whereStatusIn,
+          ...whereModifiedDate,
+        },
+      ],
+    });
   }
 
   async getHistory(documentId: number): Promise<DocumentHistory[]> {
