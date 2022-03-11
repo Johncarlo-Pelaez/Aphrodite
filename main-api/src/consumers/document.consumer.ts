@@ -453,6 +453,8 @@ export class DocumentConsumer {
       const { data: response } = uploadDocToSpringResult;
       console.log(response.SalesForce);
     } catch (err) {
+      console.log(err);
+      console.log(document);
       await this.documentRepository.failMigrate({
         documentId,
         springcmReqParams: strUploadParams,
