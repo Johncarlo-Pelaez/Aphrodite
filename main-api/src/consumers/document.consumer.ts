@@ -449,6 +449,9 @@ export class DocumentConsumer {
       uploadDocToSpringResult = await this.springCMService.uploadDocToSpring(
         uploadParams,
       );
+      console.log(uploadDocToSpringResult);
+      const { data: response } = uploadDocToSpringResult;
+      console.log(response.SalesForce);
     } catch (err) {
       await this.documentRepository.failMigrate({
         documentId,
