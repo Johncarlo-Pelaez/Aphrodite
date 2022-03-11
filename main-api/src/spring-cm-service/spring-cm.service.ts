@@ -17,6 +17,9 @@ export class SpringCMService {
   async uploadDocToSpring(
     params: UploadDocToSpringParams,
   ): Promise<AxiosResponse> {
-    return await this.request.post('/DataCapUploadDocToSpring', { ...params });
+    return await this.request.post(
+      `${this.appConfigService.uploadToSpringCM}`,
+      { ...params },
+    );
   }
 }

@@ -21,7 +21,7 @@ export class SalesForceService {
     params: GetContractDetailsParams,
   ): Promise<GetContractDetailsResult> {
     const result = await this.request.get<GetContractDetailsResult>(
-      '/GetContractDetails',
+      `${this.appConfigService.getContractDetails}`,
       {
         data: {
           ...params,
@@ -35,7 +35,7 @@ export class SalesForceService {
     params: GetDocumentTypeParams,
   ): Promise<GetDocumentTypeResult> {
     const result = await this.request.get<GetDocumentTypeResult>(
-      '/GetDocumentType',
+      `${this.appConfigService.getDocumentType}`,
       {
         data: {
           ...params,

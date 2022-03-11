@@ -91,4 +91,16 @@ export class AppConfigService {
   get fileStorage(): string {
     return this.configService.get('FILE_STORAGE') || 'Local';
   }
+
+  get getContractDetails(): string {
+    return this.configService.get('END_POINT_GetContracDetails');
+  }
+
+  get getDocumentType(): string {
+    return this.configService.get('END_POINT_GetDocumentType');
+  }
+
+  get uploadToSpringCM(): string {
+    return this.configService.get('END_POINT_UploadToSpringCM');
+  }
 }
