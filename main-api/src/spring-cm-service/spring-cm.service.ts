@@ -11,6 +11,7 @@ export class SpringCMService {
       baseURL: this.appConfigService.salesForceURl,
       maxBodyLength: Infinity,
       maxContentLength: Infinity,
+      timeout: 1000 * 60 * 30,
     });
   }
 
