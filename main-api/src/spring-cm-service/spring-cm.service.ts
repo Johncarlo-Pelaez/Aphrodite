@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { AppConfigService } from 'src/app-config';
 import { UploadDocToSpringParams } from './spring-cm.types';
-import https from 'https';
+import * as https from 'https';
 
 @Injectable()
 export class SpringCMService {
