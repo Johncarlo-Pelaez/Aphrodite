@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { AppConfigService } from 'src/app-config';
 import { UploadDocToSpringParams } from './spring-cm.types';
+import https from 'https';
 
 @Injectable()
 export class SpringCMService {
@@ -11,7 +12,10 @@ export class SpringCMService {
       baseURL: this.appConfigService.salesForceURl,
       maxBodyLength: Infinity,
       maxContentLength: Infinity,
-      timeout: 1000 * 60 * 30,
+      httpsAgent: new https.Agent({
+        keepAlive: true,
+        timeout: 1000 * 60 * 60 * 1,
+      }),
     });
   }
 
