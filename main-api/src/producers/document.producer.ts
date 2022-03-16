@@ -13,7 +13,7 @@ export class DocumentProducer {
   async migrate(documentId: number): Promise<Job<number>> {
     const AFTER_30_SECONDS = 1000 * 30;
     const job = await this.documentQueue.add(MIGRATE_JOB, documentId, {
-      attempts: 3,
+      attempts: 1,
       backoff: AFTER_30_SECONDS,
       removeOnComplete: true,
       removeOnFail: true,
