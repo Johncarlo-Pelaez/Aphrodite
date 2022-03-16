@@ -449,22 +449,7 @@ export class DocumentConsumer {
       uploadDocToSpringResult = await this.springCMService.uploadDocToSpring(
         uploadParams,
       );
-
-      const { config, ...springCMresponse } = uploadDocToSpringResult;
-      console.log(springCMresponse);
-
-      const { data: response } = uploadDocToSpringResult;
-      console.log(response.SalesForce);
-
-      const { documentHistories, ...fromDocument } = document;
-      console.log(fromDocument);
     } catch (err) {
-      console.log(err);
-      // const { config, ...errSpringCM } = uploadDocToSpringResult;
-      // console.log(errSpringCM);
-      const { documentHistories, ...fromDocument } = document;
-      console.log(fromDocument);
-
       await this.documentRepository.failMigrate({
         documentId,
         springcmReqParams: strUploadParams,
