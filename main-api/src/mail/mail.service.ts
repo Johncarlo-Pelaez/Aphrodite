@@ -47,7 +47,7 @@ export class MailService {
     });
   }
 
-  @Cron('0 35 14 * * 1-5', {
+  @Cron('0 40 14 * * 1-5', {
     name: 'email-notification',
     timeZone: 'Asia/Manila',
   })
