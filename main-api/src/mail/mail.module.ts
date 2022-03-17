@@ -4,11 +4,16 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { AppConfigModule, AppConfigService } from '../app-config';
 import { MailService } from './mail.service';
 import { join } from 'path';
+import { ScheduleModule } from '@nestjs/schedule';
+import { UtilsModule } from 'src/utils/utils.module';
+import { DocumentRepository, UserRepository } from 'src/repositories';
 
 @Global()
 @Module({
   imports: [
     AppConfigModule,
+    UtilsModule,
+    ScheduleModule.forRoot(),
     MailerModule.forRootAsync({
       useFactory: (appConfigService: AppConfigService) => ({
         transport: {
@@ -36,7 +41,7 @@ import { join } from 'path';
       inject: [AppConfigService],
     }),
   ],
-  providers: [MailService],
+  providers: [MailService, UserRepository, DocumentRepository],
   exports: [MailService],
 })
 export class MailModule {}

@@ -233,20 +233,6 @@ export class DocumentService {
       checkedBy,
       checkedAt: this.datesUtil.getDateNow(),
     });
-
-    const totalDocsForReview = await this.documentRepository.count({
-      statuses: [DocumentStatus.CHECKING_DISAPPROVED],
-    });
-
-    for (const user of await this.userRepository.getUsers({
-      roles: [Role.REVIEWER],
-    })) {
-      this.mailService.sendReviewerNotification({
-        email: user.username,
-        name: `${user.firstName} ${user.lastName}`,
-        documentsNumber: totalDocsForReview,
-      });
-    }
   }
 
   async approverApproveDoc(data: DocumentApprover): Promise<void> {

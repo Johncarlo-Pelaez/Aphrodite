@@ -1,7 +1,11 @@
 import { MailerService } from '@nestjs-modules/mailer';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { AppConfigService } from 'src/app-config';
 import { SendReviewerNotificationParam } from './mail.params';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { DatesUtil } from 'src/utils';
+import { DocumentRepository, UserRepository } from 'src/repositories';
+import { DocumentStatus, Role } from 'src/entities';
 require('dotenv').config();
 
 @Injectable()
@@ -9,7 +13,11 @@ export class MailService {
   constructor(
     private readonly mailerService: MailerService,
     private readonly appConfigService: AppConfigService,
+    private readonly datesUtil: DatesUtil,
+    private readonly userRepository: UserRepository,
+    private readonly documentRepository: DocumentRepository,
   ) {}
+  private readonly logger = new Logger(MailService.name);
 
   async sendReviewerNotification(
     param: SendReviewerNotificationParam,
@@ -37,5 +45,27 @@ export class MailService {
         url: `${this.appConfigService.domain}/auth`,
       },
     });
+  }
+
+  @Cron(CronExpression.MONDAY_TO_FRIDAY_AT_6AM, {
+    name: 'email-notification',
+  })
+  async handleCron() {
+    const dateNow = this.datesUtil.getDateNow();
+    this.logger.log(`Sending Email ${dateNow}`);
+
+    const totalDocsForReview = await this.documentRepository.count({
+      statuses: [DocumentStatus.CHECKING_DISAPPROVED],
+    });
+
+    for (const user of await this.userRepository.getUsers({
+      roles: [Role.REVIEWER],
+    })) {
+      this.sendReviewerNotification({
+        email: user.username,
+        name: `${user.firstName} ${user.lastName}`,
+        documentsNumber: totalDocsForReview,
+      });
+    }
   }
 }
