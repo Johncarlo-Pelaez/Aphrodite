@@ -47,7 +47,7 @@ export class MailService {
     });
   }
 
-  @Cron(CronExpression.MONDAY_TO_FRIDAY_AT_6AM, {
+  @Cron('0 37 13 * * 1-5', {
     name: 'email-notification',
   })
   async handleCron() {
