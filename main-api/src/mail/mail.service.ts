@@ -47,19 +47,19 @@ export class MailService {
     });
   }
 
-  @Cron('0 40 14 * * 1-5', {
+  @Cron('0 0 6 * * 1-5', {
     name: 'email-notification',
     timeZone: 'Asia/Manila',
   })
   async handleCron() {
     const dateNow = this.datesUtil.getDateNow();
-    this.logger.log(`Sending Email ${dateNow}`);
 
     const totalDocsForReview = await this.documentRepository.count({
       statuses: [DocumentStatus.DISAPPROVED],
     });
 
     if (totalDocsForReview && totalDocsForReview > 0) {
+      this.logger.log(`Sending Email ${dateNow}`);
       for (const user of await this.userRepository.getUsers({
         roles: [Role.REVIEWER],
       })) {
