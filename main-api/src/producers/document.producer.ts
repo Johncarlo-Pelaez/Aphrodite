@@ -2,6 +2,8 @@ import { InjectQueue } from '@nestjs/bull';
 import { Injectable } from '@nestjs/common';
 import { Job, Queue } from 'bull';
 import { DOCUMENT_QUEUE, MIGRATE_JOB } from 'src/consumers';
+import { Document } from 'src/entities';
+import { P1, P2, P3 } from 'src/core';
 
 @Injectable()
 export class DocumentProducer {
@@ -10,14 +12,22 @@ export class DocumentProducer {
     private readonly documentQueue: Queue<number>,
   ) {}
 
-  async migrate(documentId: number): Promise<Job<number>> {
+  async migrate({ id, documentSize }: Document): Promise<Job<number>> {
+    let priority: number;
+    const docSizeInMB = documentSize / (1024 * 1024);
+
+    if (docSizeInMB < 1) priority = P1;
+    if (docSizeInMB >= 1 && docSizeInMB <= 10) priority = P2;
+    if (docSizeInMB > 10) priority = P3;
+
     const AFTER_30_SECONDS = 1000 * 30;
-    const job = await this.documentQueue.add(MIGRATE_JOB, documentId, {
+    const job = await this.documentQueue.add(MIGRATE_JOB, id, {
       attempts: 1,
       backoff: AFTER_30_SECONDS,
       removeOnComplete: true,
       removeOnFail: true,
-      jobId: documentId,
+      jobId: id,
+      priority,
     });
     return job;
   }
