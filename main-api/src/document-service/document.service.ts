@@ -76,9 +76,9 @@ export class DocumentService {
     await this.fileStorageService.createFile(fileFullPath, buffer);
 
     const pdfData = await pdfParse(buffer);
-    const response = new CreatedResponse();
+    let document = new Document();
 
-    response.id = await this.documentRepository.createDocument({
+    document = await this.documentRepository.createDocument({
       uuid,
       documentName: originalname,
       documentSize: size,
@@ -89,9 +89,9 @@ export class DocumentService {
       pageTotal: pdfData?.numpages,
     });
 
-    await this.documentProducer.migrate(response.id);
+    await this.documentProducer.migrate(document);
 
-    return response;
+    return document;
   }
 
   async replaceDocumentFile(data: ReplaceDocumentFile): Promise<void> {
@@ -143,8 +143,9 @@ export class DocumentService {
     }
 
     const pdfData = await pdfParse(buffer);
+    let document = new Document();
 
-    await this.documentRepository.replaceFile({
+    document = await this.documentRepository.replaceFile({
       documentId: currentDocument.id,
       documentName: originalname,
       documentSize: size,
@@ -155,7 +156,7 @@ export class DocumentService {
       replacedBy: data.replacedBy,
     });
 
-    await this.documentProducer.migrate(currentDocument.id);
+    await this.documentProducer.migrate(document);
   }
 
   async getDocumentFile(documentId: number): Promise<[Document, Buffer]> {
@@ -192,36 +193,40 @@ export class DocumentService {
     };
 
     const dateRightNow = this.datesUtil.getDateNow();
-    await this.documentRepository.encodeAccountDetails({
+    let document = new Document();
+
+    document = await this.documentRepository.encodeAccountDetails({
       documentId,
       encodeValues: JSON.stringify(encodeValues),
       encodedAt: dateRightNow,
       encodedBy,
     });
-    await this.documentProducer.migrate(documentId);
+    await this.documentProducer.migrate(document);
   }
 
   async encodeDocQRBarcode(data: EncodeDocQRBarCode): Promise<void> {
     const { documentId, qrBarCode, encodedBy } = data;
-    await this.documentRepository.encodeQrBarcode({
+    let document = new Document();
+    document = await this.documentRepository.encodeQrBarcode({
       documentId,
       qrBarCode,
       encodedAt: this.datesUtil.getDateNow(),
       encodedBy,
     });
-    await this.documentProducer.migrate(documentId);
+    await this.documentProducer.migrate(document);
   }
 
   async checkerApproveDoc(data: CheckerApproveDoc): Promise<void> {
     const { documentId, documentDate, remarks, checkedBy } = data;
-    await this.documentRepository.checkerApproveDoc({
+    let document = new Document();
+    document = await this.documentRepository.checkerApproveDoc({
       documentId,
       documentDate,
       remarks,
       checkedBy,
       checkedAt: this.datesUtil.getDateNow(),
     });
-    await this.documentProducer.migrate(documentId);
+    await this.documentProducer.migrate(document);
   }
 
   async checkerDisapproveDoc(data: CheckerDisApproveDoc): Promise<void> {
@@ -237,12 +242,13 @@ export class DocumentService {
 
   async approverApproveDoc(data: DocumentApprover): Promise<void> {
     const { documentId, approver } = data;
-    await this.documentRepository.approverApproveDoc({
+    let document = new Document();
+    document = await this.documentRepository.approverApproveDoc({
       documentId,
       approver,
       modifiedAt: this.datesUtil.getDateNow(),
     });
-    await this.documentProducer.migrate(documentId);
+    await this.documentProducer.migrate(document);
   }
 
   async approverDisapproveDoc(data: DocumentApprover): Promise<void> {
@@ -255,13 +261,14 @@ export class DocumentService {
   }
 
   async retryDocuments(data: RetryDocuments): Promise<void> {
+    let document = new Document();
     for await (const documentId of data.documentIds) {
-      await this.documentRepository.updateForRetry({
+      document = await this.documentRepository.updateForRetry({
         documentId,
         processAt: this.datesUtil.getDateNow(),
         retriedBy: data.retriedBy,
       });
-      await this.documentProducer.migrate(documentId);
+      await this.documentProducer.migrate(document);
     }
   }
 

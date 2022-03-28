@@ -1,6 +1,6 @@
 import * as moment from 'moment';
 import * as fileSize from 'filesize';
-import { Document, DocumentStatus, DocumentHistory, Role } from 'src/entities';
+import { Document, DocumentStatus, DocumentHistory } from 'src/entities';
 import {
   EntityManager,
   EntityRepository,
@@ -251,9 +251,9 @@ export class DocumentRepository {
     return history;
   }
 
-  async createDocument(param: CreateDocumentParam): Promise<number> {
-    const documentId = await this.manager.transaction(
-      async (transaction): Promise<number> => {
+  async createDocument(param: CreateDocumentParam): Promise<Document> {
+    const document = await this.manager.transaction(
+      async (transaction): Promise<Document> => {
         const document = new Document();
         document.uuid = param.uuid;
         document.documentName = param.documentName;
@@ -277,11 +277,11 @@ export class DocumentRepository {
         });
         await transaction.save(history);
 
-        return document.id;
+        return document;
       },
     );
 
-    return documentId;
+    return document;
   }
 
   async beginQrDocument(param: BeginDocProcessParam): Promise<void> {
@@ -488,75 +488,89 @@ export class DocumentRepository {
     });
   }
 
-  async encodeQrBarcode(param: EncodeQrBarcodeParam): Promise<void> {
-    await this.manager.transaction(async (transaction): Promise<void> => {
-      const document = await transaction.findOneOrFail(
-        Document,
-        param.documentId,
-      );
-      document.status = DocumentStatus.ENCODING_DONE;
-      document.qrCode = param.qrBarCode;
-      document.qrAt = param.encodedAt;
-      document.encodedAt = param.encodedAt;
-      document.encoder = param.encodedBy;
-      document.modifiedDate = param.encodedAt;
-      document.modifiedBy = param.encodedBy;
-      document.description = 'Qr or Barcode has successfully encoded.';
-      await transaction.save(document);
+  async encodeQrBarcode(param: EncodeQrBarcodeParam): Promise<Document> {
+    const document = await this.manager.transaction(
+      async (transaction): Promise<Document> => {
+        const document = await transaction.findOneOrFail(
+          Document,
+          param.documentId,
+        );
+        document.status = DocumentStatus.ENCODING_DONE;
+        document.qrCode = param.qrBarCode;
+        document.qrAt = param.encodedAt;
+        document.encodedAt = param.encodedAt;
+        document.encoder = param.encodedBy;
+        document.modifiedDate = param.encodedAt;
+        document.modifiedBy = param.encodedBy;
+        document.description = 'Qr or Barcode has successfully encoded.';
+        await transaction.save(document);
 
-      const history = this.genarateDocumentHistory(document, {
-        userUsername: document.encoder,
-        note: param.qrBarCode,
-      });
-      await transaction.save(history);
-    });
+        const history = this.genarateDocumentHistory(document, {
+          userUsername: document.encoder,
+          note: param.qrBarCode,
+        });
+        await transaction.save(history);
+        return document;
+      },
+    );
+    return document;
   }
 
-  async encodeAccountDetails(param: EncodeAccountDetailsParam): Promise<void> {
-    await this.manager.transaction(async (transaction): Promise<void> => {
-      const document = await this.manager.findOneOrFail(
-        Document,
-        param.documentId,
-      );
-      document.status = DocumentStatus.ENCODING_DONE;
-      document.encodeValues = param.encodeValues;
-      document.encodedAt = param.encodedAt;
-      document.encoder = param.encodedBy;
-      document.modifiedDate = param.encodedAt;
-      document.modifiedBy = param.encodedBy;
-      document.description = 'Successfully encoded.';
-      await transaction.save(document);
+  async encodeAccountDetails(
+    param: EncodeAccountDetailsParam,
+  ): Promise<Document> {
+    const document = await this.manager.transaction(
+      async (transaction): Promise<Document> => {
+        const document = await this.manager.findOneOrFail(
+          Document,
+          param.documentId,
+        );
+        document.status = DocumentStatus.ENCODING_DONE;
+        document.encodeValues = param.encodeValues;
+        document.encodedAt = param.encodedAt;
+        document.encoder = param.encodedBy;
+        document.modifiedDate = param.encodedAt;
+        document.modifiedBy = param.encodedBy;
+        document.description = 'Successfully encoded.';
+        await transaction.save(document);
 
-      const history = this.genarateDocumentHistory(document, {
-        userUsername: document.encoder,
-        note: param.encodeValues,
-      });
-      await transaction.save(history);
-    });
+        const history = this.genarateDocumentHistory(document, {
+          userUsername: document.encoder,
+          note: param.encodeValues,
+        });
+        await transaction.save(history);
+        return document;
+      },
+    );
+    return document;
   }
 
-  async checkerApproveDoc(param: CheckerApproveDocParam): Promise<void> {
-    await this.manager.transaction(async (transaction): Promise<void> => {
-      const document = await this.manager.findOneOrFail(
-        Document,
-        param.documentId,
-      );
-      document.status = DocumentStatus.CHECKING_APPROVED;
-      document.description = 'Checker approved.';
-      document.documentDate = param.documentDate;
-      document.remarks = param.remarks;
-      document.checkedAt = param.checkedAt;
-      document.checker = param.checkedBy;
-      document.modifiedDate = param.checkedAt;
-      document.modifiedBy = param.checkedBy;
-      await transaction.save(document);
+  async checkerApproveDoc(param: CheckerApproveDocParam): Promise<Document> {
+    const document = await this.manager.transaction(
+      async (transaction): Promise<Document> => {
+        const document = await this.manager.findOneOrFail(
+          Document,
+          param.documentId,
+        );
+        document.status = DocumentStatus.CHECKING_APPROVED;
+        document.description = 'Checker approved.';
+        document.documentDate = param.documentDate;
+        document.remarks = param.remarks;
+        document.checkedAt = param.checkedAt;
+        document.checker = param.checkedBy;
+        document.modifiedDate = param.checkedAt;
+        document.modifiedBy = param.checkedBy;
+        await transaction.save(document);
 
-      const history = this.genarateDocumentHistory(document, {
-        userUsername: document.checker,
-        note: `Document Date: ${param.documentDate}, Remarks: ${param.remarks}`,
-      });
-      await transaction.save(history);
-    });
+        const history = this.genarateDocumentHistory(document, {
+          userUsername: document.checker,
+          note: `Document Date: ${param.documentDate}, Remarks: ${param.remarks}`,
+        });
+        await transaction.save(history);
+        return document;
+      },
+    );
+    return document;
   }
 
   async checkerDisapproveDoc(param: CheckerDispproveDocParam): Promise<void> {
@@ -585,24 +599,28 @@ export class DocumentRepository {
 
   async approverApproveDoc(
     param: ApproverApproveDisapproveDocParam,
-  ): Promise<void> {
-    await this.manager.transaction(async (transaction): Promise<void> => {
-      const document = await this.manager.findOneOrFail(
-        Document,
-        param.documentId,
-      );
-      document.status = DocumentStatus.APPROVED;
-      document.description = 'Approver approved.';
-      document.approver = param.approver;
-      document.modifiedDate = param.modifiedAt;
-      document.modifiedBy = param.approver;
-      await transaction.save(document);
+  ): Promise<Document> {
+    const document = await this.manager.transaction(
+      async (transaction): Promise<Document> => {
+        const document = await this.manager.findOneOrFail(
+          Document,
+          param.documentId,
+        );
+        document.status = DocumentStatus.APPROVED;
+        document.description = 'Approver approved.';
+        document.approver = param.approver;
+        document.modifiedDate = param.modifiedAt;
+        document.modifiedBy = param.approver;
+        await transaction.save(document);
 
-      const history = this.genarateDocumentHistory(document, {
-        userUsername: document.approver,
-      });
-      await transaction.save(history);
-    });
+        const history = this.genarateDocumentHistory(document, {
+          userUsername: document.approver,
+        });
+        await transaction.save(history);
+        return document;
+      },
+    );
+    return document;
   }
 
   async approverDispproveDoc(
@@ -627,23 +645,27 @@ export class DocumentRepository {
     });
   }
 
-  async updateForRetry(param: UpdateForRetryParam): Promise<void> {
-    await this.manager.transaction(async (transaction): Promise<void> => {
-      const document = await this.manager.findOneOrFail(
-        Document,
-        param.documentId,
-      );
-      document.status = DocumentStatus.RETRYING;
-      document.modifiedDate = param.processAt;
-      document.modifiedBy = param.retriedBy;
-      document.description = 'Retrying process.';
-      await transaction.save(document);
+  async updateForRetry(param: UpdateForRetryParam): Promise<Document> {
+    const document = await this.manager.transaction(
+      async (transaction): Promise<Document> => {
+        const document = await this.manager.findOneOrFail(
+          Document,
+          param.documentId,
+        );
+        document.status = DocumentStatus.RETRYING;
+        document.modifiedDate = param.processAt;
+        document.modifiedBy = param.retriedBy;
+        document.description = 'Retrying process.';
+        await transaction.save(document);
 
-      const history = this.genarateDocumentHistory(document, {
-        userUsername: document.modifiedBy,
-      });
-      await transaction.save(history);
-    });
+        const history = this.genarateDocumentHistory(document, {
+          userUsername: document.modifiedBy,
+        });
+        await transaction.save(history);
+        return document;
+      },
+    );
+    return document;
   }
 
   async updateToCancelled(param: UpdateToCancelledParam): Promise<void> {
@@ -688,35 +710,40 @@ export class DocumentRepository {
     });
   }
 
-  async replaceFile(param: ReplaceFileParam): Promise<void> {
-    await this.manager.transaction(async (transaction): Promise<void> => {
-      const document = await this.manager.findOneOrFail(
-        Document,
-        param.documentId,
-      );
-      document.documentName = param.documentName;
-      document.documentSize = param.documentSize;
-      document.mimeType = param.mimeType;
-      document.pageTotal = param.pageTotal;
-      document.qrCode = param.qrCode;
-      document.qrAt = param.replacedAt;
-      document.documentType = null;
-      document.contractDetails = null;
-      document.encodeValues = null;
-      document.modifiedDate = param.replacedAt;
-      document.modifiedBy = param.replacedBy;
-      document.isFileDeleted = false;
-      document.description = 'Replace file from system directory.';
-      await transaction.save(document);
+  async replaceFile(param: ReplaceFileParam): Promise<Document> {
+    const document = await this.manager.transaction(
+      async (transaction): Promise<Document> => {
+        const document = await this.manager.findOneOrFail(
+          Document,
+          param.documentId,
+        );
+        document.documentName = param.documentName;
+        document.documentSize = param.documentSize;
+        document.mimeType = param.mimeType;
+        document.pageTotal = param.pageTotal;
+        document.qrCode = param.qrCode;
+        document.qrAt = param.replacedAt;
+        document.documentType = null;
+        document.contractDetails = null;
+        document.encodeValues = null;
+        document.modifiedDate = param.replacedAt;
+        document.modifiedBy = param.replacedBy;
+        document.isFileDeleted = false;
+        document.description = 'Replace file from system directory.';
+        await transaction.save(document);
 
-      const history = this.genarateDocumentHistory(document, {
-        documentStatus: '',
-        userUsername: param.replacedBy,
-        note: `Filename: ${document.documentName}, Size: ${fileSize(
-          document.documentSize,
-        )}, Total page: ${document.pageTotal}, Type: ${document.mimeType}`,
-      });
-      await transaction.save(history);
-    });
+        const history = this.genarateDocumentHistory(document, {
+          documentStatus: '',
+          userUsername: param.replacedBy,
+          note: `Filename: ${document.documentName}, Size: ${fileSize(
+            document.documentSize,
+          )}, Total page: ${document.pageTotal}, Type: ${document.mimeType}`,
+        });
+        await transaction.save(history);
+
+        return document;
+      },
+    );
+    return document;
   }
 }
