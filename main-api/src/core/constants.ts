@@ -3,3 +3,4 @@ export const ROLES_KEY = 'roles';
 export const P1 = 1;
 export const P2 = 2;
 export const P3 = 3;
+export const P4 = 4;
