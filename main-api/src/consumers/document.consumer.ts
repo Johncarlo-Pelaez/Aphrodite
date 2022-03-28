@@ -20,7 +20,6 @@ import { SpringCMService } from 'src/spring-cm-service';
 import { FileStorageService } from 'src/file-storage-service';
 import { DocumentStatus } from 'src/entities';
 import { DOCUMENT_QUEUE, MIGRATE_JOB } from './document.constants';
-import * as moment from 'moment';
 
 @Processor(DOCUMENT_QUEUE)
 export class DocumentConsumer {

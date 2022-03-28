@@ -11,7 +11,6 @@ import {
   UploadedFile,
   Res,
   Delete,
-  BadRequestException,
 } from '@nestjs/common';
 import {
   ApiCreatedResponse,
