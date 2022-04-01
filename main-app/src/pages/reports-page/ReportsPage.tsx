@@ -11,7 +11,7 @@ import {
   ReportOption,
   ReportTable,
 } from './components';
-import { DateSelect } from 'core/ui';
+import { DateSelect } from './components';
 
 export const ReportsPage = (): ReactElement => {
   const [reportType, setReportType] = useState<ReportOption>(
