@@ -11,6 +11,7 @@ import {
   UploadedFile,
   Res,
   Delete,
+  BadRequestException,
 } from '@nestjs/common';
 import {
   ApiCreatedResponse,
@@ -29,8 +30,8 @@ import {
   Auth,
 } from 'src/core';
 import { Role } from 'src/entities/user.entity';
-import { Document, DocumentHistory } from 'src/entities';
-import { DocumentRepository } from 'src/repositories';
+import { Document, DocumentHistory, DocumentStatus } from 'src/entities';
+import { DocumentRepository, GetDocumentsParam, UserRepository } from 'src/repositories';
 import { DocumentService } from 'src/document-service';
 import {
   GetDocumentsDto,
@@ -55,18 +56,45 @@ export class DocumentController {
   constructor(
     private readonly documentsService: DocumentService,
     private readonly documentRepository: DocumentRepository,
+    private readonly userRepository: UserRepository,
   ) {}
 
   @ApiBadRequestResponse()
   @ApiPaginatedResponse(Document)
   @Get('/')
   async getDocuments(
-    @Query(GetDocumentsIntPipe) dto: GetDocumentsDto,
+    @Query(GetDocumentsIntPipe) {search, documentType, statuses, username, from, to, skip, take}: GetDocumentsDto,
+    @GetAzureUsername() currentUserLogIn: string,
   ): Promise<PaginatedResponse<Document>> {
     const response = new PaginatedResponse<Document>();
 
-    response.count = await this.documentRepository.count(dto);
-    response.data = await this.documentRepository.getDocuments(dto);
+    const currentUserRole = await (
+      await this.userRepository.getUserByEmail(currentUserLogIn)
+    )?.role;
+
+    if(!currentUserRole) throw new BadRequestException();
+
+    const documentsDto: GetDocumentsParam = {
+      search,
+      documentType,
+      statuses,
+      username,
+      from,
+      to,
+      skip,
+      take,
+      currentUserRole,
+      currentUserLogIn,
+    }
+
+    response.count = await this.documentRepository.count(documentsDto);
+    response.data = await this.documentRepository.getDocuments(documentsDto);
+
+    if(currentUserRole == Role.REVIEWER)
+    {
+      response.data = response.data.filter(i => i.userUsername === currentUserLogIn || i.status.includes(DocumentStatus.DISAPPROVED) || i.status.includes(DocumentStatus.CHECKING_APPROVED));
+      response.count = response.data.length;
+    }
 
     return response;
   }
@@ -294,9 +322,18 @@ export class DocumentController {
   @Get('/process/count')
   async getDocumentsProcessCount(
     @Query() dto: GetDocumentsProcessCountDto,
+    @GetAzureUsername() currentUserLogIn: string,
   ): Promise<number> {
+    const currentUserRole = await (
+      await this.userRepository.getUserByEmail(currentUserLogIn)
+    )?.role;
+
+    if(!currentUserRole) throw new BadRequestException();
+
     return await this.documentRepository.count({
       statuses: dto.statuses,
+      currentUserRole,
+      currentUserLogIn,
     });
   }
 }
