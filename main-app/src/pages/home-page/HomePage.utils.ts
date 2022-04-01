@@ -49,6 +49,9 @@ export const concatDocumentStatuses = (
       case StatusOption.DISAPPROVED:
         strDocumentStatuses += `${DocumentStatus.DISAPPROVED}, `;
         break;
+      default:
+        strDocumentStatuses += `${DocumentStatus.DISAPPROVED}, `;
+        break;
     }
   } else if (operation === OperationOption.MIGRATE) {
     switch (status) {
@@ -71,7 +74,9 @@ export const getForRetryDocStatuses = (): DocumentStatus[] =>
 export const getForCancelDocStatuses = (): DocumentStatus[] =>
   Object.values(DocumentStatus).filter(
     (s) =>
-      !s.includes('DONE') && !s.includes('FAILED') && !s.includes('CANCELLED'),
+      !s.includes(DocumentStatus.MIGRATE_DONE) &&
+      !s.includes('FAILED') &&
+      !s.includes('CANCELLED'),
   );
 
 export const getForDeleteDocsFileStatuses = (): DocumentStatus[] =>
