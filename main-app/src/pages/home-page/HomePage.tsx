@@ -44,8 +44,8 @@ export const HomePage = (): ReactElement => {
   const selectedDocumentKeys = selectedDocuments.map((d) => d.id);
   const [uploadModalShow, setUploadModalShow] = useState<boolean>(false);
   const [viewDocModalShow, setViewDocModalShow] = useState<boolean>(false);
-  const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
-  const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
+  const [dateFrom, setDateFrom] = useState<Date>(new Date());
+  const [dateTo, setDateTo] = useState<Date>(new Date());
   const [selectedUserFilter, setSelectedUserFilter] = useState<
     UserOption | undefined
   >(undefined);
@@ -160,7 +160,7 @@ export const HomePage = (): ReactElement => {
   useEffect(() => {
     if (hasRetryDocError) alert('Failed to retry documents.');
     if (hasCancelDocError) alert('Failed to cancel documents.');
-    if (hasDeleteDocsFileError) alert('Failed to delete documents file.');
+    if(hasDeleteDocsFileError) alert('Failed to delete documents file.');
   }, [hasRetryDocError, hasCancelDocError, hasDeleteDocsFileError]);
 
   useEffect(() => {

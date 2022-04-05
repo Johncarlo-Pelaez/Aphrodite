@@ -11,7 +11,7 @@ export interface DateSelectProps {
   isInvalid?: boolean;
   error?: string;
   horizontal?: boolean;
-  onChange: (date?: Date) => void;
+  onChange: (date: Date) => void;
 }
 
 export const DateSelect = (props: DateSelectProps): ReactElement => {
@@ -27,7 +27,7 @@ export const DateSelect = (props: DateSelectProps): ReactElement => {
 
   const handleChange = (event: React.ChangeEvent<any>): void => {
     const strDate = event.target.value;
-    triggerChange(strDate !== '' ? new Date(strDate) : undefined);
+    triggerChange(new Date(strDate));
   };
 
   if (horizontal) {
