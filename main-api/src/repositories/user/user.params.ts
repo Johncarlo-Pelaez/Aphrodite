@@ -15,7 +15,6 @@ export interface CreateUserParam {
   lastName: string;
   role: Role;
   createdDate: Date;
-  objectId: string;
 }
 
 export interface UpdateUserParam {

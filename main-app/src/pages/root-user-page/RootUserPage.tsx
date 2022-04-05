@@ -17,12 +17,10 @@ import {
   EmailField,
   LastNameField,
   FirstNameField,
-  ObjectIdField,
 } from './components';
 
 const createRootUserSchema = yup.object().shape({
   email: yup.string().email().required('Email is required.'),
-  objectId: yup.string().required('Object ID is required.'),
   firstName: yup.string().required('First name is required.'),
   lastName: yup.string().required('Last name is required.'),
 });
@@ -81,7 +79,6 @@ export const RootUserPage = (): ReactElement => {
               <FirstNameField control={control} />
               <LastNameField control={control} />
               <EmailField control={control} />
-              <ObjectIdField control={control} />
             </fieldset>
             <Button variant="warning" type="submit" disabled={createLoading}>
               <Spinner

@@ -44,12 +44,6 @@ export const UserDetailsModal = ({
               </tr>
               <tr>
                 <td>
-                  <strong>Object ID</strong>
-                </td>
-                <td>{user?.objectId}</td>
-              </tr>
-              <tr>
-                <td>
                   <strong>Role</strong>
                 </td>
                 <td>{user?.role}</td>

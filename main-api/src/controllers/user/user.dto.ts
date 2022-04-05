@@ -20,11 +20,6 @@ export class CreateRootUserDto {
   email: string;
 
   @ApiProperty()
-  @IsNotEmpty({ message: 'Object ID is required.' })
-  @IsString()
-  objectId: string;
-
-  @ApiProperty()
   @IsNotEmpty({ message: 'First name is required.' })
   @IsString()
   firstName: string;
@@ -68,11 +63,6 @@ export class CreateUserAccountDto {
   @IsEmail({}, { message: 'Email is invalid.' })
   @IsString()
   email: string;
-
-  @ApiProperty()
-  @IsNotEmpty({ message: 'Object ID is required.' })
-  @IsString()
-  objectId: string;
 
   @ApiProperty()
   @IsNotEmpty({ message: 'First name is required.' })
