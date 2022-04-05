@@ -90,9 +90,9 @@ export class DocumentController {
     response.count = await this.documentRepository.count(documentsDto);
     response.data = await this.documentRepository.getDocuments(documentsDto);
 
-    if(currentUserRole == Role.REVIEWER)
+    if(currentUserRole === Role.REVIEWER)
     {
-      response.data = response.data.filter(i => i.userUsername === currentUserLogIn || i.status.includes(DocumentStatus.DISAPPROVED) || i.status.includes(DocumentStatus.CHECKING_APPROVED));
+      response.data = response.data.filter(i => i.userUsername === currentUserLogIn || i.status.includes(DocumentStatus.DISAPPROVED));
       response.count = response.data.length;
     }
 

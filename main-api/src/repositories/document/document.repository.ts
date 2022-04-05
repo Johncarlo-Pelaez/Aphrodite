@@ -315,7 +315,7 @@ export class DocumentRepository {
         });
 
         if(currentUserRole === Role.REVIEWER) {
-          const data = docCount.filter(i => i.userUsername === currentUserLogIn || i.status.includes(DocumentStatus.DISAPPROVED) || i.status.includes(DocumentStatus.CHECKING_APPROVED));
+          const data = docCount.filter(i => i.userUsername === currentUserLogIn || i.status.includes(DocumentStatus.DISAPPROVED));
           document = data.length;
         }
         else document = docCount.length;
