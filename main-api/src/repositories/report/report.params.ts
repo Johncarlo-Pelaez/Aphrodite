@@ -25,7 +25,7 @@ export interface GetQualityCheckReportParam {
 }
 
 export interface GetApprovalReportParam {
-  appover?: string;
+  approver?: string;
   from?: Date;
   to?: Date;
   skip?: number;

@@ -11,13 +11,14 @@ export const UserDropdown = (props: UserDropdownProps): ReactElement => {
   const { value, onChange: triggerChange } = props;
   const { data: users, isLoading, isError } = useUsers();
   const options = users?.map((u) => u.username) ?? [];
+  const additionalOpt = [...options, 'RIS'];
 
   return (
     <AutoSuggestField
       placeholder="Filter by user"
       isLoading={isLoading}
       isInvalid={isError}
-      options={options}
+      options={additionalOpt}
       value={value ? [value] : []}
       onChange={(options) => {
         triggerChange(

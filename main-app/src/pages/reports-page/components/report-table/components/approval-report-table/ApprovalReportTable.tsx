@@ -6,7 +6,7 @@ import { useReportApproval, useDownloadReportApproval } from 'hooks';
 import { Table, TableColumnProps, SorterResult, SortOrder } from 'core/ui';
 import { ApprovalReport } from 'models';
 import { sortDateTime } from 'utils/sort';
-import { Button, Toast } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import styles from './ApprovalReportTable.module.css';
 import { downloadFile } from 'utils';
 
@@ -32,10 +32,6 @@ export const ApprovalReportTable = ({
     SorterResult | undefined
   >(DEFAULT_SORT_ORDER_APPROVAL_REPORT);
 
-  const [errorMessage, setErrorMessage] = useState<string>('');
-  const [displayErrorMessage, setDisplayErrorMessage] =
-    useState<boolean>(false);
-
   const {
     isLoading: isDownloadLoading,
     mutateAsync: downloadApprovalReportAsync,
@@ -46,18 +42,8 @@ export const ApprovalReportTable = ({
   };
 
   const downloadReportApproval = async (): Promise<void> => {
-    if (!from || !to) {
-      setErrorMessage('Date range of date approved must be selected');
-      setDisplayErrorMessage(true);
-    }
-
-    if (from && to) {
-      if (from > to) {
-        setErrorMessage('Incorrect date range of date approved');
-        setDisplayErrorMessage(true);
-        return;
-      }
-
+    if(!!approved && approvedTotal > 0)
+    {
       const approvalParams = await downloadApprovalReportAsync({
         username,
         from,
@@ -69,7 +55,7 @@ export const ApprovalReportTable = ({
         filename: `Approval_Report_${getCurrentDate()}.xlsx`,
       });
     }
-  };
+  }
 
   const getCurrentDate = (): string => {
     return moment().format(DEFAULT_DATE_FORMAT);
@@ -124,18 +110,6 @@ export const ApprovalReportTable = ({
 
   return (
     <div>
-      <Toast
-        className="error-date-range d-inline-block m-1"
-        bg="light"
-        autohide
-        show={displayErrorMessage}
-        onClose={() => setDisplayErrorMessage(false)}
-      >
-        <Toast.Header>
-          <strong className="me-auto">Download warning</strong>
-        </Toast.Header>
-        <Toast.Body className="light text-dark">{errorMessage}</Toast.Body>
-      </Toast>
       <Button
         disabled={isDownloadLoading}
         variant="outline-secondary"

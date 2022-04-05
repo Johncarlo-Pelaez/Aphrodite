@@ -261,9 +261,9 @@ export class ReportRepository {
     const queryConditions: string[] = [];
     const queryParams: (string | number | Date)[] = [];
 
-    if (!!param.appover) {
+    if(!!param.approver) {
       queryConditions.push(`approval.approver = @${queryParams.length}`);
-      queryParams.push(param.appover);
+      queryParams.push(param.approver);
     }
 
     if (!!param.from) {
@@ -296,6 +296,8 @@ export class ReportRepository {
 
     sql += ';';
 
+    // console.log(sql, queryParams);
+
     return await this.manager.query(sql, queryParams);
   }
 
@@ -303,9 +305,9 @@ export class ReportRepository {
     const queryConditions: string[] = [];
     const queryParams: (string | number | Date)[] = [];
 
-    if (!!param.appover) {
+    if (!!param.approver) {
       queryConditions.push(`approval.approver = @${queryParams.length}`);
-      queryParams.push(param.appover);
+      queryParams.push(param.approver);
     }
 
     if (!!param.from) {
