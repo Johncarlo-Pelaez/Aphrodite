@@ -27,4 +27,8 @@ export class FilenameUtil {
   removeNotAllowedChar(filaname: string): string {
     return filaname?.replace(/\\|\*|\/|\?|"|:|<|>|\|/g, '');
   }
+
+  removeCharsInvalid (variable: string): string {
+    return variable?.replace(/[\/:*?"&lt;>|",]/g, '_');
+  }
 }
