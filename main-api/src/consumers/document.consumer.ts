@@ -469,8 +469,7 @@ export class DocumentConsumer {
       +response?.SpringCMGetFolder?.Code === 200 &&
       +response?.SpringCMUploadResponse?.Code === 201 &&
       !!response?.SalesForce?.length &&
-      response?.SalesForce[0]?.created === 'true' &&
-      response?.SalesForce[0]?.success === 'true'
+      response?.SalesForce[0]?.created === 'true'
     ) {
       await this.documentRepository.migrateDocument({
         documentId,
