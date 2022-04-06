@@ -1,10 +1,12 @@
 import { ReactElement } from 'react';
 import Form from 'react-bootstrap/Form';
+import { StatusOption } from '../status-dropdown';
 import styles from './OperationDropdown.module.css';
 
 export interface OperationDropdownProps {
   onChange: (selected: OperationOption) => void;
   selected: OperationOption;
+  selectedStatus?: StatusOption;
 }
 
 export interface IOperationDropdownOptions {
@@ -14,6 +16,7 @@ export interface IOperationDropdownOptions {
 
 export enum OperationOption {
   ALL = 'ALL',
+  CANCELLED = 'CANCELLED',
   QR = 'QR',
   ENCODING = 'ENCODING',
   INDEXING = 'INDEXING',
@@ -51,6 +54,7 @@ export const OperationDropdownOptions: IOperationDropdownOptions[] = [
 export const OperationDropdown = ({
   selected,
   onChange,
+  selectedStatus
 }: OperationDropdownProps): ReactElement => {
   const handleOnChange = (event: React.FormEvent<HTMLSelectElement>): void => {
     onChange(event.currentTarget.value as OperationOption);
@@ -67,6 +71,9 @@ export const OperationDropdown = ({
           {op.label}
         </option>
       ))}
+      {selectedStatus === StatusOption.FAILED && (
+        <option value={OperationOption.CANCELLED}>Cancelled</option>
+      )}
     </Form.Select>
   );
 };

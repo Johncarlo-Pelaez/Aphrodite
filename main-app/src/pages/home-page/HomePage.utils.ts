@@ -49,9 +49,9 @@ export const concatDocumentStatuses = (
       case StatusOption.DISAPPROVED:
         strDocumentStatuses += `${DocumentStatus.DISAPPROVED}, `;
         break;
-      // default:
-      //   strDocumentStatuses += `${DocumentStatus.CHECKING_DISAPPROVED}, `;
-      //   break;
+      default:
+        strDocumentStatuses += documentStatus;
+        break;
     }
   } else if (operation === OperationOption.MIGRATE) {
     switch (status) {

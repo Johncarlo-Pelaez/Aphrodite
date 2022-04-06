@@ -247,6 +247,7 @@ export const HomePage = (): ReactElement => {
           <OperationDropdown
             selected={selectedOperation}
             onChange={setSelectedOperation}
+            selectedStatus={selectedStatus}
           />
         </Col>
         <Col className="mb-2" xs={12} lg={2}>
@@ -286,6 +287,8 @@ export const HomePage = (): ReactElement => {
           dateTo,
           statuses: documentStatusFilter,
           username: selectedUserFilter?.username,
+          operation: selectedOperation,
+          status: selectedStatus,
         }}
         setSelectedDocuments={setSelectedDocuments}
         onDoubleClickRow={handleOpen}
