@@ -19,12 +19,14 @@ export interface ImportReportTableProps {
   username?: string;
   from?: Date;
   to?: Date;
+  isTriggered?: boolean;
 }
 
 export const ImportReportTable = ({
   username,
   from,
   to,
+  isTriggered
 }: ImportReportTableProps): ReactElement => {
   const [currentPageImport, setCurrentPageImport] = useState<number>(1);
   const [pageSizeImport, setPageSizeImport] = useState<number>(15);
@@ -101,8 +103,8 @@ export const ImportReportTable = ({
   });
 
   const { imported, importedTotal } = useMemo(
-    () => ({ imported: result?.data ?? [], importedTotal: result?.count ?? 0 }),
-    [result?.data, result?.count],
+    () => ({ imported: !!isTriggered ? result?.data : [], importedTotal: result?.count ?? 0 }),
+    [result?.data, result?.count, isTriggered],
   );
 
   return (
@@ -121,7 +123,7 @@ export const ImportReportTable = ({
         loading={isLoading || isFetching}
         isError={hasDocsError}
         columns={renderColumnsImport()}
-        data={imported}
+        data={imported ?? []}
         pagination={{
           total: importedTotal,
           pageSize: pageSizeImport,

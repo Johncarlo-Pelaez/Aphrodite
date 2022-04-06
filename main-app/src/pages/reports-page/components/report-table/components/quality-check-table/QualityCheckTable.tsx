@@ -19,12 +19,14 @@ export interface QualityCheckTableProps {
   username?: string;
   from?: Date;
   to?: Date;
+  isTriggered?: boolean
 }
 
 export const QualityCheckTable = ({
   username,
   from,
   to,
+  isTriggered
 }: QualityCheckTableProps): ReactElement => {
   const [currentPageQualityCheck, setCurrentPageQualityCheck] =
     useState<number>(1);
@@ -107,10 +109,10 @@ export const QualityCheckTable = ({
 
   const { qualityCheck, qualityCheckTotal } = useMemo(
     () => ({
-      qualityCheck: result?.data ?? [],
+      qualityCheck: !!isTriggered ? result?.data : [],
       qualityCheckTotal: result?.count ?? 0,
     }),
-    [result?.data, result?.count],
+    [result?.data, result?.count, isTriggered],
   );
 
   return (
@@ -129,7 +131,7 @@ export const QualityCheckTable = ({
         loading={isLoading || isFetching}
         isError={hasDocsError}
         columns={renderColumnsQualityChecked()}
-        data={qualityCheck}
+        data={qualityCheck ?? []}
         pagination={{
           total: qualityCheckTotal,
           pageSize: pageSizeQualityCheck,
