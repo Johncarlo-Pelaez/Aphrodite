@@ -44,8 +44,8 @@ export const HomePage = (): ReactElement => {
   const selectedDocumentKeys = selectedDocuments.map((d) => d.id);
   const [uploadModalShow, setUploadModalShow] = useState<boolean>(false);
   const [viewDocModalShow, setViewDocModalShow] = useState<boolean>(false);
-  const [dateFrom, setDateFrom] = useState<Date>(new Date());
-  const [dateTo, setDateTo] = useState<Date>(new Date());
+  const [dateFrom, setDateFrom] = useState<Date | undefined>(new Date());
+  const [dateTo, setDateTo] = useState<Date | undefined>(new Date());
   const [selectedUserFilter, setSelectedUserFilter] = useState<
     UserOption | undefined
   >(undefined);
