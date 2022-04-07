@@ -214,7 +214,7 @@ export class ReportService {
     param: GenerateApprovalExcelParam,
   ): Promise<Buffer> {
     const data = await this.reportRepository.getApprovalReport({
-      appover: param.approver,
+      approver: param.approver,
       from: param.from,
       to: param.to,
     });

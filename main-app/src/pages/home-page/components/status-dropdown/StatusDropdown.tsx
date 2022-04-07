@@ -2,10 +2,12 @@ import { ReactElement } from 'react';
 import Form from 'react-bootstrap/Form';
 import styles from './StatusDropdown.module.css';
 import { OperationOption } from '../operation-dropdown';
+import { Role } from 'core/enum';
 
 export interface StatusDropdownProps {
   selectedOperation?: OperationOption;
   selected: StatusOption;
+  currentUserRole?: Role | undefined;
   onChange: (selected: StatusOption) => void;
 }
 
@@ -50,6 +52,7 @@ export const StatusDropdown = ({
   selectedOperation,
   selected,
   onChange,
+  currentUserRole,
 }: StatusDropdownProps): ReactElement => {
   const handleOnChange = (event: React.FormEvent<HTMLSelectElement>): void => {
     onChange(event.currentTarget.value as StatusOption);
@@ -66,9 +69,10 @@ export const StatusDropdown = ({
           {op.label}
         </option>
       ))}
-      {selectedOperation === OperationOption.CHECKING && (
-        <option value={StatusOption.DISAPPROVED}>Disapproved</option>
-      )}
+      {currentUserRole !== Role.ENCODER &&
+        selectedOperation === OperationOption.CHECKING && (
+          <option value={StatusOption.DISAPPROVED}>Disapproved</option>
+        )}
     </Form.Select>
   );
 };

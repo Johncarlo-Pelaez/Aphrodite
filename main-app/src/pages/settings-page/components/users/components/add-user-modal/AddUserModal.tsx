@@ -16,14 +16,12 @@ import {
   EmailField,
   LastNameField,
   FirstNameField,
-  ObjectIdField,
 } from './components';
 
 interface CreateUserForm extends CreateUserApi, FieldValues {}
 
 const createUserSchema = yup.object().shape({
   email: yup.string().email().required('Email is required.'),
-  objectId: yup.string().required('Object ID is required.'),
   firstName: yup.string().required('First name is required.'),
   lastName: yup.string().required('Last name is required.'),
   role: yup
@@ -110,7 +108,6 @@ export const AddUserModal = ({
             <FirstNameField control={control} />
             <LastNameField control={control} />
             <EmailField control={control} />
-            <ObjectIdField control={control} />
           </fieldset>
         </Modal.Body>
         <Modal.Footer>

@@ -81,7 +81,6 @@ export class UserController {
       firstName: dto.firstName,
       lastName: dto.lastName,
       role: Role.ADMIN,
-      objectId: dto.objectId,
       createdDate: rightNow,
     });
     await this.activityLogRepository.insertCreateRootUserLog({

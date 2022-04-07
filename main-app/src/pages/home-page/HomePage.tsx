@@ -5,10 +5,12 @@ import Stack from 'react-bootstrap/Stack';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { Document } from 'models';
+import { Role } from 'core/enum';
 import {
   useRetryDocuments,
   useCancelDocuments,
   useDeleteDocumentsFile,
+  useGetCurrentUser,
 } from 'hooks';
 import { SearchField, DateSelect } from 'core/ui';
 import {
@@ -42,11 +44,13 @@ export const HomePage = (): ReactElement => {
   const selectedDocumentKeys = selectedDocuments.map((d) => d.id);
   const [uploadModalShow, setUploadModalShow] = useState<boolean>(false);
   const [viewDocModalShow, setViewDocModalShow] = useState<boolean>(false);
-  const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
-  const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
+  const [dateFrom, setDateFrom] = useState<Date | undefined>(new Date());
+  const [dateTo, setDateTo] = useState<Date | undefined>(new Date());
   const [selectedUserFilter, setSelectedUserFilter] = useState<
     UserOption | undefined
   >(undefined);
+  const { data: user } = useGetCurrentUser();
+  const currentUserRole = user?.role;
   const processDetailsRef = useRef<any>(null);
   const documentsTableRef = useRef<any>(null);
   const hasSelectedRows = !!selectedDocuments.length;
@@ -156,7 +160,7 @@ export const HomePage = (): ReactElement => {
   useEffect(() => {
     if (hasRetryDocError) alert('Failed to retry documents.');
     if (hasCancelDocError) alert('Failed to cancel documents.');
-    if (hasDeleteDocsFileError) alert('Failed to delete documents file.');
+    if(hasDeleteDocsFileError) alert('Failed to delete documents file.');
   }, [hasRetryDocError, hasCancelDocError, hasDeleteDocsFileError]);
 
   useEffect(() => {
@@ -236,6 +240,7 @@ export const HomePage = (): ReactElement => {
             selectedOperation={selectedOperation}
             selected={selectedStatus}
             onChange={setSelectedStatus}
+            currentUserRole={currentUserRole}
           />
         </Col>
         <Col className="mb-2" xs={12} lg={2}>
@@ -261,10 +266,12 @@ export const HomePage = (): ReactElement => {
           />
         </Col>
         <Col xs={12} lg={4}>
-          <UserDropdown
-            value={selectedUserFilter}
-            onChange={setSelectedUserFilter}
-          />
+          {currentUserRole !== Role.ENCODER && (
+            <UserDropdown
+              value={selectedUserFilter}
+              onChange={setSelectedUserFilter}
+            />
+          )}
         </Col>
       </Row>
       <div className="d-flex justify-content-end mb-2">

@@ -38,7 +38,7 @@ export const concatDocumentStatuses = (
   } else if (operation === OperationOption.CHECKING) {
     switch (status) {
       case StatusOption.WAITING:
-        strDocumentStatuses += `${DocumentStatus.CHECKING}, `;
+        strDocumentStatuses += `${DocumentStatus.CHECKING}, ${DocumentStatus.CHECKING_DISAPPROVED}, `;
         break;
       case StatusOption.DONE:
         strDocumentStatuses += `${DocumentStatus.CHECKING_APPROVED}, ${DocumentStatus.APPROVED}, `;
@@ -49,6 +49,9 @@ export const concatDocumentStatuses = (
       case StatusOption.DISAPPROVED:
         strDocumentStatuses += `${DocumentStatus.DISAPPROVED}, `;
         break;
+      // default:
+      //   strDocumentStatuses += `${DocumentStatus.CHECKING_DISAPPROVED}, `;
+      //   break;
     }
   } else if (operation === OperationOption.MIGRATE) {
     switch (status) {
@@ -71,7 +74,9 @@ export const getForRetryDocStatuses = (): DocumentStatus[] =>
 export const getForCancelDocStatuses = (): DocumentStatus[] =>
   Object.values(DocumentStatus).filter(
     (s) =>
-      !s.includes('DONE') && !s.includes('FAILED') && !s.includes('CANCELLED'),
+      !s.includes(DocumentStatus.MIGRATE_DONE) &&
+      !s.includes('FAILED') &&
+      !s.includes('CANCELLED'),
   );
 
 export const getForDeleteDocsFileStatuses = (): DocumentStatus[] =>

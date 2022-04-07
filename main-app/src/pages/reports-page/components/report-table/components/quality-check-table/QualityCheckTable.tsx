@@ -6,7 +6,7 @@ import { useDocumentReportQC, useDownloadQualityCheck } from 'hooks';
 import { Table, TableColumnProps, SorterResult, SortOrder } from 'core/ui';
 import { QualityCheckReport } from 'models';
 import { sortDateTime } from 'utils/sort';
-import { Button, Toast } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import styles from './QualityCheckTable.module.css';
 import { downloadFile } from 'utils';
 
@@ -33,10 +33,6 @@ export const QualityCheckTable = ({
     SorterResult | undefined
   >(DEFAULT_SORT_ORDER_QUALITY_CHECK);
 
-  const [errorMessage, setErrorMessage] = useState<string>('');
-  const [displayErrorMessage, setDisplayErrorMessage] =
-    useState<boolean>(false);
-
   const {
     isLoading: isDownloadLoading,
     mutateAsync: downloadQualityCheckReportAsync,
@@ -47,18 +43,8 @@ export const QualityCheckTable = ({
   };
 
   const downloadReportQualityCheck = async (): Promise<void> => {
-    if (!from || !to) {
-      setErrorMessage('Date range of date checked must be selected');
-      setDisplayErrorMessage(true);
-    }
-
-    if (from && to) {
-      if (from > to) {
-        setErrorMessage('Incorrect date range of date checked');
-        setDisplayErrorMessage(true);
-        return;
-      }
-
+    if(!!qualityCheck && qualityCheckTotal > 0)
+    {
       const qualityCheckParams = await downloadQualityCheckReportAsync({
         username,
         from,
@@ -70,7 +56,8 @@ export const QualityCheckTable = ({
         filename: `Quality_Check_Report_${getCurrentDate()}.xlsx`,
       });
     }
-  };
+  }
+
 
   const getCurrentDate = (): string => {
     return moment().format(DEFAULT_DATE_FORMAT);
@@ -118,7 +105,6 @@ export const QualityCheckTable = ({
     username,
   });
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { qualityCheck, qualityCheckTotal } = useMemo(
     () => ({
       qualityCheck: result?.data ?? [],
@@ -129,18 +115,6 @@ export const QualityCheckTable = ({
 
   return (
     <div>
-      <Toast
-        className="error-date-range d-inline-block m-1"
-        bg="light"
-        autohide
-        show={displayErrorMessage}
-        onClose={() => setDisplayErrorMessage(false)}
-      >
-        <Toast.Header>
-          <strong className="me-auto">Download warning</strong>
-        </Toast.Header>
-        <Toast.Body className="light text-dark">{errorMessage}</Toast.Body>
-      </Toast>
       <Button
         disabled={isDownloadLoading}
         variant="outline-secondary"

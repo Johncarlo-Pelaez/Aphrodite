@@ -131,7 +131,6 @@ export const UpdateUserModal = ({
             <FirstNameField control={control} />
             <LastNameField control={control} />
             <ReadOnlyField label="Email" value={user?.username} />
-            <ReadOnlyField label="Object ID" value={user?.objectId} />
             <IsActiveField control={control} />
           </fieldset>
         </Modal.Body>

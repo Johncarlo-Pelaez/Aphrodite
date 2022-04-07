@@ -10,8 +10,8 @@ import {
 import fileSize from 'filesize';
 import moment from 'moment';
 import { DEFAULT_DATE_FORMAT } from 'core/constants';
-import { DocumentStatus } from 'core/enum';
-import { useDebounce, useDocuments } from 'hooks';
+import { DocumentStatus, Role } from 'core/enum';
+import { useDebounce, useDocuments, useGetCurrentUser } from 'hooks';
 import { Table, TableColumnProps, SorterResult, SortOrder } from 'core/ui';
 import { Document } from 'models';
 import { sortDateTime, sortText } from 'utils/sort';
@@ -60,6 +60,8 @@ export const DocumentsTable = forwardRef(
     const dateFrom = dataFilters?.dateFrom;
     const dateTo = dataFilters?.dateTo;
     const username = dataFilters?.username;
+    const { data: user } = useGetCurrentUser();
+    const currentUserRole = user?.role;
     const debouncedSearch = useDebounce(searchKey);
 
     const {
@@ -92,76 +94,89 @@ export const DocumentsTable = forwardRef(
       );
     }, [documents, selectedDocuments]);
 
-    const renderColumns = (): TableColumnProps<Document>[] => [
-      {
-        title: 'Name',
-        dataIndex: 'documentName',
-        sorter: sortText('documentName'),
-        sortOrder: sorter?.field === 'documentName' ? sorter.order : undefined,
+    const renderColumns: TableColumnProps<Document>[] = [];
+
+    const columnName = {
+      title: 'Name',
+      dataIndex: 'documentName',
+      sorter: sortText('documentName'),
+      sortOrder: sorter?.field === 'documentName' ? sorter.order : undefined,
+    };
+    const columnBarcode: TableColumnProps<Document> = {
+      title: 'Barcode / QR Code',
+      dataIndex: 'qrCode',
+    };
+    const columnSize: TableColumnProps<Document> = {
+      title: 'Size',
+      dataIndex: 'documentSize',
+      render: (document: Document) => fileSize(document.documentSize),
+    };
+    const columnDocumentType: TableColumnProps<Document> = {
+      title: 'Document Type',
+      dataIndex: '',
+      render: (document: Document) => {
+        const documentType = parseDocumentType(document.documentType ?? '');
+        return documentType ? documentType.Nomenclature : '';
       },
-      {
-        title: 'Barcode / QR Code',
-        dataIndex: 'qrCode',
+    };
+    const columnStatus: TableColumnProps<Document> = {
+      title: 'Status',
+      dataIndex: 'status',
+      render: (document: Document) => {
+        const statusText = generateStatusText(document.status);
+        return (
+          <span style={{ color: statusText === 'Error' ? 'red' : '' }}>
+            {statusText}
+          </span>
+        );
       },
-      {
-        title: 'Size',
-        dataIndex: 'documentSize',
-        render: (document: Document) => fileSize(document.documentSize),
-      },
-      {
-        title: 'Document Type',
-        dataIndex: '',
-        render: (document: Document) => {
-          const documentType = parseDocumentType(document.documentType ?? '');
-          return documentType ? documentType.Nomenclature : '';
-        },
-      },
-      {
-        title: 'Status',
-        dataIndex: 'status',
-        render: (document: Document) => {
-          const statusText = generateStatusText(document.status);
-          return (
-            <span style={{ color: statusText === 'Error' ? 'red' : '' }}>
-              {statusText}
-            </span>
+    };
+
+    const columnOperation: TableColumnProps<Document> = {
+      title: 'Operation',
+      dataIndex: 'status',
+      render: (document: Document) => {
+        if (
+          document.status === DocumentStatus.RETRYING ||
+          document.status === DocumentStatus.CANCELLED
+        ) {
+          const statuses = document.documentHistories.map(
+            (dh) => dh.documentStatus,
           );
-        },
+          const prevStatusIndex = statuses.indexOf(document.status) - 1;
+          if (prevStatusIndex < statuses.length) {
+            const prevStatus = statuses[prevStatusIndex];
+            return generateOperationText(prevStatus);
+          } else return '';
+        } else return generateOperationText(document.status);
       },
-      {
-        title: 'Operation',
-        dataIndex: 'status',
-        render: (document: Document) => {
-          if (
-            document.status === DocumentStatus.RETRYING ||
-            document.status === DocumentStatus.CANCELLED
-          ) {
-            const statuses = document.documentHistories.map(
-              (dh) => dh.documentStatus,
-            );
-            const prevStatusIndex = statuses.indexOf(document.status) - 1;
-            if (prevStatusIndex < statuses.length) {
-              const prevStatus = statuses[prevStatusIndex];
-              return generateOperationText(prevStatus);
-            } else return '';
-          } else return generateOperationText(document.status);
-        },
-      },
-      {
-        title: 'User',
-        dataIndex: 'user',
-        render: (document: Document) =>
-          `${document.user.firstName} ${document.user.lastName}`,
-      },
-      {
-        title: 'Date Modified',
-        dataIndex: 'modifiedDate',
-        render: (document: Document) =>
-          moment(document.modifiedDate).format(DEFAULT_DATE_FORMAT),
-        sorter: sortDateTime('modifiedDate'),
-        sortOrder: sorter?.field === 'modifiedDate' ? sorter.order : undefined,
-      },
-    ];
+    };
+    const columnUser: TableColumnProps<Document> = {
+      title: 'User',
+      dataIndex: 'user',
+      render: (document: Document) =>
+        `${document.user.firstName} ${document.user.lastName}`,
+    };
+    const columnDateModified: TableColumnProps<Document> = {
+      title: 'Date Modified',
+      dataIndex: 'modifiedDate',
+      render: (document: Document) =>
+        moment(document.modifiedDate).format(DEFAULT_DATE_FORMAT),
+      sorter: sortDateTime('modifiedDate'),
+      sortOrder: sorter?.field === 'modifiedDate' ? sorter.order : undefined,
+    };
+
+    renderColumns.push(
+      columnName,
+      columnBarcode,
+      columnSize,
+      columnDocumentType,
+      columnStatus,
+      columnOperation,
+      columnDateModified,
+    );
+
+    if (currentUserRole !== Role.ENCODER) renderColumns.push(columnUser);
 
     const changeSort = (sorterResult?: SorterResult): void => {
       setSorter(sorterResult ?? DEFAULT_SORT_ORDER);
@@ -204,7 +219,7 @@ export const DocumentsTable = forwardRef(
         rowKey={(doc) => doc.id}
         loading={isLoading || isFetching}
         isError={hasDocsError}
-        columns={renderColumns()}
+        columns={renderColumns}
         data={documents}
         rowSelection={{
           type: 'checkbox',

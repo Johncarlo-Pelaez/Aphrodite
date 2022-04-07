@@ -3,7 +3,7 @@ import {
   Container,
   Row,
   Col,
-  // Button
+  Button
 } from 'react-bootstrap';
 import {
   ReportStatusDropdown,
@@ -11,7 +11,7 @@ import {
   ReportOption,
   ReportTable,
 } from './components';
-import { DateSelect } from 'core/ui';
+import { DateSelect } from './components';
 
 export const ReportsPage = (): ReactElement => {
   const [reportType, setReportType] = useState<ReportOption>(
@@ -20,21 +20,21 @@ export const ReportsPage = (): ReactElement => {
   const [username, setUsername] = useState<string | undefined>(undefined);
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
-  // const [start, setStart] = useState<Date | undefined>(undefined);
-  // const [end, setEnd] = useState<Date | undefined>(undefined);
-  // const [user, setUser] = useState<string | undefined>(undefined);
+  const [start, setStart] = useState<Date | undefined>(undefined);
+  const [end, setEnd] = useState<Date | undefined>(undefined);
+  const [user, setUser] = useState<string | undefined>(undefined);
 
-  // const collectFilter = () => {
-  //   setStart(dateFrom);
-  //   setEnd(dateTo);
-  //   setUser(username);
-  // };
+  const collectFilter = () => {
+    setStart(dateFrom);
+    setEnd(dateTo);
+    setUser(username);
+  };
 
   useEffect(() => {
     if (reportType) {
-      // setStart(undefined);
-      // setEnd(undefined);
-      // setUser(undefined);
+      setStart(undefined);
+      setEnd(undefined);
+      setUser(undefined);
       setUsername(undefined);
       setDateFrom(undefined);
       setDateTo(undefined);
@@ -70,17 +70,18 @@ export const ReportsPage = (): ReactElement => {
             horizontal
           />
         </Col>
-        {/* <Col>
+        <Col>
           <Button variant="outline-secondary" onClick={collectFilter}>
             Find
           </Button>
-        </Col> */}
+        </Col>
       </Row>
       <ReportTable
-        username={username}
-        dateFrom={dateFrom}
-        dateTo={dateTo}
+        username={user}
+        dateFrom={start}
+        dateTo={end}
         reportType={reportType}
+
       />
     </Container>
   );

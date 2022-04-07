@@ -84,7 +84,6 @@ export class UserRepository {
     user.lastName = param.lastName;
     user.role = param.role;
     user.createdDate = param.createdDate;
-    user.objectId = param.objectId;
     user.isActive = true;
     await this.manager.save(user);
     return user.id;

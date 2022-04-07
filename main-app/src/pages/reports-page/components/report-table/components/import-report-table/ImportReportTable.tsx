@@ -6,7 +6,7 @@ import { useReportImport, useDownloadReportImport } from 'hooks';
 import { Table, TableColumnProps, SorterResult, SortOrder } from 'core/ui';
 import { ImportReport } from 'models';
 import { sortDateTime } from 'utils/sort';
-import { Button, Toast } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import styles from './ImportReportTable.module.css';
 import { downloadFile } from 'utils';
 
@@ -31,11 +31,6 @@ export const ImportReportTable = ({
   const [sorterImport, setSorterImport] = useState<SorterResult | undefined>(
     DEFAULT_SORT_ORDER_IMPORT_REPORT,
   );
-
-  const [errorMessage, setErrorMessage] = useState<string>('');
-  const [displayErrorMessage, setDisplayErrorMessage] =
-    useState<boolean>(false);
-
   const {
     isLoading: isDownloadLoading,
     mutateAsync: downloadImportReportAsync,
@@ -46,18 +41,8 @@ export const ImportReportTable = ({
   };
 
   const downloadReportImport = async (): Promise<void> => {
-    if (!from || !to) {
-      setErrorMessage('Date range of date import must be selected');
-      setDisplayErrorMessage(true);
-    }
-
-    if (from && to) {
-      if (from > to) {
-        setErrorMessage('Incorrect date range of date import');
-        setDisplayErrorMessage(true);
-        return;
-      }
-
+    if(!!imported && importedTotal > 0)
+    {
       const importParams = await downloadImportReportAsync({
         username,
         from,
@@ -69,7 +54,7 @@ export const ImportReportTable = ({
         filename: `Import_Report_${getCurrentDate()}.xlsx`,
       });
     }
-  };
+  }
 
   const getCurrentDate = (): string => {
     return moment().format(DEFAULT_DATE_FORMAT);
@@ -115,7 +100,6 @@ export const ImportReportTable = ({
     username,
   });
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { imported, importedTotal } = useMemo(
     () => ({ imported: result?.data ?? [], importedTotal: result?.count ?? 0 }),
     [result?.data, result?.count],
@@ -123,18 +107,6 @@ export const ImportReportTable = ({
 
   return (
     <div>
-      <Toast
-        className="error-date-range d-inline-block m-1"
-        bg="light"
-        autohide
-        show={displayErrorMessage}
-        onClose={() => setDisplayErrorMessage(false)}
-      >
-        <Toast.Header>
-          <strong className="me-auto">Download warning</strong>
-        </Toast.Header>
-        <Toast.Body className="light text-dark">{errorMessage}</Toast.Body>
-      </Toast>
       <Button
         disabled={isDownloadLoading}
         variant="outline-secondary"

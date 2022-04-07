@@ -9,7 +9,7 @@ import {
 import { Table, TableColumnProps, SorterResult, SortOrder } from 'core/ui';
 import { DocumentReport } from 'models';
 import { sortDateTime } from 'utils/sort';
-import { Button, Toast } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import { downloadFile } from 'utils';
 import styles from './UploadedTable.module.css';
 
@@ -33,11 +33,7 @@ export const UploadedTable = ({
   const [pageSizeUploaded, setPageSizeUploaded] = useState<number>(15);
   const [sorterUploaded, setSorterUploaded] = useState<
     SorterResult | undefined
-  >(DEFAULT_SORT_ORDER_UPLOADED);
-  const [errorMessage, setErrorMessage] = useState<string>('');
-  const [displayErrorMessage, setDisplayErrorMessage] =
-    useState<boolean>(false);
-
+    >(DEFAULT_SORT_ORDER_UPLOADED);
   const {
     isLoading: isDownloadLoading,
     mutateAsync: downloadUploadedReportAsync,
@@ -47,19 +43,9 @@ export const UploadedTable = ({
     setSorterUploaded(sorterResult ?? DEFAULT_SORT_ORDER_UPLOADED);
   };
 
-  const downloadReportUpload = async (): Promise<void> => {
-    if (!from || !to) {
-      setErrorMessage('Date range of date uploaded must be selected');
-      setDisplayErrorMessage(true);
-    }
-
-    if (from && to) {
-      if (from > to) {
-        setErrorMessage('Incorrect date range of date uploaded');
-        setDisplayErrorMessage(true);
-        return;
-      }
-
+  const downloadReportUpload = async () => {
+    if(!!uploaded && total > 0)
+    {
       const uploadedParams = await downloadUploadedReportAsync({
         username,
         from,
@@ -70,8 +56,8 @@ export const UploadedTable = ({
         file: uploadedParams,
         filename: `Uploaded_Report_${getCurrentDate()}.xlsx`,
       });
-    }
-  };
+      }
+  }
 
   const getCurrentDate = (): string => {
     return moment().format(DEFAULT_DATE_FORMAT);
@@ -128,18 +114,6 @@ export const UploadedTable = ({
 
   return (
     <div>
-      <Toast
-        className="error-date-range d-inline-block m-1"
-        bg="light"
-        autohide
-        show={displayErrorMessage}
-        onClose={() => setDisplayErrorMessage(false)}
-      >
-        <Toast.Header>
-          <strong className="me-auto">Download warning</strong>
-        </Toast.Header>
-        <Toast.Body className="light text-dark">{errorMessage}</Toast.Body>
-      </Toast>
       <Button
         disabled={isDownloadLoading}
         variant="outline-secondary"

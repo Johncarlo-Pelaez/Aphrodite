@@ -1,7 +1,7 @@
 import { ReactElement, useState, useMemo, useEffect } from 'react';
 import fileSize from 'filesize';
 import moment from 'moment';
-import { Button, Toast } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import { Stack } from 'react-bootstrap';
 import { DEFAULT_DATE_FORMAT } from 'core/constants';
 import { useReportRIS, useDownloadReportRIS } from 'hooks';
@@ -46,9 +46,6 @@ export const RISReportTable = ({
   const [nomenclature, setNomenclature] = useState<string | undefined>(
     undefined,
   );
-  const [errorMessage, setErrorMessage] = useState<string>('');
-  const [displayErrorMessage, setDisplayErrorMessage] =
-    useState<boolean>(false);
   const [selectedStatus, setSelectedStatus] = useState<StatusOption>(
     StatusOption.ALL,
   );
@@ -71,18 +68,8 @@ export const RISReportTable = ({
     useDownloadReportRIS();
 
   const downloadReportRIS = async (): Promise<void> => {
-    if (!from || !to) {
-      setErrorMessage('Date range of date scanned must be selected');
-      setDisplayErrorMessage(true);
-    }
-
-    if (from && to) {
-      if (from > to) {
-        setErrorMessage('Incorrect date range of date scanned');
-        setDisplayErrorMessage(true);
-        return;
-      }
-
+    if(!!ris && risTotal > 0)
+    {
       const risParams = await downloadRISReportAsync({
         username,
         from,
@@ -96,7 +83,7 @@ export const RISReportTable = ({
         filename: `RIS_Report_${getCurrentDate()}.xlsx`,
       });
     }
-  };
+  }
 
   const getCurrentDate = (): string => {
     return moment().format(DEFAULT_DATE_FORMAT);
@@ -176,8 +163,6 @@ export const RISReportTable = ({
         setPageSize(15);
         setSorter(DEFAULT_SORT_ORDER_RIS_REPORT);
         setNomenclature(undefined);
-        setErrorMessage('');
-        setDisplayErrorMessage(false);
         setSelectedStatus(StatusOption.ALL);
         setSelectedOperation(OperationOption.ALL);
 
@@ -197,18 +182,6 @@ export const RISReportTable = ({
 
   return (
     <div>
-      <Toast
-        className="error-date-range d-inline-block m-1"
-        bg="light"
-        autohide
-        show={displayErrorMessage}
-        onClose={() => setDisplayErrorMessage(false)}
-      >
-        <Toast.Header>
-          <strong className="me-auto">Download warning</strong>
-        </Toast.Header>
-        <Toast.Body className="light text-dark">{errorMessage}</Toast.Body>
-      </Toast>
       <div className="d-flex justify-content-between align-items-center flex-wrap my-1">
         <Stack direction="horizontal" gap={3}>
           <StatusDropdown
