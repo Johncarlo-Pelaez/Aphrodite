@@ -46,7 +46,7 @@ export const UploadedTable = ({
   };
 
   const downloadReportUpload = async () => {
-    if(!!uploaded && total > 0)
+    if(!!uploaded && !!total)
     {
       const uploadedParams = await downloadUploadedReportAsync({
         username,
@@ -110,7 +110,7 @@ export const UploadedTable = ({
   });
 
   const { uploaded, total } = useMemo(
-    () => ({ uploaded: !!isTriggered ? result?.data : [], total: result?.count ?? 0 }),
+    () => ({ uploaded: !!isTriggered ? result?.data : [], total: !!isTriggered ? result?.count : 0 }),
     [result?.data, result?.count, isTriggered],
   );
 
@@ -132,7 +132,7 @@ export const UploadedTable = ({
         columns={renderColumnsUpload()}
         data={uploaded ?? []}
         pagination={{
-          total: total,
+          total: total ?? 0,
           pageSize: pageSizeUploaded,
           current: currentPageUploaded,
           pageNumber: 5,

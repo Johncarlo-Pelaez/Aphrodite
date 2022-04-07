@@ -45,7 +45,7 @@ export const QualityCheckTable = ({
   };
 
   const downloadReportQualityCheck = async (): Promise<void> => {
-    if(!!qualityCheck && qualityCheckTotal > 0)
+    if(!!qualityCheck && !!qualityCheckTotal)
     {
       const qualityCheckParams = await downloadQualityCheckReportAsync({
         username,
@@ -110,7 +110,7 @@ export const QualityCheckTable = ({
   const { qualityCheck, qualityCheckTotal } = useMemo(
     () => ({
       qualityCheck: !!isTriggered ? result?.data : [],
-      qualityCheckTotal: result?.count ?? 0,
+      qualityCheckTotal: !!isTriggered ? result?.count : 0,
     }),
     [result?.data, result?.count, isTriggered],
   );
@@ -133,7 +133,7 @@ export const QualityCheckTable = ({
         columns={renderColumnsQualityChecked()}
         data={qualityCheck ?? []}
         pagination={{
-          total: qualityCheckTotal,
+          total: qualityCheckTotal ?? 0,
           pageSize: pageSizeQualityCheck,
           current: currentPageQualityCheck,
           pageNumber: 5,

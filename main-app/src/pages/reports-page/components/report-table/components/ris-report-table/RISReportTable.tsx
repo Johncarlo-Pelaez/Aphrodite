@@ -70,7 +70,7 @@ export const RISReportTable = ({
     useDownloadReportRIS();
 
   const downloadReportRIS = async (): Promise<void> => {
-    if(!!ris && risTotal > 0)
+    if(!!ris && !!risTotal)
     {
       const risParams = await downloadRISReportAsync({
         username,
@@ -144,7 +144,7 @@ export const RISReportTable = ({
   const { ris, risTotal, risIndexes } = useMemo(
     () => ({
       ris: !!isTriggered ? result?.data : [],
-      risTotal: result?.count ?? 0,
+      risTotal: !!isTriggered ? result?.count : 0,
       risIndexes: !!result?.data
         ? result.data.map(({ indexes }) => {
             const docType: GetIndexesResult =
@@ -167,19 +167,9 @@ export const RISReportTable = ({
         setNomenclature(undefined);
         setSelectedStatus(StatusOption.ALL);
         setSelectedOperation(OperationOption.ALL);
-
-        // if (username || from || to) {
-        //   setStatus(undefined);
-        //   setOperation(undefined);
-        //   setDocType(undefined);
-        // }
       };
     },
-    [
-      // from,
-      // to,
-      // username
-    ],
+    [],
   );
 
   return (
@@ -223,7 +213,7 @@ export const RISReportTable = ({
         columns={renderColumnsRIS()}
         data={ris ?? []}
         pagination={{
-          total: risTotal,
+          total: risTotal ?? 0,
           pageSize,
           current: currentPage,
           pageNumber: 5,

@@ -44,7 +44,7 @@ export const ApprovalReportTable = ({
   };
 
   const downloadReportApproval = async (): Promise<void> => {
-    if(!!approved && approvedTotal > 0)
+    if(!!approved && !!approvedTotal)
     {
       const approvalParams = await downloadApprovalReportAsync({
         username,
@@ -106,7 +106,7 @@ export const ApprovalReportTable = ({
   });
 
   const { approved, approvedTotal } = useMemo(
-    () => ({ approved: !!isTriggered ? result?.data : [], approvedTotal: result?.count ?? 0 }),
+    () => ({ approved: !!isTriggered ? result?.data : [], approvedTotal: !!isTriggered ? result?.count : 0 }),
     [result?.data, result?.count, isTriggered],
   );
 
@@ -128,7 +128,7 @@ export const ApprovalReportTable = ({
         columns={renderColumnsUpload()}
         data={approved ?? []}
         pagination={{
-          total: approvedTotal,
+          total: approvedTotal ?? 0,
           pageSize: pageSizeApproval,
           current: currentPageApproval,
           pageNumber: 5,

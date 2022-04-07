@@ -47,7 +47,7 @@ export const InformationRequestTable = ({
 
   const downloadReportInfoRequest = async (): Promise<void> => {
 
-    if(!!infoRequest && infoRequestTotal > 0)
+    if(!!infoRequest && !!infoRequestTotal)
     {
       const infoRequestParams = await downloadInfoRequestReportAsync({
         username,
@@ -110,7 +110,7 @@ export const InformationRequestTable = ({
   const { infoRequest, infoRequestTotal } = useMemo(
     () => ({
       infoRequest: !!isTriggered ? result?.data : [],
-      infoRequestTotal: result?.count ?? 0,
+      infoRequestTotal: !!isTriggered ? result?.count : 0,
     }),
     [result?.data, result?.count, isTriggered],
   );
@@ -133,7 +133,7 @@ export const InformationRequestTable = ({
         columns={renderColumnsInfoRequest()}
         data={infoRequest ?? []}
         pagination={{
-          total: infoRequestTotal,
+          total: infoRequestTotal ?? 0,
           pageSize: pageSizeInfoReq,
           current: currentPageInfoReq,
           pageNumber: 5,

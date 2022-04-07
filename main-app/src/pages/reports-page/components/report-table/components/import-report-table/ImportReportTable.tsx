@@ -43,7 +43,7 @@ export const ImportReportTable = ({
   };
 
   const downloadReportImport = async (): Promise<void> => {
-    if(!!imported && importedTotal > 0)
+    if(!!imported && !!importedTotal)
     {
       const importParams = await downloadImportReportAsync({
         username,
@@ -103,7 +103,7 @@ export const ImportReportTable = ({
   });
 
   const { imported, importedTotal } = useMemo(
-    () => ({ imported: !!isTriggered ? result?.data : [], importedTotal: result?.count ?? 0 }),
+    () => ({ imported: !!isTriggered ? result?.data : [], importedTotal: !!isTriggered ? result?.count : 0 }),
     [result?.data, result?.count, isTriggered],
   );
 
@@ -125,7 +125,7 @@ export const ImportReportTable = ({
         columns={renderColumnsImport()}
         data={imported ?? []}
         pagination={{
-          total: importedTotal,
+          total: importedTotal ?? 0,
           pageSize: pageSizeImport,
           current: currentPageImport,
           pageNumber: 5,
