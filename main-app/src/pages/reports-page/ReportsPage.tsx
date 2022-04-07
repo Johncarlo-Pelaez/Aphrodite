@@ -23,11 +23,13 @@ export const ReportsPage = (): ReactElement => {
   const [start, setStart] = useState<Date | undefined>(undefined);
   const [end, setEnd] = useState<Date | undefined>(undefined);
   const [user, setUser] = useState<string | undefined>(undefined);
+  const [isTriggered, setIsTriggered] = useState<boolean>(false);
 
   const collectFilter = () => {
     setStart(dateFrom);
     setEnd(dateTo);
     setUser(username);
+    setIsTriggered(true);
   };
 
   useEffect(() => {
@@ -38,8 +40,22 @@ export const ReportsPage = (): ReactElement => {
       setUsername(undefined);
       setDateFrom(undefined);
       setDateTo(undefined);
+      setIsTriggered(false);
     }
   }, [reportType]);
+
+
+  useEffect(() => {
+    return function componentCleanUp () {
+      setIsTriggered(false);
+      setStart(undefined);
+      setEnd(undefined);
+      setUser(undefined);
+      setUsername(undefined);
+      setDateFrom(undefined);
+      setDateTo(undefined);
+    };
+  }, []);
 
   return (
     <Container className="my-4" fluid>
@@ -72,7 +88,7 @@ export const ReportsPage = (): ReactElement => {
         </Col>
         <Col>
           <Button variant="outline-secondary" onClick={collectFilter}>
-            Find
+            Filter
           </Button>
         </Col>
       </Row>
@@ -81,7 +97,7 @@ export const ReportsPage = (): ReactElement => {
         dateFrom={start}
         dateTo={end}
         reportType={reportType}
-
+        isTriggered={isTriggered}
       />
     </Container>
   );

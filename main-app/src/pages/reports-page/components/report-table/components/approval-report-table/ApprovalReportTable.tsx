@@ -19,12 +19,14 @@ export interface ApprovalReportTableProps {
   username?: string;
   from?: Date;
   to?: Date;
+  isTriggered?: boolean;
 }
 
 export const ApprovalReportTable = ({
   username,
   from,
   to,
+  isTriggered,
 }: ApprovalReportTableProps): ReactElement => {
   const [currentPageApproval, setCurrentPageApproval] = useState<number>(1);
   const [pageSizeApproval, setPageSizeApproval] = useState<number>(15);
@@ -104,8 +106,8 @@ export const ApprovalReportTable = ({
   });
 
   const { approved, approvedTotal } = useMemo(
-    () => ({ approved: result?.data ?? [], approvedTotal: result?.count ?? 0 }),
-    [result?.data, result?.count],
+    () => ({ approved: !!isTriggered ? result?.data : [], approvedTotal: result?.count ?? 0 }),
+    [result?.data, result?.count, isTriggered],
   );
 
   return (
@@ -124,7 +126,7 @@ export const ApprovalReportTable = ({
         loading={isLoading || isFetching}
         isError={hasDocsError}
         columns={renderColumnsUpload()}
-        data={approved}
+        data={approved ?? []}
         pagination={{
           total: approvedTotal,
           pageSize: pageSizeApproval,

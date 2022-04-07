@@ -22,12 +22,14 @@ export interface InformationRequestTableProps {
   username?: string;
   from?: Date;
   to?: Date;
+  isTriggered?: boolean;
 }
 
 export const InformationRequestTable = ({
   username,
   from,
   to,
+  isTriggered
 }: InformationRequestTableProps): ReactElement => {
   const [currentPageInfoReq, setCurrentPageInfoReq] = useState<number>(1);
   const [pageSizeInfoReq, setPageSizeInfoReq] = useState<number>(15);
@@ -107,10 +109,10 @@ export const InformationRequestTable = ({
 
   const { infoRequest, infoRequestTotal } = useMemo(
     () => ({
-      infoRequest: result?.data ?? [],
+      infoRequest: !!isTriggered ? result?.data : [],
       infoRequestTotal: result?.count ?? 0,
     }),
-    [result?.data, result?.count],
+    [result?.data, result?.count, isTriggered],
   );
 
   return (
@@ -129,7 +131,7 @@ export const InformationRequestTable = ({
         loading={isLoading || isFetching}
         isError={hasDocsError}
         columns={renderColumnsInfoRequest()}
-        data={infoRequest}
+        data={infoRequest ?? []}
         pagination={{
           total: infoRequestTotal,
           pageSize: pageSizeInfoReq,

@@ -44,9 +44,6 @@ export class ReportController {
     @Query(GetDocumentsReportIntPipe) dto: GetUploadedReportDto,
   ): Promise<PaginatedResponse<DocumentHistory>> {
     const response = new PaginatedResponse<DocumentHistory>();
-
-    if(!!dto.from || !!dto.uploader)
-    {
       response.count = await this.reportRepository.getUploadedCountReport({
         uploader: dto.uploader,
         from: dto.from,
@@ -60,9 +57,6 @@ export class ReportController {
         take: dto.take,
       });
       return response;
-    }
-    else
-    return response;
   }
 
   @Get('/uploaded/download')
@@ -94,8 +88,6 @@ export class ReportController {
     @Query(GetDocumentsReportIntPipe) dto: GetInformationRequestReportDto,
   ): Promise<PaginatedResponse<InformationRequestReport>> {
     const response = new PaginatedResponse<InformationRequestReport>();
-
-    if(!!dto.from || !!dto.encoder) {
       response.count =
         await this.reportRepository.getInformationRequestCountReport({
           encoder: dto.encoder,
@@ -106,10 +98,6 @@ export class ReportController {
         dto,
       );
       return response;
-    }
-    else
-      return response;
-
   }
 
   @Get('/information-request/download')
@@ -142,7 +130,6 @@ export class ReportController {
     @Query(GetDocumentsReportIntPipe) dto: GetQualityCheckReportDto,
   ): Promise<PaginatedResponse<QualityCheckReport>> {
     const response = new PaginatedResponse<QualityCheckReport>();
-    if(!!dto.from || !!dto.checker) {
       response.count = await this.reportRepository.getQualityCheckCountReport({
         checker: dto.checker,
         from: dto.from,
@@ -150,8 +137,6 @@ export class ReportController {
       });
       response.data = await this.reportRepository.getQualityCheckReport(dto);
       return response;
-    }
-    else return response;
   }
 
   @Get('/quality-check/download')
@@ -183,7 +168,6 @@ export class ReportController {
     @Query(GetDocumentsReportIntPipe) dto: GetApprovalReportDto,
   ): Promise<PaginatedResponse<ApprovalReport>> {
     const response = new PaginatedResponse<ApprovalReport>();
-    if(!!dto.from || !!dto.approver) {
       response.count = await this.reportRepository.getApprovalCountReport({
         approver: dto.approver,
         from: dto.from,
@@ -191,8 +175,6 @@ export class ReportController {
       });
       response.data = await this.reportRepository.getApprovalReport(dto);
       return response;
-    }
-    else return response;
   }
 
   @Get('/approval/download')
@@ -224,8 +206,6 @@ export class ReportController {
     @Query(GetDocumentsReportIntPipe) dto: GetImportReportDto,
   ): Promise<PaginatedResponse<ImportReport>> {
     const response = new PaginatedResponse<ImportReport>();
-
-    if(!!dto.from || !!dto.username) {
       response.count = await this.reportRepository.getImportCountReport({
         username: dto.username,
         from: dto.from,
@@ -233,7 +213,6 @@ export class ReportController {
       });
       response.data = await this.reportRepository.getImportReport(dto);
       return response;
-    } else return response;
   }
 
   @Get('/import/download')
@@ -265,7 +244,6 @@ export class ReportController {
     @Query(GetDocumentsReportIntPipe) dto: GetRISReportDto,
   ): Promise<PaginatedResponse<RISReport>> {
     const response = new PaginatedResponse<RISReport>();
-    if(!!dto.from || !!dto.scannerUsername) {
       response.count = await this.reportRepository.getRISCountReport({
         scannerUsername: dto.scannerUsername,
         nomenclature: dto.nomenclature,
@@ -275,8 +253,6 @@ export class ReportController {
       });
       response.data = await this.reportRepository.getRISReport(dto);
       return response;
-    }
-    else return response;
   }
 
   @Get('/ris/download')

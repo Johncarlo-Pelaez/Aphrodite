@@ -22,12 +22,14 @@ export interface UploadedTableProps {
   username?: string;
   from?: Date;
   to?: Date;
+  isTriggered?: boolean;
 }
 
 export const UploadedTable = ({
   username,
   from,
   to,
+  isTriggered,
 }: UploadedTableProps): ReactElement => {
   const [currentPageUploaded, setCurrentPageUploaded] = useState<number>(1);
   const [pageSizeUploaded, setPageSizeUploaded] = useState<number>(15);
@@ -108,8 +110,8 @@ export const UploadedTable = ({
   });
 
   const { uploaded, total } = useMemo(
-    () => ({ uploaded: result?.data ?? [], total: result?.count ?? 0 }),
-    [result?.data, result?.count],
+    () => ({ uploaded: !!isTriggered ? result?.data : [], total: result?.count ?? 0 }),
+    [result?.data, result?.count, isTriggered],
   );
 
   return (
@@ -128,7 +130,7 @@ export const UploadedTable = ({
         loading={isLoading || isFetching}
         isError={hasDocsError}
         columns={renderColumnsUpload()}
-        data={uploaded}
+        data={uploaded ?? []}
         pagination={{
           total: total,
           pageSize: pageSizeUploaded,

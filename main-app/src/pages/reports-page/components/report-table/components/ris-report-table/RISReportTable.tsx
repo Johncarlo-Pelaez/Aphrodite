@@ -27,6 +27,7 @@ export interface RISReportTableProps {
   username?: string;
   from?: Date;
   to?: Date;
+  isTriggered?: boolean;
 }
 
 export interface GetIndexesResult {
@@ -37,6 +38,7 @@ export const RISReportTable = ({
   username,
   from,
   to,
+  isTriggered
 }: RISReportTableProps): ReactElement => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(15);
@@ -141,7 +143,7 @@ export const RISReportTable = ({
 
   const { ris, risTotal, risIndexes } = useMemo(
     () => ({
-      ris: result?.data ?? [],
+      ris: !!isTriggered ? result?.data : [],
       risTotal: result?.count ?? 0,
       risIndexes: !!result?.data
         ? result.data.map(({ indexes }) => {
@@ -153,7 +155,7 @@ export const RISReportTable = ({
           })
         : undefined,
     }),
-    [result?.data, result?.count],
+    [result?.data, result?.count, isTriggered],
   );
 
   useEffect(
@@ -219,7 +221,7 @@ export const RISReportTable = ({
         loading={isLoading || isFetching}
         isError={hasDocsError}
         columns={renderColumnsRIS()}
-        data={ris}
+        data={ris ?? []}
         pagination={{
           total: risTotal,
           pageSize,
