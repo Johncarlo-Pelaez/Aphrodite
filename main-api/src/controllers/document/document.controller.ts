@@ -87,16 +87,19 @@ export class DocumentController {
       currentUserLogIn,
     }
 
-    response.count = await this.documentRepository.count(documentsDto);
     response.data = await this.documentRepository.getDocuments(documentsDto);
+    const documentData = response.data;
 
-    if(currentUserRole === Role.REVIEWER)
-    {
-      const reviewerDocuments = response.data.filter(i => i.userUsername === currentUserLogIn || i.status.includes(DocumentStatus.DISAPPROVED));
+    if(currentUserRole === Role.REVIEWER) {
+      const reviewerDocuments = documentData.filter(i => i.userUsername === currentUserLogIn || i.status.includes(DocumentStatus.DISAPPROVED));
       response.data = reviewerDocuments;
       response.count = reviewerDocuments.length;
     }
-
+    else
+    {
+      response.data = documentData;
+      response.count = documentData.length;
+    }
     return response;
   }
 
