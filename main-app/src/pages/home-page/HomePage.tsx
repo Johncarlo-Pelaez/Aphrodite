@@ -286,6 +286,8 @@ export const HomePage = (): ReactElement => {
           dateTo,
           statuses: documentStatusFilter,
           username: selectedUserFilter?.username,
+          selectedOperation: selectedOperation,
+          selectedStatus: selectedStatus,
         }}
         setSelectedDocuments={setSelectedDocuments}
         onDoubleClickRow={handleOpen}

@@ -20,6 +20,8 @@ import {
   generateOperationText,
   generateStatusText,
 } from './DocumentTable.utils';
+import { OperationOption } from '../operation-dropdown';
+import { StatusOption } from '../status-dropdown';
 
 const DEFAULT_SORT_ORDER: SorterResult = {
   field: 'modifiedDate',
@@ -32,6 +34,8 @@ export interface DataFilterProps {
   dateFrom?: Date;
   dateTo?: Date;
   username?: string;
+  selectedOperation: OperationOption;
+  selectedStatus: StatusOption
 }
 
 export interface DocumentsTableProps {
@@ -56,7 +60,14 @@ export const DocumentsTable = forwardRef(
     );
     const selectedDocumentKeys = selectedDocuments.map((d) => d.id);
     const searchKey = dataFilters?.searchKey ?? '';
-    const statuses = dataFilters?.statuses ?? [];
+    let statuses = dataFilters?.statuses ?? [];
+
+    if(dataFilters?.selectedOperation === OperationOption.ALL && dataFilters?.selectedStatus === StatusOption.FAILED)
+    {
+      statuses = [...statuses, DocumentStatus.CANCELLED]
+      statuses = Array.from(new Set(statuses));
+    }
+
     const dateFrom = dataFilters?.dateFrom;
     const dateTo = dataFilters?.dateTo;
     const username = dataFilters?.username;
