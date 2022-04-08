@@ -129,24 +129,6 @@ export class DocumentRepository {
               },
               ...whereModifiedDate,
             },
-            {
-              ...whereDocumentType,
-              ...whereStatusIn,
-              ...whereModifiedDate,
-              user: {
-                firstName: ILike(`%${search}%`),
-                ...whereUsername,
-              },
-            },
-            {
-              ...whereDocumentType,
-              ...whereStatusIn,
-              ...whereModifiedDate,
-              user: {
-                lastName: ILike(`%${search}%`),
-                ...whereUsername,
-              },
-            },
           ],
           order: { modifiedDate: 'DESC' },
           skip: param.skip,
@@ -266,6 +248,7 @@ export class DocumentRepository {
               ...whereModifiedDate,
             },
             {
+              documentType: ILike(`%${search}%`),
               userUsername: currentUserLogIn,
               ...whereDocumentType,
               ...whereStatusIn,
@@ -281,44 +264,35 @@ export class DocumentRepository {
           documentName: ILike(`%${search}%`),
           ...whereDocumentType,
           ...whereStatusIn,
+          ...whereModifiedDate,
           user: {
             ...whereUsername,
           },
-          ...whereModifiedDate,
         };
 
         let secondCondition: CountFilterProp = {
-          user: {
-            firstName: ILike(`%${search}%`),
-            ...whereUsername,
-          },
+          documentType: ILike(`%${search}%`),
           ...whereDocumentType,
           ...whereStatusIn,
           ...whereModifiedDate,
-        };
-
-        let thirdCondition: CountFilterProp = {
           user: {
-            lastName: ILike(`%${search}%`),
             ...whereUsername,
           },
-          ...whereDocumentType,
-          ...whereStatusIn,
-          ...whereModifiedDate,
         };
 
-        countFilters.push(firstCondtion, secondCondition, thirdCondition);
-        let docCount: Document[] = [];
-        docCount = await this.manager.find(Document, {
+        countFilters.push(firstCondtion, secondCondition,
+        );
+        let documentCount: Document[] = [];
+        documentCount = await this.manager.find(Document, {
           relations: ['user'],
           where: countFilters,
         });
 
         if(currentUserRole === Role.REVIEWER) {
-          const data = docCount.filter(i => i.userUsername === currentUserLogIn || i.status.includes(DocumentStatus.DISAPPROVED));
+          const data = documentCount.filter(i => i.userUsername === currentUserLogIn || i.status.includes(DocumentStatus.DISAPPROVED));
           document = data.length;
         }
-        else document = docCount.length;
+        else document = documentCount.length;
         break;
     }
 

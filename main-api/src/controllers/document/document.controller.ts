@@ -92,8 +92,9 @@ export class DocumentController {
 
     if(currentUserRole === Role.REVIEWER)
     {
-      response.data = response.data.filter(i => i.userUsername === currentUserLogIn || i.status.includes(DocumentStatus.DISAPPROVED));
-      response.count = response.data.length;
+      const reviewerDocuments = response.data.filter(i => i.userUsername === currentUserLogIn || i.status.includes(DocumentStatus.DISAPPROVED));
+      response.data = reviewerDocuments;
+      response.count = reviewerDocuments.length;
     }
 
     return response;
