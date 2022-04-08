@@ -136,14 +136,19 @@ export const DocumentsTable = forwardRef(
             document.status === DocumentStatus.RETRYING ||
             document.status === DocumentStatus.CANCELLED
           ) {
-            const statuses = document.documentHistories.map(
+            let statuses = document.documentHistories.map(
               (dh) => dh.documentStatus,
             );
+            statuses = statuses.filter(status => status);
             const prevStatusIndex = statuses.indexOf(document.status) - 1;
             if (prevStatusIndex < statuses.length) {
               const prevStatus = statuses[prevStatusIndex];
-              return generateOperationText(prevStatus);
-            } else return '';
+              if(!!prevStatus && !!prevStatus.length) {
+                return generateOperationText(prevStatus);
+              }
+              else
+                return generateOperationText(document.status);
+            }
           } else return generateOperationText(document.status);
         },
       },

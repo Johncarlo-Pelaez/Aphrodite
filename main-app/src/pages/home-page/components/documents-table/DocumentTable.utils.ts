@@ -1,27 +1,34 @@
 import { DocumentStatus } from 'core/enum';
 
 export const generateOperationText = (status: DocumentStatus): string => {
-  const arrStatus = status.split('_');
-  if (!!arrStatus?.length) {
-    const operation = arrStatus[0];
-    switch (operation) {
-      case 'INDEXING':
-        return 'Information Request';
-      case 'ENCODING':
-        return 'Manual Encoding';
-      case 'CHECKING':
-      case 'APPROVED':
-      case 'DISAPPROVED':
-        return 'Quality Checking';
-      case 'MIGRATE':
-        return 'Document Import';
-      case 'UPLOADED':
-        return 'Upload Document';
-      case 'QR':
-        return 'QR code/ Barcode Scanning';
+  if(!!status)
+  {
+    const arrStatus = status.split('_');
+    if(!!arrStatus?.length) {
+      const operation = arrStatus[0];
+      switch(operation) {
+        case 'INDEXING':
+          return 'Information Request';
+        case 'ENCODING':
+          return 'Manual Encoding';
+        case 'CHECKING':
+        case 'APPROVED':
+        case 'DISAPPROVED':
+          return 'Quality Checking';
+        case 'MIGRATE':
+          return 'Document Import';
+        case 'UPLOADED':
+          return 'Upload Document';
+        case 'QR':
+          return 'QR code/ Barcode Scanning';
+        default:
+          return '';
+      }
     }
+    else return '';
   }
-  return '';
+  else return '';
+
 };
 
 export const generateStatusText = (status: DocumentStatus): string => {
