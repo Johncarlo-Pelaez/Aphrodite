@@ -1,8 +1,6 @@
 import { DocumentStatus } from 'core/enum';
 
 export const generateOperationText = (status: DocumentStatus): string => {
-  if(!!status)
-  {
     const arrStatus = status.split('_');
     if(!!arrStatus?.length) {
       const operation = arrStatus[0];
@@ -24,11 +22,8 @@ export const generateOperationText = (status: DocumentStatus): string => {
         default:
           return '';
       }
-    }
-    else return '';
   }
   else return '';
-
 };
 
 export const generateStatusText = (status: DocumentStatus): string => {
