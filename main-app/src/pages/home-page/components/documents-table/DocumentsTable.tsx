@@ -132,6 +132,8 @@ export const DocumentsTable = forwardRef(
         title: 'Operation',
         dataIndex: 'status',
         render: (document: Document) => {
+          let theStatus: DocumentStatus | undefined;
+
           if (
             document.status === DocumentStatus.RETRYING ||
             document.status === DocumentStatus.CANCELLED
@@ -139,12 +141,18 @@ export const DocumentsTable = forwardRef(
             const statuses = document.documentHistories.map(
               (dh) => dh.documentStatus,
             );
-            const prevStatusIndex = statuses.indexOf(document.status) - 1;
-            if (prevStatusIndex < statuses.length) {
-              const prevStatus = statuses[prevStatusIndex];
-                return generateOperationText(prevStatus);
-              }
-          } else return generateOperationText(document.status);
+            const prevStatus = statuses[statuses.length - 2];
+
+            if (prevStatus) {
+              theStatus = prevStatus;
+            }
+          }
+
+          if (!theStatus) {
+            theStatus = document.status;
+          }
+          console.log(theStatus);
+          return generateOperationText(theStatus);
         },
       },
       {
