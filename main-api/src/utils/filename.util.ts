@@ -29,6 +29,6 @@ export class FilenameUtil {
   }
 
   removeCharsInvalid (variable: string): string {
-    return variable?.replace(/[\/:*?"&lt;>|",]/g, '_');
+    return variable?.replace(/[/\\:*?"&<>;,|]/g, '_');
   }
 }

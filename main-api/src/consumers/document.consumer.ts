@@ -428,11 +428,15 @@ export class DocumentConsumer {
         document.documentDate
           ? this.datesUtil.formatDateString(document.documentDate, 'MMDDYYYY')
           : empty
-      }${path.extname(document.documentName)}`;
+        }${path.extname(document.documentName)}`;
+
+      uploadParams.FileName = this.filenameUtil.removeCharsInvalid(uploadParams.FileName);
     } else {
       uploadParams.FileName = `${this.filenameUtil.removeNotAllowedChar(
         documentType?.Nomenclature?.replace(/\/|\\|\|/g, '_'),
       )}${path.extname(document.documentName)}`;
+
+      uploadParams.FileName = this.filenameUtil.removeCharsInvalid(uploadParams.FileName);
     }
 
     const { B64Attachment, ...forStrUploadParams } = uploadParams;
