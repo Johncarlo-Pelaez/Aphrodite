@@ -34,8 +34,10 @@ export class DocumentProducer {
     return job;
   }
 
-  async cancel(documentId: number): Promise<void> {
-    const job = await this.documentQueue.getJob(documentId);
-    if (job) job.remove();
+  async cancel (documentIds: number[]): Promise<void> {
+    for await(const documentId of documentIds) {
+      const job = await this.documentQueue.getJob(documentId);
+      if(job) job.remove();
+    }
   }
 }

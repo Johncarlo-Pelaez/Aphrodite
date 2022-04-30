@@ -272,10 +272,10 @@ export class DocumentService {
     }
   }
 
-  async cancelDocuments(data: CancelDocuments): Promise<void> {
+  async cancelDocuments (data: CancelDocuments): Promise<void> {
+    await this.documentProducer.cancel(data.documentIds);
     for await (const documentId of data.documentIds) {
       try {
-        await this.documentProducer.cancel(documentId);
         await this.documentRepository.updateToCancelled({
           documentId,
           processAt: this.datesUtil.getDateNow(),
