@@ -20,6 +20,7 @@ import { SpringCMService } from 'src/spring-cm-service';
 import { FileStorageService } from 'src/file-storage-service';
 import { DocumentStatus } from 'src/entities';
 import { DOCUMENT_QUEUE, MIGRATE_JOB } from './document.constants';
+import { AxiosResponse } from 'axios';
 
 @Processor(DOCUMENT_QUEUE)
 export class DocumentConsumer {
@@ -448,18 +449,22 @@ export class DocumentConsumer {
       processAt: this.datesUtil.getDateNow(),
     });
 
-    let uploadDocToSpringResult;
+    let uploadDocToSpringResult:AxiosResponse;
     try {
       uploadDocToSpringResult = await this.springCMService.uploadDocToSpring(
         uploadParams,
+        document.documentName,
       );
-    } catch (err) {
+    } catch(err) {
+      const requestIncomingMessage = {
+        StatusCode: +err.request?.res.statusCode,
+        StatusMessage: err.request?.res.statusMessage,
+      }
+
       await this.documentRepository.failMigrate({
         documentId,
         springcmReqParams: strUploadParams,
-        springcmResponse: !!uploadDocToSpringResult
-          ? JSON.stringify(uploadDocToSpringResult)
-          : null,
+        springcmResponse: JSON.stringify(requestIncomingMessage),
         failedAt: this.datesUtil.getDateNow(),
         errorMessage: err,
       });
@@ -467,19 +472,24 @@ export class DocumentConsumer {
       throw err;
     }
 
-    const { data: response }: any = uploadDocToSpringResult;
+    const { data: springResponse }: any = uploadDocToSpringResult;
+    const { request: clientRequest }: any = uploadDocToSpringResult;
 
-    if (
-      +response?.SpringCMAccessToken?.Code === 200 &&
-      +response?.SpringCMGetFolder?.Code === 200 &&
-      +response?.SpringCMUploadResponse?.Code === 201 &&
-      !!response?.SalesForce?.length &&
-      response?.SalesForce[0]?.created === 'true'
-    ) {
+    const clientResponse = {
+      StatusCode: +clientRequest?.res.statusCode,
+      StatusMessage: clientRequest?.res.statusMessage,
+    }
+
+    if(
+      +springResponse?.SpringCMAccessToken?.Code === 200 &&
+      +springResponse?.SpringCMGetFolder?.Code === 200 &&
+      +springResponse?.SpringCMUploadResponse?.Code === 201 &&
+      !!springResponse?.SalesForce?.length &&
+      springResponse?.SalesForce[0]?.created === 'true') {
       await this.documentRepository.migrateDocument({
         documentId,
         springcmReqParams: strUploadParams,
-        springcmResponse: JSON.stringify(response),
+        springcmResponse: JSON.stringify(springResponse),
         migratedAt: this.datesUtil.getDateNow(),
       });
       await this.fileStorageService.deleteFile(sysSrcFileName);
@@ -487,16 +497,94 @@ export class DocumentConsumer {
         documentId,
         deletedAt: this.datesUtil.getDateNow(),
       });
-    } else {
-      const strResponse = JSON.stringify(response);
+    }
+    else if(+clientRequest?.res.statusCode === 200 && clientRequest?.res.statusMessage.toLocaleLowerCase() === 'ok') {
+      await this.documentRepository.migrateDocument({
+        documentId,
+        springcmReqParams: strUploadParams,
+        springcmResponse: JSON.stringify(clientResponse),
+        migratedAt: this.datesUtil.getDateNow(),
+      });
+      await this.fileStorageService.deleteFile(sysSrcFileName);
+      await this.documentRepository.deleteFile({
+        documentId,
+        deletedAt: this.datesUtil.getDateNow(),
+      });
+    }
+    else {
       await this.documentRepository.failMigrate({
         documentId,
         springcmReqParams: strUploadParams,
-        springcmResponse: strResponse,
-        errorMessage: strResponse,
+        springcmResponse: JSON.stringify(springResponse),
+        errorMessage: `Client Request Error: ${JSON.stringify(clientResponse)}`,
         failedAt: this.datesUtil.getDateNow(),
       });
-      throw new Error(response?.faultInfo?.message);
+      throw new Error(springResponse?.faultInfo?.message);
     }
+
+        // else if(+clientRequest?.res.statusCode >= 500 && +clientRequest?.res.statusCode <= 599)
+    // {
+    //   await this.documentRepository.failMigrate({
+    //     documentId,
+    //     springcmReqParams: strUploadParams,
+    //     springcmResponse: JSON.stringify(springResponse),
+    //     errorMessage: `Client Request Error: ${JSON.stringify(clientResponse)}`,
+    //     failedAt: this.datesUtil.getDateNow(),
+    //   });
+    //   throw new Error(springResponse?.faultInfo?.message);
+    //   }
+    // const str = `${JSON.parse(JSON.stringify(response.statusCode))}, ${JSON.parse(JSON.stringify(response.statusMessage))}`;
+    // if(+response?.statusCode === 200) {
+    //   await this.documentRepository.migrateDocument({
+    //     documentId,
+    //     springcmReqParams: strUploadParams,
+    //     springcmResponse: JSON.stringify(str),
+    //     migratedAt: this.datesUtil.getDateNow(),
+    //   });
+    //   await this.fileStorageService.deleteFile(sysSrcFileName);
+    //   await this.documentRepository.deleteFile({
+    //     documentId,
+    //     deletedAt: this.datesUtil.getDateNow(),
+    //   });
+    // } else {
+    //   const strResponse = JSON.stringify(response);
+    //   await this.documentRepository.failMigrate({
+    //     documentId,
+    //     springcmReqParams: strUploadParams,
+    //     springcmResponse: strResponse,
+    //     errorMessage: strResponse,
+    //     failedAt: this.datesUtil.getDateNow(),
+    //   });
+    //   throw new Error(response?.faultInfo?.message);
+    // }
+    // if (
+    //   +response?.SpringCMAccessToken?.Code === 200 &&
+    //   +response?.SpringCMGetFolder?.Code === 200 &&
+    //   +response?.SpringCMUploadResponse?.Code === 201 &&
+    //   !!response?.SalesForce?.length &&
+    //   response?.SalesForce[0]?.created === 'true'
+    // ) {
+    //   await this.documentRepository.migrateDocument({
+    //     documentId,
+    //     springcmReqParams: strUploadParams,
+    //     springcmResponse: JSON.stringify(response),
+    //     migratedAt: this.datesUtil.getDateNow(),
+    //   });
+    //   await this.fileStorageService.deleteFile(sysSrcFileName);
+    //   await this.documentRepository.deleteFile({
+    //     documentId,
+    //     deletedAt: this.datesUtil.getDateNow(),
+    //   });
+    // } else {
+    //   const strResponse = JSON.stringify(response);
+    //   await this.documentRepository.failMigrate({
+    //     documentId,
+    //     springcmReqParams: strUploadParams,
+    //     springcmResponse: strResponse,
+    //     errorMessage: strResponse,
+    //     failedAt: this.datesUtil.getDateNow(),
+    //   });
+    //   throw new Error(response?.faultInfo?.message);
+    // }
   }
 }
