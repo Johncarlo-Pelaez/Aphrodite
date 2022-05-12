@@ -20,6 +20,8 @@
   .pdfViewerWrapper {
     width: 100%;
     height: 73vh;
+    position: relative;
+    overflow: hidden;
   }
 
   .indexesCardWrapper {
