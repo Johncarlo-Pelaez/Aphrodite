@@ -241,14 +241,14 @@ export class DocumentConsumer {
         failedAt: this.datesUtil.getDateNow(),
       });
     }
-
-    await this.documentRepository.doneIndexing({
-      documentId,
-      documentType: JSON.stringify(getDocTypeResult),
-      docTypeReqParams: JSON.stringify(getDocTypeReqParams),
-      indexedAt: this.datesUtil.getDateNow(),
-    });
-
+    else {
+      await this.documentRepository.doneIndexing({
+        documentId,
+        documentType: JSON.stringify(getDocTypeResult),
+        docTypeReqParams: JSON.stringify(getDocTypeReqParams),
+        indexedAt: this.datesUtil.getDateNow(),
+      });
+    }
     return documentType;
   }
 
@@ -293,18 +293,6 @@ export class DocumentConsumer {
         ? getContractDetailsResult.response[0].items[0]
         : undefined;
 
-    if (!contractDetail) {
-      await this.documentRepository.failIndexing({
-        documentId,
-        contractDetailsReqParams: JSON.stringify(getContractDetailsReqParams),
-        salesforceResponse: getContractDetailsResult
-          ? JSON.stringify(getContractDetailsResult)
-          : null,
-        errorMessage: 'Document details is empty.',
-        failedAt: this.datesUtil.getDateNow(),
-      });
-    }
-
     const documentType = {
       Nomenclature: nomenclature,
       DocumentGroup: documentGroup,
@@ -321,20 +309,31 @@ export class DocumentConsumer {
       CopyType: '',
     };
 
-    const getDocTypeReqResult: GetDocumentTypeResult = {
-      response: [documentType],
-    };
+    if (!contractDetail) {
+      await this.documentRepository.failIndexing({
+        documentId,
+        contractDetailsReqParams: JSON.stringify(getContractDetailsReqParams),
+        salesforceResponse: getContractDetailsResult
+          ? JSON.stringify(getContractDetailsResult)
+          : null,
+        errorMessage: 'Document details is empty.',
+        failedAt: this.datesUtil.getDateNow(),
+      });
+    } else {
+      const getDocTypeReqResult: GetDocumentTypeResult = {
+        response: [documentType],
+      };
 
-    await this.documentRepository.doneIndexing({
-      documentId,
-      documentType: contractDetail
-        ? JSON.stringify(getDocTypeReqResult)
-        : undefined,
-      contractDetails: JSON.stringify(getContractDetailsResult),
-      contractDetailsReqParams: JSON.stringify(getContractDetailsReqParams),
-      indexedAt: this.datesUtil.getDateNow(),
-    });
-
+      await this.documentRepository.doneIndexing({
+        documentId,
+        documentType: contractDetail
+          ? JSON.stringify(getDocTypeReqResult)
+          : undefined,
+        contractDetails: JSON.stringify(getContractDetailsResult),
+        contractDetailsReqParams: JSON.stringify(getContractDetailsReqParams),
+        indexedAt: this.datesUtil.getDateNow(),
+      });
+    }
     return contractDetail ? documentType : undefined;
   }
 
