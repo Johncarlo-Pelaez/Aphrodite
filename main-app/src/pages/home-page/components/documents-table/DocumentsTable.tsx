@@ -166,8 +166,6 @@ export const DocumentsTable = forwardRef(
         if (!theStatus) {
           theStatus = document.status;
         }
-        // To Do
-        console.log(theStatus);
         return generateOperationText(theStatus);
       },
     };
