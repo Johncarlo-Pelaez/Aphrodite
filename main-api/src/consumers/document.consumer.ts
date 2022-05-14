@@ -451,13 +451,15 @@ export class DocumentConsumer {
       uploadDocToSpringResult = await this.springCMService.uploadDocToSpring(
         uploadParams,
       );
-    } catch (err) {
+    } catch(err) {
+      const requestIncomingMessage = {
+        StatusCode: +err.request?.res.statusCode,
+        StatusMessage: err.request?.res.statusMessage,
+      }
       await this.documentRepository.failMigrate({
         documentId,
         springcmReqParams: strUploadParams,
-        springcmResponse: !!uploadDocToSpringResult
-          ? JSON.stringify(uploadDocToSpringResult)
-          : null,
+        springcmResponse: JSON.stringify(requestIncomingMessage),
         failedAt: this.datesUtil.getDateNow(),
         errorMessage: err,
       });

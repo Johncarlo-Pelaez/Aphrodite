@@ -17,6 +17,13 @@ export class SpringCMService {
   async uploadDocToSpring(
     params: UploadDocToSpringParams,
   ): Promise<AxiosResponse> {
+    this.request.interceptors.response.use(res => {
+      if(res?.data)
+        return res;
+    }, error => {
+      return Promise.reject(error);
+    })
+
     return await this.request.post(
       `${this.appConfigService.uploadToSpringCM}`,
       { ...params },
