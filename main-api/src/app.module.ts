@@ -55,6 +55,7 @@ const logger = new Logger('AppModule');
         options: {
           encrypt: false,
         },
+        requestTimeout: 5 * 60 * 1000,
       }),
       inject: [AppConfigService],
       connectionFactory: async (options) => {
