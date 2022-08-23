@@ -191,6 +191,8 @@ export class DocumentController {
     @Body(ValidationPipe) dto: EncodeDocQRBarCodeDto,
     @GetAzureUsername() username: string,
   ): Promise<void> {
+    await this.documentsService.checkBarcodeIfExist(documentId, dto.qrBarCode);
+
     await this.documentsService.encodeDocQRBarcode({
       documentId,
       qrBarCode: dto.qrBarCode,

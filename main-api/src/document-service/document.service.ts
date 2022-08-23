@@ -56,12 +56,13 @@ export class DocumentService {
       qrCode = filename;
     }
 
-    if (filename.match(/_/g)) {
-      qrCode = filename.replace(/_/g, '|');
-    }
-
     if (filename.length === 18) {
       qrCode = filename.substr(0, 15);
+    }
+
+    if (filename.match(/_/g)) {
+      qrCode = null;
+      filename.replace(/_/g, '|');
     }
 
     const dupDoc = await this.documentRepository.getDocumentByQRCode(qrCode);
@@ -112,12 +113,13 @@ export class DocumentService {
       qrCode = filename;
     }
 
-    if (filename.match(/_/g)) {
-      qrCode = filename.replace(/_/g, '|');
-    }
-
     if (filename.length >= 18) {
       qrCode = filename.substr(0, 15);
+    }
+
+    if (filename.match(/_/g)) {
+      qrCode = null;
+      filename.replace(/_/g, '|');
     }
 
     const dupDoc = await this.documentRepository.getDocumentByQRCode(
@@ -214,6 +216,16 @@ export class DocumentService {
       encodedBy,
     });
     await this.documentProducer.migrate(document);
+  }
+
+  async checkBarcodeIfExist(documentId: number, qrCode: string): Promise<void> {
+    const barcode = await this.documentRepository.getDocumentByQRCode(qrCode, documentId);
+    if (
+      barcode &&
+      !!barcode &&
+      (!barcode?.isFileDeleted || barcode?.status === DocumentStatus.MIGRATE_DONE)
+    )
+    throw new ConflictException('QR code or Barcode already exist.');
   }
 
   async checkerApproveDoc(data: CheckerApproveDoc): Promise<void> {
