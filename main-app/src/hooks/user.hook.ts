@@ -10,7 +10,7 @@ import {
   updateUserApi,
   getCurrentUser,
   deleteUserApi,
-  removeApiHeaders,
+  // removeApiHeaders,
 } from 'apis';
 import {
   useQuery,
@@ -19,10 +19,12 @@ import {
   UseMutationResult,
   useQueryClient,
 } from 'react-query';
-import { useSetRecoilState } from 'recoil';
-import { isAccountTokenLoadedState } from 'states';
+// import { useSetRecoilState } from 'recoil';
+// import { isAccountTokenLoadedState } from 'states';
 import { User } from 'models';
-import { useEmailAllowed, useLoadAccountToken } from 'hooks/account.hook';
+import { useEmailAllowed,
+  //  useLoadAccountToken,
+    useSignOut } from 'hooks/account.hook';
 import { ApiError } from 'core/types';
 import { useState } from 'react';
 import { QueryKey, checkIfUnAuthorize } from 'utils';
@@ -112,16 +114,19 @@ export const useEmailExists = (): UseEmailExistsResult => {
 };
 
 export const useGetCurrentUser = (): UseQueryResult<User, ApiError> => {
-  const setIsLoaded = useSetRecoilState(isAccountTokenLoadedState);
+  const { signOut } = useSignOut();
+  // const setIsLoaded = useSetRecoilState(isAccountTokenLoadedState);
   const { isAllowed } = useEmailAllowed();
-  const { isLoaded } = useLoadAccountToken();
+  // const { isLoaded } = useLoadAccountToken();
   return useQuery<User, ApiError>(QueryKey.currentUser, getCurrentUser, {
     refetchInterval: 1000 * 30,
-    enabled: isAllowed && isLoaded,
-    onError: (error) => {
+    enabled: isAllowed,
+    // && isLoaded,
+    onError: async (error) => {
       if (checkIfUnAuthorize(error)) {
-        removeApiHeaders();
-        setIsLoaded(false);
+        await signOut();
+        // removeApiHeaders();
+        // setIsLoaded(false);
       }
     },
   });
