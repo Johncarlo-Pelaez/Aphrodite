@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import {
-  DatesUtil, FilenameUtil
+  DatesUtil, FilenameUtil, BarcodeUtil
 } from '.';
 
 @Module({
   providers: [
-    DatesUtil, FilenameUtil
+    DatesUtil, FilenameUtil, BarcodeUtil
   ],
-  exports: [DatesUtil, FilenameUtil],
+  exports: [DatesUtil, FilenameUtil, BarcodeUtil],
 })
 export class UtilsModule {}

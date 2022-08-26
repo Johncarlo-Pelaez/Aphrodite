@@ -7,7 +7,7 @@ import {
 import * as fs from 'fs';
 import * as pdfParse from 'pdf-parse';
 import { v4 as uuidv4 } from 'uuid';
-import { DatesUtil, FilenameUtil } from 'src/utils';
+import { DatesUtil, FilenameUtil, BarcodeUtil } from 'src/utils';
 import { FileStorageService } from 'src/file-storage-service';
 import { DocumentRepository, UserRepository } from 'src/repositories';
 import { EncodeValues } from 'src/repositories/document';
@@ -15,6 +15,7 @@ import { DocumentProducer } from 'src/producers';
 import { CreatedResponse } from 'src/core';
 import { Document, DocumentStatus, Role } from 'src/entities';
 import { MailService } from 'src/mail/';
+import { QRService } from 'src/qr-service';
 import {
   UploadDocument,
   ReplaceDocumentFile,
@@ -37,9 +38,11 @@ export class DocumentService {
     private readonly documentRepository: DocumentRepository,
     private readonly documentProducer: DocumentProducer,
     private readonly datesUtil: DatesUtil,
+    private readonly barcodeUtil: BarcodeUtil,
     private readonly filenameUtil: FilenameUtil,
     private readonly mailService: MailService,
     private readonly fileStorageService: FileStorageService,
+    private readonly qrService: QRService,
   ) {}
 
   async uploadDocument(data: UploadDocument): Promise<CreatedResponse> {
@@ -51,26 +54,16 @@ export class DocumentService {
       .getFilenameWithoutExtension(originalname)
       .replace(/\.$/, '');
     let qrCode: string;
+    const barcodeChecking = await this.readDocumentBarcode(buffer, fileFullPath);
+    
+    if (!!barcodeChecking) {
+      qrCode = this.barcodeUtil.transformBarcode(barcodeChecking);
+    } else
+      qrCode = this.barcodeUtil.transformBarcode(filename)
 
-    if (filename.match(/^ecr/i) || filename.match(/^ecp/i)) {
-      qrCode = filename;
-    }
+    const checkQrCode = await this.documentRepository.getDocumentByQRCode(qrCode);
 
-    if (filename.match(/_/g)) {
-      qrCode = filename.replace(/_/g, '|');
-    }
-
-    if (filename.length === 18) {
-      qrCode = filename.substr(0, 15);
-    }
-
-    const dupDoc = await this.documentRepository.getDocumentByQRCode(qrCode);
-
-    if (
-      qrCode &&
-      !!dupDoc &&
-      (!dupDoc?.isFileDeleted || dupDoc?.status === DocumentStatus.MIGRATE_DONE)
-    )
+    if (qrCode && !!checkQrCode && (!checkQrCode.isFileDeleted || checkQrCode.status === DocumentStatus.MIGRATE_DONE))
       throw new ConflictException('QR code or Barcode already exist.');
 
     await this.fileStorageService.createFile(fileFullPath, buffer);
@@ -94,6 +87,16 @@ export class DocumentService {
     return document;
   }
 
+  private async readDocumentBarcode(buffer: Buffer, filename: string): Promise<string> {
+    let barcode: string;
+    try {
+      barcode = await this.qrService.readPdfQrCode(buffer, filename);
+    } catch (err) {
+      this.logger.error(err);
+    }
+    return barcode;
+  }
+
   async replaceDocumentFile(data: ReplaceDocumentFile): Promise<void> {
     const currentDocument = await this.documentRepository.getDocument(
       data.documentId,
@@ -108,17 +111,7 @@ export class DocumentService {
       .replace(/\.$/, '');
     let qrCode: string;
 
-    if (filename.match(/^ecr/i) || filename.match(/^ecp/i)) {
-      qrCode = filename;
-    }
-
-    if (filename.match(/_/g)) {
-      qrCode = filename.replace(/_/g, '|');
-    }
-
-    if (filename.length >= 18) {
-      qrCode = filename.substr(0, 15);
-    }
+    qrCode = this.barcodeUtil.transformBarcode(filename);
 
     const dupDoc = await this.documentRepository.getDocumentByQRCode(
       qrCode,
@@ -206,6 +199,7 @@ export class DocumentService {
 
   async encodeDocQRBarcode(data: EncodeDocQRBarCode): Promise<void> {
     const { documentId, qrBarCode, encodedBy } = data;
+
     let document = new Document();
     document = await this.documentRepository.encodeQrBarcode({
       documentId,

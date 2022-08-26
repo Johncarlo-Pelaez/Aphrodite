@@ -2,7 +2,7 @@ import { Process, Processor } from '@nestjs/bull';
 import { ConflictException, Logger, NotFoundException } from '@nestjs/common';
 import { Job } from 'bull';
 import * as path from 'path';
-import { DatesUtil, FilenameUtil } from 'src/utils';
+import { BarcodeUtil, DatesUtil, FilenameUtil } from 'src/utils';
 import {
   DocumentRepository,
   NomenclatureWhitelistRepository,
@@ -32,6 +32,7 @@ export class DocumentConsumer {
     private readonly springCMService: SpringCMService,
     private readonly datesUtil: DatesUtil,
     private readonly filenameUtil: FilenameUtil,
+    private readonly barcodeUtil: BarcodeUtil,
     private readonly fileStorageService: FileStorageService,
   ) {}
 
@@ -128,69 +129,89 @@ export class DocumentConsumer {
       throw err;
     }
 
-    try {
-      qrCode = await this.qrService.readPdfQrCode(buffer, filename);
-    } catch (error) {
-      await this.documentRepository.failQrDocument({
+    // try {
+    //   qrCode = await this.qrService.readPdfQrCode(buffer, filename);
+    //   console.log(`qr code: ${qrCode}`);
+    // } catch (error) {
+    //   await this.documentRepository.failQrDocument({
+    //     documentId,
+    //     errorMessage: error,
+    //     failedAt: this.datesUtil.getDateNow(),
+    //   });
+    //   this.logger.error(error);
+    //   throw error;
+    // }
+
+    qrCode = await this.qrService.readPdfQrCode(buffer, filename);
+
+    if(!!qrCode)
+    {
+      qrCode = this.barcodeUtil.transformBarcode(qrCode);
+
+      const checkBarcodeExist = await this.documentRepository.getDocumentByQRCode(
+        qrCode,
         documentId,
-        errorMessage: error,
-        failedAt: this.datesUtil.getDateNow(),
-      });
-      this.logger.error(error);
-      throw error;
+      );
+
+      if (!!checkBarcodeExist) {
+        const note = 'QR code or Barcode is already exist.';
+        await this.documentRepository.failQrDocument({
+          documentId,
+          errorMessage: note,
+          failedAt: this.datesUtil.getDateNow(),
+        });
+        throw new ConflictException(note);
+      }
+      else {
+        await this.documentRepository.qrDocument({
+          documentId,
+          qrCode,
+          qrAt: this.datesUtil.getDateNow(),
+        });
+      }
+    } else {
+      const note = 'No QR Barcode in the document.';
+        await this.documentRepository.failQrDocument({
+          documentId,
+          errorMessage: note,
+          failedAt: this.datesUtil.getDateNow(),
+        });
     }
-
-    if (
-      typeof qrCode === 'string' &&
-      (qrCode.includes('exceptionCode') || qrCode.includes('Attention'))
-    ) {
-      const note = 'The license for QR Code module is invalid';
-      await this.documentRepository.failQrDocument({
-        documentId,
-        errorMessage: note,
-        failedAt: this.datesUtil.getDateNow(),
-      });
-      throw new Error(note);
-    }
-
-    if (qrCode?.match(/^ecr/i) || qrCode?.match(/^ecp/i)) {
-      qrCode = qrCode;
-    }
-
-    if (qrCode?.match(/_/g)) {
-      qrCode = qrCode.replace(/_/g, '|');
-    }
-
-    if (qrCode && qrCode.length >= 18) {
-      qrCode = qrCode.substr(0, 15);
-    }
-
-    const dupDoc = await this.documentRepository.getDocumentByQRCode(
-      qrCode,
-      documentId,
-    );
-
-    if (
-      qrCode &&
-      !!dupDoc &&
-      (!dupDoc?.isFileDeleted || dupDoc?.status === DocumentStatus.MIGRATE_DONE)
-    ) {
-      const note = 'QR code or Barcode is already exist.';
-      await this.documentRepository.failQrDocument({
-        documentId,
-        errorMessage: note,
-        failedAt: this.datesUtil.getDateNow(),
-      });
-      throw new ConflictException(note);
-    }
-
-    await this.documentRepository.qrDocument({
-      documentId,
-      qrCode,
-      qrAt: this.datesUtil.getDateNow(),
-    });
-
     return qrCode;
+
+    // if (
+    //   typeof qrCode === 'string' &&
+    //   (qrCode.includes('exceptionCode') || qrCode.includes('Attention'))
+    // ) {
+    //   const note = 'The license for QR Code module is invalid';
+    //   await this.documentRepository.failQrDocument({
+    //     documentId,
+    //     errorMessage: note,
+    //     failedAt: this.datesUtil.getDateNow(),
+    //   });
+    //   throw new Error(note);
+    // } 
+
+
+
+    // if (!!checkBarcodeExist) {
+    //   const note = 'QR code or Barcode is already exist.';
+    //   await this.documentRepository.failQrDocument({
+    //     documentId,
+    //     errorMessage: note,
+    //     failedAt: this.datesUtil.getDateNow(),
+    //   });
+    //   throw new ConflictException(note);
+    // }
+    // else
+    // {
+    //   await this.documentRepository.qrDocument({
+    //     documentId,
+    //     qrCode,
+    //     qrAt: this.datesUtil.getDateNow(),
+    //   });
+    // }
+    // return qrCode;
   }
 
   private async runGetDocumentType(
