@@ -54,16 +54,22 @@ export class DocumentService {
       .getFilenameWithoutExtension(originalname)
       .replace(/\.$/, '');
     let qrCode: string;
-    const barcodeChecking = await this.readDocumentBarcode(buffer, fileFullPath);
+    const filenameQrChecking = this.barcodeUtil.transformBarcode(filename);
     
-    if (!!barcodeChecking) {
-      qrCode = this.barcodeUtil.transformBarcode(barcodeChecking);
-    } else
-      qrCode = this.barcodeUtil.transformBarcode(filename)
+    if (filenameQrChecking)
+      qrCode = filenameQrChecking;
+    else
+    {
+      const docQrChecking = await this.readDocumentBarcode(buffer, fileFullPath);
+      if(docQrChecking)
+        qrCode = docQrChecking;
+      else
+        qrCode = '';
+    }
 
-    const checkQrCode = await this.documentRepository.getDocumentByQRCode(qrCode);
+    const isBarcodeExist = await this.documentRepository.getDocumentByQRCode(qrCode);
 
-    if (qrCode && !!checkQrCode && (!checkQrCode.isFileDeleted || checkQrCode.status === DocumentStatus.MIGRATE_DONE))
+    if (isBarcodeExist)
       throw new ConflictException('QR code or Barcode already exist.');
 
     await this.fileStorageService.createFile(fileFullPath, buffer);
@@ -113,16 +119,12 @@ export class DocumentService {
 
     qrCode = this.barcodeUtil.transformBarcode(filename);
 
-    const dupDoc = await this.documentRepository.getDocumentByQRCode(
+    const isBarcodeExist = await this.documentRepository.getDocumentByQRCode(
       qrCode,
       currentDocument.id,
     );
 
-    if (
-      qrCode &&
-      !!dupDoc &&
-      (!dupDoc?.isFileDeleted || dupDoc?.status === DocumentStatus.MIGRATE_DONE)
-    )
+    if (isBarcodeExist)
       throw new ConflictException('QR code or Barcode already exist.');
 
     if (await this.fileStorageService.checkIfFileExist(fileFullPath)) {
@@ -199,6 +201,11 @@ export class DocumentService {
 
   async encodeDocQRBarcode(data: EncodeDocQRBarCode): Promise<void> {
     const { documentId, qrBarCode, encodedBy } = data;
+
+    const isBarcodeExist = await this.documentRepository.getDocumentByQRCode(qrBarCode);
+
+    if (isBarcodeExist)
+      throw new ConflictException('QR code or Barcode already exist.');
 
     let document = new Document();
     document = await this.documentRepository.encodeQrBarcode({
