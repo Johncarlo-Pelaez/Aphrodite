@@ -164,7 +164,7 @@ export class DocumentRepository {
     if (exceptDocId) {
       let exceptDocQrExisted: Document;
       for (const exceptDocQr of await this.manager.find(Document, {
-        where: { qrCode, id: Not(exceptDocId) },
+        where: { qrCode, id: Not(exceptDocId), isFileDeleted: false },
       })) {
         if (qrCode === exceptDocQr.qrCode) {
           exceptDocQrExisted = exceptDocQr;
@@ -173,17 +173,19 @@ export class DocumentRepository {
       }
       return exceptDocQrExisted;
     }
-
-    let documentQrExisted: Document;
-    for (const existedQrCode of await this.manager.find(Document, {
-      where: { qrCode },
-    })) {
-      if (qrCode === existedQrCode.qrCode) {
-        documentQrExisted = existedQrCode;
-        break;
+    else 
+    {
+      let documentQrExisted: Document;
+      for (const existedQrCode of await this.manager.find(Document, {
+        where: { qrCode, isFileDeleted: false },
+      })) {
+        if (qrCode === existedQrCode.qrCode) {
+          documentQrExisted = existedQrCode;
+          break;
+        }
       }
+      return documentQrExisted;
     }
-    return documentQrExisted;
   }
 
   async count(param: GetDocumentsParam): Promise<number> {
