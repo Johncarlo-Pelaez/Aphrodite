@@ -54,17 +54,13 @@ export class DocumentService {
       .getFilenameWithoutExtension(originalname)
       .replace(/\.$/, '');
     let qrCode: string;
-    const filenameQrChecking = this.barcodeUtil.transformBarcode(filename);
-    
-    if (filenameQrChecking)
-      qrCode = filenameQrChecking;
+
+    if(this.barcodeUtil.isFilenameAsBarcode(filename))
+      qrCode = this.barcodeUtil.transformBarcode(filename);
     else
     {
-      const docQrChecking = await this.readDocumentBarcode(buffer, fileFullPath);
-      if(docQrChecking)
-        qrCode = docQrChecking;
-      else
-        qrCode = '';
+      const readPdfBarcode = await this.readDocumentBarcode(buffer, fileFullPath);
+      qrCode = this.barcodeUtil.transformBarcode(readPdfBarcode);
     }
 
     const isBarcodeExist = await this.documentRepository.getDocumentByQRCode(qrCode);
@@ -99,6 +95,7 @@ export class DocumentService {
       barcode = await this.qrService.readPdfQrCode(buffer, filename);
     } catch (err) {
       this.logger.error(err);
+      throw new Error(`${err}, try it again.`);
     }
     return barcode;
   }
