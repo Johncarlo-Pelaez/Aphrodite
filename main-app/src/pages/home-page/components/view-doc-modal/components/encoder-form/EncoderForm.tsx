@@ -212,8 +212,9 @@ export const EncoderForm = forwardRef(
 
     useImperativeHandle(ref, () => ({
       encodeDocument: () => {
-        handleSubmit(encodeDocumentSubmit)().catch(() => {
-          alert('Failed to encode.');
+        handleSubmit(encodeDocumentSubmit)().catch((error) => {
+          if(error)
+            alert(`Failed to Encode: ${error?.response?.statusText}`);
         });
       },
     }));
@@ -239,7 +240,7 @@ export const EncoderForm = forwardRef(
         <Alert variant="danger" show={hasEncodeDocError}>
           {!!error && checkIfForbidden(error)
             ? 'Permission denied or access not allowed, You may have no permission to encode documents.'
-            : 'Failed to encode.'}
+            : `${error?.response?.data.statusCode}: ${error?.response?.data.message}`}
         </Alert>
         <Card>
           <Card.Header className="text-center">BARCODE / QR CODE</Card.Header>
