@@ -5,4 +5,6 @@ export const P2 = 2;
 export const P3 = 3;
 export const P4 = 4;
 export const AlphaNumeric = /^[0-9a-zA-Z]+$/;
-export const AlphaNumericUndScore = /^[a-z\d\-_\s]+$/i;
+export const AlphaNumericUndScore = /^([a-zA-Z0-9_]+)$/i;
+export const QrEcr = /^ecr/i;
+export const QrEcp = /^ecp/i;
