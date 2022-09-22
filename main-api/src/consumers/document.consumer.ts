@@ -144,7 +144,7 @@ export class DocumentConsumer {
 
     qrCode = await this.qrService.readPdfQrCode(buffer, filename);
 
-    if(!!qrCode)
+    if(qrCode)
     {
       qrCode = this.barcodeUtil.transformBarcode(qrCode);
 
@@ -153,7 +153,7 @@ export class DocumentConsumer {
         documentId,
       );
 
-      if (!!checkBarcodeExist) {
+      if (checkBarcodeExist) {
         const note = 'QR code or Barcode is already exist.';
         await this.documentRepository.failQrDocument({
           documentId,
