@@ -1,4 +1,4 @@
-FROM node:fermium-alpine
+FROM node:gallium-alpine
 
 RUN apk --no-cache --update add imagemagick
 RUN mkdir -p /usr/src/files
