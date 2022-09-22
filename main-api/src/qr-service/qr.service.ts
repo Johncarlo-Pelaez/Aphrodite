@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import Dynamsoft from 'dbr/dbr';
+import * as Dynamsoft from 'dbr/dbr';
 import * as gm from 'gm';
 import * as pdfParse from 'pdf-parse';
 import { AppConfigService } from 'src/app-config';
@@ -8,11 +8,14 @@ const imageMagick = gm.subClass({ imageMagick: true });
 @Injectable()
 export class QRService {
   constructor(private readonly appConfigService: AppConfigService) {
-    Dynamsoft.BarcodeReader.productKeys = this.appConfigService.barcodeLicense;
+    Dynamsoft.DBR.BarcodeReader.productKeys = this.appConfigService.barcodeLicense;
+    Dynamsoft.DBR.BarcodeReader.handshakeCode = "200932-101212824";
+    Dynamsoft.DBR.BarcodeReader.organizationID = "200932";
   }
 
   async readImageQRCode(imageBuffer: Buffer): Promise<string | undefined> {
-    const reader = await Dynamsoft.BarcodeReader.createInstance();
+    console.log(process.version)
+    const reader = await Dynamsoft.DBR.BarcodeReader.createInstance();
     const results = await reader.decode(imageBuffer);
     reader.destroy();
     return !!results.length ? results[0].barcodeText : undefined;
