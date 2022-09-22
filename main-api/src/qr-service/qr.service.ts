@@ -9,8 +9,8 @@ const imageMagick = gm.subClass({ imageMagick: true });
 export class QRService {
   constructor(private readonly appConfigService: AppConfigService) {
     Dynamsoft.DBR.BarcodeReader.productKeys = this.appConfigService.barcodeLicense;
-    Dynamsoft.DBR.BarcodeReader.handshakeCode = "200932-101212824";
-    Dynamsoft.DBR.BarcodeReader.organizationID = "200932";
+    // Dynamsoft.DBR.BarcodeReader.handshakeCode = "200932-101212824";
+    // Dynamsoft.DBR.BarcodeReader.organizationID = "200932";
   }
 
   async readImageQRCode(imageBuffer: Buffer): Promise<string | undefined> {
