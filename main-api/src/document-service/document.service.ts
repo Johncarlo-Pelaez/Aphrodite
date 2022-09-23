@@ -63,10 +63,13 @@ export class DocumentService {
       qrCode = this.barcodeUtil.transformBarcode(readPdfBarcode);
     }
 
-    const isBarcodeExist = await this.documentRepository.getDocumentByQRCode(qrCode);
+    if(qrCode)
+    {
+      const isBarcodeExist = await this.documentRepository.getDocumentByQRCode(qrCode);
 
-    if (isBarcodeExist)
-      throw new ConflictException('QR code or Barcode already exist.');
+      if (isBarcodeExist)
+        throw new ConflictException('QR code or Barcode already exist.');
+    }
 
     await this.fileStorageService.createFile(fileFullPath, buffer);
 
