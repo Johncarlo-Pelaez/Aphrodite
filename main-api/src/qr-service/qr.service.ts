@@ -8,7 +8,7 @@ const imageMagick = gm.subClass({ imageMagick: true });
 @Injectable()
 export class QRService {
   constructor(private readonly appConfigService: AppConfigService) {
-    Dynamsoft.DBR.BarcodeReader.productKeys = this.appConfigService.barcodeLicense;
+    Dynamsoft.DBR.BarcodeReader.license = this.appConfigService.barcodeLicense;
     // Dynamsoft.DBR.BarcodeReader.handshakeCode = "200932-101212824";
     // Dynamsoft.DBR.BarcodeReader.organizationID = "200932";
   }
