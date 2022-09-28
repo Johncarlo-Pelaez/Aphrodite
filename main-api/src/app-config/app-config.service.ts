@@ -103,4 +103,12 @@ export class AppConfigService {
   get uploadToSpringCM(): string {
     return this.configService.get('END_POINT_UploadToSpringCM');
   }
+
+  get handShakeCode(): string {
+    return this.configService.get('HANDSHAKE_CODE');
+  }
+
+  get organizationId(): string {
+    return this.configService.get('ORGANIZATION_ID');
+  }
 }

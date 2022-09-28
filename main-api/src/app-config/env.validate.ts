@@ -57,6 +57,12 @@ class EnvironmentVariables {
   @IsOptional()
   @IsUrl()
   SALESFORCE_URL: string;
+
+  @IsString()
+  HANDSHAKE_CODE: string;
+
+  @IsString()
+  ORGANIZATION_ID: string;
 }
 
 export function validate(config: Record<string, unknown>) {
