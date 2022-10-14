@@ -2,6 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Environment } from './env.validate';
 
+/*
+ * configuration service for api environment
+ */
 @Injectable()
 export class AppConfigService {
   constructor(private readonly configService: ConfigService) {}

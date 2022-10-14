@@ -14,6 +14,7 @@ export class SpringCMService {
     });
   }
 
+  // Upload Document to SpringCM
   async uploadDocToSpring(
     params: UploadDocToSpringParams,
   ): Promise<AxiosResponse> {

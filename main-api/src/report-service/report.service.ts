@@ -30,6 +30,7 @@ export class ReportService {
     private readonly dateUtil: DatesUtil,
   ) {}
 
+  // Sales Force Response Parsing
   private parseDocumentType(
     salesforceStrRes?: string,
   ): DocumentType | undefined {
@@ -42,6 +43,7 @@ export class ReportService {
       : undefined;
   }
 
+  // Generate Uploaded Document Report to Excel
   async generateUploadedExcel(
     param: GenerateUploadedExcelParam,
   ): Promise<Buffer> {
@@ -83,7 +85,7 @@ export class ReportService {
       rows: data,
     });
   }
-
+  // Generate Information Request Documents Report to Excel
   async generateInformationRequestExcel(
     param: GenerateInformationRequestExcekParam,
   ): Promise<Buffer> {
@@ -147,6 +149,7 @@ export class ReportService {
     });
   }
 
+  // Generate Quality Check Documents Report to Excel
   async generateQualityCheckExcel(
     param: GenerateQualityCheckExcelParam,
   ): Promise<Buffer> {
@@ -210,6 +213,7 @@ export class ReportService {
     });
   }
 
+  // Generate Approval Documents Report to Excel
   async generateApprovalExcel(
     param: GenerateApprovalExcelParam,
   ): Promise<Buffer> {
@@ -273,6 +277,7 @@ export class ReportService {
     });
   }
 
+  // Generate Import Documents Report to Excel
   async generateImportExcel(param: GenerateImportExcelParam): Promise<Buffer> {
     const data = await this.reportRepository.getImportReport({
       username: param.username,
@@ -334,6 +339,7 @@ export class ReportService {
     });
   }
 
+  // Generate RIS Documents Report to Excel
   async generateRISReportExcel(param: GenerateRISReportParam): Promise<Buffer> {
     const data = await this.reportRepository.getRISReport({
       scannerUsername: param.scannerUsername,

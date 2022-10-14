@@ -21,6 +21,7 @@ export class FileStorageService {
       );
   }
 
+  // Write a file in documents storage location
   async createFile(
     pathWithFilename: string,
     fileBuffer: Buffer,
@@ -34,6 +35,7 @@ export class FileStorageService {
     } else throw new Error('Storage not found.');
   }
 
+  // Check if file is already exist
   async checkIfFileExist(pathWithFilename: string): Promise<boolean> {
     if (this.appConfigService.fileStorage === FileStorage.LOCAL) {
       const sourceFile = this.filenameUtil.buildFullPath(
@@ -53,6 +55,7 @@ export class FileStorageService {
     } else throw new Error('Storage not found.');
   }
 
+  // Get Document file in storage
   async getFile(pathWithFilename: string): Promise<Buffer> {
     if (this.appConfigService.fileStorage === FileStorage.LOCAL) {
       const sourceFile = this.filenameUtil.buildFullPath(
@@ -73,6 +76,7 @@ export class FileStorageService {
     } else throw new Error('Storage not found.');
   }
 
+  // Delete Document File in storage
   async deleteFile(pathWithFilename: string): Promise<void> {
     if (this.appConfigService.fileStorage === FileStorage.LOCAL) {
       const sourceFile = this.filenameUtil.buildFullPath(

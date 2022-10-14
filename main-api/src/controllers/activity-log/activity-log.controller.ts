@@ -19,6 +19,9 @@ import {
 } from './activity-log.dto';
 import { GetActivityLogsIntPipe } from './activity-log.pipe';
 
+/*
+ * API Activity logs
+ */
 @Auth(Role.ADMIN)
 @Controller('/activity-logs')
 export class ActivityLogController {
@@ -28,6 +31,8 @@ export class ActivityLogController {
     private readonly filenameUtil: FilenameUtil,
   ) {}
 
+
+  // Get activity logs
   @ApiPaginatedResponse(ActivityLog)
   @Get('/')
   async getActivityLogs(
@@ -43,6 +48,7 @@ export class ActivityLogController {
     return response;
   }
 
+  // Download Activity logs
   @Get('/download')
   async downloadActivityLogs(
     @Query() dto: DownloadActivityLogsDto,
@@ -87,6 +93,7 @@ export class ActivityLogController {
     res.send(excelFileBuffer);
   }
 
+  // Get activity log by id
   @ApiOkResponse({
     type: ActivityLog,
   })

@@ -45,6 +45,7 @@ export class DocumentService {
     private readonly qrService: QRService,
   ) {}
 
+  // Uploading of Documents 
   async uploadDocument(data: UploadDocument): Promise<CreatedResponse> {
     const dateRightNow = this.datesUtil.getDateNow();
     const { buffer, size, mimetype, originalname } = data.file;
@@ -92,6 +93,7 @@ export class DocumentService {
     return document;
   }
 
+  // Read Document Barcode
   private async readDocumentBarcode(buffer: Buffer, filename: string): Promise<string> {
     let barcode: string;
     try {
@@ -103,6 +105,7 @@ export class DocumentService {
     return barcode;
   }
 
+  // Replace Document File
   async replaceDocumentFile(data: ReplaceDocumentFile): Promise<void> {
     const currentDocument = await this.documentRepository.getDocument(
       data.documentId,
@@ -154,6 +157,7 @@ export class DocumentService {
     await this.documentProducer.migrate(document);
   }
 
+  // Get Document File
   async getDocumentFile(documentId: number): Promise<[Document, Buffer]> {
     const document = await this.documentRepository.getDocument(documentId);
     const fileFullPath = document.uuid;
@@ -170,6 +174,7 @@ export class DocumentService {
     return [document, buffer];
   }
 
+  // Manual Encode Document Details
   async encodeDocDetails(data: EncodeDocDetails): Promise<void> {
     const {
       documentId,
@@ -199,6 +204,7 @@ export class DocumentService {
     await this.documentProducer.migrate(document);
   }
 
+  // Manual Encode Document Barcode
   async encodeDocQRBarcode(data: EncodeDocQRBarCode): Promise<void> {
     const { documentId, qrBarCode, encodedBy } = data;
 
@@ -217,6 +223,7 @@ export class DocumentService {
     await this.documentProducer.migrate(document);
   }
 
+  // Checker Disapprove Document
   async checkerApproveDoc(data: CheckerApproveDoc): Promise<void> {
     const { documentId, documentDate, remarks, checkedBy } = data;
     let document = new Document();
@@ -230,6 +237,7 @@ export class DocumentService {
     await this.documentProducer.migrate(document);
   }
 
+  // Checker Disapprove Document
   async checkerDisapproveDoc(data: CheckerDisApproveDoc): Promise<void> {
     const { documentId, documentDate, remarks, checkedBy } = data;
     await this.documentRepository.checkerDisapproveDoc({
@@ -241,6 +249,7 @@ export class DocumentService {
     });
   }
 
+  // Approver Approve Document
   async approverApproveDoc(data: DocumentApprover): Promise<void> {
     const { documentId, approver } = data;
     let document = new Document();
@@ -252,6 +261,7 @@ export class DocumentService {
     await this.documentProducer.migrate(document);
   }
 
+  // Approver Disapprove Document
   async approverDisapproveDoc(data: DocumentApprover): Promise<void> {
     const { documentId, approver } = data;
     await this.documentRepository.approverDispproveDoc({
@@ -261,6 +271,7 @@ export class DocumentService {
     });
   }
 
+  // Retry Documents
   async retryDocuments(data: RetryDocuments): Promise<void> {
     let document = new Document();
     for await (const documentId of data.documentIds) {
@@ -273,6 +284,7 @@ export class DocumentService {
     }
   }
 
+  // Cancel Documents on process
   async cancelDocuments(data: CancelDocuments): Promise<void> {
     for await (const documentId of data.documentIds) {
       try {
@@ -289,6 +301,7 @@ export class DocumentService {
     }
   }
 
+  // Retry Error Documents
   async retryErrorDocuments(retriedBy: string): Promise<void> {
     const documentIds = (
       await this.documentRepository.getDocuments({
@@ -301,6 +314,7 @@ export class DocumentService {
     await this.retryDocuments({ documentIds, retriedBy });
   }
 
+  // Cancel on process queue documents
   async cancelWaitingDocumentsInQueue(cancelledBy: string): Promise<void> {
     const documentIds = (
       await this.documentRepository.getDocuments({
@@ -318,6 +332,7 @@ export class DocumentService {
     await this.cancelDocuments({ documentIds, cancelledBy });
   }
 
+  // Delete Documents
   async deleteDocuments(data: DeleteDocuments): Promise<void> {
     for await (const documentId of data.documentIds) {
       const document = await this.documentRepository.getDocument(documentId);

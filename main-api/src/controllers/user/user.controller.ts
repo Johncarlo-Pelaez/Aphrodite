@@ -33,6 +33,9 @@ import {
   UpdateUserAccountDto,
 } from './user.dto';
 
+/*
+ * API Users
+ */
 @Controller('/users')
 export class UserController {
   constructor(
@@ -42,6 +45,7 @@ export class UserController {
     private readonly filenameUtil: FilenameUtil,
   ) {}
 
+  // Check if Root User Exist
   @ApiOkResponse({
     type: Boolean,
   })
@@ -50,6 +54,7 @@ export class UserController {
     return (await this.userRepository.count()) > 0;
   }
 
+  // Get Users
   @Auth()
   @ApiOkResponse({
     type: User,
@@ -60,6 +65,7 @@ export class UserController {
     return await this.userRepository.getUsers(dto);
   }
 
+  // Create Root User
   @ApiCreatedResponse({
     type: CreatedResponse,
   })
@@ -91,6 +97,7 @@ export class UserController {
     return response;
   }
 
+  // Download Users Report
   @Auth(Role.ADMIN)
   @Get('/download')
   async downloadUsersReport(
@@ -146,6 +153,7 @@ export class UserController {
     res.send(excelFileBuffer);
   }
 
+  // Check if Email is Exist
   @ApiOkResponse({
     type: Boolean,
   })
@@ -154,6 +162,7 @@ export class UserController {
     return !!(await this.userRepository.getAuthUserByEmail(dto.email));
   }
 
+  // Get Current User Logged In
   @Auth()
   @ApiOkResponse({
     type: User,
@@ -163,6 +172,7 @@ export class UserController {
     return this.userRepository.getAuthUserByEmail(azureUser.preferred_username);
   }
 
+  // Create Regular User
   @Auth(Role.ADMIN)
   @ApiCreatedResponse({
     type: CreatedResponse,
@@ -192,6 +202,7 @@ export class UserController {
     return response;
   }
 
+  // Update User
   @Auth(Role.ADMIN)
   @ApiOkResponse()
   @Put('/:id')
@@ -231,6 +242,7 @@ export class UserController {
     });
   }
 
+  // Delete User
   @Auth(Role.ADMIN)
   @ApiNotAcceptableResponse()
   @ApiOkResponse()

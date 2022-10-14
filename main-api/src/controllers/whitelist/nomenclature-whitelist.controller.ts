@@ -21,6 +21,9 @@ import {
   UpdateNomenclatureWhitelistDto,
 } from './nomenclature-whitelist.dto';
 
+/*
+ * API Nomenclature Whitelist
+ */ 
 @Auth(Role.ADMIN)
 @Controller('/nomenclatures/whitelist')
 export class NomenclatureWhitelistController {
@@ -29,6 +32,7 @@ export class NomenclatureWhitelistController {
     private readonly activityLogRepository: ActivityLogRepository,
   ) {}
 
+  // Get Nomenclature Whitelists
   @ApiOkResponse({
     type: NomenclatureWhitelist,
     isArray: true,
@@ -38,6 +42,7 @@ export class NomenclatureWhitelistController {
     return this.whitelistRepository.getWhitelistNomenclatures();
   }
 
+  // Create Nomenclature Whitelist
   @ApiCreatedResponse({
     type: CreatedResponse,
   })
@@ -58,6 +63,7 @@ export class NomenclatureWhitelistController {
     return response;
   }
 
+  // Update Nomenclature Whitelist
   @ApiOkResponse()
   @Put('/:id')
   async updateNomenclatureWhitelist(
@@ -80,6 +86,7 @@ export class NomenclatureWhitelistController {
     });
   }
 
+  // Delete Nomenclature Whitelist
   @ApiOkResponse()
   @Delete('/:id')
   async deleteNomenclatureWhitelist(

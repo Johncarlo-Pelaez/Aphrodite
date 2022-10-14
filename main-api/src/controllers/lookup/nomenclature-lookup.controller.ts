@@ -27,6 +27,9 @@ import {
   UpdateNomenclatureLookupDto,
 } from './nomenclature-lookup.dto';
 
+/*
+ * API Nomenclatures/Document types lookup
+ */
 @Auth()
 @Controller('/nomenclatures/lookups')
 export class NomenclatureLookupController {
@@ -35,6 +38,7 @@ export class NomenclatureLookupController {
     private readonly activityLogRepository: ActivityLogRepository,
   ) {}
 
+  // Get Nomenclatures
   @ApiOkResponse({
     type: NomenclatureLookup,
     isArray: true,
@@ -44,6 +48,7 @@ export class NomenclatureLookupController {
     return this.lookupRepository.getNomenclatureLookups();
   }
 
+  // Admin Create Nomenclature
   @Roles(Role.ADMIN)
   @ApiCreatedResponse({
     type: CreatedResponse,
@@ -65,6 +70,7 @@ export class NomenclatureLookupController {
     return response;
   }
 
+  // Admin Update Nomenclature
   @Roles(Role.ADMIN)
   @ApiOkResponse()
   @Put('/:id')
@@ -97,6 +103,7 @@ export class NomenclatureLookupController {
     });
   }
 
+  // Admin Delete Nomenclature
   @Roles(Role.ADMIN)
   @ApiOkResponse()
   @Delete('/:id')

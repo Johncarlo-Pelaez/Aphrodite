@@ -21,6 +21,9 @@ import { FileStorageService } from 'src/file-storage-service';
 import { DocumentStatus } from 'src/entities';
 import { DOCUMENT_QUEUE, MIGRATE_JOB } from './document.constants';
 
+/*
+ * Queueing process of reading barcode, sales force and upload document to springcm
+ */
 @Processor(DOCUMENT_QUEUE)
 export class DocumentConsumer {
   private readonly logger = new Logger(DocumentConsumer.name);

@@ -17,6 +17,7 @@ export class SalesForceService {
     });
   }
 
+  // Get Contract Details From Sales Force
   async getContractDetails(
     params: GetContractDetailsParams,
   ): Promise<GetContractDetailsResult> {
@@ -31,6 +32,7 @@ export class SalesForceService {
     return result.data;
   }
 
+  // Get Document Type from Sales Force
   async getDocumentType(
     params: GetDocumentTypeParams,
   ): Promise<GetDocumentTypeResult> {

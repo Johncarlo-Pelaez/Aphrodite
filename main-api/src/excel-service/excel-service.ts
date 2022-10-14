@@ -6,6 +6,7 @@ import { ExcelCreate } from './excel-service.types';
 export class ExcelService {
   constructor() {}
 
+  // Create Excel Worksheet
   async create<T extends Record<string, any> = {}>(
     data: ExcelCreate<T>,
   ): Promise<Buffer> {

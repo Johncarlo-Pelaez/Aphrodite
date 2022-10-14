@@ -5,6 +5,9 @@ import * as pdfParse from 'pdf-parse';
 import { AppConfigService } from 'src/app-config';
 const imageMagick = gm.subClass({ imageMagick: true });
 
+/*
+ * Read document barcode
+ */
 @Injectable()
 export class QRService {
   constructor(private readonly appConfigService: AppConfigService) {
@@ -20,6 +23,7 @@ export class QRService {
     return !!results.length ? results[0].barcodeText : undefined;
   }
 
+  // Read document barcode
   async readPdfQrCode(buffer: Buffer, srcFileName: string): Promise<string> {
     let qrCode;
     let pageIndex = 0;
@@ -38,6 +42,7 @@ export class QRService {
     return qrCode ?? '';
   }
 
+  // Convert the pages into an image
   private async convertToImage(
     buffer: Buffer,
     srcFilename: string,

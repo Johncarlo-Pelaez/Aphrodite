@@ -12,6 +12,7 @@ export class DocumentProducer {
     private readonly documentQueue: Queue<number>,
   ) {}
 
+  // Queue Migration Setting
   async migrate({ id, documentSize }: Document): Promise<Job<number>> {
     let priority: number;
     const docSizeInMB = documentSize / (1024 * 1024);
@@ -34,6 +35,7 @@ export class DocumentProducer {
     return job;
   }
 
+  // Cancel on queue document
   async cancel(documentId: number): Promise<void> {
     const job = await this.documentQueue.getJob(documentId);
     if (job) job.remove();

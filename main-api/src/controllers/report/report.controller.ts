@@ -29,6 +29,9 @@ import {
 } from './report.dto';
 import { GetDocumentsReportIntPipe } from './report.pipe';
 
+/*
+ * API Documents Reports
+ */ 
 @Auth()
 @Controller('/reports')
 export class ReportController {
@@ -38,6 +41,7 @@ export class ReportController {
     private readonly filenameUtil: FilenameUtil,
   ) {}
 
+  // Get Documents Uploaded Report
   @ApiPaginatedResponse(DocumentHistory)
   @Get('/uploaded')
   async getUploadedReport(
@@ -59,6 +63,7 @@ export class ReportController {
       return response;
   }
 
+  // Download Documents Uploaded Report
   @Get('/uploaded/download')
   async downloadUploadedReport(
     @Query() dto: DownloadUploadedReportDto,
@@ -81,6 +86,7 @@ export class ReportController {
     res.send(excelFileBuffer);
   }
 
+  // Get Documents Information Request from Sales force Report
   @ApiExtraModels(InformationRequestReport)
   @ApiPaginatedResponse(InformationRequestReport)
   @Get('/information-request')
@@ -100,6 +106,7 @@ export class ReportController {
       return response;
   }
 
+  // Download Documents Information Request Report
   @Get('/information-request/download')
   async downloadInformationRequestReport(
     @Query() dto: DownloadInformationRequestReportDto,
@@ -123,6 +130,7 @@ export class ReportController {
     res.send(excelFileBuffer);
   }
 
+  // Get Documents Quality Check Report
   @ApiExtraModels(QualityCheckReport)
   @ApiPaginatedResponse(QualityCheckReport)
   @Get('/quality-check')
@@ -139,6 +147,7 @@ export class ReportController {
       return response;
   }
 
+  // Download Documents Quality Check Report
   @Get('/quality-check/download')
   async downloadQualityCheckReport(
     @Query() dto: DonwloadQualityCheckReportDto,
@@ -161,6 +170,7 @@ export class ReportController {
     res.send(excelFileBuffer);
   }
 
+  // Get Documents for Approval Report
   @ApiExtraModels(ApprovalReport)
   @ApiPaginatedResponse(ApprovalReport)
   @Get('/approval')
@@ -177,6 +187,7 @@ export class ReportController {
       return response;
   }
 
+  // Download Documents for Approval Report
   @Get('/approval/download')
   async downloadApprovalReport(
     @Query() dto: DownloadApprovalReportDto,
@@ -199,6 +210,7 @@ export class ReportController {
     res.send(excelFileBuffer);
   }
 
+  // Get Import Documents Report
   @ApiExtraModels(ImportReport)
   @ApiPaginatedResponse(ImportReport)
   @Get('/import')
@@ -215,6 +227,7 @@ export class ReportController {
       return response;
   }
 
+  // Download Import Documents Report
   @Get('/import/download')
   async downloadImportReport(
     @Query() dto: DownloadImportReportDto,
@@ -237,6 +250,7 @@ export class ReportController {
     res.send(excelFileBuffer);
   }
 
+  // Get RIS Documents Report
   @ApiExtraModels(RISReport)
   @ApiPaginatedResponse(RISReport)
   @Get('/ris')
@@ -255,6 +269,7 @@ export class ReportController {
       return response;
   }
 
+  // Download RIS Documents Report
   @Get('/ris/download')
   async downloadRISReport(
     @Query() dto: DownloadRISReportDto,

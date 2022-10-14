@@ -50,6 +50,9 @@ import {
   CancelDocumentsIntPipe,
 } from './document.pipe';
 
+/*
+ * API Documents
+ */ 
 @Auth()
 @Controller('/documents')
 export class DocumentController {
@@ -59,6 +62,7 @@ export class DocumentController {
     private readonly userRepository: UserRepository,
   ) {}
 
+  // Get Documents
   @ApiBadRequestResponse()
   @ApiPaginatedResponse(Document)
   @Get('/')
@@ -99,6 +103,7 @@ export class DocumentController {
     return response;
   }
 
+  // Upload Documents
   @ApiCreatedResponse({
     type: CreatedResponse,
   })
@@ -114,6 +119,7 @@ export class DocumentController {
     });
   }
 
+  // Delete Documents
   @ApiOkResponse()
   @Delete('/')
   async deleteDocuments(
@@ -126,6 +132,7 @@ export class DocumentController {
     });
   }
 
+  // Get Document
   @ApiOkResponse({
     type: Document,
   })
@@ -134,6 +141,7 @@ export class DocumentController {
     return await this.documentRepository.getDocument(id);
   }
 
+  // Get Document History
   @ApiOkResponse({
     type: DocumentHistory,
     isArray: true,
@@ -145,6 +153,7 @@ export class DocumentController {
     return await this.documentRepository.getHistory(id);
   }
 
+  // Get Document File
   @ApiOkResponse({
     type: Buffer,
   })
@@ -166,6 +175,7 @@ export class DocumentController {
     res.send(buffer);
   }
 
+  // Replace Document
   @Roles(Role.REVIEWER, Role.ADMIN)
   @ApiOkResponse()
   @Put('/:id/file')
@@ -183,6 +193,7 @@ export class DocumentController {
     });
   }
 
+  // Manual Encode Barcode
   @ApiOkResponse()
   @Put('/:id/encode/qrbarcode')
   async encodeDocQRBarCode(
@@ -198,6 +209,7 @@ export class DocumentController {
     });
   }
 
+  // Manual Encode Document Details
   @ApiOkResponse()
   @Put('/:id/encode/details')
   async encodeDocDetails(
@@ -216,6 +228,7 @@ export class DocumentController {
     });
   }
 
+  // Checker Approve Document
   @ApiOkResponse()
   @Put('/:id/checker/approve')
   async checkerApproveDoc(
@@ -232,6 +245,7 @@ export class DocumentController {
     });
   }
 
+  // Checker Disapprove Document
   @ApiOkResponse()
   @Put('/:id/checker/disapprove')
   async checkerDisApproveDoc(
@@ -248,6 +262,7 @@ export class DocumentController {
     });
   }
 
+  // Approver Approve Document
   @Roles(Role.REVIEWER, Role.ADMIN)
   @ApiOkResponse()
   @Put('/:id/approver/approve')
@@ -262,6 +277,7 @@ export class DocumentController {
     });
   }
 
+  // Approver Disapprove Document
   @Roles(Role.REVIEWER, Role.ADMIN)
   @ApiOkResponse()
   @Put('/:id/approver/disapprove')
@@ -276,6 +292,7 @@ export class DocumentController {
     });
   }
 
+  // Retry Documents
   @ApiOkResponse()
   @Put('/retry')
   async retryDocuments(
@@ -288,6 +305,7 @@ export class DocumentController {
     });
   }
 
+  // Retry Error Documents
   @ApiOkResponse()
   @Put('/retry/error')
   async retryErrorDocuments(
@@ -296,6 +314,7 @@ export class DocumentController {
     await this.documentsService.retryErrorDocuments(username);
   }
 
+  // Cancel Document Process
   @ApiOkResponse()
   @Put('/cancel')
   async cancelDocuments(
@@ -308,6 +327,7 @@ export class DocumentController {
     });
   }
 
+  // Cancel Document Status waiting
   @ApiOkResponse()
   @Put('/cancel/waiting')
   async cancelWaitingInQueue(
@@ -316,6 +336,7 @@ export class DocumentController {
     await this.documentsService.cancelWaitingDocumentsInQueue(username);
   }
 
+  // Count of documents of a user depending on role 
   @ApiOkResponse({
     type: Number,
   })

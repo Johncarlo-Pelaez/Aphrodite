@@ -19,6 +19,7 @@ export class MailService {
   ) {}
   private readonly logger = new Logger(MailService.name);
 
+  // Send Reviewer Email Notification of Documents for Approval
   async sendReviewerNotification(
     param: SendReviewerNotificationParam,
   ): Promise<void> {
@@ -47,6 +48,7 @@ export class MailService {
     });
   }
 
+  // Send Email Notification every Mon-Fri 6:00 AM in the morning
   @Cron('0 0 6 * * 1-5', {
     name: 'email-notification',
     timeZone: 'Asia/Manila',
