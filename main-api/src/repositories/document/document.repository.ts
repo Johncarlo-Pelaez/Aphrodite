@@ -164,7 +164,7 @@ export class DocumentRepository {
     if (exceptDocId) {
       let exceptDocQrExisted: Document;
       for (const exceptDocQr of await this.manager.find(Document, {
-        where: { qrCode, id: Not(exceptDocId), isFileDeleted: false },
+        where: { qrCode, id: Not(exceptDocId) },
       })) {
         if (qrCode === exceptDocQr.qrCode) {
           exceptDocQrExisted = exceptDocQr;
@@ -177,7 +177,7 @@ export class DocumentRepository {
     {
       let documentQrExisted: Document;
       for (const existedQrCode of await this.manager.find(Document, {
-        where: { qrCode, isFileDeleted: false },
+        where: { qrCode },
       })) {
         if (qrCode === existedQrCode.qrCode) {
           documentQrExisted = existedQrCode;

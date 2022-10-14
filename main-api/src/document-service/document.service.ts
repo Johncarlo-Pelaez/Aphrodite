@@ -68,7 +68,7 @@ export class DocumentService {
     {
       const isBarcodeExist = await this.documentRepository.getDocumentByQRCode(qrCode);
 
-      if (isBarcodeExist)
+      if (isBarcodeExist && (!isBarcodeExist.isFileDeleted || isBarcodeExist.status === DocumentStatus.MIGRATE_DONE))
         throw new ConflictException('QR code or Barcode already exist.');
     }
 
