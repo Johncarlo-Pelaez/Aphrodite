@@ -1,6 +1,7 @@
 import { request } from './request';
 import { nomenclatureLookup } from 'models';
 
+// Request Nomenclature Lookups
 export const getNomenclatureLookupsApi = async (): Promise<
   nomenclatureLookup[]
 > => {
@@ -15,6 +16,7 @@ export interface CreateNomenclatureLookupApi {
   documentGroup: string;
 }
 
+// Request Create Nomenclature Lookups
 export const createNomenclatureLookupApi = async (
   params: CreateNomenclatureLookupApi,
 ): Promise<void> => {
@@ -26,6 +28,7 @@ export interface UpdateNomenclatureLookupApi
   id: number;
 }
 
+// Request Update Nomenclature Lookup
 export const updateNomenclatureLookupApi = async ({
   id,
   ...rest
@@ -33,6 +36,7 @@ export const updateNomenclatureLookupApi = async ({
   await request.put(`/api/nomenclatures/lookups/${id}`, rest);
 };
 
+// Request Delete Nomenclature Lookup
 export const deleteNomenclatureLookupApi = async (
   id: number,
 ): Promise<void> => {

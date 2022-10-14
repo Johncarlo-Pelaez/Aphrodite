@@ -24,6 +24,7 @@ export interface UseReportImport extends UseReportImportFilterParams {
   pageSize: number;
 }
 
+// Request Imported Documents Report from API
 export const getReportImportApi = async (
   params: UseReportImport,
 ): Promise<GetReportImportApiResponse> => {
@@ -51,6 +52,7 @@ export const getReportImportApi = async (
   return res.data;
 };
 
+// Request Download Imported Documents Report from API 
 export const getDownloadReportImport = async (
   params: UseReportImportFilterParams,
 ): Promise<Blob> => {

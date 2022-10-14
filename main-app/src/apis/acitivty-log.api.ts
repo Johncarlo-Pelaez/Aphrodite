@@ -26,6 +26,7 @@ export interface UseActivityLog extends UseActivityLogsFilterParams {
   pageSize: number;
 }
 
+// Request Acticity Logs from API
 export const getActivityLogApi = async (
   params: UseActivityLog,
 ): Promise<GetActivityLogsApiResponse> => {
@@ -58,6 +59,7 @@ export const getActivityLogApi = async (
 
 export type DownloadActivityLogsParams = UseActivityLog;
 
+// Download Activty Logs from API
 export const getDownloadActivityLogs = async (
   params: UseActivityLogsFilterParams,
 ): Promise<Blob> => {

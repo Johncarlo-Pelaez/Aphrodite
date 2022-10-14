@@ -24,12 +24,14 @@ export const LoginPage = (): ReactElement => {
     resolver: yupResolver(signinFormSchema),
   });
 
+  // Used to sign in a user
   const handleSignin: SubmitHandler<SigninForm> = async (
     params,
   ): Promise<void> => {
     await signIn(params.email);
   };
 
+  // Log In Page
   return (
     <div className={styles.loginContainer}>
       <div className={styles.boxWrappper}>

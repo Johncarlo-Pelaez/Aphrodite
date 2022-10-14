@@ -40,6 +40,7 @@ export const RootUserPage = (): ReactElement => {
     resolver: yupResolver(createRootUserSchema),
   });
 
+  // Create Root User
   const createRootUser: SubmitHandler<CreateRootUserApi> = async (
     params,
   ): Promise<void> => {
@@ -63,6 +64,7 @@ export const RootUserPage = (): ReactElement => {
   if (isLoading) return <FullHeightSpinner />;
   if (isError || isRootExist) return <Redirect to="/not-found" />;
 
+  // Root User Page
   return (
     <div className={styles.FormContainer}>
       <div>

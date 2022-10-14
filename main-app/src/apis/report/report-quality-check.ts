@@ -24,6 +24,7 @@ export interface UseDocumentReportQC extends UseDocumentReportQCFilterParams {
   pageSize: number;
 }
 
+// Request Quality Check Documents Report from API
 export const getReportQCApi = async (
   params: UseDocumentReportQC,
 ): Promise<GetDocumentReportQCApiResponse> => {
@@ -53,6 +54,7 @@ export const getReportQCApi = async (
 
 export type DownloadReportQCParams = UseDocumentReportQC;
 
+// Request Download Quality Check Documents report from API
 export const getDownloadQualityCheck = async (
   params: UseDocumentReportQCFilterParams,
 ): Promise<Blob> => {

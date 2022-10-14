@@ -24,6 +24,7 @@ export interface UseDocumentReport extends UseDocumentReportFilterParams {
   pageSize: number;
 }
 
+// Request Uploaded Documents Report from API
 export const getDocumentReportApiUploaded = async (
   params: UseDocumentReport,
 ): Promise<GetDocumentReportApiResponse> => {
@@ -51,6 +52,7 @@ export const getDocumentReportApiUploaded = async (
   return res.data;
 };
 
+// Request Download Uploaded Documents Report from API 
 export const getDownloadDocumentReportUploaded = async (
   params: UseDocumentReportFilterParams,
 ): Promise<Blob> => {

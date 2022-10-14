@@ -23,6 +23,7 @@ export interface GetDocumentsApiResponse {
   data: Document[];
 }
 
+// Request Documents
 export const getDocumentsApi = async (
   params: GetDocumentsApi,
 ): Promise<GetDocumentsApiResponse> => {
@@ -49,6 +50,7 @@ export const getDocumentsApi = async (
   return res.data;
 };
 
+// Request Get Document
 export const getDocumentApi = async (id: number): Promise<Document> => {
   const res = await request.get<Document>(`/api/documents/${id}`);
   return res.data;
@@ -64,6 +66,7 @@ export interface uploadDocumentApiResponse {
   id: number;
 }
 
+// Request Upload Documents
 export const uploadDocumentApi = async (
   params: UploadDocumentApi,
 ): Promise<uploadDocumentApiResponse> => {
@@ -93,6 +96,7 @@ export const uploadDocumentApi = async (
   return res.data;
 };
 
+// Request Document History
 export const getDocumentHistoryApi = async (
   id: number,
 ): Promise<DocumentHistory[]> => {
@@ -107,6 +111,7 @@ export interface EncodeDocQRBarcodeApi {
   qrBarCode: string;
 }
 
+// Request Manual Encode of Barcode in the Document
 export const encodeDocQRBarcodeApi = async (
   params: EncodeDocQRBarcodeApi,
 ): Promise<void> => {
@@ -122,6 +127,7 @@ export interface EncodeDocDetailsApi {
   documentGroup: string;
 }
 
+// Request Encode Document Details
 export const encodeDocDetailsApi = async (
   params: EncodeDocDetailsApi,
 ): Promise<void> => {
@@ -135,6 +141,7 @@ export interface CheckerApproveDocApi {
   documentId: number;
 }
 
+// Request Checker Approve the Document
 export const checkerApproveDocApi = async (
   params: CheckerApproveDocApi,
 ): Promise<void> => {
@@ -144,6 +151,7 @@ export const checkerApproveDocApi = async (
 
 export interface CheckerDisapproveDocApi extends CheckerApproveDocApi {}
 
+// Request Checker Disapprove the Document
 export const checkerDisapproveDocApi = async (
   params: CheckerDisapproveDocApi,
 ): Promise<void> => {
@@ -151,18 +159,21 @@ export const checkerDisapproveDocApi = async (
   await request.put(`/api/documents/${documentId}/checker/disapprove`, rest);
 };
 
+// Request Approver Approve the Document
 export const approverApproveDocApi = async (
   documentId: number,
 ): Promise<void> => {
   await request.put(`/api/documents/${documentId}/approver/approve`);
 };
 
+// Request Approver Disapprove the Document
 export const approverDisapproveDocApi = async (
   documentId: number,
 ): Promise<void> => {
   await request.put(`/api/documents/${documentId}/approver/disapprove`);
 };
 
+// Request Retry the Documents
 export const retryDocumentsApi = async (
   documentIds: number[],
 ): Promise<void> => {
@@ -175,6 +186,7 @@ export interface GetDocumentsProcessCountApi {
   statuses: DocumentStatus[];
 }
 
+// Request Count of Documents Processed/Processing 
 export const getDocumentsProcessCountApi = async (
   params: GetDocumentsProcessCountApi,
 ): Promise<number> => {
@@ -188,6 +200,7 @@ export const getDocumentsProcessCountApi = async (
   return res.data;
 };
 
+// Request Cancel Documents Processing
 export const cancelDocumentsApi = async (
   documentIds: number[],
 ): Promise<void> => {
@@ -196,14 +209,17 @@ export const cancelDocumentsApi = async (
   });
 };
 
+// Request Cancel Waiting Documents
 export const cancelWaitingDocumentsApi = async (): Promise<void> => {
   await request.put('/api/documents/cancel/waiting');
 };
 
+// Request Retry Error Documents
 export const retryErrorDocumentsApi = async (): Promise<void> => {
   await request.put('/api/documents/retry/error');
 };
 
+// Request Delete Documents
 export const deleteDocumentsFileApi = async (
   documentIds: number[],
 ): Promise<void> => {
@@ -221,6 +237,7 @@ export interface ReplaceDocumentFileApi {
   cancelToken?: CancelTokenSource;
 }
 
+// Request Replace the Document File
 export const replaceDocumentFileApi = async (
   params: ReplaceDocumentFileApi,
 ): Promise<void> => {

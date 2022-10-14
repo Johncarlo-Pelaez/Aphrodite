@@ -1,6 +1,7 @@
 import { request } from './request';
 import { NomenclatureWhitelist } from 'models';
 
+// Request Nomenclature Whitelists
 export const getNomenclaturesWhitelistApi = async (): Promise<
   NomenclatureWhitelist[]
 > => {
@@ -14,6 +15,7 @@ export interface CreateNomenclatureWhitelistApi {
   description: string;
 }
 
+// Request Create Nomenclature Whitelist
 export const createNomenclatureWhitelistApi = async (
   params: CreateNomenclatureWhitelistApi,
 ): Promise<void> => {
@@ -25,6 +27,7 @@ export interface UpdateNomenclatureWhitelistApi
   id: number;
 }
 
+// Request Update Nomenclature Whitelist
 export const updateNomenclatureWhitelistApi = async ({
   id,
   ...rest
@@ -32,6 +35,7 @@ export const updateNomenclatureWhitelistApi = async ({
   await request.put(`/api/nomenclatures/whitelist/${id}`, rest);
 };
 
+// Request Delete Nomenclature Whitelist
 export const deleteNomenclatureWhitelistApi = async (
   id: number,
 ): Promise<void> => {

@@ -26,6 +26,7 @@ export interface UseReportRIS extends UseReportRISFilterParams {
   pageSize: number;
 }
 
+// Request RIS Documents Report from API
 export const geReportRISApi = async (
   params: UseReportRIS,
 ): Promise<GetReportRISApiResponse> => {
@@ -55,6 +56,7 @@ export const geReportRISApi = async (
   return res.data;
 };
 
+// Request Download RIS Documents Report from API
 export const getDownloadReportRIS = async (
   params: UseReportRISFilterParams,
 ): Promise<Blob> => {

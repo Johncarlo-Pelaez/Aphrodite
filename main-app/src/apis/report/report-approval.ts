@@ -24,6 +24,7 @@ export interface UseReportApproval extends UseReportApprovalFilterParams {
   pageSize: number;
 }
 
+// Request Approval Documents Report from API 
 export const getReportApprovalApi = async (
   params: UseReportApproval,
 ): Promise<GetReportApprovalApiResponse> => {
@@ -51,6 +52,7 @@ export const getReportApprovalApi = async (
   return res.data;
 };
 
+// Request Download Approval Documents Report from API
 export const getDownloadDocumentReportApproval = async (
   params: UseReportApprovalFilterParams,
 ): Promise<Blob> => {

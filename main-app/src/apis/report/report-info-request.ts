@@ -25,6 +25,7 @@ export interface UseInfoRequest
   pageSize: number;
 }
 
+// Request Information Request Documents Report from API 
 export const getDocumentReportApiInfoRequest = async (
   params: UseInfoRequest,
 ): Promise<GetDocumentReportInfoRequestApiResponse> => {
@@ -52,6 +53,7 @@ export const getDocumentReportApiInfoRequest = async (
   return res.data;
 };
 
+// Request Download Information Request Documents Report from API
 export type DownloadReportInfoRequestParams = UseInfoRequest;
 
 export const getDownloadDocumentReportInfoRequest = async (
