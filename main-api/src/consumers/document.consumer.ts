@@ -92,6 +92,8 @@ export class DocumentConsumer {
         h.documentStatus === DocumentStatus.CHECKING_APPROVED,
     ).length;
 
+    const isDocUploadedToSpring:boolean = documentHistories.some(history => history.documentStatus === DocumentStatus.MIGRATE_DONE);
+
     if (isWhiteListed && !isApproved) {
       await this.documentRepository.updateForChecking({
         documentId,
@@ -100,7 +102,7 @@ export class DocumentConsumer {
       return;
     }
 
-    if (!isWhiteListed || isApproved) {
+    if ((!isWhiteListed || isApproved) && !isDocUploadedToSpring) {
       await this.runUploadToSpringCM(documentId);
     }
   }
@@ -156,7 +158,7 @@ export class DocumentConsumer {
         documentId,
       );
 
-      if (checkBarcodeExist) {
+      if (checkBarcodeExist && (!checkBarcodeExist.isFileDeleted || checkBarcodeExist.status === DocumentStatus.MIGRATE_DONE)) {
         const note = 'QR code or Barcode is already exist.';
         await this.documentRepository.failQrDocument({
           documentId,
