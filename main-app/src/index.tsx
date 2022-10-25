@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { PublicClientApplication } from '@azure/msal-browser';
+import { AuthenticationResult, EventType, PublicClientApplication } from '@azure/msal-browser';
 import App from './App';
 import './styles/main.scss';
 import { buildMsalConfig } from 'authConfig';
@@ -17,6 +17,14 @@ import axios from 'axios';
     res.data.azureAdTenantId,
   );
   const msalInstance = new PublicClientApplication(msalConfig);
+  msalInstance.addEventCallback(event => {
+    if(event.eventType === EventType.LOGIN_SUCCESS)
+    {
+      const payload = event.payload as AuthenticationResult;
+      console.log(payload)
+      msalInstance.setActiveAccount(payload.account)
+    }
+  })
 
   ReactDOM.render(
     <React.StrictMode>

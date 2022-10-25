@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useMsal } from '@azure/msal-react';
+import { useMsal, useIsAuthenticated } from '@azure/msal-react';
 import {
   AccountInfo,
   InteractionStatus,
@@ -14,6 +14,7 @@ import { scopes } from 'authConfig';
 import { useRecoilState } from 'recoil';
 import { isAccountTokenLoadedState, isEmailAccountAllowedState } from 'states';
 import { queryClient } from 'query-client';
+
 
 const buildSilentRequest = (account: AccountInfo): SilentRequest => ({
   scopes,
@@ -110,6 +111,28 @@ export const useLoadAccountToken = (): UseLoadAccountTokenResult => {
 
   return { isLoaded, isAuthenticatedButTokenNotLoaded };
 };
+
+export const useAccountToActivate = (): boolean => {
+  const {instance} = useMsal();
+  const isAuthenticated = useIsAuthenticated();
+  const { account } = useAccount();
+  const isAuthenticatedUser = !!account && !!isAuthenticated;
+
+  useEffect(() => {
+    if(account && !isAuthenticated)
+    {
+      instance.ssoSilent(buildSilentRequest(account))
+        .then((response) => { instance.setActiveAccount(response.account)} )
+        .catch((error) => { 
+          if(error instanceof InteractionRequiredAuthError){
+            instance.loginRedirect({scopes: scopes})
+          }
+        })
+      }
+  }, [instance, isAuthenticated, account])
+
+  return isAuthenticatedUser;
+}
 
 type UseEmailAllowedResult = {
   isAllowed: boolean;

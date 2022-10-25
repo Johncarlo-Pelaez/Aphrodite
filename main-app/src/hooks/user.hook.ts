@@ -10,7 +10,7 @@ import {
   updateUserApi,
   getCurrentUser,
   deleteUserApi,
-  // removeApiHeaders,
+  removeApiHeaders,
 } from 'apis';
 import {
   useQuery,
@@ -19,15 +19,15 @@ import {
   UseMutationResult,
   useQueryClient,
 } from 'react-query';
-// import { useSetRecoilState } from 'recoil';
-// import { isAccountTokenLoadedState } from 'states';
+import { useSetRecoilState } from 'recoil';
+import { isAccountTokenLoadedState } from 'states';
 import { User } from 'models';
-import { useEmailAllowed,
-  //  useLoadAccountToken,
-    useSignOut } from 'hooks/account.hook';
+import { useAccountToActivate, useEmailAllowed, useLoadAccountToken} from 'hooks/account.hook';
 import { ApiError } from 'core/types';
 import { useState } from 'react';
 import { QueryKey, checkIfUnAuthorize } from 'utils';
+import { useMsal } from '@azure/msal-react';
+import { scopes } from 'authConfig';
 
 export const useUsers = (): UseQueryResult<User[], ApiError> => {
   return useQuery(QueryKey.users, getUsersApi);
@@ -114,17 +114,16 @@ export const useEmailExists = (): UseEmailExistsResult => {
 };
 
 export const useGetCurrentUser = (): UseQueryResult<User, ApiError> => {
-  const { signOut } = useSignOut();
-  // const setIsLoaded = useSetRecoilState(isAccountTokenLoadedState);
+  const {instance} = useMsal();
+  const setIsLoaded = useSetRecoilState(isAccountTokenLoadedState);
   const { isAllowed } = useEmailAllowed();
-  // const { isLoaded } = useLoadAccountToken();
+  const isLoaded = useAccountToActivate();
   return useQuery<User, ApiError>(QueryKey.currentUser, getCurrentUser, {
     refetchInterval: 1000 * 30,
-    enabled: isAllowed,
-    // && isLoaded,
+    enabled: isAllowed && isLoaded,
     onError: async (error) => {
       if (checkIfUnAuthorize(error)) {
-        await signOut();
+        instance.loginRedirect({scopes: scopes})
         // removeApiHeaders();
         // setIsLoaded(false);
       }
