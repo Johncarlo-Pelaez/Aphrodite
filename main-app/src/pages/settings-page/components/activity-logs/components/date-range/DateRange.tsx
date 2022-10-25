@@ -17,22 +17,20 @@ export const DateRange = ({
 }: DateRangeProps): ReactElement => {
   return (
     <div className="d-flex justify-content-between align-items-center flex-wrap my-1">
-      <Form>
-        <Stack direction="horizontal" gap={2}>
-          <DateSelect
-            value={dateFrom}
-            onChange={setDateFrom}
-            label="From:"
-            horizontal
-          />
-          <DateSelect
-            value={dateTo}
-            onChange={setDateTo}
-            label="To:"
-            horizontal
-          />
-        </Stack>
-      </Form>
+      <Stack direction="horizontal" gap={2}>
+        <DateSelect
+          value={dateFrom}
+          onChange={setDateFrom}
+          label="From:"
+          horizontal
+        />
+        <DateSelect
+          value={dateTo}
+          onChange={setDateTo}
+          label="To:"
+          horizontal
+        />
+      </Stack>
     </div>
   );
 };

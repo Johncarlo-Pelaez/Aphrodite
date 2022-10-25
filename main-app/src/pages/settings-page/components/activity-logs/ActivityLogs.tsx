@@ -66,7 +66,8 @@ export const ActivityLogs = (): ReactElement => {
       </Toast>
       <div className="d-flex justify-content-between align-items-center flex-wrap my-1">
         <Stack direction="horizontal" gap={2} className="m-2">
-          <UsersDropdown onChange={setUsername} />
+            <UsersDropdown onChange={setUsername} />
+
           <DateRange
             setDateFrom={setDateFrom}
             setDateTo={setDateTo}
