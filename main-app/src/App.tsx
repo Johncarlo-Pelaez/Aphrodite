@@ -3,7 +3,7 @@ import { MsalProvider } from '@azure/msal-react';
 import { Suspense, lazy } from 'react';
 import { QueryClientProvider, QueryClient } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch, useHistory } from 'react-router-dom';
 import { MainLayout, PublicLayout } from 'layouts';
 import { AnonymousRoute, PrivateRoute } from 'routes';
 import { FullHeightSpinner } from 'core/ui';
@@ -11,6 +11,7 @@ import { Role } from 'core/enum';
 import { useLoadAccountToken } from 'hooks';
 import { RecoilRoot } from 'recoil';
 import { ForbiddenAccount } from 'pages';
+import { CustomNavigationClient } from 'utils';
 
 const HomePage = lazy(() => import('pages/home-page'));
 const LoginPage = lazy(() => import('pages/login-page'));
@@ -26,6 +27,10 @@ export interface AppProps {
 }
 
 function App({ msalInstance, queryClient }: AppProps) {
+  const history = useHistory();
+  const navigationClient = new CustomNavigationClient(history);
+  msalInstance.setNavigationClient(navigationClient);
+
   return (
     <MsalProvider instance={msalInstance}>
       <RecoilRoot>
