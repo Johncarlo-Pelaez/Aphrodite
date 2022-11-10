@@ -1,5 +1,5 @@
 import { ReactElement, Dispatch, SetStateAction } from 'react';
-import { Form, Stack } from 'react-bootstrap';
+import { Stack } from 'react-bootstrap';
 import { DateSelect } from 'core/ui';
 
 export interface DateRangeProps {
