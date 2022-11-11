@@ -16,7 +16,16 @@ import axios from 'axios';
     res.data.azureAdClientId,
     res.data.azureAdTenantId,
   );
+
   const msalInstance = new PublicClientApplication(msalConfig);
+
+  if (!msalInstance.getActiveAccount() && msalInstance.getAllAccounts().length > 0) {
+    // Account selection logic is app dependent. Adjust as needed for different use cases.
+    msalInstance.setActiveAccount(msalInstance.getAllAccounts()[0]);
+  }
+
+  msalInstance.enableAccountStorageEvents();
+
   msalInstance.addEventCallback(event => {
     if(event.eventType === EventType.LOGIN_SUCCESS)
     {
