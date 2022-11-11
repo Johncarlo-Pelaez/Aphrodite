@@ -177,7 +177,7 @@ export const GetToken = async () => {
       if (error instanceof (InteractionRequiredAuthError)){
         if (inProgress === InteractionStatus.None)
         {
-          await instance.acquireTokenRedirect(redirectRequest);
+          await instance.loginRedirect(redirectRequest);
         }
       }
     }

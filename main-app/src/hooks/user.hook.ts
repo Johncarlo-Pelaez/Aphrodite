@@ -23,7 +23,7 @@ import {
 // import { isAccountTokenLoadedState } from 'states';
 import { User } from 'models';
 import { 
-  GetToken,
+  // GetToken,
   useAccountToActivate, 
   useEmailAllowed, 
   // useLoadAccountToken
@@ -31,6 +31,8 @@ import {
 import { ApiError } from 'core/types';
 import { useState } from 'react';
 import { QueryKey, checkIfUnAuthorize } from 'utils';
+import { useMsal } from '@azure/msal-react';
+import { scopes } from 'authConfig';
 
 export const useUsers = (): UseQueryResult<User[], ApiError> => {
   return useQuery(QueryKey.users, getUsersApi);
@@ -118,6 +120,7 @@ export const useEmailExists = (): UseEmailExistsResult => {
 
 export const useGetCurrentUser = (): UseQueryResult<User, ApiError> => {
   // const setIsLoaded = useSetRecoilState(isAccountTokenLoadedState);
+  const {instance} = useMsal();
   const { isAllowed } = useEmailAllowed();
   const isLoaded = useAccountToActivate();
   return useQuery<User, ApiError>(QueryKey.currentUser, getCurrentUser, {
@@ -127,8 +130,8 @@ export const useGetCurrentUser = (): UseQueryResult<User, ApiError> => {
       if (checkIfUnAuthorize(error)) {
         // removeApiHeaders();
         // setIsLoaded(false);
-        // instance.acquireTokenRedirect({scopes})
-        GetToken();
+        instance.loginRedirect({scopes})
+        // GetToken();
       }
     },
   });
