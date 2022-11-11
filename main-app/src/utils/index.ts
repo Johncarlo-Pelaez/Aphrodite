@@ -3,3 +3,4 @@ export * from './download';
 export * from './query-string';
 export * from './sort';
 export * from './validations';
+export * from './CustomNavigationClient';

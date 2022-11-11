@@ -116,22 +116,72 @@ export const useAccountToActivate = (): boolean => {
   const {instance} = useMsal();
   const isAuthenticated = useIsAuthenticated();
   const { account } = useAccount();
-  const isAuthenticatedUser = !!account && !!isAuthenticated;
+  const isAuthenticatedUser = !!account || !isAuthenticated;
+
+  
 
   useEffect(() => {
     if(account && !isAuthenticated)
     {
+      const requestSilent = buildSilentRequest(account);
+
       instance.ssoSilent(buildSilentRequest(account))
-        .then((response) => { instance.setActiveAccount(response.account)} )
-        .catch((error) => { 
+        .then((response) => 
+        { 
+          instance.setActiveAccount(response.account);
+          onSigninSuccess(response.idToken, response.accessToken);
+        })
+        .catch(async (error) => { 
           if(error instanceof InteractionRequiredAuthError){
-            instance.loginRedirect({scopes: scopes})
+            let response: AuthenticationResult | undefined = undefined;
+            try
+            {
+              response = await instance.acquireTokenSilent(requestSilent)
+            }
+            catch(error)
+            { alert(error) }
+
+            if (response?.account)
+            {
+              onSigninSuccess(response.idToken, response.accessToken);
+              instance.acquireTokenRedirect({scopes: scopes})
+            }
+            
+
           }
         })
       }
   }, [instance, isAuthenticated, account])
 
   return isAuthenticatedUser;
+}
+
+export const GetToken = async () => {
+  const { instance, inProgress } = useMsal();
+  const accounts = instance.getAllAccounts();
+  const isAuthenticated = useIsAuthenticated();
+
+  if(accounts.length > 0 && isAuthenticated)
+  {
+    const silentRequest = {
+      scopes,
+      account: instance.getActiveAccount() || accounts[0] 
+    };
+
+    const redirectRequest = {scopes};
+
+    try {
+      const response = await instance.acquireTokenSilent(silentRequest);
+      onSigninSuccess(response.idToken, response.accessToken);
+    } catch (error) {
+      if (error instanceof (InteractionRequiredAuthError)){
+        if (inProgress === InteractionStatus.None)
+        {
+          await instance.acquireTokenRedirect(redirectRequest);
+        }
+      }
+    }
+  }
 }
 
 type UseEmailAllowedResult = {

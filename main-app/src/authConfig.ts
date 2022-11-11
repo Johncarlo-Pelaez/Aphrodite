@@ -42,9 +42,6 @@ export const buildMsalConfig = (
           }
         },
       },
-      windowHashTimeout: 0,
-      iframeHashTimeout: 0,
-      loadFrameTimeout: 0,
       tokenRenewalOffsetSeconds: 0,
       redirectNavigationTimeout: 0,
     }
