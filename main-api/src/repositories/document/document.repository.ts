@@ -31,6 +31,7 @@ import {
   ReplaceFileParam,
 } from './document.params';
 import { ENCODER_RESTRICTION } from 'src/core';
+import { COUNT_MIGRATED_DOCUMENTS } from './document.queries';
 
 @EntityRepository()
 export class DocumentRepository {
@@ -299,6 +300,57 @@ export class DocumentRepository {
     }
 
     return document;
+  }
+
+  async countDocuments(param: GetDocumentsParam): Promise<number> {
+    const queryConditions: string[] = [];
+    const queryParams: (string | number)[] = [];
+
+
+    if(param.currentUserRole !== Role.ADMIN)
+    {
+      if (!!param.currentUserLogIn) {
+        queryConditions.push(
+          `userUsername = @${queryParams.length}`,
+        );
+        queryParams.push(param.currentUserLogIn);
+      }
+    }
+
+    if (typeof param.statuses === 'string') {
+      queryConditions.push(`status = @${queryParams.length}`);
+      queryParams.push(param.statuses);
+    } else if (param.statuses instanceof Array && !!param.statuses.length) {
+      let escapeParams = '';
+      param.statuses.forEach((status) => {
+        escapeParams += `@${queryParams.length}, `;
+        queryParams.push(status);
+      });
+      queryConditions.push(
+        `status IN(${escapeParams.substring(
+          0,
+          escapeParams.length - 2,
+        )})`,
+      );
+    }
+
+    let sql = COUNT_MIGRATED_DOCUMENTS;
+
+    if (!!queryConditions.length) {
+      sql += `\nWHERE ${queryConditions.join(' AND ')}`;
+    }
+
+    sql += ';';
+    console.log(sql);
+    console.log(queryParams);
+
+
+    const queryData = await this.manager.query(sql, queryParams);
+    const queryObject = !!queryData?.length ? queryData[0] : null;
+    const queryObjectValues = !!queryObject ? Object.values(queryObject) : [];
+    return !!queryObjectValues.length
+      ? (queryObjectValues[0] as number) ?? 0
+      : 0;
   }
 
   async getHistory(documentId: number): Promise<DocumentHistory[]> {

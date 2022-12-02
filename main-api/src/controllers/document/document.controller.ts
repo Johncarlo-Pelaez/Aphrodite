@@ -351,7 +351,7 @@ export class DocumentController {
 
     if(!currentUserRole) throw new BadRequestException();
 
-    return await this.documentRepository.count({
+    return await this.documentRepository.countDocuments({
       statuses: dto.statuses,
       currentUserRole,
       currentUserLogIn,
