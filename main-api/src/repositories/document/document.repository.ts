@@ -341,10 +341,6 @@ export class DocumentRepository {
     }
 
     sql += ';';
-    console.log(sql);
-    console.log(queryParams);
-
-
     const queryData = await this.manager.query(sql, queryParams);
     const queryObject = !!queryData?.length ? queryData[0] : null;
     const queryObjectValues = !!queryObject ? Object.values(queryObject) : [];
