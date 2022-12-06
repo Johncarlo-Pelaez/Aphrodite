@@ -5,7 +5,7 @@ import Stack from 'react-bootstrap/Stack';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { Document } from 'models';
-import { Role } from 'core/enum';
+import { DocumentStatus, Role } from 'core/enum';
 import {
   useRetryDocuments,
   useCancelDocuments,
@@ -33,7 +33,7 @@ import {
 } from './HomePage.utils';
 
 export const HomePage = (): ReactElement => {
-  const [searchKey, setSearchKey] = useState<string>('');
+  const [searchKey, setSearchKey] = useState<string | undefined>('');
   const [selectedStatus, setSelectedStatus] = useState<StatusOption>(
     StatusOption.ALL,
   );
@@ -46,6 +46,14 @@ export const HomePage = (): ReactElement => {
   const [viewDocModalShow, setViewDocModalShow] = useState<boolean>(false);
   const [dateFrom, setDateFrom] = useState<Date | undefined>(new Date());
   const [dateTo, setDateTo] = useState<Date | undefined>(new Date());
+  const [isFiltered, setIsFiltered] = useState<boolean>(false);
+
+  const [start, setStart] = useState<Date | undefined>(undefined);
+  const [end, setEnd] = useState<Date | undefined>(undefined);
+  const [username, setUsername] = useState<string | undefined>(undefined);
+  const [documentStatus, setDocumentStatus] = useState<DocumentStatus[] | undefined>(undefined);
+  const [searchDoc, setSearchDoc] = useState<string | undefined>(undefined);
+
   const [selectedUserFilter, setSelectedUserFilter] = useState<
     UserOption | undefined
   >(undefined);
@@ -157,6 +165,15 @@ export const HomePage = (): ReactElement => {
     refreshDocumentslist();
   };
 
+  const collectFilter = () => {
+    setIsFiltered(true);
+    setStart(dateFrom);
+    setEnd(dateTo);
+    setUsername(selectedUserFilter?.username);
+    setDocumentStatus(documentStatusFilter);
+    setSearchDoc(searchKey);
+  };
+
   useEffect(() => {
     if (hasRetryDocError) alert('Failed to retry documents.');
     if (hasCancelDocError) alert('Failed to cancel documents.');
@@ -165,6 +182,13 @@ export const HomePage = (): ReactElement => {
 
   useEffect(() => {
     return function componentCleanUp() {
+      setIsFiltered(false);
+      setSearchDoc(undefined);
+      setStart(undefined);
+      setEnd(undefined);
+      setUsername(undefined);
+      setDocumentStatus(undefined);
+
       resetRetryDoc();
       resetCancelDoc();
       resetDeleteDocsFile();
@@ -233,6 +257,15 @@ export const HomePage = (): ReactElement => {
             Delete
           </Button>
         )}
+        <Col className='d-flex justify-content-end mb-2'>
+          <Button
+            className="px-2"
+            variant="outline-secondary"
+            onClick={collectFilter}
+          >
+            Filter
+          </Button>
+        </Col>
       </Stack>
       <Row className="my-2">
         <Col className="mb-2" xs={12} lg={2}>
@@ -253,7 +286,7 @@ export const HomePage = (): ReactElement => {
           <DateSelect
             value={dateFrom}
             onChange={setDateFrom}
-            label="From:"
+            label="From"
             horizontal
           />
         </Col>
@@ -261,11 +294,11 @@ export const HomePage = (): ReactElement => {
           <DateSelect
             value={dateTo}
             onChange={setDateTo}
-            label="To:"
+            label="To"
             horizontal
           />
         </Col>
-        <Col xs={12} lg={4}>
+        <Col className="mb-2" xs={12} lg={2}>
           {currentUserRole !== Role.ENCODER && (
             <UserDropdown
               value={selectedUserFilter}
@@ -274,6 +307,7 @@ export const HomePage = (): ReactElement => {
           )}
         </Col>
       </Row>
+      
       <div className="d-flex justify-content-end mb-2">
         <SearchField searchKey={searchKey} onSearchDocument={setSearchKey} />
       </div>
@@ -281,13 +315,14 @@ export const HomePage = (): ReactElement => {
         ref={documentsTableRef}
         selectedDocuments={selectedDocuments}
         dataFilters={{
-          searchKey,
-          dateFrom,
-          dateTo,
-          statuses: documentStatusFilter,
-          username: selectedUserFilter?.username,
+          searchKey : searchDoc,
+          dateFrom: start,
+          dateTo: end,
+          statuses: documentStatus,
+          username: username,
           selectedOperation: selectedOperation,
           selectedStatus: selectedStatus,
+          isFiltered,
         }}
         setSelectedDocuments={setSelectedDocuments}
         onDoubleClickRow={handleOpen}

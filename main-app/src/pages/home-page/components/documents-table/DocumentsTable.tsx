@@ -29,13 +29,14 @@ const DEFAULT_SORT_ORDER: SorterResult = {
 };
 
 export interface DataFilterProps {
-  searchKey: string;
-  statuses: DocumentStatus[];
+  searchKey: string | undefined;
+  statuses: DocumentStatus[] | undefined;
   dateFrom?: Date;
   dateTo?: Date;
   username?: string;
   selectedOperation: OperationOption;
   selectedStatus: StatusOption
+  isFiltered?: boolean,
 }
 
 export interface DocumentsTableProps {
@@ -74,6 +75,7 @@ export const DocumentsTable = forwardRef(
     const { data: user } = useGetCurrentUser();
     const currentUserRole = user?.role;
     const debouncedSearch = useDebounce(searchKey);
+    const isFiltered = dataFilters?.isFiltered;
 
     const {
       isFetching,
@@ -92,13 +94,14 @@ export const DocumentsTable = forwardRef(
     });
 
     const { documents, total } = useMemo(
-      () => ({ documents: result?.data ?? [], total: result?.count ?? 0 }),
-      [result?.data, result?.count],
+      () => ({ documents: !!isFiltered ? result?.data : [], total: !!isFiltered ? result?.count : 0 }),
+      [result?.data, result?.count, isFiltered],
     );
     const selectedIndexes = useMemo(() => {
       return selectedDocuments.reduce(
         (indexes: number[], current: Document) => {
-          indexes.push(documents.findIndex((d) => d.id === current.id));
+          if(documents)
+            indexes.push(documents.findIndex((d) => d.id === current.id));
           return indexes;
         },
         [],
@@ -208,11 +211,15 @@ export const DocumentsTable = forwardRef(
     };
 
     const selectNextDocument = useCallback(() => {
-      const nextIndex = (Math.max(...selectedIndexes) + 1) % documents.length;
-      const nextDocument = documents[nextIndex];
-      if (nextDocument) {
-        setSelectedDocuments([nextDocument]);
+      if (documents)
+      {
+        const nextIndex = (Math.max(...selectedIndexes) + 1) % documents.length;
+        const nextDocument = documents[nextIndex];
+        if (nextDocument) {
+          setSelectedDocuments([nextDocument]);
+        }
       }
+
     }, [selectedIndexes, documents, setSelectedDocuments]);
 
     useImperativeHandle(
@@ -225,10 +232,13 @@ export const DocumentsTable = forwardRef(
     );
 
     useEffect(() => {
-      const pageDocKeys = documents.map((d): React.Key => d.id);
-      setSelectedDocuments((current) =>
-        current.filter((d) => pageDocKeys.includes(d.id)),
-      );
+      if(documents)
+      {
+        const pageDocKeys = documents.map((d): React.Key => d.id);
+        setSelectedDocuments((current) =>
+          current.filter((d) => pageDocKeys.includes(d.id)),
+        );
+      }
     }, [documents, currentPage, pageSize, setSelectedDocuments]);
 
     return (
@@ -238,14 +248,14 @@ export const DocumentsTable = forwardRef(
         loading={isLoading || isFetching}
         isError={hasDocsError}
         columns={renderColumns}
-        data={documents}
+        data={documents ?? []}
         rowSelection={{
           type: 'checkbox',
           selectedRowKeys: selectedDocumentKeys,
           onChange: changeSelectedRows,
         }}
         pagination={{
-          total: total,
+          total: total ?? 0,
           pageSize: pageSize,
           current: currentPage,
           pageNumber: 5,

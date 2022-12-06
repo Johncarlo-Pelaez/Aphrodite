@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
 interface SearchFieldProps {
-  searchKey: string;
+  searchKey: string | undefined;
   onSearchDocument: (seachKey: string) => void;
 }
 
