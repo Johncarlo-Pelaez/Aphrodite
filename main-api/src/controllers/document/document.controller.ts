@@ -72,6 +72,9 @@ export class DocumentController {
   ): Promise<PaginatedResponse<Document>> {
     const response = new PaginatedResponse<Document>();
 
+    if(!statuses)
+      return response;
+
     const currentUserRole = await (
       await this.userRepository.getUserByEmail(currentUserLogIn)
     )?.role;
