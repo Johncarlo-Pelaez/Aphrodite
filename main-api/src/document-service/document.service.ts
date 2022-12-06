@@ -303,32 +303,38 @@ export class DocumentService {
 
   // Retry Error Documents
   async retryErrorDocuments(retriedBy: string): Promise<void> {
-    const documentIds = (
-      await this.documentRepository.getDocuments({
-        statuses: Object.values(DocumentStatus).filter(
-          (s) => s.includes('FAILED') || s.includes('CANCELLED'),
-        ),
-        username: retriedBy,
-      })
-    ).map((doc) => doc.id);
+    // const documentIds = (
+    //   await this.documentRepository.getDocuments({
+    //     statuses: Object.values(DocumentStatus).filter(
+    //       (s) => s.includes('FAILED') || s.includes('CANCELLED'),
+    //     ),
+    //     username: retriedBy,
+    //   })
+    // ).map((doc) => doc.id);
+    const [documents] = await this.documentRepository.getDocuments({
+      statuses: Object.values(DocumentStatus).filter(
+        (s) => s.includes('FAILED') || s.includes('CANCELLED'),
+      ), username: retriedBy});
+
+    const documentIds = documents.map(d => d.id);
     await this.retryDocuments({ documentIds, retriedBy });
   }
 
   // Cancel on process queue documents
   async cancelWaitingDocumentsInQueue(cancelledBy: string): Promise<void> {
-    const documentIds = (
-      await this.documentRepository.getDocuments({
-        statuses: [
-          DocumentStatus.UPLOADED,
-          DocumentStatus.ENCODING,
-          DocumentStatus.CHECKING,
-          DocumentStatus.RETRYING,
-          DocumentStatus.APPROVED,
-          DocumentStatus.CHECKING_APPROVED,
-        ],
-        username: cancelledBy,
-      })
-    ).map((doc) => doc.id);
+    const [documents] = await this.documentRepository.getDocuments({
+      statuses: [
+        DocumentStatus.UPLOADED,
+        DocumentStatus.ENCODING,
+        DocumentStatus.CHECKING,
+        DocumentStatus.RETRYING,
+        DocumentStatus.APPROVED,
+        DocumentStatus.CHECKING_APPROVED,
+      ],
+      username: cancelledBy,
+    });
+
+    const documentIds = documents.map(d => d.id);
     await this.cancelDocuments({ documentIds, cancelledBy });
   }
 

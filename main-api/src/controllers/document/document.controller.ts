@@ -91,16 +91,21 @@ export class DocumentController {
       currentUserLogIn,
     }
 
-    response.count = await this.documentRepository.count(documentsDto);
-    response.data = await this.documentRepository.getDocuments(documentsDto);
+    const [document, count] = await this.documentRepository.getDocuments(documentsDto);
 
     if(currentUserRole === Role.REVIEWER)
     {
-      const reviewerDocuments = response.data.filter(i => i.userUsername === currentUserLogIn || i.status.includes(DocumentStatus.DISAPPROVED));
+      const reviewerDocuments = document.filter(i => i.userUsername === currentUserLogIn || i.status.includes(DocumentStatus.DISAPPROVED));
       response.data = reviewerDocuments;
-    }
+      response.count = reviewerDocuments.length;
 
-    return response;
+      return response;
+    } else {
+      response.data = document;
+      response.count = count;
+  
+      return response;
+    }
   }
 
   // Upload Documents

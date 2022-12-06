@@ -31,21 +31,21 @@ import {
   ReplaceFileParam,
 } from './document.params';
 import { ENCODER_RESTRICTION } from 'src/core';
-import { COUNT_MIGRATED_DOCUMENTS } from './document.queries';
+import { COUNT_MIGRATED_DOCUMENTS, FIND_DOCUMENTS } from './document.queries';
 
 @EntityRepository()
 export class DocumentRepository {
   constructor(private readonly manager: EntityManager) {}
 
-  async getDocuments(param: GetDocumentsParam): Promise<Document[]> {
+  async getDocuments(param: GetDocumentsParam): Promise<[Document[], number]> {
     const { search = '', documentType, statuses, username, from, to, currentUserRole, currentUserLogIn } = param;
-    let whereDocumentType: { documentType: FindOperator<string> };
+    // let whereDocumentType: { documentType: FindOperator<string> };
     let whereStatusIn: { status: FindOperator<DocumentStatus> };
     let whereUsername: { username: string };
     let whereModifiedDate: { modifiedDate: FindOperator<Date> };
 
     let statusesFilter: DocumentStatus[] = [];
-    let document: Document[] = [];
+    let document: [Document[], number];
     const relations = ['user', 'documentHistories'];
 
     if(currentUserRole == Role.ENCODER)
@@ -53,11 +53,11 @@ export class DocumentRepository {
     else statusesFilter = statuses;
 
 
-    if (documentType && documentType !== '') {
-      whereDocumentType = {
-        documentType: ILike(`%${documentType}%`),
-      };
-    }
+    // if (documentType && documentType !== '') {
+    //   whereDocumentType = {
+    //     documentType: ILike(`%${documentType}%`),
+    //   };
+    // }
 
     if (statusesFilter && !!statusesFilter.length) {
       whereStatusIn = {
@@ -85,20 +85,20 @@ export class DocumentRepository {
     switch(currentUserRole)
     {
       case Role.ENCODER:
-        document = await this.manager.find(Document, {
+        document = await this.manager.findAndCount(Document, {
           relations,
           where: [
             {
               userUsername: currentUserLogIn,
               documentName: ILike(`%${search}%`),
-              ...whereDocumentType,
+              // ...whereDocumentType,
               ...whereStatusIn,
               ...whereModifiedDate,
             },
             {
               userUsername: currentUserLogIn,
               documentType: ILike(`%${search}%`),
-              ...whereDocumentType,
+              // ...whereDocumentType,
               ...whereStatusIn,
               ...whereModifiedDate,
             },
@@ -109,12 +109,12 @@ export class DocumentRepository {
         });
         break;
       default:
-        document = await this.manager.find(Document, {
+        document = await this.manager.findAndCount(Document, {
           relations,
           where: [
             {
               documentName: ILike(`%${search}%`),
-              ...whereDocumentType,
+              // ...whereDocumentType,
               ...whereStatusIn,
               user: {
                 ...whereUsername,
@@ -123,7 +123,7 @@ export class DocumentRepository {
             },
             {
               documentType: ILike(`%${search}%`),
-              ...whereDocumentType,
+              // ...whereDocumentType,
               ...whereStatusIn,
               user: {
                 ...whereUsername,
@@ -138,6 +138,85 @@ export class DocumentRepository {
         break;
     }
     return document;
+  }
+
+  async getDocumentsRawQuery(param: GetDocumentsParam): Promise<Document[]> {
+    const queryConditions: string[] = [];
+    const queryParams: (string | number | Date)[] = [];
+    console.log(param);
+
+    if(param.currentUserRole !== Role.ADMIN)
+    {
+      if (!!param.currentUserLogIn) {
+        queryConditions.push(
+          `d.userUsername = @${queryParams.length}`,
+        );
+        queryParams.push(param.currentUserLogIn);
+      }
+    }
+
+    if(param.username)
+    {
+      queryConditions.push(`d.userUsername = @${queryParams.length}`);
+      queryParams.push(`%${param.username}%`);
+    }
+
+    if (!!param.search) {
+      queryConditions.push(`d.documentType LIKE @${queryParams.length} OR d.documentName LIKE @${queryParams.length}`);
+      queryParams.push(`%${param.search}%`);
+    }
+
+    if (typeof param.statuses === 'string') {
+      queryConditions.push(`status = @${queryParams.length}`);
+      queryParams.push(param.statuses);
+    } else if (param.statuses instanceof Array && !!param.statuses.length) {
+      let escapeParams = '';
+      param.statuses.forEach((status) => {
+        escapeParams += `@${queryParams.length}, `;
+        queryParams.push(status);
+      });
+      queryConditions.push(
+        `d.status IN(${escapeParams.substring(
+          0,
+          escapeParams.length - 2,
+        )})`,
+      );
+    }
+
+    if (!!param.from) {
+      queryConditions.push(
+        `d.modifiedDate BETWEEN @${queryParams.length} AND @${
+          queryParams.length + 1
+        }`,
+      );
+      const dateTo = moment(!!param.to ? param.to : param.from)
+        .add(1, 'day')
+        .add(-1, 'millisecond')
+        .toDate();
+      queryParams.push(param.from, dateTo);
+    }
+
+    let sql = FIND_DOCUMENTS;
+
+    if (!!queryConditions.length) {
+      sql += `\nWHERE ${queryConditions.join(' AND ')}`;
+    }
+
+    sql += '\nORDER BY d.modifiedDate DESC';
+
+    if (param.skip !== undefined && param.take !== undefined) {
+      sql += `\nOFFSET @${queryParams.length} ROWS FETCH NEXT @${
+        queryParams.length + 1
+      } ROWS ONLY`;
+      queryParams.push(param.skip, param.take);
+    }
+
+    sql += ';';
+
+    console.log(sql);
+    console.log(queryParams);
+
+    return await this.manager.query(sql, queryParams);
   }
 
   async findDocumentsByIds(documentIds: number[]): Promise<Document[]> {
@@ -283,19 +362,23 @@ export class DocumentRepository {
           },
         };
 
+        let thirdCondition: CountFilterProp = {status: In([DocumentStatus.DISAPPROVED])}
+
+        if(currentUserRole === Role.REVIEWER)
+          countFilters.push(thirdCondition);
+
         countFilters.push(firstCondtion, secondCondition,
         );
-        let documentCount: Document[] = [];
-        documentCount = await this.manager.find(Document, {
+        document = await this.manager.count(Document, {
           relations: ['user'],
           where: countFilters,
         });
 
-        if(currentUserRole === Role.REVIEWER) {
-          const data = documentCount.filter(i => i.userUsername === currentUserLogIn || i.status.includes(DocumentStatus.DISAPPROVED));
-          document = data.length;
-        }
-        else document = documentCount.length;
+        // if(currentUserRole === Role.REVIEWER) {
+        //   const data = documentCount.filter(i => i.userUsername === currentUserLogIn || i.status.includes(DocumentStatus.DISAPPROVED));
+        //   document = data.length;
+        // }
+        // else document = documentCount.length;
         break;
     }
 
@@ -305,7 +388,6 @@ export class DocumentRepository {
   async countDocuments(param: GetDocumentsParam): Promise<number> {
     const queryConditions: string[] = [];
     const queryParams: (string | number)[] = [];
-
 
     if(param.currentUserRole !== Role.ADMIN)
     {
@@ -338,6 +420,13 @@ export class DocumentRepository {
 
     if (!!queryConditions.length) {
       sql += `\nWHERE ${queryConditions.join(' AND ')}`;
+    }
+
+    if(param.currentUserRole === Role.REVIEWER && param.statuses.includes(DocumentStatus.DISAPPROVED))
+    {
+      sql += ` OR status IN(@${queryParams.length}, @${queryParams.length + 1})`
+      queryParams.push(DocumentStatus.DISAPPROVED);
+      queryParams.push(DocumentStatus.CHECKING_DISAPPROVED);
     }
 
     sql += ';';
