@@ -257,15 +257,6 @@ export const HomePage = (): ReactElement => {
             Delete
           </Button>
         )}
-        <Col className='d-flex justify-content-end mb-2'>
-          <Button
-            className="px-2"
-            variant="outline-secondary"
-            onClick={collectFilter}
-          >
-            Filter
-          </Button>
-        </Col>
       </Stack>
       <Row className="my-2">
         <Col className="mb-2" xs={12} lg={2}>
@@ -305,6 +296,15 @@ export const HomePage = (): ReactElement => {
               onChange={setSelectedUserFilter}
             />
           )}
+        </Col>
+        <Col className='justify-content-end mb-2'>
+          <Button
+            className="px-2"
+            variant="outline-secondary"
+            onClick={collectFilter}
+          >
+            Filter
+          </Button>
         </Col>
       </Row>
       
